@@ -1,5 +1,6 @@
 #include <sourcemod>
 #include <cstrike>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
@@ -7,44 +8,53 @@
 
 new Handle:s_tag;
 new Handle:s_admin;
-
-new v_level;
 new admin_tag;
 
 new String:tag[PLATFORM_MAX_PATH + 1];
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature VIP Tag",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.3",
 	description = "Give VIP's a VIP Tag",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+
+	STAMM_AddFeature("VIP Tag", "", true, false);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	s_tag = CreateConVar("tag_text", "*VIP*", "Stamm Tag");
-	s_admin = CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
+	AutoExecConfig_SetFile("stamm/features/tag");
+
+	s_tag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
+	s_admin = AutoExecConfig_CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
 	
 	AutoExecConfig(true, "tag", "stamm/features");
+
+	AutoExecConfig_CleanFile();
 	
 	HookEvent("player_spawn", eventPlayerSpawn);
+}
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:description[64];
+	
+	Format(description, sizeof(description), "%T", "GetTag", LANG_SERVER, tag);
+	
+	STAMM_AddFeatureText(STAMM_GetLevel(), description);
 }
 
 public OnConfigsExecuted()
@@ -53,21 +63,7 @@ public OnConfigsExecuted()
 	admin_tag = GetConVarInt(s_admin);
 }
 
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetTag", LANG_SERVER, tag);
-	
-	v_level = AddStammFeature(basename, "VIP Tag", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetTag", LANG_SERVER, tag);
-	AddStammFeatureInfo(basename, v_level, description);
-}
-
-public OnStammClientReady(client)
+public STAMM_OnClientReady(client)
 {
 	NameCheck(client);
 }
@@ -77,7 +73,8 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 	new userid = GetEventInt(event, "userid");
 	new client = GetClientOfUserId(userid);
 	
-	if (IsStammClientValid(client)) NameCheck(client);
+	if (STAMM_IsClientValid(client)) 
+		NameCheck(client);
 }
 
 
@@ -89,7 +86,7 @@ public NameCheck(client)
 	
 	if (StrContains(name, tag) != -1)
 	{
-		if (!IsClientVip(client, v_level))
+		if (!STAMM_IsClientVip(client, STAMM_GetLevel()))
 		{
 			ReplaceString(name, sizeof(name), tag, "");
 			CS_SetClientClanTag(client, name);
@@ -97,9 +94,10 @@ public NameCheck(client)
 	}
 	else
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename)) 
+		if (STAMM_HaveClientFeature(client)) 
 		{
-			if (admin_tag || (!admin_tag && !IsClientStammAdmin(client))) CS_SetClientClanTag(client, tag);
+			if (admin_tag || (!admin_tag && !STAMM_IsClientAdmin(client))) 
+				CS_SetClientClanTag(client, tag);
 		}
 	}
 }

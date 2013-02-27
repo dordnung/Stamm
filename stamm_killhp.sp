@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
@@ -6,42 +7,49 @@
 
 new hp;
 new mhp;
-new v_level;
 
 new Handle:c_hp;
 new Handle:m_hp;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature KillHP",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Give VIP's HP every kill",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	
+	STAMM_LoadTranslation();
+		
+	STAMM_AddFeature("VIP KillHP", "");
+}
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:description[64];
+	
+	Format(description, sizeof(description), "%T", "GetKillHP", LANG_SERVER, hp);
+	
+	STAMM_AddFeatureText(STAMM_GetLevel(), description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
+	AutoExecConfig_SetFile("stamm/features/killhp");
+
 	HookEvent("player_death", PlayerDeath);
 	
-	c_hp = CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
-	m_hp = CreateConVar("killhp_max", "100", "Max HP of a player");
+	c_hp = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
+	m_hp = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
 	
 	AutoExecConfig(true, "killhp", "stamm/features");
+	AutoExecConfig_CleanFile();
 }
 
 public OnConfigsExecuted()
@@ -55,29 +63,16 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
 	
-	if (IsStammClientValid(client) && IsStammClientValid(attacker))
+	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
-		if (IsClientVip(attacker, v_level) && ClientWantStammFeature(attacker, basename))
+		if (STAMM_HaveClientFeature(attacker))
 		{
 			new newHP = GetClientHealth(attacker) + hp;
 			
-			if (newHP >= mhp) newHP = mhp;
+			if (newHP >= mhp) 
+				newHP = mhp;
 			
 			SetEntityHealth(attacker, newHP);
 		}
 	}
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[256];
-	
-	Format(description, sizeof(description), "%T", "GetKillHP", LANG_SERVER, hp);
-	
-	v_level = AddStammFeature(basename, "VIP KillHP", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetKillHP", LANG_SERVER, hp);
-	AddStammFeatureInfo(basename, v_level, description);
 }

@@ -1,18 +1,15 @@
 #include <sourcemod>
 #include <sdktools>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
 #pragma semicolon 1
 
-new v_level;
-
 new Float:lifetime;
 
 new bool:haveBeam[MAXPLAYERS+1];
 new Float:PlayerVector[MAXPLAYERS+1][3];
-
-new String:basename[64];
 
 new Handle:c_lifeTime;
 
@@ -20,34 +17,40 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature PlayerTrail",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Give VIP's a player trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:description[64];
+
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (GetStammGame() != GameCSS) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() != GameCSS) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetPlayerTrail", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP PlayerTrail", description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_disconnect", eventPlayerDisc);
 	HookEvent("player_death", eventPlayerDeath);
+
+	AutoExecConfig_SetFile("stamm/features/playertrail");
 	
-	c_lifeTime = CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element");
+	c_lifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element");
 	
 	AutoExecConfig(true, "playertrail", "stamm/features");
+	AutoExecConfig_CleanFile();
 }
 
 public OnConfigsExecuted()
@@ -57,34 +60,22 @@ public OnConfigsExecuted()
 	PrecacheModel("materials/sprites/laserbeam.vmt", true);
 }
 
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetPlayerTrail", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP PlayerTrail", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetPlayerTrail", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
-}
-
 public OnMapStart()
 {
-	for (new i = 1; i <= MaxClients; i++) haveBeam[i] = false;
+	for (new i = 1; i <= MaxClients; i++) 
+		haveBeam[i] = false;
 }
 
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
-			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) CreateTimer(2.5, SetupTrail, client);
+			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
+				CreateTimer(2.5, SetupTrail, client);
 		}
 	}
 }
@@ -105,7 +96,7 @@ public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroad
 
 public Action:SetupTrail(Handle:timer, any:client)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
 		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 		{
@@ -118,14 +109,15 @@ public Action:SetupTrail(Handle:timer, any:client)
 	}
 }
 
-public OnClientChangeStammFeature(client, String:base[], mode)
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
-	if (StrEqual(basename, base) && mode == 0) haveBeam[client] = false;
+	if (!mode) 
+		haveBeam[client] = false;
 }
 
 public Action:CreateTrail(Handle:timer, any:client)
 {
-	if (IsStammClientValid(client) && haveBeam[client])
+	if (STAMM_IsClientValid(client) && haveBeam[client])
 	{
 		new ent = CreateEntityByName("env_beam");
 
@@ -144,8 +136,13 @@ public Action:CreateTrail(Handle:timer, any:client)
 			SetEntPropVector(ent, Prop_Data, "m_vecEndPos", Orig);
 			
 			DispatchKeyValue(ent, "targetname", "beam");
-			if (GetClientTeam(client) == 2) DispatchKeyValue(ent, "rendercolor", "255 0 0");
-			if (GetClientTeam(client) == 3) DispatchKeyValue(ent, "rendercolor", "0 0 255");
+			
+			if (GetClientTeam(client) == 2) 
+				DispatchKeyValue(ent, "rendercolor", "255 0 0");
+				
+			if (GetClientTeam(client) == 3) 
+				DispatchKeyValue(ent, "rendercolor", "0 0 255");
+				
 			DispatchKeyValue(ent, "renderamt", "100");
 			
 			DispatchSpawn(ent);
@@ -161,7 +158,8 @@ public Action:CreateTrail(Handle:timer, any:client)
 			CreateTimer(lifetime, DeleteTrail, ent);
 		}
 	}
-	else return Plugin_Stop;
+	else 
+		return Plugin_Stop;
 	
 	return Plugin_Continue;
 }
@@ -170,10 +168,11 @@ public Action:DeleteTrail(Handle:timer, any:ent)
 {
 	if (IsValidEntity(ent))
 	{
-		new String:class[128];
+		decl String:class[128];
 		
 		GetEdictClassname(ent, class, sizeof(class));
 		
-		if (StrEqual(class, "env_beam")) RemoveEdict(ent);
+		if (StrEqual(class, "env_beam")) 
+			RemoveEdict(ent);
 	}
 }

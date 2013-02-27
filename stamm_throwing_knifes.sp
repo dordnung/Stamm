@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <cssthrowingknives>
@@ -7,41 +8,51 @@
 
 new Handle:c_throwingknife;
 
-new v_level;
-
 new throwingknife;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Throwing Knife",
-	author = "Popoklopsi/Bara",
-	version = "1.2",
+	author = "Popoklopsi",
+	version = "1.3",
 	description = "Give VIP's every Round x Throwing Knifes",
-	url = "www.pupboard.de"
+	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
-	if (!LibraryExists("cssthrowingknives")) SetFailState("Can't Load Feature, Throwing Knifes is not installed!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+		
+	if (!LibraryExists("cssthrowingknives")) 	
+		SetFailState("Can't Load Feature, Throwing Knifes is not installed!");
 	
-	if (GetStammGame() != GameCSS) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() != GameCSS) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
+	STAMM_AddFeature("VIP Throwing Knife", "");
+}
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:description[64];
+	
+	Format(description, sizeof(description), "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
+	
+	STAMM_AddFeatureText(STAMM_GetLevel(), description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	c_throwingknife = CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
+	AutoExecConfig_SetFile("stamm/features/throwing_knifes");
+
+	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
 	
 	AutoExecConfig(true, "throwing_knifes", "stamm/features");
+
+	AutoExecConfig_CleanFile();
 	
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
@@ -51,23 +62,10 @@ public OnConfigsExecuted()
 	throwingknife = GetConVarInt(c_throwingknife);
 }
 
-public OnStammReady()
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
-	
-	v_level = AddStammFeature(basename, "VIP Throwing Knife", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetThrowingKnife", LANG_SERVER, throwingknife);
-	AddStammFeatureInfo(basename, v_level, description);
-}
-
-public OnClientChangeStammFeature(client, String:base[], mode)
-{
-	if (mode == 0) SetClientThrowingKnives(client, 0);
+	if (!mode) 
+		SetClientThrowingKnives(client, 0);
 }
 
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
@@ -79,13 +77,14 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 public Action:SetKnifes(Handle:timer, any:client)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
 		SetClientThrowingKnives(client, 0);
 		
-		if (ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
-			if (IsClientVip(client, v_level) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) SetClientThrowingKnives(client, throwingknife);
+			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
+				SetClientThrowingKnives(client, throwingknife);
 		}
 	}
 }

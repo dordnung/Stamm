@@ -1,56 +1,37 @@
-#pragma semicolon 1
 #include <sourcemod>
+#include <sdkhooks>
 
 #undef REQUIRE_PLUGIN 
-#include <sdkhooks>
 #include <stamm>
 
-new v_level;
-
-new String:basename[64];
+#pragma semicolon 1
 
 #define DMG_FALL   (1 << 5)
-
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Fall Damage",
-	author = "Franc1sco steam: franug",
-	version = "1.0",
+	author = "Popoklopsi",
+	version = "1.1",
 	description = "Give VIP's No Fall Damage",
-	url = "www.servers-cfg.foroactivo.com"
+	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
-	if (!LibraryExists("sdkhooks")) SetFailState("Can't Load Feature, SDKHooks is not installed!");
+	decl String:description[64];
 	
-	if (GetStammGame() != GameCSS) SetFailState("Can't Load Feature, not Supported for your game!");
-}
-
-public OnPluginStart()
-{
-	new Handle:myPlugin = GetMyHandle();
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+		
+	if (!LibraryExists("sdkhooks")) 
+		SetFailState("Can't Load Feature, SDKHooks is not installed!");
 	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
+	STAMM_LoadTranslation();
+		
 	Format(description, sizeof(description), "%T", "GetNoFallDamage", LANG_SERVER);
 	
-	v_level = AddStammFeature(basename, "VIP No Fall Damage", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetNoFallDamage", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
+	STAMM_AddFeature("VIP No Fall Damage", description);
 }
 
 public OnClientPutInServer(client)
@@ -60,18 +41,17 @@ public OnClientPutInServer(client)
 
 public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
-			if (IsClientVip(client, v_level) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
+			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 			{
 				if (damagetype & DMG_FALL)
-				{
 					return Plugin_Handled;
-				}
 			}
 		}
 	}
+	
 	return Plugin_Continue;
 }

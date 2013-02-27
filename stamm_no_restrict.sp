@@ -5,60 +5,45 @@
 
 #pragma semicolon 1
 
-new v_level;
-
-new String:basename[64];
-
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Restrict",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "VIP's can use restricted weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
-	if (!LibraryExists("weaponrestrict")) SetFailState("Can't Load Feature, Restrict is not installed!");
+	decl String:description[64];
 	
-	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
-}
-
-public OnPluginStart()
-{
-	new Handle:myPlugin = GetMyHandle();
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+		
+	if (!LibraryExists("weaponrestrict")) 
+		SetFailState("Can't Load Feature, Weapon Restrict is not installed!");
 	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
+	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
 	Format(description, sizeof(description), "%T", "GetNoRestrict", LANG_SERVER);
 	
-	v_level = AddStammFeature(basename, "VIP No Restrict", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetNoRestrict", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
+	STAMM_AddFeature("VIP No Restrict", description);
 }
 
 public Action:Restrict_OnCanBuyWeapon(client, team, WeaponID:id, &CanBuyResult:result)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
 			if (result != CanBuy_Allow)
 			{
 				result = CanBuy_Allow;
+				
 				return Plugin_Changed;
 			}
 		}
@@ -69,13 +54,14 @@ public Action:Restrict_OnCanBuyWeapon(client, team, WeaponID:id, &CanBuyResult:r
 
 public Action:Restrict_OnCanPickupWeapon(client, team, WeaponID:id, &bool:result)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
 			if (result != true)
 			{
 				result = true;
+				
 				return Plugin_Changed;
 			}
 		}

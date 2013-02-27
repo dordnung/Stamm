@@ -1,13 +1,10 @@
 #include <sourcemod>
 #include <sdktools>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
 #pragma semicolon 1
-
-new v_level;
-
-new String:basename[64];
 
 new Handle:colors_c;
 new Handle:mode_smoke_c;
@@ -19,31 +16,37 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Colored Smokes",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Give VIP's colored smokes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:description[64];
 	
-	if (GetStammGame() != GameCSS) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	
+	if (STAMM_GetGame() != GameCSS) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetColoredSmokes", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP Colored Smokes", description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	mode_smoke_c = CreateConVar("smoke_mode", "0", "The Mode: 0=Team Colors, 1=Random, 2=Party, 3=Custom");
-	colors_c = CreateConVar("smoke_color", "255 255 255", "When mode = 3: RGB colors of the smoke");
+	AutoExecConfig_SetFile("stamm/features/colored_smokes");
+
+	mode_smoke_c = AutoExecConfig_CreateConVar("smoke_mode", "0", "The Mode: 0=Team Colors, 1=Random, 2=Party, 3=Custom");
+	colors_c = AutoExecConfig_CreateConVar("smoke_color", "255 255 255", "When mode = 3: RGB colors of the smoke");
 	
 	AutoExecConfig(true, "colored_smokes", "stamm/features");
+	AutoExecConfig_CleanFile();
 	
 	HookEvent("smokegrenade_detonate", eventHeDetonate);
 }
@@ -51,33 +54,20 @@ public OnPluginStart()
 public OnConfigsExecuted()
 {
 	mode_smoke = GetConVarInt(mode_smoke_c);
+	
 	GetConVarString(colors_c, colors, sizeof(colors));
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetColoredSmokes", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP Colored Smokes", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetColoredSmokes", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
 }
 
 public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
 			new Float:origin[3];
-			new String:sBuffer[64];
+			decl String:sBuffer[64];
 			
 			origin[0] = GetEventFloat(event, "x");
 			origin[1] = GetEventFloat(event, "y");
@@ -93,8 +83,10 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 					{
 						new team = GetClientTeam(client);
 						
-						if (team == 2) DispatchKeyValue(ent_light, "_light", "255 0 0");
-						else if (team == 3) DispatchKeyValue(ent_light, "_light", "0 0 255");
+						if (team == 2) 
+							DispatchKeyValue(ent_light, "_light", "255 0 0");
+						else if (team == 3) 
+							DispatchKeyValue(ent_light, "_light", "0 0 255");
 					}
 					case 1:
 					{
@@ -136,7 +128,8 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 
 public Action:PartyLight(Handle:timer, any:light)
 {
-	if (!IsValidEntity(light)) return Plugin_Stop;
+	if (!IsValidEntity(light)) 
+		return Plugin_Stop;
 	
 	decl String:sBuffer[64];
 				
@@ -154,10 +147,11 @@ public Action:delete(Handle:timer, any:light)
 {
 	if (IsValidEntity(light))
 	{
-		new String:class[128];
+		decl String:class[128];
 		
 		GetEdictClassname(light, class, sizeof(class));
 		
-		if (StrEqual(class, "light_dynamic")) RemoveEdict(light);
+		if (StrEqual(class, "light_dynamic")) 
+			RemoveEdict(light);
 	}
 } 

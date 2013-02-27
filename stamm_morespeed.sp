@@ -1,99 +1,89 @@
 #include <sourcemod>
 #include <sdktools>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
 #pragma semicolon 1
 
-new speed;
-
+new pspeed;
 new Handle:c_speed;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreSpeed",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Give VIP's more speed",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	
+	STAMM_LoadTranslation();
+	STAMM_AddFeature("VIP MoreSpeed", "");
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
 	HookEvent("player_spawn", PlayerSpawn);
+
+	AutoExecConfig_SetFile("stamm/features/morespeed");
 	
-	c_speed = CreateConVar("speed_increase", "20", "Speed increase in percent each level!");
+	c_speed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
 	
 	AutoExecConfig(true, "morespeed", "stamm/features");
+	AutoExecConfig_CleanFile();
+}
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:haveDescription[64];
+	
+	for (new i=1; i <= STAMM_GetBlockCount(); i++)
+	{
+		Format(haveDescription, sizeof(haveDescription), "%T", "GetMoreSpeed", LANG_SERVER, pspeed * i);
+		
+		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+	}
 }
 
 public OnConfigsExecuted()
 {
-	speed = GetConVarInt(c_speed);
+	pspeed = GetConVarInt(c_speed);
 }
 
 public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client) && IsPlayerAlive(client))
-	{
-		if (IsClientVip(client, 1) && ClientWantStammFeature(client, basename))
-		{
-			new Float:newSpeed;
-			
-			newSpeed = 1.0 + float(speed)/100.0 * GetClientStammLevel(client);
-			
-			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
-		}
-		else SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
-	}
+	STAMM_OnClientChangedFeature(client, true);
 }
 
-public OnClientChangeStammFeature(client, String:base[], mode)
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
-	if (IsStammClientValid(client) && StrEqual(basename, base))
+	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
-		if (mode == 1 && IsClientVip(client, 1))
+		if (mode)
 		{
-			new Float:newSpeed;
-			
-			newSpeed = 1.0 + float(speed)/100.0 * GetClientStammLevel(client);
-			
-			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
+			for (new i=STAMM_GetBlockCount(); i > 0; i--)
+			{
+				if (STAMM_HaveClientFeature(client, i))
+				{
+					new Float:newSpeed;
+					
+					newSpeed = 1.0 + float(pspeed)/100.0 * i;
+					
+					SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
+
+					break;
+				}
+			}
 		}
-		
-		if (mode == 0) SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
-	}
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[256];
-	
-	Format(description, sizeof(description), "%T", "GetMoreSpeed", LANG_SERVER, speed);
-	
-	AddStammFeature(basename, "VIP MoreSpeed", description);
-
-	for (new i=1; i <= GetStammLevelCount(); i++)
-	{
-		Format(description, sizeof(description), "%T", "YouGetMoreSpeed", LANG_SERVER, speed * i);
-		AddStammFeatureInfo(basename, i, description);
+		else
+			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 	}
 }

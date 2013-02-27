@@ -44,7 +44,7 @@ enum StammType
  *
  * @param level			Level needed for your feature.
  */
-forward STAMM_OnFeatureLoaded(level);
+forward STAMM_OnFeatureLoaded(String:basename[]);
 
 /**
  * Executes when a player becomes VIP
@@ -73,7 +73,7 @@ forward STAMM_OnClientReady(client);
 forward STAMM_OnSaveClient(client);
 
 /**
- * Executes when a player switched the Feature on/off
+ * Executes when a player switched your feature on or off
  *
  * @param client		Client.
  * @param mode			true = Switched on, false = Switched off.
@@ -89,6 +89,15 @@ forward STAMM_OnClientChangedFeature(client, bool:mode);
 forward STAMM_OnClientGetPoints(client, number);
 
 /**
+ * Executes before a player gets Stamm Points (Only for added features)
+ *
+ * @param client		Client.
+ * @param number		The number of points, the player gets.
+ * @return  			Plugin_Continue, Plugin_Changed to give points, anything else to prevent it.
+ */
+forward Action:STAMM_OnClientGetPoints_PRE(client, &number);
+
+/**
  * Executes when Happy Hour starts
  *
  * @param time			runtime in seconds 
@@ -102,7 +111,6 @@ forward STAMM_OnHappyHourStart(time, factor);
  */
 forward STAMM_OnHappyHourEnd();
 
-
 /**
  * Adds a new Stamm Feature
  *
@@ -115,7 +123,7 @@ forward STAMM_OnHappyHourEnd();
 native STAMM_AddFeature(String:name[], String:description[], bool:allowChange=true, bool:standard=true);
 
 /**
- * Adds information about what a player get on his level with this feature (will be shown in the !sme list)
+ * Adds information about what a player gets on a specific level with this feature (will be shown in the !sme list)
  *
  * @param level			The level, 0=No VIP, x=Level
  * @param description	What a player get on this level.
@@ -129,16 +137,39 @@ native bool:STAMM_AddFeatureText(level, String:description[]);
  * @param basename		Basename to look for.
  * @return				true = your feature, false = other feature.
  */
-native bool:STAMM_IsFeature(String:basename[]);
+native bool:STAMM_IsMyFeature(String:basename[]);
 
 /**
- * Returns the basename for this Plugin
+ * Returns the basename for your Plugin
  *
  * @param basename		String to store basename in.
  * @param size			Size of the basename.
  * @noreturn
  */
 native STAMM_GetBasename(String:basename[], size);
+
+/**
+ * Returns the level a block needs in this Feature
+ *
+ * @param block			Block to search for.
+ * @return 				The level.
+ */
+native STAMM_GetLevel(block=1);
+
+/**
+ * Returns the number of a block by name
+ *
+ * @param name 			The name.
+ * @return 				The block number.
+ */
+native STAMM_GetBlockOfName(String:name[]);
+
+/**
+ * Returns the number of blocks found in LevelSettings
+ *
+ * @return 				The blocks.
+ */
+native STAMM_GetBlockCount();
 
 /**
  * Return the Number of a clients level
@@ -165,6 +196,14 @@ native STAMM_GetClientPoints(client);
  * @return				false on error, true on success
  */
 native bool:STAMM_GetLevelName(level, String:name[], maxlength);
+
+/**
+ * Return whether the level is private or not
+ *
+ * @param level			x = Level.
+ * @return				true=pivate, false=point based
+ */
+native STAMM_IsLevelPrivate(level);
 
 /**
  * Return the number of a specific Level
@@ -222,6 +261,15 @@ native bool:STAMM_AddClientPoints(client, number);
 native bool:STAMM_DelClientPoints(client, number);
 
 /**
+ * Set Points of a player
+ *
+ * @param client		Client.
+ * @param number		Number of Points to set.
+ * @return				true = Success, false = Fail
+ */
+native bool:STAMM_SetClientPoints(client, number);
+
+/**
  * Return true when the specific player is VIP, otherwise false
  *
  * @param client		Client.
@@ -237,7 +285,7 @@ native bool:STAMM_IsClientVip(client, type, bool:min=true);
  * @param client		Client.
  * @return				true if allowed, otherwise false.
  */
-native bool:STAMM_HaveClientFeature(client);
+native bool:STAMM_HaveClientFeature(client, block=1);
 
 /**
  * Return true when the specific player is complete loaded by Stamm, otherwise false
@@ -256,19 +304,19 @@ native bool:STAMM_IsClientValid(client);
 native bool:STAMM_IsClientAdmin(client);
 
 /**
- * Return true when stamm is fully loaded.
- *
- * @return				true if yes, otherwise false.
- */
-native bool:STAMM_IsLoaded();
-
-/**
  * Return true when the specific player enabled this feature, false otherwise
  *
  * @param client		Client.
  * @return				true if the player wants, otherwise false.
  */
 native bool:STAMM_WantClientFeature(client);
+
+/**
+ * Return true when stamm is fully loaded.
+ *
+ * @return				true if yes, otherwise false.
+ */
+native bool:STAMM_IsLoaded();
 
 /**
  * Starts Happy Hour
@@ -306,15 +354,16 @@ native STAMM_UnloadFeature(Handle:plugin);
 /**
  * Logs a Message to the Stamm Log File
  *
+ * @param debug		  Write to debug, or normal log file
  * @param fmt         Format string.
  * @param ...         Format arguments.
  *
  * @noreturn
  */
-native STAMM_WriteToLog(const String:fmt[], any:...);
+native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 
 /**
- * Load the translation file of your feature in Stamm/languages
+ * Load the translation file of your feature in stamm/languages
  *
  * @noreturn
  */
@@ -324,7 +373,7 @@ stock STAMM_LoadTranslation()
 	
 	STAMM_GetBasename(basename, sizeof(basename));
 	
-	Format(basename, sizeof(basename), "Stamm/%s", basename);
+	Format(basename, sizeof(basename), "stamm/%s", basename);
 	
 	LoadTranslations(basename);
 }
@@ -345,11 +394,14 @@ public __pl_stamm_SetNTVOptional()
 {
 	MarkNativeAsOptional("STAMM_AddFeature");
 	MarkNativeAsOptional("STAMM_AddFeatureText");
-	MarkNativeAsOptional("STAMM_IsFeature");
+	MarkNativeAsOptional("STAMM_IsMyFeature");
+	MarkNativeAsOptional("STAMM_GetLevel");
+	MarkNativeAsOptional("STAMM_GetBlockCount");
 	MarkNativeAsOptional("STAMM_GetBasename");
 	MarkNativeAsOptional("STAMM_GetClientPoints");
 	MarkNativeAsOptional("STAMM_GetClientLevel");
 	MarkNativeAsOptional("STAMM_GetLevelName");
+	MarkNativeAsOptional("STAMM_IsLevelPrivate");
 	MarkNativeAsOptional("STAMM_GetLevelNumber");
 	MarkNativeAsOptional("STAMM_GetLevelPoints");
 	MarkNativeAsOptional("STAMM_GetLevelCount");
@@ -357,6 +409,7 @@ public __pl_stamm_SetNTVOptional()
 	MarkNativeAsOptional("STAMM_GetGame");
 	MarkNativeAsOptional("STAMM_AddClientPoints");
 	MarkNativeAsOptional("STAMM_DelClientPoints");
+	MarkNativeAsOptional("STAMM_SetClientPoints");
 	MarkNativeAsOptional("STAMM_HaveClientFeature");
 	MarkNativeAsOptional("STAMM_IsClientVip");
 	MarkNativeAsOptional("STAMM_IsClientValid");

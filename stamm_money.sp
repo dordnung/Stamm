@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
@@ -7,41 +8,49 @@
 new Handle:c_cash;
 new Handle:c_max;
 
-new v_level;
 new cash;
-new max;
-
-new String:basename[64];
+new maxm;
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Money",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Give VIP's every Round x Cash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
+	STAMM_AddFeature("VIP Cash", "");
+}
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:description[64];
+	
+	Format(description, sizeof(description), "%T", "GetCash", LANG_SERVER, cash);
+	
+	STAMM_AddFeatureText(STAMM_GetLevel(), description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	c_cash = CreateConVar("money_amount", "2000", "x = Cash, what a VIP gets, when he spawns");
-	c_max = CreateConVar("money_max", "1", "1 = Give not more than the max. Money, 0 = Off");
+	AutoExecConfig_SetFile("stamm/features/cash");
+
+	c_cash = AutoExecConfig_CreateConVar("money_amount", "2000", "x = Cash, what a VIP gets, when he spawns");
+	c_max = AutoExecConfig_CreateConVar("money_max", "1", "1 = Give not more than the max. Money, 0 = Off");
 	
 	AutoExecConfig(true, "cash", "stamm/features");
+	AutoExecConfig_CleanFile();
 	
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
@@ -49,21 +58,7 @@ public OnPluginStart()
 public OnConfigsExecuted()
 {
 	cash = GetConVarInt(c_cash);
-	max = GetConVarInt(c_max);
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetCash", LANG_SERVER, cash);
-	
-	v_level = AddStammFeature(basename, "VIP Cash", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetCash", LANG_SERVER, cash);
-	AddStammFeatureInfo(basename, v_level, description);
+	maxm = GetConVarInt(c_max);
 }
 
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
@@ -71,21 +66,25 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 	new userid = GetEventInt(event, "userid");
 	new client = GetClientOfUserId(userid);
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && ClientWantStammFeature(client, basename))
+		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && STAMM_HaveClientFeature(client))
 		{
 			new OldMoney = GetEntData(client, FindSendPropOffs("CCSPlayer", "m_iAccount"));
 			new NewMoney = cash + OldMoney;
 			
-			if (GetStammGame() == GameCSS && NewMoney > 16000 && max) NewMoney = 16000;
-			if (GetStammGame() == GameCSGO && max)
+			if (STAMM_GetGame() == GameCSS && NewMoney > 16000 && maxm) 
+				NewMoney = 16000;
+				
+			if (STAMM_GetGame() == GameCSGO && maxm)
 			{
 				new MaxMoney = GetConVarInt(FindConVar("mp_maxmoney"));
-				if (NewMoney > MaxMoney) NewMoney = MaxMoney;
+				
+				if (NewMoney > MaxMoney)
+					NewMoney = MaxMoney;
 			}
 			
-			if (IsClientVip(client, v_level)) SetEntData(client, FindSendPropOffs("CCSPlayer", "m_iAccount"), NewMoney);
+			SetEntData(client, FindSendPropOffs("CCSPlayer", "m_iAccount"), NewMoney);
 		}
 	}
 }

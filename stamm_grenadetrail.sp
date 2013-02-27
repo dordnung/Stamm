@@ -11,36 +11,36 @@
 
 #pragma semicolon 1
 
-new v_level;
 new BeamSprite;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature GrenadeTrail",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.3",
 	description = "Give VIP's a grenade trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:description[64];
+
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetGrenadeTrail", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP Grenade Trail", description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
 	HookEvent("weapon_fire", eventWeaponFire);
 }
 
@@ -49,51 +49,31 @@ public OnMapStart()
 	BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
 }
 
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetGrenadeTrail", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP Grenade Trail", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetGrenadeTrail", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
-}
-
 public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
-	new String:weapon[64];
+	decl String:weapon[64];
 	
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (ClientWantStammFeature(client, basename) && IsClientVip(client, v_level))
+		if (STAMM_HaveClientFeature(client))
 		{
 			if (StrEqual(weapon, "hegrenade"))
-			{
 				CreateTimer(0.15, SetupHE, client);
-			}
+
 			else if (StrEqual(weapon, "flashbang"))
-			{
 				CreateTimer(0.15, SetupFlash, client);
-			}
+
 			else if (StrEqual(weapon, "smokegrenade"))
-			{
 				CreateTimer(0.15, SetupSmoke, client);
-			}
+				
 			else if (StrEqual(weapon, "decoy"))
-			{
 				CreateTimer(0.15, SetupDecoy, client);
-			}
+				
 			else if (StrEqual(weapon, "molotov"))
-			{
 				CreateTimer(0.15, SetupMolo, client);
-			}
 		}
 	}
 }

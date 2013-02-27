@@ -6,22 +6,28 @@
 #pragma semicolon 1
 
 new stammview[MAXPLAYERS + 1];
-new v_level;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Icon",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Adds an Stamm Icon on top of a player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:description[64];
+
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetIcon", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP Icon", description);
 }
 
 public OnPluginStart()
@@ -29,53 +35,33 @@ public OnPluginStart()
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_death", eventPlayerDeath);
 	
-	for (new i=0; i <= MaxClients; i++) stammview[i] = 0;
+	for (new i=0; i <= MaxClients; i++) 
+		stammview[i] = 0;
 }
 
-public OnStammReady()
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetIcon", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP Icon", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetIcon", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
-}
-
-public OnClientChangeStammFeature(client, String:base[], mode)
-{
-	if (StrEqual(basename, base))
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsStammClientValid(client))
+		if (!mode)
 		{
-			if (!mode) 
+			if (stammview[client] != 0) 
 			{
-				if (stammview[client] != 0) 
+				if (IsValidEntity(stammview[client]))
 				{
-					if (IsValidEntity(stammview[client]))
-					{
-						new String:class[128];
-						
-						GetEdictClassname(stammview[client], class, sizeof(class));
-						
-						if (StrEqual(class, "prop_dynamic")) RemoveEdict(stammview[client]);
-					}
-					stammview[client] = 0;
+					decl String:class[128];
+					
+					GetEdictClassname(stammview[client], class, sizeof(class));
+					
+					if (StrEqual(class, "prop_dynamic")) 
+						RemoveEdict(stammview[client]);
 				}
+				
+				stammview[client] = 0;
 			}
-			else CreateTimer(2.5, CreateStamm, client);
 		}
+		else if (STAMM_HaveClientFeature(client))
+			CreateTimer(2.5, CreateStamm, client);
 	}
 }
 
@@ -97,11 +83,12 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 {	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
-			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) CreateTimer(2.5, CreateStamm, client);
+			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
+				CreateTimer(2.5, CreateStamm, client);
 		}
 	}
 }
@@ -114,19 +101,21 @@ public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroad
 	{
 		if (IsValidEntity(stammview[client]))
 		{
-			new String:class[128];
+			decl String:class[128];
 			
 			GetEdictClassname(stammview[client], class, sizeof(class));
 			
-			if (StrEqual(class, "prop_dynamic")) RemoveEdict(stammview[client]);
+			if (StrEqual(class, "prop_dynamic")) 
+				RemoveEdict(stammview[client]);
 		}
+		
 		stammview[client] = 0;
 	}
 }
 
 public Action:CreateStamm(Handle:timer, any:client)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
 		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 		{
@@ -134,13 +123,15 @@ public Action:CreateStamm(Handle:timer, any:client)
 			{
 				if (IsValidEntity(stammview[client]))
 				{
-					new String:class[128];
+					decl String:class[128];
 					
 					GetEdictClassname(stammview[client], class, sizeof(class));
 					
-					if (StrEqual(class, "prop_dynamic")) RemoveEdict(stammview[client]);
+					if (StrEqual(class, "prop_dynamic")) 
+						RemoveEdict(stammview[client]);
 				}
 			}
+			
 			new view = CreateEntityByName("prop_dynamic");
 			
 			if (view != -1)
@@ -153,6 +144,7 @@ public Action:CreateStamm(Handle:timer, any:client)
 				if (DispatchSpawn(view))
 				{
 					decl Float:origin[3];
+					decl String:steamid[20];
 					
 					if (IsValidEntity(view))
 					{
@@ -163,8 +155,6 @@ public Action:CreateStamm(Handle:timer, any:client)
 						origin[2] = origin[2] + 90.0;
 						
 						TeleportEntity(view, origin, NULL_VECTOR, NULL_VECTOR);
-						
-						new String:steamid[20];
 						
 						GetClientAuthString(client, steamid, sizeof(steamid));
 						DispatchKeyValue(client, "targetname", steamid);

@@ -1,43 +1,41 @@
 #include <sourcemod>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
 #pragma semicolon 1
 
 new grav;
-
 new Handle:c_grav;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature LessGravity",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "Give VIP's less gravity",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	
+	STAMM_LoadTranslation();
+	STAMM_AddFeature("VIP KnifeInfect", "");
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
 	HookEvent("player_spawn", PlayerSpawn);
+
+	AutoExecConfig_SetFile("stamm/features/lessgravity");
 	
-	c_grav = CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each level!");
+	c_grav = AutoExecConfig_CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each block!");
 	
 	AutoExecConfig(true, "lessgravity", "stamm/features");
+	AutoExecConfig_CleanFile();
 }
 
 public OnConfigsExecuted()
@@ -45,57 +43,49 @@ public OnConfigsExecuted()
 	grav = GetConVarInt(c_grav);
 }
 
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:haveDescription[64];
+	
+	for (new i=1; i <= STAMM_GetBlockCount(); i++)
+	{
+		Format(haveDescription, sizeof(haveDescription), "%T", "GetLessGravity", LANG_SERVER, grav * i);
+		
+		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+	}
+}
+
 public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client) && IsPlayerAlive(client))
-	{
-		if (IsClientVip(client, 1) && ClientWantStammFeature(client, basename))
-		{
-			new Float:newGrav;
-			
-			newGrav = 1.0 - float(grav)/100.0 * GetClientStammLevel(client);
-			
-			if (newGrav < 0.1) newGrav = 0.1;
-			
-			SetEntityGravity(client, newGrav);
-		}
-		else SetEntityGravity(client, 1.0);
-	}
+	STAMM_OnClientChangedFeature(client, true);
 }
 
-public OnClientChangeStammFeature(client, String:base[], mode)
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
-	if (IsStammClientValid(client) && StrEqual(base, basename))
+	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
 		new Float:newGrav;
 		
-		if (mode == 1 && IsClientVip(client, 1))
+		if (mode)
 		{
-			newGrav = 1.0 - float(grav)/100.0 * GetClientStammLevel(client);
-			
-			if (newGrav < 0.1) newGrav = 0.1;
-				
-			SetEntityGravity(client, newGrav);
+			for (new i=STAMM_GetBlockCount(); i > 0; i--)
+			{
+				if (STAMM_HaveClientFeature(client, i))
+				{
+					newGrav = 1.0 - float(grav)/100.0 * i;
+
+					if (newGrav < 0.1) 
+						newGrav = 0.1;
+					
+					SetEntityGravity(client, newGrav);
+
+					break;
+				}
+			}
 		}
-		if (mode == 0) SetEntityGravity(client, 1.0);
-	}
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[256];
-	
-	Format(description, sizeof(description), "%T", "GetLessGravity", LANG_SERVER, grav);
-	
-	AddStammFeature(basename, "VIP LessGravity", description);
-
-	for (new i=1; i <= GetStammLevelCount(); i++)
-	{
-		Format(description, sizeof(description), "%T", "YouGetLessGravity", LANG_SERVER, grav * i);
-		AddStammFeatureInfo(basename, i, description);
+		else
+			SetEntityGravity(client, 1.0);
 	}
 }

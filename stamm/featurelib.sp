@@ -1,98 +1,206 @@
-public featurelib_addFeature(String:basename[], String:name[], String:description[], bool:allowChange)
+#pragma semicolon 1
+
+public featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:allowChange, bool:standard)
 {
-	new String:levelPath[PLATFORM_MAX_PATH + 1];
-	new String:Svalue[128];
+	decl String:basename[64];
+	decl String:levelPath[PLATFORM_MAX_PATH + 1];
+	decl String:Svalue[128];
+	decl String:Svalue2[128];
+
+	new bool:goON = true;
+
 	new value = -1;
-	new mode = -1;
-	
+
+	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
+	GetPluginFilename(plugin, g_FeatureList[g_features][FEATURE_BASEREAL], sizeof(basename));
+
+	ReplaceString(g_FeatureList[g_features][FEATURE_BASEREAL], sizeof(basename), ".smx", "", false);
+
 	for (new i=0; i < g_features; i++)
 	{
-		if (StrEqual(g_FeatureBase[i], basename))
+		if (StrEqual(g_FeatureList[i][FEATURE_BASE], basename, false))
 		{
-			g_FeatureEnable[g_features] = 0;
-			ServerCommand("sm plugins unload stamm/%s", basename);
+			g_FeatureList[i][FEATURE_ENABLE] = 1;
+			g_FeatureList[i][FEATURE_HANDLE] = plugin;
+			g_FeatureList[i][FEATURE_CHANGE] = allowChange;
+			g_FeatureList[i][FEATURE_STANDARD] = standard;
 
-			LogToFile(g_LogFile, "[ STAMM ] Feature %s invalid or duplicated!!", basename);
-			
-			return -1;
+			if (g_pluginStarted)
+				CreateTimer(0.5, featurelib_loadFeatures, i);
+
+			if (g_debug)
+				LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s again", basename);
+
+			return;
 		}
 	}
 	
-	Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_StammFolder, basename);
-	Format(g_FeatureBase[g_features], 64, basename);
-	Format(g_FeatureName[g_features], 64, name);
-	Format(g_FeatureDesc[g_features], 256, description);
+	Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
+	Format(g_FeatureList[g_features][FEATURE_BASE], sizeof(basename), basename);
+	Format(g_FeatureList[g_features][FEATURE_NAME], sizeof(basename), name);
 	
-	g_FeatureEnable[g_features] = 1;
-	g_FeatureChange[g_features] = allowChange;
-	
-	sqllib_AddColumn(basename);
+	g_FeatureList[g_features][FEATURE_HANDLE] = plugin;
+	g_FeatureList[g_features][FEATURE_ENABLE] = 1;
+	g_FeatureList[g_features][FEATURE_CHANGE] = allowChange;
+	g_FeatureList[g_features][FEATURE_STANDARD] = standard;
 	
 	if (!FileExists(levelPath))
 	{
-		Format(levelPath, sizeof(levelPath), "cfg/stamm/LevelSettings.txt");
-		mode = 1;
-		
+		Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_StammFolder, basename);
+			
 		if (!FileExists(levelPath))
 		{
-			g_FeatureEnable[g_features] = 0;
-			ServerCommand("sm plugins unload stamm/%s", basename);
+			goON = false;
+			g_FeatureList[g_features][FEATURE_LEVEL][0] = 0;
+		}
+	}
 
-			LogToFile(g_LogFile, "[ STAMM ] Didn't find level config for %s", basename);
-			
-			return -1;
-		}
-	}
-	
-	new Handle:level_settings = CreateKeyValues("LevelSettings");
-	
-	FileToKeyValues(level_settings, levelPath);
-	
-	if (mode == -1) KvGetString(level_settings, "level", Svalue, sizeof(Svalue));
-	else KvGetString(level_settings, basename, Svalue, sizeof(Svalue));
-	
-	if (StringToInt(Svalue) != 0) value = StringToInt(Svalue);
-	else
+	if (goON)
 	{
-		for (new i=0; i < g_levels; i++)
-		{
-			if (StrEqual(Svalue, g_LevelName[i])) value = i+1; 
-		}
-	}
-	
-	CloseHandle(level_settings);
-	
-	if (value != -1)
-	{
-		if (value > 0 && value <= g_levels)
-		{
-			if (g_debug) LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s", basename);
-		}
+		
+		new Handle:level_settings = CreateKeyValues("LevelSettings");
+		
+		FileToKeyValues(level_settings, levelPath);
+
+		if (!KvGotoFirstSubKey(level_settings, false))
+			g_FeatureList[g_features][FEATURE_LEVEL][0] = 0;
 		else
 		{
-			g_FeatureEnable[g_features] = 0;
-			ServerCommand("sm plugins unload stamm/%s", basename);
-			
-			LogToFile(g_LogFile, "[ STAMM ] Invalid Level for %s", basename);
+			new start=0;
+
+			do
+			{
+				KvGetSectionName(level_settings, Svalue, sizeof(Svalue));
+				KvGoBack(level_settings);
+
+				KvGetString(level_settings, Svalue, Svalue2, sizeof(Svalue2));
+
+				Format(g_FeatureBlocks[g_features][start], sizeof(g_FeatureBlocks[][]), Svalue);
+
+				if (StringToInt(Svalue2) > 0)
+					value = StringToInt(Svalue2);
+				else
+				{
+					for (new i=0; i < g_levels+g_plevels; i++)
+					{
+						if (StrEqual(Svalue2, g_LevelName[i]))
+						{
+							value = i+1; 
+							break;
+						}
+					}
+				}
+
+				if (value <= 0 || value > g_levels+g_plevels)
+				{
+					g_FeatureList[g_features][FEATURE_ENABLE] = 0;
+
+					ServerCommand("sm plugins unload %s", g_FeatureList[g_features][FEATURE_BASEREAL]);
+					
+					LogToFile(g_LogFile, "[ STAMM ] Invalid Level %i for Feature: %s", value, g_FeatureList[g_features][FEATURE_BASEREAL]);
+
+					return;
+				}
+
+				g_FeatureList[g_features][FEATURE_LEVEL][start] = value;
+				Format(g_FeatureHaveDesc[g_features][value], sizeof(g_FeatureHaveDesc[]), description);
+
+				start++;
+
+				KvJumpToKey(level_settings, Svalue);
+
+			} 
+			while (KvGotoNextKey(level_settings, false));
 		}
+		
+		CloseHandle(level_settings);
 	}
 
-	g_FeatureLevel[g_features] = value;
-	
 	g_features++;
+
+	if (g_pluginStarted)
+		CreateTimer(0.5, featurelib_loadFeatures, g_features-1);
+}
+
+public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
+{
+	if (featureIndex != -1)
+	{
+		if (g_debug) 
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
+
+		sqllib_AddColumn(g_FeatureList[featureIndex][FEATURE_BASE], g_FeatureList[featureIndex][FEATURE_STANDARD]);
+
+		nativelib_startLoaded(g_FeatureList[featureIndex][FEATURE_HANDLE], g_FeatureList[featureIndex][FEATURE_BASE]);
+	}
+	else
+	{
+		g_pluginStarted = true;
+		
+		for (new i = 0; i < g_features; i++)
+		{
+			sqllib_AddColumn(g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][FEATURE_STANDARD]);
+			
+			nativelib_startLoaded(g_FeatureList[i][FEATURE_HANDLE], g_FeatureList[i][FEATURE_BASE]);
+			
+			if (g_debug) 
+				LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[i][FEATURE_BASE]);
+		}
+		
+		nativelib_StammReady();
+		
+		if (g_isLate)
+		{
+			for (new i=1; i <= MaxClients; i++)
+			{
+				g_ClientReady[i] = false;
+				
+				if (clientlib_isValidClient_PRE(i))
+					sqllib_InsertPlayer(i);
+			}
+		}
+	}
 	
-	return value;
+	return Plugin_Handled;
+}
+
+public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
+{
+	new retriev;
+	
+	decl String:basename[64];
+	decl String:explodedBasename[10][64];
+	
+	GetPluginFilename(plugin, basename, sizeof(basename));
+	
+	ReplaceString(basename, sizeof(basename), ".smx", "");
+	
+	retriev = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
+	
+	if (!retriev)
+		retriev = ExplodeString(basename, "\\", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
+		
+	if (!retriev)
+		Format(name, size, basename);
+	else	
+		Format(name, size, explodedBasename[retriev-1]);
+	
+	return true;
 }
 
 public featurelib_LoadTranslations()
 {
-	new Handle:Folder;
-	new String:LanguagesFolder[PLATFORM_MAX_PATH +1];
-	new String:PhraseFile[PLATFORM_MAX_PATH +1];
-	new String:FileToOpen[PLATFORM_MAX_PATH +1];
-	new FileType:type;
+	decl String:LanguagesFolder[PLATFORM_MAX_PATH +1];
+	decl String:LanguagesStammFolder[PLATFORM_MAX_PATH +1];
+	decl String:FileToOpen[PLATFORM_MAX_PATH +1];
+	decl String:PathToFile[PLATFORM_MAX_PATH +1];
+	decl String:FileToPath[PLATFORM_MAX_PATH +1];
 	
+	new Handle:Folder;
+	new FileType:type;
+
 	Format(LanguagesFolder, sizeof(LanguagesFolder), "%s/languages", g_StammFolder);
+	BuildPath(Path_SM, LanguagesStammFolder, sizeof(LanguagesStammFolder), "translations/stamm");
 	
 	Folder = OpenDirectory(LanguagesFolder);
 	
@@ -100,132 +208,180 @@ public featurelib_LoadTranslations()
 	{
 		if (type == FileType_File)
 		{
-			new Handle:kv = CreateKeyValues("StammLanguage");
-			new String:PathToFile[PLATFORM_MAX_PATH +1];
-			
 			Format(PathToFile, sizeof(PathToFile), "%s/%s", LanguagesFolder, FileToOpen);
+			Format(FileToPath, sizeof(FileToPath), "%s/%s", LanguagesStammFolder, FileToOpen);
+			
+			new Handle:kv = CreateKeyValues("Phrases");
 			
 			if (FileToKeyValues(kv, PathToFile))
 			{
-				if (KvGotoFirstSubKey(kv))
-				{
-					do
-					{
-						decl String:PhraseString[128];
-						decl String:language[128];
-						
-						KvGetSectionName(kv, PhraseString, sizeof(PhraseString));
-
-						if (KvGotoFirstSubKey(kv, false))
-						{
-							new index = 0;
-							decl String:value[1024];
-							
-							do
-							{
-								KvGetSectionName(kv, language, sizeof(language));
-								featurelib_CheckLanguageFolder(language);
-								
-								KvGoBack(kv);
-
-								if (!StrEqual(language, "en") && !StrEqual(language, "#format")) BuildPath(Path_SM, PhraseFile, sizeof(PhraseFile), "translations/%s/stamm-features.phrases.txt", language);
-								else BuildPath(Path_SM, PhraseFile, sizeof(PhraseFile), "translations/stamm-features.phrases.txt");
-								
-								new Handle:Phrase = CreateKeyValues("Phrases");
-								
-								FileToKeyValues(Phrase, PhraseFile);
-								
-								if (KvJumpToKey(Phrase, PhraseString, true))
-								{
-									KvGetString(Phrase, language, value, sizeof(value), "");
-
-									if (StrEqual(value, "") || g_replacePhrases)
-									{
-										KvGetString(kv, language, value, sizeof(value));
-										KvSetString(Phrase, language, value);
-									}
-									
-									KvGoBack(Phrase);
-								}
-								
-								KeyValuesToFile(Phrase, PhraseFile);
-								
-								CloseHandle(Phrase);
-								
-								KvGotoFirstSubKey(kv, false);
-								for (new i=0; i < index; i++) KvGotoNextKey(kv, false);
-								index++;
-								
-							}
-							while (KvGotoNextKey(kv, false));
-							
-							KvGoBack(kv);
-						}
-					}
-					while (KvGotoNextKey(kv));
-
-					KvGoBack(kv);
-				}
+				KvSetSectionName(kv, "Phrases");
+				KeyValuesToFile(kv, FileToPath);
+				
 				CloseHandle(kv);
 			}
 		}
 	}
 }
 
-public featurelib_CheckLanguageFolder(String:language[])
+public featurelib_UnloadFeature(Handle:plugin)
 {
-	new String:PhraseFile[PLATFORM_MAX_PATH +1];
-	new String:PhraseFolder[PLATFORM_MAX_PATH +1];
-	
-	if (!StrEqual(language, "en") && !StrEqual(language, "#format"))
-	{
-		BuildPath(Path_SM, PhraseFolder, sizeof(PhraseFolder), "translations/%s", language);
-		if (!DirExists(PhraseFolder)) CreateDirectory(PhraseFolder, 511);
-		
-		BuildPath(Path_SM, PhraseFile, sizeof(PhraseFile), "translations/%s/stamm-features.phrases.txt", language);
-	}
-	else BuildPath(Path_SM, PhraseFile, sizeof(PhraseFile), "translations/stamm-features.phrases.txt");
-	
-	if (!FileExists(PhraseFile))
-	{
-		new Handle:createFile = OpenFile(PhraseFile, "wb");
-		new Handle:Phrase = CreateKeyValues("Phrases");
-		
-		KeyValuesToFile(Phrase, PhraseFile);
-		
-		CloseHandle(Phrase);
-		CloseHandle(createFile);
-	}
+	new index = featurelib_getFeatureByHandle(plugin);
+
+	ServerCommand("sm plugins unload %s", g_FeatureList[index][FEATURE_BASEREAL]);
+
+	g_FeatureList[index][FEATURE_ENABLE] = 0;
+	CPrintToChatAll("%s %t", g_StammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
 }
 
-public featurlib_UnloadFeature(String:basename[])
+public featurelib_loadFeature(Handle:plugin)
 {
-	ServerCommand("sm plugins unload stamm/%s", basename);
-	
-	for (new i=0; i < g_features; i++)
-	{
-		if (StrEqual(g_FeatureBase[i], basename))
-		{
-			g_FeatureEnable[i] = 0;
-			CPrintToChatAll("%s %T", g_StammTag, "UnloadedFeature", LANG_SERVER, g_FeatureName[i]);
-			
-			break;
-		}
-	}
+	new index = featurelib_getFeatureByHandle(plugin);
+
+	ServerCommand("sm plugins load %s", g_FeatureList[index][FEATURE_BASEREAL]);
+
+	g_FeatureList[index][FEATURE_ENABLE] = 1;
+	CPrintToChatAll("%s %t", g_StammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
 }
 
-public featurlib_loadFeature(String:basename[])
+public featurelib_ReloadFeature(Handle:plugin)
 {
-	ServerCommand("sm plugins load stamm/%s", basename);
+	featurelib_UnloadFeature(plugin);
+	featurelib_loadFeature(plugin);
+}
+
+public Action:featurelib_Load(args)
+{
+	if (GetCmdArgs() == 1)
+	{
+		decl String:basename[64];
+		
+		GetCmdArg(1, basename, sizeof(basename));
+
+		for (new i=0; i < g_features; i++)
+		{
+			if (g_FeatureList[i][FEATURE_ENABLE] == 0 && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			{
+				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+				return Plugin_Handled;
+			}
+		}
+		
+		for (new i=0; i < g_features; i++)
+		{
+			if (g_FeatureList[i][FEATURE_ENABLE] == 0 && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			{
+				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+				return Plugin_Handled;
+			}
+		}
+
+		PrintToServer("Feature %s was not loaded before, try to load it via SM...", basename);
+
+		ServerCommand("sm plugins load %s", basename);
+	}
+	else
+		ReplyToCommand(0, "Usage: stamm_feature_load <basename>");
 	
+	return Plugin_Handled;
+}
+
+public Action:featurelib_UnLoad(args)
+{
+	if (GetCmdArgs() == 1)
+	{
+		decl String:basename[64];
+		
+		GetCmdArg(1, basename, sizeof(basename));
+
+		for (new i=0; i < g_features; i++)
+		{
+			if (g_FeatureList[i][FEATURE_ENABLE] == 1 && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			{
+				featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+				return Plugin_Handled;
+			}
+		}
+		
+		for (new i=0; i < g_features; i++)
+		{
+			if (g_FeatureList[i][FEATURE_ENABLE] == 1 && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			{
+				featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+				return Plugin_Handled;
+			}
+		}
+
+		ReplyToCommand(0, "Error. Feature not found or already unloaded.");
+	}
+	else
+		ReplyToCommand(0, "Usage: stamm_feature_unload <basename>");
+	
+	return Plugin_Handled;
+}
+
+public Action:featurelib_ReLoad(args)
+{
+	if (GetCmdArgs() == 1)
+	{
+		decl String:basename[64];
+		
+		GetCmdArg(1, basename, sizeof(basename));
+
+		for (new i=0; i < g_features; i++)
+		{
+			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			{
+				featurelib_ReloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+				return Plugin_Handled;
+			}
+		}
+		
+		for (new i=0; i < g_features; i++)
+		{
+			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			{
+				featurelib_ReloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+				return Plugin_Handled;
+			}	
+		}
+
+		ReplyToCommand(0, "Error. Feature not found.");
+	}
+	else
+		ReplyToCommand(0, "Usage: stamm_feature_reload <basename>");
+	
+	return Plugin_Handled;
+}
+
+public Action:featurelib_List(args)
+{
+	PrintToServer("[STAMM] Listing %d Plugin(s):", g_features);
+
 	for (new i=0; i < g_features; i++)
 	{
-		if (StrEqual(g_FeatureBase[i], basename))
-		{
-			g_FeatureEnable[i] = 1;
-			CPrintToChatAll("%s %T", g_StammTag, "LoadedFeature", LANG_SERVER, g_FeatureName[i]);
-			
-			break;
-		}
+		if (g_FeatureList[i][FEATURE_ENABLE])
+			PrintToServer("  %02d \"%s\" <%s>", i+1, g_FeatureList[i][FEATURE_NAME], g_FeatureList[i][FEATURE_BASEREAL]);
+		else
+			PrintToServer("  %02d Disabled - \"%s\" <%s>", i+1, g_FeatureList[i][FEATURE_NAME], g_FeatureList[i][FEATURE_BASEREAL]);
 	}
+	
+	return Plugin_Handled;
+}
+
+public featurelib_getFeatureByHandle(Handle:plugin)
+{
+	for (new i=0; i < g_features; i++)
+	{
+		if (g_FeatureList[i][FEATURE_HANDLE] == plugin)
+			return i;
+	}
+
+	return -1;
 }

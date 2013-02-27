@@ -1,14 +1,19 @@
+#pragma semicolon 1
+
 new Handle:otherlib_inftimer;
 
 public otherlib_PrepareFiles()
 {
-	if (!StrEqual(g_lvl_up_sound, "0")) otherlib_DownloadLevel();	
-	if (!StrEqual(g_lvl_up_sound, "0")) PrecacheSound(g_lvl_up_sound, true);
+	if (!StrEqual(g_lvl_up_sound, "0")) 
+	{
+		otherlib_DownloadLevel();	
+		PrecacheSound(g_lvl_up_sound, true);
+	}
 }
 
 public otherlib_DownloadLevel()
 {
-	new String:downloadfile[PLATFORM_MAX_PATH + 1];
+	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
 	
 	Format(downloadfile, sizeof(downloadfile), "sound/%s", g_lvl_up_sound);
 	
@@ -17,48 +22,30 @@ public otherlib_DownloadLevel()
 
 public otherlib_getGame()
 {
-	new String:GameName[64];
+	return g_gameID;
+}
+
+public otherlib_saveGame()
+{
+	new String:GameName[12];
+	g_gameID = 0;
 	
 	GetGameFolderName(GameName, sizeof(GameName));
 	
-	if (StrEqual(GameName, "cstrike")) return 1;
-	if (StrEqual(GameName, "csgo")) return 2;
-	if (StrEqual(GameName, "tf")) return 3;
-	
-	return 0;
-}
-
-public otherlib_createDB()
-{
-	new String:dbPath[PLATFORM_MAX_PATH + 1];
-	
-	BuildPath(Path_SM, dbPath, sizeof(dbPath), "configs/databases.cfg");
-	
-	new Handle:dbHandle = CreateKeyValues("Databases");
-	FileToKeyValues(dbHandle, dbPath);
-	
-	if (!KvJumpToKey(dbHandle, "stamm_sql"))
-	{
-		KvJumpToKey(dbHandle, "stamm_sql", true);
-		
-		KvSetString(dbHandle, "driver", "sqlite");
-		KvSetString(dbHandle, "host", "localhost");
-		KvSetString(dbHandle, "database", "Stamm-DB");
-		KvSetString(dbHandle, "user", "root");
-		
-		KvGoBack(dbHandle);
-		
-		KeyValuesToFile(dbHandle, dbPath);
-		
-		for (new i=0; i <= 20; i++) PrintToServer("Created Stamm DB. To use Stamm, please restart your Server now!!");
-	}
+	if (StrEqual(GameName, "cstrike")) 
+		g_gameID = 1;
+	if (StrEqual(GameName, "csgo")) 
+		g_gameID = 2;
+	if (StrEqual(GameName, "tf")) 
+		g_gameID = 3;
+	if (StrEqual(GameName, "dod"))
+		g_gameID = 4;
 }
 
 public Action:otherlib_PlayerInfoTimer(Handle:timer)
 {
-	CPrintToChatAll("%s %T", g_StammTag, "InfoTyp", LANG_SERVER, g_texttowrite_f);
-	
-	CPrintToChatAll("%s %T", g_StammTag, "InfoTypInfo", LANG_SERVER, g_sinfo_f);
+	CPrintToChatAll("%s %t", g_StammTag, "InfoTyp", g_texttowrite_f);
+	CPrintToChatAll("%s %t", g_StammTag, "InfoTypInfo", g_sinfo_f);
 	
 	return Plugin_Continue;
 }
@@ -66,22 +53,30 @@ public Action:otherlib_PlayerInfoTimer(Handle:timer)
 public otherlib_MakeHappyHour(client)
 {
 	g_happynumber[client] = 1;
-	CPrintToChat(client, "%s %T", g_StammTag, "WriteHappyTime", LANG_SERVER);
-	CPrintToChat(client, "%s %T", g_StammTag, "WriteHappyTimeInfo", LANG_SERVER);
+	
+	CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyTime");
+	CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyTimeInfo");
 }
 
 public otherlib_EndHappyHour()
 {
 	if (g_happyhouron)
 	{
+		decl String:query[128];
+
+		Format(query, sizeof(query), "DELETE FROM `%s_happy`", g_tablename);
+		
+		if (g_debug) 
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+
 		g_points = 1;
 		g_happyhouron = 0;
 		
-		if (g_HappyTimer != INVALID_HANDLE) KillTimer(g_HappyTimer);
+		g_HappyTimer = otherlib_checkTimer(g_HappyTimer);
 		
-		g_HappyTimer = INVALID_HANDLE;
-		
-		CPrintToChatAll("%s %T", g_StammTag, "HappyEnded", LANG_SERVER);
+		CPrintToChatAll("%s %t", g_StammTag, "HappyEnded");
 		
 		nativelib_HappyEnd();
 		
@@ -89,60 +84,65 @@ public otherlib_EndHappyHour()
 	}
 }
 
+public otherlib_StartHappyHour(time, factor)
+{
+	decl String:query[128];
+
+	Format(query, sizeof(query), "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)", g_tablename, GetTime() + time, factor);
+	
+	if (g_debug) 
+		LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+	
+	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+
+	g_points = factor;
+
+	g_happyhouron = 1;
+	
+	CPrintToChatAll("%s %t", g_StammTag, "HappyActive", g_points);
+	
+	otherlib_checkTimer(g_HappyTimer);
+
+	g_HappyTimer = CreateTimer(float(time), otherlib_StopHappyHour);
+	
+	nativelib_HappyStart(time/60, g_points);
+}
+
 public Action:otherlib_StopHappyHour(Handle:timer)
 {
-	if (g_happyhouron)
-	{
-		g_happyhouron = 0;
-		g_points = 1;
-		g_HappyTimer = INVALID_HANDLE;
-		
-		CPrintToChatAll("%s %T", g_StammTag, "HappyEnded", LANG_SERVER);
-		
-		nativelib_HappyEnd();
-		
-		clientlib_CheckPlayers();
-	}
+	otherlib_EndHappyHour();
 }
 
 public Action:otherlib_StartHappy(args)
 {
 	if (GetCmdArgs() == 2 && !g_happyhouron)
 	{
-		new String:timeString[25];
-		new String:factorString[25];
+		decl String:timeString[25];
+		decl String:factorString[25];
 		
 		GetCmdArg(1, timeString, sizeof(timeString));
 		GetCmdArg(2, factorString, sizeof(factorString));
 		
 		new time = StringToInt(timeString);
-		g_points = StringToInt(factorString);
-		
-		g_happyhouron = 1;
-		
-		CPrintToChatAll("%s %T", g_StammTag, "HappyActive", LANG_SERVER, g_points);
-	
-		g_HappyTimer = CreateTimer(float(time)*60, otherlib_StopHappyHour);
-		
-		nativelib_HappyStart(time, g_points);
+
+		if (time > 1 && StringToInt(factorString) > 1)
+			otherlib_StartHappyHour(time*60, StringToInt(factorString));
+		else
+			ReplyToCommand(0, "[ STAMM ] Time and Factor have to be greater than 1 !");
 	}
+	else
+		ReplyToCommand(0, "Usage: stamm_start_happyhour <time> <factor>");
 }
 
 public Action:otherlib_StopHappy(args)
 {
-	if (g_happyhouron)
-	{
-		g_points = 1;
-		g_happyhouron = 0;
-		
-		if (g_HappyTimer != INVALID_HANDLE) KillTimer(g_HappyTimer);
-		
-		g_HappyTimer = INVALID_HANDLE;
-		
-		CPrintToChatAll("%s %T", g_StammTag, "HappyEnded", LANG_SERVER);
-		
-		nativelib_HappyEnd();
-		
-		clientlib_CheckPlayers();
-	}
+	otherlib_EndHappyHour();
+}
+
+public Handle:otherlib_checkTimer(Handle:timer)
+{
+	if (timer != INVALID_HANDLE)
+		KillTimer(timer);
+	
+	return INVALID_HANDLE;
 }

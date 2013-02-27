@@ -1,45 +1,48 @@
 #include <sourcemod>
 #include <sdktools>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
 #pragma semicolon 1
 
 new Handle:hear_all;
-
-new v_level;
 new hear;
-
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Holy Granade",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.3",
 	description = "Give VIP's a holy granade",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:description[64];
+
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetHoly", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP Holy Grenade", description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	hear_all = CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player");
+	AutoExecConfig_SetFile("stamm/features/holy_grenade");
+
+	hear_all = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
 	
 	AutoExecConfig(true, "holy_grenade", "stamm/features");
+	AutoExecConfig_CleanFile();
 	
 	HookEvent("weapon_fire", eventWeaponFire);
 	HookEvent("hegrenade_detonate", eventHeDetonate);
@@ -66,55 +69,42 @@ public OnConfigsExecuted()
 	PrecacheSound("music/stamm/explode.mp3", true);
 }
 
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-
-	Format(description, sizeof(description), "%T", "GetHoly", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP Holy Granade", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetHoly", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
-}
-
 public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new userid = GetEventInt(event, "userid");
 	new client = GetClientOfUserId(userid);
-	new String:weapon[256];
+	decl String:weapon[256];
 	
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (ClientWantStammFeature(client, basename))
+		if (StrEqual(weapon, "hegrenade")) 
 		{
-			if (StrEqual(weapon, "hegrenade")) 
+			if (STAMM_HaveClientFeature(client))
 			{
-				if (IsClientVip(client, v_level))
+				if (hear) 
 				{
-					if (hear) 
-					{
-						if (GetStammGame() != GameCSGO) EmitSoundToClient(client, "music/stamm/throw.mp3");
-						else ClientCommand(client, "play music/stamm/throw.mp3");
-					}
+					if (STAMM_GetGame() != GameCSGO)
+						EmitSoundToClient(client, "music/stamm/throw.mp3");
+					else 
+						ClientCommand(client, "play music/stamm/throw.mp3");
+				}
+				else
+				{
+					if (STAMM_GetGame() != GameCSGO)
+						EmitSoundToAll("music/stamm/throw.mp3");
 					else
 					{
-						if (GetStammGame() != GameCSGO) EmitSoundToAll("music/stamm/throw.mp3");
-						else
+						for (new i=0; i <= MaxClients; i++)
 						{
-							for (new i=0; i <= MaxClients; i++)
-							{
-								if (IsStammClientValid(i)) ClientCommand(i, "play music/stamm/throw.mp3");
-							}
+							if (STAMM_IsClientValid(i))
+								ClientCommand(i, "play music/stamm/throw.mp3");
 						}
 					}
-					
-					CreateTimer(0.25, change, client);
 				}
+				
+				CreateTimer(0.25, change, client);
 			}
 		}
 	}
@@ -130,54 +120,55 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 	origin[1] = float(GetEventInt(event, "y"));
 	origin[2] = float(GetEventInt(event, "z"));
 	
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		if (ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
-			if (IsClientVip(client, v_level))
+			new explode = CreateEntityByName("env_explosion");
+			new shake = CreateEntityByName("env_shake");
+			
+			if (explode != -1 && shake != -1)
 			{
-				new explode = CreateEntityByName("env_explosion");
-				new shake = CreateEntityByName("env_shake");
+				DispatchKeyValue(explode, "fireballsprite", "sprites/splodesprite.vmt");
+				DispatchKeyValue(explode, "iMagnitude", "20");
+				DispatchKeyValue(explode, "iRadiusOverride", "500");
+				DispatchKeyValue(explode, "rendermode", "5");
+				DispatchKeyValue(explode, "spawnflags", "2");
 				
-				if (explode != -1 && shake != -1)
-				{
-					DispatchKeyValue(explode, "fireballsprite", "sprites/splodesprite.vmt");
-					DispatchKeyValue(explode, "iMagnitude", "20");
-					DispatchKeyValue(explode, "iRadiusOverride", "500");
-					DispatchKeyValue(explode, "rendermode", "5");
-					DispatchKeyValue(explode, "spawnflags", "2");
-					
-					DispatchKeyValue(shake, "amplitude", "4");
-					DispatchKeyValue(shake, "duration", "5");
-					DispatchKeyValue(shake, "frequency", "255");
-					DispatchKeyValue(shake, "radius", "500");
-					DispatchKeyValue(shake, "spawnflags", "0");
-					
-					DispatchSpawn(explode);
-					DispatchSpawn(shake);
-					
-					TeleportEntity(explode, origin, NULL_VECTOR, NULL_VECTOR);
-					TeleportEntity(shake, origin, NULL_VECTOR, NULL_VECTOR);
-					
-					AcceptEntityInput(explode, "Explode");
-					AcceptEntityInput(shake, "StartShake");
-					
-				}
+				DispatchKeyValue(shake, "amplitude", "4");
+				DispatchKeyValue(shake, "duration", "5");
+				DispatchKeyValue(shake, "frequency", "255");
+				DispatchKeyValue(shake, "radius", "500");
+				DispatchKeyValue(shake, "spawnflags", "0");
 				
-				if (hear) 
-				{
-					if (GetStammGame() != GameCSGO) EmitSoundToClient(client, "music/stamm/explode.mp3");
-					else ClientCommand(client, "play music/stamm/explode.mp3");
-				}
+				DispatchSpawn(explode);
+				DispatchSpawn(shake);
+				
+				TeleportEntity(explode, origin, NULL_VECTOR, NULL_VECTOR);
+				TeleportEntity(shake, origin, NULL_VECTOR, NULL_VECTOR);
+				
+				AcceptEntityInput(explode, "Explode");
+				AcceptEntityInput(shake, "StartShake");
+				
+			}
+			
+			if (hear) 
+			{
+				if (STAMM_GetGame() != GameCSGO) 
+					EmitSoundToClient(client, "music/stamm/explode.mp3");
+				else 
+					ClientCommand(client, "play music/stamm/explode.mp3");
+			}
+			else
+			{
+				if (STAMM_GetGame() != GameCSGO) 
+					EmitSoundToAll("music/stamm/explode.mp3");
 				else
 				{
-					if (GetStammGame() != GameCSGO) EmitSoundToAll("music/stamm/explode.mp3");
-					else
+					for (new i=0; i <= MaxClients; i++)
 					{
-						for (new i=0; i <= MaxClients; i++)
-						{
-							if (IsStammClientValid(i)) ClientCommand(i, "play music/stamm/explode.mp3");
-						}
+						if (STAMM_IsClientValid(i)) 
+							ClientCommand(i, "play music/stamm/explode.mp3");
 					}
 				}
 			}
@@ -195,6 +186,7 @@ public Action:change(Handle:timer, any:client)
 	{
 		new owner = GetEntPropEnt(ent, Prop_Send, "m_hThrower");
 		
-		if (IsValidEntity(ent) && owner == client) SetEntityModel(ent, "models/stamm/holy_grenade.mdl");
+		if (IsValidEntity(ent) && owner == client) 
+			SetEntityModel(ent, "models/stamm/holy_grenade.mdl");
 	}
 }

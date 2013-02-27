@@ -1,47 +1,35 @@
 #include <sourcemod>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
 #pragma semicolon 1
 
-new String:basename[64];
-
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Admin Flags",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.3",
 	description = "Give VIP's admin flags",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("stamm"))
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+		
+	STAMM_LoadTranslation();
+
+	STAMM_AddFeature("VIP Admin Flags", "");
 }
 
-public OnPluginStart()
+public STAMM_OnFeatureLoaded(String:basename[])
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
+	decl String:description[64];
 	new String:theflags[64];
-	
-	Format(description, sizeof(description), "%T", "GetAdminFlags", LANG_SERVER, "");
-	
-	AddStammFeature(basename, "VIP Admin Flags", description);
-	
-	for (new i=1; i <= GetStammLevelCount(); i++)
+
+	for (new i=1; i <= STAMM_GetLevelCount(); i++)
 	{
 		Format(theflags, sizeof(theflags), "");
 		
@@ -49,21 +37,22 @@ public OnStammReady()
 		
 		if (!StrEqual(theflags, ""))
 		{
-			Format(description, sizeof(description), "%T", "YouGetAdminFlags", LANG_SERVER, theflags);
-			AddStammFeatureInfo(basename, i, description);
+			Format(description, sizeof(description), "%T", "GetAdminFlags", LANG_SERVER, theflags);
+			STAMM_AddFeatureText(i, description);
 		}
 	}
 }
 
-public OnStammClientReady(client)
+public STAMM_OnClientReady(client)
 {
-	if (IsStammClientValid(client))
+	if (STAMM_IsClientValid(client))
 	{
-		new String:steamid[64];
-		new String:File[PLATFORM_MAX_PATH + 1];
-		new String:File2[PLATFORM_MAX_PATH + 1];
-		new String:Line[1024];
-		new String:theflags[64];
+		decl String:steamid[64];
+		decl String:File[PLATFORM_MAX_PATH + 1];
+		decl String:File2[PLATFORM_MAX_PATH + 1];
+		decl String:Line[1024];
+		decl String:theflags[64];
+		
 		new Handle:hFile;
 		new Handle:hFile2;
 		
@@ -72,23 +61,31 @@ public OnStammClientReady(client)
 		GetClientAuthString(client, steamid, sizeof(steamid));
 		
 		hFile = OpenFile(File, "rb");
-		if (hFile == INVALID_HANDLE) return;
+		
+		if (hFile == INVALID_HANDLE) 
+			return;
+			
 		hFile2 = OpenFile(File2, "wb");
-		if (hFile2 == INVALID_HANDLE) return;
+		
+		if (hFile2 == INVALID_HANDLE)
+			return;
 		
 		Format(theflags, sizeof(theflags), "");
 		
-		getLevelFlag(theflags, sizeof(theflags), GetClientStammLevel(client));
+		getLevelFlag(theflags, sizeof(theflags), STAMM_GetClientLevel(client));
 		
 		while (ReadFileLine(hFile, Line, sizeof(Line)))
 		{
 			ReplaceString(Line, sizeof(Line), "\n", "");
 			
-			if (StrContains(Line, steamid) != -1) continue;
+			if (StrContains(Line, steamid) != -1) 
+				continue;
 			
 			WriteFileLine(hFile2, Line);
 		}
-		if (!StrEqual(theflags, "")) WriteFileLine(hFile2, "\"%s\" \"%s\" \"\"", steamid, theflags);
+		
+		if (!StrEqual(theflags, "")) 
+			WriteFileLine(hFile2, "\"%s\" \"%s\" \"\"", steamid, theflags);
 		
 		CloseHandle(hFile);
 		CloseHandle(hFile2);
@@ -101,6 +98,12 @@ public OnStammClientReady(client)
 public getLevelFlag(String:theflags[], size, level)
 {
 	new Handle:flagvalue = CreateKeyValues("AdminFlags");
+
+	if (!FileExists("cfg/stamm/features/adminflags.txt"))
+	{
+		STAMM_WriteToLog(false, "Didn't find cfg/stamm/features/adminflags.txt!");
+		return;
+	}
 	
 	FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
 	
@@ -112,7 +115,7 @@ public getLevelFlag(String:theflags[], size, level)
 			
 			KvGetSectionName(flagvalue, section, sizeof(section));
 
-			if (GetStammLevelNumber(section) == level)
+			if (STAMM_GetLevelNumber(section) == level)
 			{
 				KvGoBack(flagvalue);
 				KvGetString(flagvalue, section, theflags, size);

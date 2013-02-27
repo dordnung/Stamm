@@ -1,6 +1,7 @@
 #include <sourcemod>
 #include <colors>
 #include <sdktools>
+#include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
@@ -10,7 +11,6 @@ new dur;
 new mode_infect;
 new lhp;
 new timers[MAXPLAYERS+1];
-new v_level;
 
 new Handle:dur_c;
 new Handle:mode_c;
@@ -18,42 +18,49 @@ new Handle:lhp_c;
 
 new bool:Infected[MAXPLAYERS+1];
 
-new String:basename[64];
-
 public Plugin:myinfo =
 {
 	name = "Stamm Feature KnifeInfect",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.2",
 	description = "VIP's can infect players with knife",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:description[64];
+
+	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
+ 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+
+	if (!LibraryExists("stamm")) 
+		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
+	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+		SetFailState("Can't Load Feature, not Supported for your game!");
+		
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetKnifeInfect", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP KnifeInfect", description);
 }
 
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
 	HookEvent("player_death", PlayerDeath);
 	HookEvent("player_hurt", PlayerHurt);
 	HookEvent("player_spawn", PlayerDeath);
+
+	AutoExecConfig_SetFile("stamm/features/knife_infect");
 	
-	dur_c = CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
-	mode_c = CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
-	lhp_c = CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
+	dur_c = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
+	mode_c = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
+	lhp_c = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
 	
 	AutoExecConfig(true, "knife_infect", "stamm/features");
+	AutoExecConfig_CleanFile();
 }
 
 public OnConfigsExecuted()
@@ -62,14 +69,15 @@ public OnConfigsExecuted()
 	mode_infect = GetConVarInt(mode_c);
 	lhp = GetConVarInt(lhp_c);
 	
-	if (mode_infect != 1 || dur) CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	if (mode_infect != 1 || dur) 
+		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action:SecondTimer(Handle:timer, any:data)
 {
 	for (new i=1; i <= MaxClients; i++)
 	{
-		if (IsStammClientValid(i))
+		if (STAMM_IsClientValid(i))
 		{
 			if (Infected[i])
 			{
@@ -80,24 +88,31 @@ public Action:SecondTimer(Handle:timer, any:data)
 					if (timers[i] <= 0)
 					{
 						Infected[i] = false;
-						if (mode_infect) ClientCommand(i, "r_screenoverlay \"\"");
+						
+						if (mode_infect) 
+							ClientCommand(i, "r_screenoverlay \"\"");
 						
 						continue;
 					}
 				}
+				
 				if (mode_infect != 1)
 				{
 					new newhp = GetClientHealth(i) - lhp;
+					
 					if (newhp <= 0)
 					{
 						newhp = 0;
+						
 						ForcePlayerSuicide(i);
 					}
+					
 					SetEntityHealth(i, newhp);
 				}
 			}
 		}
 	}
+	
 	return Plugin_Continue;
 }
 
@@ -105,11 +120,12 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client) && Infected[client])
+	if (STAMM_IsClientValid(client) && Infected[client])
 	{
 		Infected[client] = false;
 
-		if (mode_infect) ClientCommand(client, "r_screenoverlay \"\"");
+		if (mode_infect) 
+			ClientCommand(client, "r_screenoverlay \"\"");
 	}
 }
 
@@ -123,18 +139,20 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 	
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
 
-	if (IsStammClientValid(client) && IsStammClientValid(attacker))
+	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
 		if (StrEqual(weapon, "knife") && !Infected[client])
 		{
-			if (IsClientVip(attacker, v_level) && ClientWantStammFeature(attacker, basename))
+			if (STAMM_HaveClientFeature(attacker))
 			{
 				Infected[client] = true;
+				
 				GetClientName(attacker, p_name, sizeof(p_name));
 				
 				if (mode_infect)
 				{
-					if (GetStammGame() == GameCSS) ClientCommand(client, "r_screenoverlay effects/tp_eyefx/tp_eyefx");
+					if (STAMM_GetGame() == GameCSS) 
+						ClientCommand(client, "r_screenoverlay effects/tp_eyefx/tp_eyefx");
 					else
 					{
 						ClientCommand(client, "r_drawscreenoverlay 1");
@@ -145,24 +163,12 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 				if (dur)
 				{
 					timers[client] = dur;
-					CPrintToChat(client, "{olive}[ {green}Stamm {olive}] %T", "YouGotTimeInfected", LANG_SERVER, p_name, dur);
+					
+					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotTimeInfected", LANG_SERVER, p_name, dur);
 				}
-				else CPrintToChat(client, "{olive}[ {green}Stamm {olive}] %T", "YouGotRoundInfected", LANG_SERVER, p_name);
+				else 
+					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotRoundInfected", LANG_SERVER, p_name);
 			}
 		}
 	}
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[256];
-	
-	Format(description, sizeof(description), "%T", "GetKnifeInfect", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP KnifeInfect", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetKnifeInfect", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
 }
