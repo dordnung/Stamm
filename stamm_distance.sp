@@ -11,7 +11,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Distance",
 	author = "Popoklopsi",
-	version = "1.0",
+	version = "1.0.0",
 	description = "VIP's see the distance of the nearest player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

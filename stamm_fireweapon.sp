@@ -10,7 +10,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature FireWeapon",
 	author = "Popoklopsi",
-	version = "1.0",
+	version = "1.0.0",
 	description = "VIP's can ignite players with there weapon",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

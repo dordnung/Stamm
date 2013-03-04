@@ -15,7 +15,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature End of Round Immunity",
 	author = "Popoklopsi",
-	version = "1.0",
+	version = "1.0.0",
 	description = "Give VIP's immunity at the end of the round",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

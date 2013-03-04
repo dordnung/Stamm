@@ -17,7 +17,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature RegenerateHP",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "Regenerate HP of VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

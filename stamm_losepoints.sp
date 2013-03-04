@@ -19,7 +19,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LosePoints",
 	author = "Popoklopsi",
-	version = "1.0",
+	version = "1.0.0",
 	description = "Non VIP's lose until a specific level points on death",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

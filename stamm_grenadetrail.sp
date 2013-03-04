@@ -18,7 +18,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature GrenadeTrail",
 	author = "Popoklopsi",
-	version = "1.3",
+	version = "1.3.0",
 	description = "Give VIP's a grenade trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

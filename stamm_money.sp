@@ -16,7 +16,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Money",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "Give VIP's every Round x Cash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

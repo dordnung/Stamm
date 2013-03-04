@@ -19,7 +19,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature FroggyJump",
 	author = "Popoklopsi",
-	version = "1.0",
+	version = "1.0.0",
 	description = "VIP's have Froggy Jump",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

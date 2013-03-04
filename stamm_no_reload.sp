@@ -14,7 +14,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature No Reload",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "VIP's don't have to reload",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

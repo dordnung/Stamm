@@ -10,7 +10,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Chat Messages",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "Give VIP's VIP Chat and Message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

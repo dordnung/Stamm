@@ -21,7 +21,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature VIP Slot",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "Give VIP's a VIP Slot",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

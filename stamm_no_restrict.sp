@@ -10,7 +10,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature No Restrict",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "VIP's can use restricted weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

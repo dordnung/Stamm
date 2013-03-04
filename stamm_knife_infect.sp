@@ -23,7 +23,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature KnifeInfect",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "VIP's can infect players with knife",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

@@ -10,7 +10,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Instant Defuse",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.2.0",
 	description = "VIP's can defuse the bomb instantly",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

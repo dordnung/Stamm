@@ -9,7 +9,7 @@ public Plugin:myinfo =
 {
 	name = "EasyBhop",
 	author = "Bara",
-	version = "1.0",
+	version = "1.0.0",
 	description = "Give VIP's eady bunnyhop",
 	url = "www.bara.in"
 };

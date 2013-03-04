@@ -45,7 +45,7 @@ new String:g_LogFile[PLATFORM_MAX_PATH + 1];
 new String:g_DebugFile[PLATFORM_MAX_PATH + 1];
 new String:g_StammFolder[PLATFORM_MAX_PATH + 1];
 new String:g_lvl_up_sound[PLATFORM_MAX_PATH + 1];
-new String:g_Plugin_Version[10] = "2.1";
+new String:g_Plugin_Version[10] = "2.1.0";
 new String:g_tablename[64];
 new String:g_texttowrite[32];
 new String:g_texttowrite_f[32];

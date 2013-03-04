@@ -13,7 +13,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature No Fall Damage",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.1.0",
 	description = "Give VIP's No Fall Damage",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
