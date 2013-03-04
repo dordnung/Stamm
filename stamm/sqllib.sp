@@ -1,6 +1,7 @@
 #pragma semicolon 1
 
 new Handle:sqllib_db;
+new sqllib_convert = -1;
 
 public sqllib_Start()
 {
@@ -312,5 +313,197 @@ public sqllib_SQLErrorCheckCallback2(Handle:owner, Handle:hndl, const String:err
 	{
 		if (g_debug)
 			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Maybe VALID Database Error: %s", error);
+	}
+}
+
+public Action:sqllib_convertDB(args)
+{
+	decl String:mysqlString[12];
+
+	if (GetCmdArgs() != 1)
+	{
+		ReplyToCommand(0, "Usage: stamm_convert_db <mysql>");
+
+		return Plugin_Handled;
+	}
+
+	if (sqllib_convert > -1)
+	{
+		ReplyToCommand(0, "You are already converting the database. Please Wait.");
+
+		return Plugin_Handled;
+	}
+
+	GetCmdArg(1, mysqlString, sizeof(mysqlString));
+
+	if (StringToInt(mysqlString) > 1 || StringToInt(mysqlString) < 0)
+	{
+		ReplyToCommand(0, "Usage: stamm_convert_db <mysql>");
+
+		return Plugin_Handled;
+	}
+
+	sqllib_convert = StringToInt(mysqlString);
+
+	decl String:query[128];
+
+	Format(query, sizeof(query), "SELECT `steamid`, `level`, `points`, `name`, `version` FROM `%s`", g_tablename);
+
+	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile, query);
+
+	ReplyToCommand(0, "Converting now Stamm database to a file. Please wait. This could take a bit!");
+
+	return Plugin_Handled;
+}
+
+public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:error[], any:data)
+{
+	if (hndl != INVALID_HANDLE && SQL_FetchRow(hndl))
+	{
+		new String:filename[64];
+
+		new counter = 0;
+
+		Format(filename, sizeof(filename), "%s.sql", g_tablename);
+
+		new Handle:file = OpenFile(filename, "wb");
+
+		if (file != INVALID_HANDLE)
+		{
+			if (sqllib_convert == 0)
+				WriteFileLine(file, "BEGIN TRANSACTION;");
+
+			WriteFileLine(file, "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, PRIMARY KEY (`steamid`));", g_tablename);
+
+			do
+			{
+				new level;
+				new points;
+				new Float:version;
+
+				decl String:steamid[64];
+				decl String:name[128];
+				decl String:name2[256];
+				decl String:versionS[12];
+
+				level = SQL_FetchInt(hndl, 1);
+				points = SQL_FetchInt(hndl, 2);
+				version = SQL_FetchFloat(hndl, 4);
+
+				FloatToString(version, versionS, sizeof(versionS));
+
+				SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
+				SQL_FetchString(hndl, 3, name, sizeof(name));
+
+				sqllib_escapeString(name, name2, sizeof(name2), sqllib_convert);
+
+				if (sqllib_convert == 0)
+					WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`) VALUES ('%s', %i, %i, '%s', %s);", g_tablename, steamid, level, points, name2, versionS);
+				else
+				{
+					if (counter == 0)
+						WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`) VALUES", g_tablename);
+
+					if (++counter == 1000 || !SQL_MoreRows(hndl))
+					{
+						WriteFileLine(file, "('%s', %i, %i, '%s', %s);", steamid, level, points, name2, versionS);
+
+						counter = 0;
+					}
+					else
+						WriteFileLine(file, "('%s', %i, %i, '%s', %s),", steamid, level, points, name2, versionS);
+				}
+
+			} 
+			while (SQL_FetchRow(hndl) && sqllib_convert > -1);
+
+			if (sqllib_convert == 0)
+				WriteFileLine(file, "COMMIT;");
+
+			CloseHandle(file);
+
+			PrintToServer("Converted Database to file %s successfully", filename);
+		}
+		else
+			PrintToServer("Couldn't convert database to file. Couldn't create file %s", filename);
+	}
+	else
+		PrintToServer("Couldn't convert database to file. Error: ", error);
+
+	sqllib_convert = -1;
+}
+
+public sqllib_escapeString(String:input[], String:output[], maxlen, mysql)
+{
+	new len = strlen(input);
+	new count = 0;
+
+	Format(output, maxlen, "");
+
+	if (mysql == 1)
+	{
+		for (new offset=0; offset < len; offset++)
+		{
+			new ch = input[offset];
+
+			switch(ch)
+			{
+				case '\'':
+				{
+					if (count % 2 == 0)
+						Format(output, maxlen, "%s\\", output);
+
+					count = 0;
+					Format(output, maxlen, "%s%c", output, ch);
+				}
+				case '\\':
+				{
+					count++;
+					Format(output, maxlen, "%s%c", output, ch);
+				}
+				default:
+				{
+					count = 0;
+					Format(output, maxlen, "%s%c", output, ch);
+				}
+			}
+		}
+
+		if (count != 0)
+		{
+			if (count % 2 == 1)
+				Format(output, maxlen, "%s\\", output);
+		}
+	}
+	else	
+	{
+		for (new offset=0; offset < len; offset++)
+		{
+			new ch = input[offset];
+
+			switch(ch)
+			{
+				case '\'':
+				{
+					count++;
+
+					Format(output, maxlen, "%s%c", output, ch);
+				}
+				default:
+				{
+					if (count % 2 == 1)
+						Format(output, maxlen, "%s'", output);
+
+					count = 0;
+					Format(output, maxlen, "%s%c", output, ch);
+				}
+			}
+		}
+
+		if (count != 0)
+		{
+			if (count % 2 == 1)
+				Format(output, maxlen, "%s'", output);
+		}
 	}
 }

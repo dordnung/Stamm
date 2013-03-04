@@ -82,7 +82,7 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		ReplaceString(steamid, sizeof(steamid), "STEAM_0:", "STEAM_1:");
 		
-		pointlib_GivePlayerPoints(client, SQL_FetchInt(hndl, 0));
+		pointlib_GivePlayerPoints(client, SQL_FetchInt(hndl, 0), false);
 
 		Format(query, sizeof(query), "DELETE FROM `%s` WHERE `steamid`='%s'", g_tablename, steamid);
 		

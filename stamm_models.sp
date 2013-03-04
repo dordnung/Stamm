@@ -7,21 +7,23 @@
 
 #pragma semicolon 1
 
+#define MODELPATH 0
+#define MODELNAME 1
+#define MODELTEAM 2
+
 new PlayerHasModel[MAXPLAYERS + 1];
 new LastTeam[MAXPLAYERS + 1];
+new modelCount;
 new model_change;
 new same_models;
 new admin_model;
+new TMODELS;
+new CTMODELS;
 
 new String:PlayerModel[MAXPLAYERS + 1][PLATFORM_MAX_PATH + 1];
-new String:T_1_MODEL[PLATFORM_MAX_PATH + 1];
-new String:T_1_NAME[128];
-new String:T_2_MODEL[PLATFORM_MAX_PATH + 1];
-new String:T_2_NAME[128];
-new String:CT_1_MODEL[PLATFORM_MAX_PATH + 1];
-new String:CT_1_NAME[128];
-new String:CT_2_MODEL[PLATFORM_MAX_PATH + 1];
-new String:CT_2_NAME[128];
+
+new String:models[64][3][PLATFORM_MAX_PATH + 1];
+
 new String:model_change_cmd[32];
 
 new Handle:c_model_change_cmd;
@@ -44,12 +46,14 @@ public OnAllPluginsLoaded()
 {
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
-	
-	if (STAMM_GetGame() == GameTF2) 
-		SetFailState("Can't Load Feature, not Supported for your game!");
 
-	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
- 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 		
 	STAMM_LoadTranslation();
 
@@ -70,14 +74,14 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/vip_models");
+	AutoExecConfig_SetFile("vip_models", "stamm/features");
 
 	c_model_change = AutoExecConfig_CreateConVar("model_change", "1", "0 = Players can only change models, when changing team, 1 = Players can always change it");
 	c_admin_model = AutoExecConfig_CreateConVar("model_admin_model", "1", "Should Admins also get a VIP Skin 1 = Yes, 0 = No");
 	c_model_change_cmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
-	c_same_models = AutoExecConfig_CreateConVar("model_models", "0", "1 = Vip's get always the same Skin 0 = Random Skin every Round");
+	c_same_models = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
 
-	AutoExecConfig(true, "vip_models", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 	
 	HookEvent("player_team", eventPlayerTeam);
@@ -100,42 +104,47 @@ public OnConfigsExecuted()
 		SetFailState("Couldn't load Stamm Models. ModelSettings.txt missing.");
 	
 	new Handle:model_settings = CreateKeyValues("ModelSettings");
+
 	FileToKeyValues(model_settings, "cfg/stamm/features/ModelSettings.txt");
-	
-	KvGetString(model_settings, "T_1_MODEL", T_1_MODEL, sizeof(T_1_MODEL));
-	KvGetString(model_settings, "T_1_NAME", T_1_NAME, sizeof(T_1_NAME));
-	KvGetString(model_settings, "T_2_MODEL", T_2_MODEL, sizeof(T_2_MODEL));
-	KvGetString(model_settings, "T_2_NAME", T_2_NAME, sizeof(T_2_NAME));
-	KvGetString(model_settings, "CT_1_MODEL", CT_1_MODEL, sizeof(CT_1_MODEL));
-	KvGetString(model_settings, "CT_1_NAME", CT_1_NAME, sizeof(CT_1_NAME));
-	KvGetString(model_settings, "CT_2_MODEL", CT_2_MODEL, sizeof(CT_2_MODEL));
-	KvGetString(model_settings, "CT_2_NAME", CT_2_NAME, sizeof(CT_2_NAME));
+
+	if (KvGotoFirstSubKey(model_settings))
+	{
+		do
+		{
+			KvGetString(model_settings, "team", models[modelCount][MODELTEAM], sizeof(models[][]));
+			KvGetString(model_settings, "model", models[modelCount][MODELPATH], sizeof(models[][]));
+
+			if (!StrEqual(models[modelCount][MODELPATH], "") && !StrEqual(models[modelCount][MODELPATH], "0"))
+				PrecacheModel(models[modelCount][MODELPATH], true);
+
+			KvGetString(model_settings, "name", models[modelCount++][MODELNAME], sizeof(models[][]));
+		}
+		while (KvGotoNextKey(model_settings));
+	}
 	
 	CloseHandle(model_settings);
+
+	for (new item = 0; item < modelCount; item++)
+	{
+		if (StringToInt(models[item][MODELTEAM]) == 2)
+			TMODELS++;
+		else
+			CTMODELS++;
+	}
+
 	
 	if (!Loaded)
 	{
 		RegConsoleCmd(model_change_cmd, CmdModel);
+
 		Loaded = true;
 	}
-	
+
 	if (!StrContains(model_change_cmd, "sm_") || StrContains(model_change_cmd, "!") != 0)
 	{
 		ReplaceString(model_change_cmd, sizeof(model_change_cmd), "sm_", "");
 		Format(model_change_cmd, sizeof(model_change_cmd), "!%s", model_change_cmd);
 	}
-	
-	if (!StrEqual(T_1_MODEL, "") && !StrEqual(T_1_MODEL, "0") && !StrEqual(T_1_MODEL, " ")) 
-		PrecacheModel(T_1_MODEL, true);
-		
-	if (!StrEqual(T_2_MODEL, "") && !StrEqual(T_2_MODEL, "0") && !StrEqual(T_2_MODEL, " ")) 
-		PrecacheModel(T_2_MODEL, true);
-		
-	if (!StrEqual(CT_1_MODEL, "") && !StrEqual(CT_1_MODEL, "0") && !StrEqual(CT_1_MODEL, " ")) 
-		PrecacheModel(CT_1_MODEL, true);
-		
-	if (!StrEqual(CT_2_MODEL, "") && !StrEqual(CT_2_MODEL, "0") && !StrEqual(CT_2_MODEL, " ")) 
-		PrecacheModel(CT_2_MODEL, true);
 }
 
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
@@ -151,7 +160,7 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 			{
 				PlayerHasModel[client] = 0;
 				
-				Format(PlayerModel[client], PLATFORM_MAX_PATH + 1, "");
+				Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 			}
 			
 			LastTeam[client] = GetClientTeam(client);
@@ -175,7 +184,7 @@ public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadc
 	{
 		PlayerHasModel[client] = 0;
 		
-		Format(PlayerModel[client], PLATFORM_MAX_PATH + 1, "");
+		Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 	}
 }
 
@@ -218,9 +227,9 @@ public Action:CmdModel(client, args)
 		{
 			PlayerHasModel[client] = 0;
 			
-			Format(PlayerModel[client], PLATFORM_MAX_PATH+1, "");
+			Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 			
-			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "NewModel", LANG_SERVER);
+			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "NewModel", client);
 		}
 	}
 	
@@ -243,13 +252,13 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 				
 				PlayerHasModel[param1] = 1;
 				
-				Format(PlayerModel[param1], PLATFORM_MAX_PATH + 1, ModelChoose);
+				Format(PlayerModel[param1], sizeof(PlayerModel[]), ModelChoose);
 			}
 			if (StrEqual(ModelChoose, "standard")) 
 			{
 				PlayerHasModel[param1] = 1;
 				
-				Format(PlayerModel[param1], PLATFORM_MAX_PATH + 1, "");
+				Format(PlayerModel[param1], sizeof(PlayerModel[]), "");
 			}
 		}
 	}
@@ -265,30 +274,21 @@ public PrepareSameModels(client)
 		decl String:ModelChooseLang[256];
 		decl String:StandardModel[256];
 		
-		Format(ModelChooseLang, sizeof(ModelChooseLang), "%T", "ChooseModel", LANG_SERVER);
-		Format(StandardModel, sizeof(StandardModel), "%T", "StandardModel", LANG_SERVER);
+		Format(ModelChooseLang, sizeof(ModelChooseLang), "%T", "ChooseModel", client);
+		Format(StandardModel, sizeof(StandardModel), "%T", "StandardModel", client);
 		
 		new Handle:ModelMenu = CreateMenu(ModelMenuCall);
 		
 		SetMenuTitle(ModelMenu, ModelChooseLang);
 		SetMenuExitButton(ModelMenu, false);
-		
-		if (GetClientTeam(client) == 2)
+
+		for (new item = 0; item < modelCount; item++)
 		{
-			if (!StrEqual(T_1_MODEL, "") && !StrEqual(T_1_MODEL, "0") && !StrEqual(T_1_MODEL, " ")) 
-				AddMenuItem(ModelMenu, T_1_MODEL, T_1_NAME);
-				
-			if (!StrEqual(T_2_MODEL, "") && !StrEqual(T_2_MODEL, "0") && !StrEqual(T_2_MODEL, " ")) 
-				AddMenuItem(ModelMenu, T_2_MODEL, T_2_NAME);
-		}
-		
-		if (GetClientTeam(client) == 3)
-		{
-			if (!StrEqual(CT_1_MODEL, "") && !StrEqual(CT_1_MODEL, "0") && !StrEqual(CT_1_MODEL, " ")) 	
-				AddMenuItem(ModelMenu, CT_1_MODEL, CT_1_NAME);
-				
-			if (!StrEqual(CT_2_MODEL, "") && !StrEqual(CT_2_MODEL, "0") && !StrEqual(CT_2_MODEL, " ")) 
-				AddMenuItem(ModelMenu, CT_2_MODEL, CT_2_NAME);
+			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]))
+			{
+				if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
+					AddMenuItem(ModelMenu, models[item][MODELPATH], models[item][MODELNAME]);
+			}
 		}
 		
 		AddMenuItem(ModelMenu, "standard", StandardModel);
@@ -304,73 +304,26 @@ public PrepareSameModels(client)
 
 public PrepareRandomModels(client)
 {
-	new TMODELS = 0;
-	new CTMODELS = 0;
-	
-	if (!StrEqual(T_1_MODEL, "") && !StrEqual(T_1_MODEL, "0") && !StrEqual(T_1_MODEL, " "))
-		TMODELS++;
-		
-	if (!StrEqual(T_2_MODEL, "") && !StrEqual(T_2_MODEL, "0") && !StrEqual(T_2_MODEL, " ")) 
-		TMODELS++;
-		
-	if (!StrEqual(CT_1_MODEL, "") && !StrEqual(CT_1_MODEL, "0") && !StrEqual(CT_1_MODEL, " ")) 
-		CTMODELS++;
-		
-	if (!StrEqual(CT_2_MODEL, "") && !StrEqual(CT_2_MODEL, "0") && !StrEqual(CT_2_MODEL, " ")) 
-		CTMODELS++;
-	
-	new RandModelT = GetRandomInt(1, TMODELS);
-	new RandModelCT = GetRandomInt(1, CTMODELS);
+	new team = GetClientTeam(client);
+	new randomValue;
+
+	if (team == 2)
+		randomValue = GetRandomInt(1, TMODELS);
+	else
+		randomValue = GetRandomInt(1, CTMODELS);
 	
 	if ((!admin_model && !STAMM_IsClientAdmin(client)) || admin_model)
 	{
-		if (GetClientTeam(client) == 2)
+		new counter;
+
+		for (new item = 0; item < modelCount; item++)
 		{
-			if (TMODELS == 1)
+			if (StringToInt(models[item][MODELTEAM]) == team)
 			{
-				if (!StrEqual(T_1_MODEL, "") && !StrEqual(T_1_MODEL, "0") && !StrEqual(T_1_MODEL, " ") && !StrEqual(T_1_MODEL, "\0")) 
-					SetEntityModel(client, T_1_MODEL);
-					
-				else if (!StrEqual(T_2_MODEL, "") && !StrEqual(T_2_MODEL, "0") && !StrEqual(T_2_MODEL, " ") && !StrEqual(T_2_MODEL, "\0")) 
-					SetEntityModel(client, T_2_MODEL);
-			}
-			
-			if (TMODELS == 2)
-			{
-				if (RandModelT == 1)
+				if (++counter == randomValue)
 				{
-					if (!StrEqual(T_1_MODEL, "") && !StrEqual(T_1_MODEL, "0") && !StrEqual(T_1_MODEL, " ") && !StrEqual(T_1_MODEL, "\0")) 
-						SetEntityModel(client, T_1_MODEL);
-				}
-				if (RandModelT == 2)
-				{
-					if (!StrEqual(T_2_MODEL, "") && !StrEqual(T_2_MODEL, "0") && !StrEqual(T_2_MODEL, " ") && !StrEqual(T_2_MODEL, "\0")) 
-						SetEntityModel(client, T_2_MODEL);
-				}
-			}
-		}
-		if (GetClientTeam(client) == 3)
-		{
-			if (CTMODELS == 1)
-			{
-				if (!StrEqual(CT_1_MODEL, "") && !StrEqual(CT_1_MODEL, "0") && !StrEqual(CT_1_MODEL, " ") && !StrEqual(CT_1_MODEL, "\0")) 
-					SetEntityModel(client, CT_1_MODEL);
-					
-				else if (!StrEqual(CT_2_MODEL, "") && !StrEqual(CT_2_MODEL, "0") && !StrEqual(CT_2_MODEL, " ") && !StrEqual(CT_2_MODEL, "\0"))
-					SetEntityModel(client, CT_2_MODEL);
-			}
-			
-			if (CTMODELS == 2)
-			{
-				if (RandModelCT == 1)
-				{
-					if (!StrEqual(CT_1_MODEL, "") && !StrEqual(CT_1_MODEL, "0") && !StrEqual(CT_1_MODEL, " ") && !StrEqual(CT_1_MODEL, "\0")) 
-						SetEntityModel(client, CT_1_MODEL);
-				}
-				if (RandModelCT == 2)
-				{
-					if (!StrEqual(CT_2_MODEL, "") && !StrEqual(CT_2_MODEL, "0") && !StrEqual(CT_2_MODEL, " ") && !StrEqual(CT_2_MODEL, "\0")) 
-						SetEntityModel(client, CT_2_MODEL);
+					if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
+						SetEntityModel(client, models[item][MODELPATH]);
 				}
 			}
 		}

@@ -42,8 +42,13 @@ public OnPluginStart()
 {
 	decl String:path[PLATFORM_MAX_PATH + 1];
 
-	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
- 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 
 	if (STAMM_GetGame() == GameCSGO)
 		Format(path, sizeof(path), "cfg/stamm/features/WeaponSettings_csgo.txt");

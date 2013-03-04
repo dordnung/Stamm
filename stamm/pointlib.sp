@@ -26,7 +26,7 @@ public Action:pointlib_PlayerTime(Handle:timer)
 		if (clientlib_isValidClient(i))
 		{
 			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && g_min_player <= GetClientCount())
-				pointlib_GivePlayerPoints(i, g_points);
+				pointlib_GivePlayerPoints(i, g_points, true);
 		}
 	}
 	return Plugin_Continue;
@@ -57,7 +57,7 @@ public Action:pointlib_AddPlayerPoints(args)
 			new client = GetClientOfUserId(StringToInt(useridString));
 			
 			if (clientlib_isValidClient(client))
-				pointlib_GivePlayerPoints(client, number);
+				pointlib_GivePlayerPoints(client, number, false);
 			else
 				ReplyToCommand(0, "Error. Couldn't find userid %s", useridString);
 		}
@@ -68,7 +68,7 @@ public Action:pointlib_AddPlayerPoints(args)
 			new client = clientlib_IsSteamIDConnected(useridString);
 
 			if (client > 0)
-				pointlib_GivePlayerPoints(client, number);
+				pointlib_GivePlayerPoints(client, number, false);
 			else
 			{
 				decl String:query[128];
@@ -108,7 +108,7 @@ public Action:pointlib_SetPlayerPoints(args)
 			{
 				new diff = number - g_playerpoints[client];
 
-				pointlib_GivePlayerPoints(client, diff);
+				pointlib_GivePlayerPoints(client, diff, false);
 			}
 			else
 				ReplyToCommand(0, "Error. Couldn't find userid %s or number is less than zero.", useridString);
@@ -123,7 +123,7 @@ public Action:pointlib_SetPlayerPoints(args)
 			{
 				new diff = number - g_playerpoints[client];
 
-				pointlib_GivePlayerPoints(client, diff);
+				pointlib_GivePlayerPoints(client, diff, false);
 			}
 			else
 			{
@@ -161,7 +161,7 @@ public Action:pointlib_DelPlayerPoints(args)
 			new client = GetClientOfUserId(StringToInt(useridString));
 			
 			if (clientlib_isValidClient(client))
-				pointlib_GivePlayerPoints(client, number);
+				pointlib_GivePlayerPoints(client, number, false);
 			else
 				ReplyToCommand(0, "Error. Couldn't find userid %s", useridString);
 		}
@@ -172,7 +172,7 @@ public Action:pointlib_DelPlayerPoints(args)
 			new client = clientlib_IsSteamIDConnected(useridString);
 
 			if (client > 0)
-				pointlib_GivePlayerPoints(client, number);
+				pointlib_GivePlayerPoints(client, number, false);
 			else
 			{
 				decl String:query[128];
@@ -206,21 +206,24 @@ public Action:pointlib_ShowPoints(client, arg)
 	return Plugin_Handled;
 }
 
-public pointlib_GivePlayerPoints(client, number)
+public pointlib_GivePlayerPoints(client, number, bool:check)
 {
 	if (number < 0 && g_playerpoints[client] + number < 0)
 		number = -g_playerpoints[client];
 
-	new Action:result;
-
-	for (new i=0; i < g_features; i++)
+	if (check)
 	{
-		if (g_FeatureList[i][FEATURE_ENABLE] == 1)
+		new Action:result;
+
+		for (new i=0; i < g_features; i++)
 		{
-			result = nativelib_PublicPlayerGetPointsPlugin(g_FeatureList[i][FEATURE_HANDLE], client, number);
-			
-			if (result != Plugin_Changed && result != Plugin_Continue)
-				return;
+			if (g_FeatureList[i][FEATURE_ENABLE] == 1)
+			{
+				result = nativelib_PublicPlayerGetPointsPlugin(g_FeatureList[i][FEATURE_HANDLE], client, number);
+				
+				if (result != Plugin_Changed && result != Plugin_Continue)
+					return;
+			}
 		}
 	}
 

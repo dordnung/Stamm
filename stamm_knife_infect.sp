@@ -31,8 +31,13 @@ public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 
-	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
- 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -53,13 +58,13 @@ public OnPluginStart()
 	HookEvent("player_hurt", PlayerHurt);
 	HookEvent("player_spawn", PlayerDeath);
 
-	AutoExecConfig_SetFile("stamm/features/knife_infect");
+	AutoExecConfig_SetFile("knife_infect", "stamm/features");
 	
 	dur_c = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
 	mode_c = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
 	lhp_c = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
 	
-	AutoExecConfig(true, "knife_infect", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 }
 

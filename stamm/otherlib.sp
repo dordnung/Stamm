@@ -74,7 +74,7 @@ public otherlib_EndHappyHour()
 		g_points = 1;
 		g_happyhouron = 0;
 		
-		g_HappyTimer = otherlib_checkTimer(g_HappyTimer);
+		otherlib_checkTimer(g_HappyTimer);
 		
 		CPrintToChatAll("%s %t", g_StammTag, "HappyEnded");
 		
@@ -139,10 +139,10 @@ public Action:otherlib_StopHappy(args)
 	otherlib_EndHappyHour();
 }
 
-public Handle:otherlib_checkTimer(Handle:timer)
+public otherlib_checkTimer(&Handle:timer)
 {
 	if (timer != INVALID_HANDLE)
-		KillTimer(timer);
-	
-	return INVALID_HANDLE;
+		CloseHandle(timer);
+
+	timer = INVALID_HANDLE;
 }

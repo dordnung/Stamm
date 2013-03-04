@@ -6,8 +6,10 @@
 #pragma semicolon 1
 
 new hp;
+new timeInterval;
 
 new Handle:c_hp;
+new Handle:c_time;
 new Handle:ClientTimers[MAXPLAYERS + 1];
 
 public Plugin:myinfo =
@@ -35,7 +37,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetRegenerate", LANG_SERVER, hp * i);
+		Format(haveDescription, sizeof(haveDescription), "%T", "GetRegenerate", LANG_SERVER, hp * i, timeInterval);
 		
 		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
 	}
@@ -45,17 +47,19 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
-	AutoExecConfig_SetFile("stamm/features/regenerate");
+	AutoExecConfig_SetFile("regenerate", "stamm/features");
 	
-	c_hp = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every second per block");
+	c_hp = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every x seconds per block");
+	c_time = AutoExecConfig_CreateConVar("regenerate_time", "1", "Time interval to regenerate (in Seconds)");
 	
-	AutoExecConfig(true, "regenerate", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 }
 
 public OnConfigsExecuted()
 {
 	hp = GetConVarInt(c_hp);
+	timeInterval = GetConVarInt(c_time);
 }
 
 public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
@@ -69,7 +73,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 			if (ClientTimers[client] != INVALID_HANDLE) 
 				KillTimer(ClientTimers[client]);
 			
-			ClientTimers[client] = CreateTimer(1.0, GiveHealth, client, TIMER_REPEAT);
+			ClientTimers[client] = CreateTimer(float(timeInterval), GiveHealth, client, TIMER_REPEAT);
 		}
 	}
 }

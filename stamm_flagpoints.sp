@@ -19,11 +19,11 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/flagpoints");
+	AutoExecConfig_SetFile("flagpoints", "stamm/features");
 
 	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag a player needs to collect points");
 	
-	AutoExecConfig(true, "flagpoints", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 }
 

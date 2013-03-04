@@ -11,7 +11,7 @@ public Plugin:myinfo =
 	name = "Stamm Feature NoBlock",
 	author = "Popoklopsi",
 	version = "1.1",
-	description = "VIP's can walk through other players",
+	description = "Non VIP's cant' walk through VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
@@ -45,7 +45,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 	
 	if (STAMM_IsClientValid(client))
 	{
-		if (!STAMM_IsClientVip(client, STAMM_GetLevel()))
+		if (!STAMM_HaveClientFeature(client))
 			SetEntData(client, coll_offset, 2, 4, true);
 	}
 	else

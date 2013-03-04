@@ -46,11 +46,11 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/throwing_knifes");
+	AutoExecConfig_SetFile("throwing_knifes", "stamm/features");
 
 	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
 	
-	AutoExecConfig(true, "throwing_knifes", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 
 	AutoExecConfig_CleanFile();
 	

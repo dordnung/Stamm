@@ -28,8 +28,13 @@ public OnAllPluginsLoaded()
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 
-	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
- 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 		
 	STAMM_LoadTranslation();
 		
@@ -59,13 +64,13 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/chats");
+	AutoExecConfig_SetFile("chats", "stamm/features");
 
 	c_MessageTag = AutoExecConfig_CreateConVar("chats_messagetag", "VIP Message", "Tag when a player writes something as a VIP");
 	c_OwnChatTag = AutoExecConfig_CreateConVar("chats_ownchattag", "VIP Chat", "Tag when a player writes something in the VIP Chat");
 	c_NeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate it, 0 = Off");
 	
-	AutoExecConfig(true, "chats", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 	
 	RegConsoleCmd("say", CmdSay);

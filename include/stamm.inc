@@ -363,6 +363,13 @@ native STAMM_UnloadFeature(Handle:plugin);
 native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 
 /**
+ * Checks for new translations
+ *
+ * @noreturn
+ */
+native STAMM_CheckTranslations();
+
+/**
  * Load the translation file of your feature in stamm/languages
  *
  * @noreturn
@@ -370,6 +377,8 @@ native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 stock STAMM_LoadTranslation()
 {
 	decl String:basename[64];
+
+	STAMM_CheckTranslations();
 	
 	STAMM_GetBasename(basename, sizeof(basename));
 	
@@ -421,5 +430,6 @@ public __pl_stamm_SetNTVOptional()
 	MarkNativeAsOptional("STAMM_LoadFeature");
 	MarkNativeAsOptional("STAMM_UnloadFeature");
 	MarkNativeAsOptional("STAMM_WriteToLog");
+	MarkNativeAsOptional("STAMM_CheckTranslations");
 }
 #endif

@@ -19,8 +19,13 @@ public OnAllPluginsLoaded()
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 
-	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
- 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 		
 	STAMM_LoadTranslation();
 		

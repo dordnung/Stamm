@@ -42,10 +42,15 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 public OnPluginStart()
 {
 	CheckStammFolders();
-	featurelib_LoadTranslations();
+	featurelib_LoadTranslations(true);
 
-	if (!CColorAllowed(Color_Lightgreen) && CColorAllowed(Color_Lime))
- 	 	CReplaceColor(Color_Lightgreen, Color_Lime);
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 
 	LoadTranslations("stamm.phrases");
 
@@ -59,11 +64,13 @@ public OnPluginStart()
 	RegServerCmd("stamm_start_happyhour", otherlib_StartHappy, "Starts happy hour: stamm_start_happyhour <time> <factor>");
 	RegServerCmd("stamm_stop_happyhour", otherlib_StopHappy, "Stops happy hour");
 
-	RegServerCmd("stamm_feature_load", featurelib_Load, "Loads a feature: stamm_feature_load <basename>");
-	RegServerCmd("stamm_feature_unload", featurelib_UnLoad, "Unloads a feature: stamm_feature_unload <basename>");
-	RegServerCmd("stamm_feature_reload", featurelib_ReLoad, "Reloads a feature: stamm_feature_reload <basename>");
+	RegServerCmd("stamm_load_feature", featurelib_Load, "Loads a feature: stamm_load_feature <basename>");
+	RegServerCmd("stamm_unload_feature", featurelib_UnLoad, "Unloads a feature: stamm_unload_feature <basename>");
+	RegServerCmd("stamm_reload_feature", featurelib_ReLoad, "Reloads a feature: stamm_reload_feature <basename>");
 
 	RegServerCmd("stamm_feature_list", featurelib_List, "List all features.");
+
+	RegServerCmd("stamm_convert_db", sqllib_convertDB, "Converts the stamm database to a file");
 	
 	otherlib_saveGame();
 	levellib_LoadLevels();
@@ -177,7 +184,7 @@ public OnConfigsExecuted()
 	if (g_showpoints && g_see_text == 0) 
 		pointlib_showpointer = CreateTimer(float(g_showpoints), pointlib_PointShower, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 		
-	if (g_infotime) 
+	if (g_infotime > 0.0) 
 		otherlib_inftimer = CreateTimer(g_infotime, otherlib_PlayerInfoTimer, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
 	otherlib_PrepareFiles();

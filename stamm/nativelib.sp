@@ -41,6 +41,7 @@ public nativelib_Start()
 	CreateNative("STAMM_LoadFeature", nativelib_LoadFeature);
 	CreateNative("STAMM_UnloadFeature", nativelib_UnloadFeature);
 	CreateNative("STAMM_WriteToLog", nativelib_WriteToStammLog);
+	CreateNative("STAMM_CheckTranslations", nativelib_CheckTranslations);
 	
 	nativelib_stamm_ready = CreateGlobalForward("STAMM_OnReady", ET_Ignore);
 	nativelib_client_ready = CreateGlobalForward("STAMM_OnClientReady", ET_Ignore, Param_Cell);
@@ -280,6 +281,8 @@ public nativelib_GetStammLevelName(Handle:plugin, numParams)
 		
 		return true;
 	}
+
+	SetNativeString(2, "", len, false);	
 	
 	return false;
 }
@@ -383,7 +386,7 @@ public nativelib_AddClientStammPoints(Handle:plugin, numParams)
 	
 	if (clientlib_isValidClient(client)) 
 	{
-		pointlib_GivePlayerPoints(client, pointschange);
+		pointlib_GivePlayerPoints(client, pointschange, false);
 		
 		return true;
 	}
@@ -398,7 +401,7 @@ public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 	
 	if (clientlib_isValidClient(client)) 
 	{
-		pointlib_GivePlayerPoints(client, pointschange*-1);
+		pointlib_GivePlayerPoints(client, pointschange*-1, false);
 		
 		return true;
 	}
@@ -417,7 +420,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 		{
 			new diff = pointschange - g_playerpoints[client];
 
-			pointlib_GivePlayerPoints(client, diff);
+			pointlib_GivePlayerPoints(client, diff, false);
 			
 			return true;
 		}
@@ -567,4 +570,9 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 	 	LogToFile(g_DebugFile, "[ STAMM-%s ] %s", basename, buffer);
 	else if (!useDebug)
 		LogToFile(g_LogFile, "[ STAMM-%s ] %s", basename, buffer);
+}
+
+public nativelib_CheckTranslations(Handle:plugin, numParams)
+{
+	featurelib_LoadTranslations(false);
 }

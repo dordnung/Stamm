@@ -28,7 +28,7 @@ public OnAllPluginsLoaded()
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (STAMM_GetGame() != GameCSS) 
+	if (STAMM_GetGame() != GameCSS || STAMM_GetGame() != GameCSGO) 
 		SetFailState("Can't Load Feature, not Supported for your game!");
 
 	STAMM_LoadTranslation();
@@ -40,12 +40,12 @@ public OnAllPluginsLoaded()
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/colored_smokes");
+	AutoExecConfig_SetFile("colored_smokes", "stamm/features");
 
 	mode_smoke_c = AutoExecConfig_CreateConVar("smoke_mode", "0", "The Mode: 0=Team Colors, 1=Random, 2=Party, 3=Custom");
 	colors_c = AutoExecConfig_CreateConVar("smoke_color", "255 255 255", "When mode = 3: RGB colors of the smoke");
 	
-	AutoExecConfig(true, "colored_smokes", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 	
 	HookEvent("smokegrenade_detonate", eventHeDetonate);

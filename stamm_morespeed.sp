@@ -31,11 +31,11 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
-	AutoExecConfig_SetFile("stamm/features/morespeed");
+	AutoExecConfig_SetFile("morespeed", "stamm/features");
 	
 	c_speed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
 	
-	AutoExecConfig(true, "morespeed", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 }
 

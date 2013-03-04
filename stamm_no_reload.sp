@@ -1,5 +1,6 @@
 #include <sourcemod>
 #include <sdktools>
+#include <tf2>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 
@@ -20,32 +21,42 @@ public OnAllPluginsLoaded()
 
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
-	
-	if (STAMM_GetGame() == GameTF2) 
+
+	if (STAMM_GetGame() == GameDOD) 
 		SetFailState("Can't Load Feature, not Supported for your game!");
-		
+
 	STAMM_LoadTranslation();
 		
 	Format(description, sizeof(description), "%T", "GetNoReload", LANG_SERVER);
 	
 	STAMM_AddFeature("VIP No Reload", description);
+
+	if (STAMM_GetGame() != GameTF2)
+		HookEvent("weapon_fire", eventWeaponFire);
 }
 
-public OnPluginStart()
+public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &bool:result)
 {
-	HookEvent("weapon_fire", eventWeaponFire);
+	giveNoReload(client, weaponname);
+
+	return Plugin_Continue;
 }
 
 public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	new client = GetClientOfUserId(GetEventInt(event, "userid"));
-	
 	decl String:weapons[64];
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+
+	GetEventString(event, "weapon", weapons, sizeof(weapons));
+
+	giveNoReload(client, weapons);
+}
+
+public giveNoReload(client, String:weapons[])
+{
 	decl String:Pri[64];
 	decl String:Sec[64];
-	
-	GetEventString(event, "weapon", weapons, sizeof(weapons));
-	
+
 	if (STAMM_IsClientValid(client))
 	{
 		if (STAMM_HaveClientFeature(client))
@@ -57,15 +68,19 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 			if (pri_i != -1)
 			{
 				GetEdictClassname(pri_i, Pri, sizeof(Pri));
-				ReplaceString(Pri, sizeof(Pri), "weapon_", "");
+
+				if (STAMM_GetGame() != GameTF2)
+					ReplaceString(Pri, sizeof(Pri), "weapon_", "");
 			}
 			
 			if (sec_i != -1)
 			{
 				GetEdictClassname(sec_i, Sec, sizeof(Sec));
-				ReplaceString(Sec, sizeof(Sec), "weapon_", "");
+
+				if (STAMM_GetGame() != GameTF2)
+					ReplaceString(Sec, sizeof(Sec), "weapon_", "");
 			}
-			
+
 			if (StrEqual(weapons, Pri))
 				weapon = pri_i;
 				
@@ -73,7 +88,7 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 				weapon = sec_i;
 			else 
 				return;
-			
+
 			new clip = GetEntProp(weapon, Prop_Send, "m_iClip1");
 			new ammotype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
 			new ammo = GetEntProp(client, Prop_Send, "m_iAmmo", _, ammotype);

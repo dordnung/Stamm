@@ -160,7 +160,7 @@ public clientlib_CheckFlagAdmin(client)
 public clientlib_GiveFastVIP(client)
 {
 	if (g_playerlevel[client] < g_levels)
-		pointlib_GivePlayerPoints(client, g_LevelPoints[g_levels-1]);
+		pointlib_GivePlayerPoints(client, g_LevelPoints[g_levels-1], false);
 }
 
 public clientlib_CheckVip(client)
@@ -345,10 +345,10 @@ public Action:clientlib_CmdSay(client, args)
 				
 				GetClientName(choose, names, sizeof(names));
 				
-				pointlib_GivePlayerPoints(choose, pointstoset);
+				pointlib_GivePlayerPoints(choose, pointstoset, false);
 				
-				CPrintToChat(client, "%s %t", g_StammTag, "SetPoints", names, g_playerpoints[client]);
-				CPrintToChat(choose, "%s %t", g_StammTag, "SetPoints2", g_playerpoints[client]);
+				CPrintToChat(client, "%s %t", g_StammTag, "SetPoints", names, g_playerpoints[choose]);
+				CPrintToChat(choose, "%s %t", g_StammTag, "SetPoints2", g_playerpoints[choose]);
 			}
 			
 			g_pointsnumber[client] = 0;

@@ -43,11 +43,11 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
-	AutoExecConfig_SetFile("stamm/features/spawnhp");
+	AutoExecConfig_SetFile("spawnhp", "stamm/features");
 	
 	c_hp = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more");
 	
-	AutoExecConfig(true, "spawnhp", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 
 	AutoExecConfig_CleanFile();
 }

@@ -35,11 +35,11 @@ public OnAllPluginsLoaded()
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/show_damage");
+	AutoExecConfig_SetFile("show_damage", "stamm/features");
 
 	damage_area_c = AutoExecConfig_CreateConVar("damage_area", "1", "Textarea where to show message, 1=Center Text, 2=Hint Text, 3=Chat");
 	
-	AutoExecConfig(true, "show_damage", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 	
 	HookEvent("player_hurt", eventPlayerHurt);
@@ -62,6 +62,8 @@ public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadc
 			
 			if (STAMM_GetGame() == GameTF2) 
 				damage = GetEventInt(event, "damageamount");
+			else if (STAMM_GetGame() == GameDOD)
+				damage = GetEventInt(event, "damage");
 			else 
 				damage = GetEventInt(event, "dmg_health");
 			

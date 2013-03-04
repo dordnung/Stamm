@@ -177,10 +177,10 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 	
 	retriev = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	
-	if (!retriev)
+	if (retriev <= 1)
 		retriev = ExplodeString(basename, "\\", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 		
-	if (!retriev)
+	if (retriev <= 1)
 		Format(name, size, basename);
 	else	
 		Format(name, size, explodedBasename[retriev-1]);
@@ -188,7 +188,7 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 	return true;
 }
 
-public featurelib_LoadTranslations()
+public featurelib_LoadTranslations(bool:checkAll)
 {
 	decl String:LanguagesFolder[PLATFORM_MAX_PATH +1];
 	decl String:LanguagesStammFolder[PLATFORM_MAX_PATH +1];
@@ -208,17 +208,21 @@ public featurelib_LoadTranslations()
 	{
 		if (type == FileType_File)
 		{
-			Format(PathToFile, sizeof(PathToFile), "%s/%s", LanguagesFolder, FileToOpen);
 			Format(FileToPath, sizeof(FileToPath), "%s/%s", LanguagesStammFolder, FileToOpen);
-			
-			new Handle:kv = CreateKeyValues("Phrases");
-			
-			if (FileToKeyValues(kv, PathToFile))
+
+			if (checkAll || !FileExists(FileToPath))
 			{
-				KvSetSectionName(kv, "Phrases");
-				KeyValuesToFile(kv, FileToPath);
+				Format(PathToFile, sizeof(PathToFile), "%s/%s", LanguagesFolder, FileToOpen);
+
+				new Handle:kv = CreateKeyValues("Phrases");
 				
-				CloseHandle(kv);
+				if (FileToKeyValues(kv, PathToFile))
+				{
+					KvSetSectionName(kv, "Phrases");
+					KeyValuesToFile(kv, FileToPath);
+					
+					CloseHandle(kv);
+				}
 			}
 		}
 	}
@@ -283,7 +287,7 @@ public Action:featurelib_Load(args)
 		ServerCommand("sm plugins load %s", basename);
 	}
 	else
-		ReplyToCommand(0, "Usage: stamm_feature_load <basename>");
+		ReplyToCommand(0, "Usage: stamm_load_feature <basename>");
 	
 	return Plugin_Handled;
 }
@@ -319,7 +323,7 @@ public Action:featurelib_UnLoad(args)
 		ReplyToCommand(0, "Error. Feature not found or already unloaded.");
 	}
 	else
-		ReplyToCommand(0, "Usage: stamm_feature_unload <basename>");
+		ReplyToCommand(0, "Usage: stamm_unload_feature <basename>");
 	
 	return Plugin_Handled;
 }
@@ -355,14 +359,14 @@ public Action:featurelib_ReLoad(args)
 		ReplyToCommand(0, "Error. Feature not found.");
 	}
 	else
-		ReplyToCommand(0, "Usage: stamm_feature_reload <basename>");
+		ReplyToCommand(0, "Usage: stamm_reload_feature <basename>");
 	
 	return Plugin_Handled;
 }
 
 public Action:featurelib_List(args)
 {
-	PrintToServer("[STAMM] Listing %d Plugin(s):", g_features);
+	PrintToServer("[STAMM] Listing %d Feature(s):", g_features);
 
 	for (new i=0; i < g_features; i++)
 	{

@@ -24,7 +24,7 @@ new Handle:configlib_viprank;
 
 public configlib_CreateConfig()
 {
-	AutoExecConfig_SetFile("stamm/stamm_config");
+	AutoExecConfig_SetFile("stamm_config", "stamm");
 	
 	AutoExecConfig_CreateConVar("stamm_ver", g_Plugin_Version, "Stamm Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
@@ -50,7 +50,7 @@ public configlib_CreateConfig()
 	configlib_sme = AutoExecConfig_CreateConVar("stamm_me_cmd", "sm_ssme", "Command to see ones current features");
 	configlib_viprank = AutoExecConfig_CreateConVar("stamm_viprank", "sm_srank", "Command for VIP Rank");
 
-	AutoExecConfig(true, "stamm_config", "stamm");
+	AutoExecConfig_AutoExecConfig(true);
 	
 	AutoExecConfig_CleanFile();
 }

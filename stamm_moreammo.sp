@@ -44,11 +44,11 @@ public OnPluginStart()
 	if (STAMM_GetGame() == GameDOD)
 		HookEvent("dod_round_start", RoundStart);
 
-	AutoExecConfig_SetFile("stamm/features/moreammo");
+	AutoExecConfig_SetFile("moreammo", "stamm/features");
 	
 	c_ammo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
 	
-	AutoExecConfig(true, "moreammo", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 }
 

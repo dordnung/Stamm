@@ -29,7 +29,7 @@ public OnAllPluginsLoaded()
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+	if (STAMM_GetGame() == GameDOD || STAMM_GetGame() == GameTF2) 
 		SetFailState("Can't Load Feature, not Supported for your game!");
 		
 	STAMM_LoadTranslation();

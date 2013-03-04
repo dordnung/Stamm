@@ -37,11 +37,11 @@ public OnAllPluginsLoaded()
 
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("stamm/features/joinsound");
+	AutoExecConfig_SetFile("joinsound", "stamm/features");
 
 	j_path = AutoExecConfig_CreateConVar("joinsound_path", "music/stamm/vip_sound.mp3", "Path to joinsound, after sound/");
 	
-	AutoExecConfig(true, "joinsound", "stamm/features");
+	AutoExecConfig_AutoExecConfig();
 	AutoExecConfig_CleanFile();
 }
 

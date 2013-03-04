@@ -24,7 +24,7 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 			if (clientlib_isValidClient(client))
 			{
 				if (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)
-					pointlib_GivePlayerPoints(client, g_points);
+					pointlib_GivePlayerPoints(client, g_points, true);
 			}
 		}
 	}
@@ -43,7 +43,7 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 		if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7)
 		{
 			if (GetClientCount() >= g_min_player && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
-				pointlib_GivePlayerPoints(client, g_points);
+				pointlib_GivePlayerPoints(client, g_points, true);
 		}
 	}
 }
