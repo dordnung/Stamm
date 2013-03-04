@@ -28,7 +28,7 @@ public OnAllPluginsLoaded()
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (STAMM_GetGame() != GameCSS || STAMM_GetGame() != GameCSGO) 
+	if (STAMM_GetGame() != GameCSS && STAMM_GetGame() != GameCSGO) 
 		SetFailState("Can't Load Feature, not Supported for your game!");
 
 	STAMM_LoadTranslation();

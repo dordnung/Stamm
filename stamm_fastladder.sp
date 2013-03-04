@@ -30,6 +30,7 @@ public OnAllPluginsLoaded()
 
 	STAMM_AddFeature("VIP FastLadder", description, false);
 }
+
 public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon)
 {
 	if (STAMM_IsClientValid(client) && !STAMM_HaveClientFeature(client))

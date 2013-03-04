@@ -43,7 +43,7 @@ public configlib_CreateConfig()
 	configlib_texttowrite = AutoExecConfig_CreateConVar("stamm_texttowrite", "sm_stamm", "Command to see currently points");
 	configlib_vip_type = AutoExecConfig_CreateConVar("stamm_vip_type", "1", "How to get Points, 1=kills, 2=rounds, 3=time, 4=kills&rounds, 5=kills&time, 6=rounds&time, 7=kills&rounds&time");
 	configlib_time_point = AutoExecConfig_CreateConVar("stamm_time_point", "1", "How much minutes are one point?");
-	configlib_viplist = AutoExecConfig_CreateConVar("stamm_viplist", "sm_slist", "Command for VIP Top 100");
+	configlib_viplist = AutoExecConfig_CreateConVar("stamm_viplist", "sm_slist", "Command for VIP Top 10");
 	configlib_tablename = AutoExecConfig_CreateConVar("stamm_table_name", "STAMM_DB", "Your Stamm Table Name. It appends '_<serverid>' at the end!");
 	configlib_sinfo = AutoExecConfig_CreateConVar("stamm_info_cmd", "sm_sinfo", "Command to see infos about stamm");
 	configlib_schange = AutoExecConfig_CreateConVar("stamm_change_cmd", "sm_schange", "Command to put ones features on/off");

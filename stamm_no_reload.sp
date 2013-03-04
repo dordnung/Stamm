@@ -1,8 +1,11 @@
 #include <sourcemod>
 #include <sdktools>
-#include <tf2>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
+
+#undef REQUIRE_EXTENSIONS
+#include <tf2>
 
 #pragma semicolon 1
 

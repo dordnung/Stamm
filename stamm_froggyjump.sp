@@ -1,8 +1,11 @@
 #include <sourcemod>
 #include <autoexecconfig>
-#include <tf2_stocks>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
+
+#undef REQUIRE_EXTENSIONS
+#include <tf2_stocks>
 
 #pragma semicolon 1
 

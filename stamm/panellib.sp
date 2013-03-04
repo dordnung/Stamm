@@ -237,8 +237,6 @@ public panellib_CreateUserPanels(client, mode)
 						{
 							AddMenuItem(melist, "", g_FeatureHaveDesc[i][index]);
 							found = true;
-							
-							break;
 						}
 					}
 				}
