@@ -3,6 +3,7 @@
 #include <colors>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
@@ -20,6 +21,16 @@ public Plugin:myinfo =
 	description = "VIP's can create Teleport Points",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
+}
 
 public OnAllPluginsLoaded()
 {

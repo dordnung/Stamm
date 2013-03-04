@@ -1,6 +1,7 @@
 #include <sourcemod>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
@@ -18,6 +19,17 @@ public Plugin:myinfo =
 public OnPluginStart()
 {
 	HookEvent("player_spawn", eventPlayerSpawn);
+}
+
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
 }
 
 public OnAllPluginsLoaded()

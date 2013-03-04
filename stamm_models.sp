@@ -4,6 +4,7 @@
 #include <autoexecconfig>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
@@ -63,6 +64,12 @@ public OnAllPluginsLoaded()
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:description[64];
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
 	
 	if (model_change)
 		Format(description, sizeof(description), "%T", "GetModelChange", LANG_SERVER, model_change_cmd);

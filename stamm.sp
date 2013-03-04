@@ -145,19 +145,19 @@ public CheckStammFolders()
 	}
 }
 
-/*
+
 public OnAllPluginsLoaded()
 {
 	if (LibraryExists("updater"))
-		Updater_AddPlugin("http://announcer.smacbans.com/stamm-update.txt");
+		Updater_AddPlugin("http://popoklopsi.couch-fighter.de/updater/update.php?plugin=stamm");
 }
 
 public OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "updater"))
-		Updater_AddPlugin("http://announcer.smacbans.com/stamm-update.txt");
+		Updater_AddPlugin("http://popoklopsi.couch-fighter.de/updater/update.php?plugin=stamm");
 }
-*/
+
 
 public OnConfigsExecuted()
 {

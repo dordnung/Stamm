@@ -3,6 +3,7 @@
 #include <tf2items>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
@@ -48,7 +49,13 @@ public OnConfigsExecuted()
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:haveDescription[64];
-	
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
+		
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
 		Format(haveDescription, sizeof(haveDescription), "%T", "GetHigherFiringRate", LANG_SERVER, firerate * i);

@@ -1,6 +1,7 @@
 #include <sourcemod>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
@@ -14,6 +15,16 @@ public Plugin:myinfo =
 	description = "Non VIP's cant' walk through VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
+}
 
 public OnAllPluginsLoaded()
 {

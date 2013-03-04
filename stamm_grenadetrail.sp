@@ -2,6 +2,7 @@
 #include <sdktools>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #define HEColor 	{225,0,0,225}
 #define FlashColor 	{255,255,0,225}
@@ -21,6 +22,16 @@ public Plugin:myinfo =
 	description = "Give VIP's a grenade trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
+public STAMM_OnFeatureLoaded(String:basename[])
+{
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
+}
 
 public OnAllPluginsLoaded()
 {

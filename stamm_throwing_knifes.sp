@@ -3,6 +3,7 @@
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <cssthrowingknives>
+#include <updater>
 
 #pragma semicolon 1
 
@@ -38,6 +39,12 @@ public OnAllPluginsLoaded()
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:description[64];
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.couch-fighter.de/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater"))
+		Updater_AddPlugin(urlString);
 	
 	Format(description, sizeof(description), "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
 	
