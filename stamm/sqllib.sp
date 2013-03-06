@@ -48,7 +48,7 @@ public sqllib_LoadDB()
 	{
 		decl String:query[620];
 		
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, PRIMARY KEY (`steamid`))", g_tablename);
+		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY (`steamid`))", g_tablename);
 		
 		if (g_debug) 
 			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -153,7 +153,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 			if (!SQL_FetchRow(hndl))
 			{
-				Format(query, sizeof(query), "INSERT INTO `%s` (`steamid`, `name`, `version`) VALUES ('%s', '%s', %s)", g_tablename, steamid, name2, g_Plugin_Version);
+				Format(query, sizeof(query), "INSERT INTO `%s` (`steamid`, `name`, `version`, `last_visit`) VALUES ('%s', '%s', %s, %i)", g_tablename, steamid, name2, g_Plugin_Version, GetTime());
 				
 				if (g_debug) 
 					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -182,7 +182,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				
 				g_playerpoints[client] = SQL_FetchInt(hndl, 0);
 				
-				Format(query, sizeof(query), "UPDATE `%s` SET `name`='%s', `version`=%s WHERE `steamid`='%s'", g_tablename, name2, g_Plugin_Version, steamid);
+				Format(query, sizeof(query), "UPDATE `%s` SET `name`='%s', `version`=%s, `last_visit`=%i WHERE `steamid`='%s'", g_tablename, name2, g_Plugin_Version, GetTime(), steamid);
 				
 				if (g_debug) 
 					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);

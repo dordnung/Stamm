@@ -42,7 +42,7 @@ public otherlib_saveGame()
 		g_gameID = 4;
 }
 
-public Action:otherlib_PlayerInfoTimer(Handle:timer)
+public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 {
 	CPrintToChatAll("%s %t", g_StammTag, "InfoTyp", g_texttowrite_f);
 	CPrintToChatAll("%s %t", g_StammTag, "InfoTypInfo", g_sinfo_f);
@@ -139,7 +139,7 @@ public Action:otherlib_StopHappy(args)
 	otherlib_EndHappyHour();
 }
 
-public otherlib_checkTimer(&Handle:timer)
+public otherlib_checkTimer(Handle:timer)
 {
 	if (timer != INVALID_HANDLE)
 		CloseHandle(timer);

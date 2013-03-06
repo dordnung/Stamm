@@ -25,7 +25,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm",
 	author = "Popoklopsi",
-	version = g_Plugin_Version,
+	version = g_Plugin_Version2,
 	description = "A powerful VIP Addon with a lot of features",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -145,19 +145,17 @@ public CheckStammFolders()
 	}
 }
 
-
 public OnAllPluginsLoaded()
 {
 	if (LibraryExists("updater"))
-		Updater_AddPlugin("http://popoklopsi.couch-fighter.de/updater/update.php?plugin=stamm");
+		Updater_AddPlugin("http://popoklopsi.de/stamm/updater/update.php?plugin=stamm");
 }
 
 public OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "updater"))
-		Updater_AddPlugin("http://popoklopsi.couch-fighter.de/updater/update.php?plugin=stamm");
+		Updater_AddPlugin("http://popoklopsi.de/stamm/updater/update.php?plugin=stamm");
 }
-
 
 public OnConfigsExecuted()
 {
@@ -177,15 +175,19 @@ public OnConfigsExecuted()
 	otherlib_checkTimer(pointlib_timetimer);
 	otherlib_checkTimer(pointlib_showpointer);
 	otherlib_checkTimer(otherlib_inftimer);
+	otherlib_checkTimer(clientlib_olddelete);
 	
 	if (g_vip_type == 3 || g_vip_type == 5 || g_vip_type == 6 ||  g_vip_type == 7)
-		pointlib_timetimer = CreateTimer((60.0*g_time_point), pointlib_PlayerTime, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+		pointlib_timetimer = CreateTimer((60.0*g_time_point), pointlib_PlayerTime, _, TIMER_REPEAT);
 		
 	if (g_showpoints && g_see_text == 0) 
-		pointlib_showpointer = CreateTimer(float(g_showpoints), pointlib_PointShower, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+		pointlib_showpointer = CreateTimer(float(g_showpoints), pointlib_PointShower, _, TIMER_REPEAT);
 		
 	if (g_infotime > 0.0) 
-		otherlib_inftimer = CreateTimer(g_infotime, otherlib_PlayerInfoTimer, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+		otherlib_inftimer = CreateTimer(g_infotime, otherlib_PlayerInfoTimer, _, TIMER_REPEAT);
+
+	if (g_delete) 
+		clientlib_olddelete = CreateTimer(36000.0, clientlib_deleteOlds, _, TIMER_REPEAT);
 	
 	otherlib_PrepareFiles();
 }

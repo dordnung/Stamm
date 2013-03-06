@@ -10,6 +10,7 @@ new Handle:configlib_adminflag;
 new Handle:configlib_extra_points;
 new Handle:configlib_lvl_up_sound;
 new Handle:configlib_min_player;
+new Handle:configlib_delete;
 new Handle:configlib_see_text;
 new Handle:configlib_serverid;
 new Handle:configlib_texttowrite;
@@ -33,6 +34,7 @@ public configlib_CreateConfig()
 	configlib_extra_points = AutoExecConfig_CreateConVar("stamm_extrapoints", "0", "1 = Give less Players more Points, with factor: ((max players on your server) - (current players)), 0 = disable");
 	configlib_showpoints = AutoExecConfig_CreateConVar("stamm_showpoints", "480", "Shows every x Seconds all Players their Points (480 = 8 minutes), 0 = Off");
 	configlib_giveflagadmin = AutoExecConfig_CreateConVar("stamm_oflag", "0", "not 0 = a Player with the a special Flag become VIP (1='o', 2='p' , 3='q', 4='r', 5='s', 6='t'), 0 = Off");
+	configlib_delete = AutoExecConfig_CreateConVar("stamm_delete", "0", "x = Days until a inactive player gets deleted, 0 = Off");
 	configlib_adminflag = AutoExecConfig_CreateConVar("stamm_adminflag", "t", "Flag a player needs to access the stamm admin menu (see addons/sourcemod/configs/admin_levels.cfg for all flags)");
 	configlib_infotime = AutoExecConfig_CreateConVar("stamm_infotime", "300", "Info Message Interval in seconds (300 = 5 minutes), 0 = Off");
 	configlib_join_show = AutoExecConfig_CreateConVar("stamm_join_show", "1", "1 = When a Player join, he see his points, 0 = OFF");
@@ -63,6 +65,7 @@ public configlib_LoadConfig()
 	g_extra_points = GetConVarInt(configlib_extra_points);
 	g_showpoints = GetConVarInt(configlib_showpoints);
 	g_join_show = GetConVarInt(configlib_join_show);
+	g_delete = GetConVarInt(configlib_delete);
 	g_min_player = GetConVarInt(configlib_min_player);
 	g_see_text = GetConVarInt(configlib_see_text);
 	g_time_point = GetConVarInt(configlib_time_point);

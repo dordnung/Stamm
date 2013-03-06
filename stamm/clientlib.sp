@@ -1,5 +1,7 @@
 #pragma semicolon 1
 
+new Handle:clientlib_olddelete;
+
 public bool:clientlib_isValidClient_PRE(client)
 {
 	if (client > 0 && client <= MaxClients)
@@ -161,6 +163,22 @@ public clientlib_GiveFastVIP(client)
 {
 	if (g_playerlevel[client] < g_levels)
 		pointlib_GivePlayerPoints(client, g_LevelPoints[g_levels-1], false);
+}
+
+public Action:clientlib_deleteOlds(Handle:timer, any:data)
+{
+	new lastEntry = GetTime() - (g_delete * 24 * 60 * 60);
+
+	decl String:query[128];
+
+	Format(query, sizeof(query), "DELETE FROM `%s` WHERE `last_visit` < %i", g_tablename, lastEntry);
+
+	if (g_debug) 
+		LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+
+	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+	
+	return Plugin_Continue;
 }
 
 public clientlib_CheckVip(client)
