@@ -106,7 +106,7 @@ public sqlback_ModifyVersion()
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
-	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i", g_tablename, GetTime());
 	
 	if (g_debug) 
 		LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -125,7 +125,7 @@ public sqlback_ModifyTableBackwards()
 {
 	decl String:query[128];
 
-	if (StringToFloat(g_databaseVersion) <= 2.1)
+	if (StringToFloat(g_databaseVersion) < 2.1)
 	{
 		if (sqllib_db != INVALID_HANDLE)
 		{
@@ -147,7 +147,7 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[600];
 		
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY (`steamid`))", g_tablename);
+		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
 		
 		if (g_debug) 
 			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);

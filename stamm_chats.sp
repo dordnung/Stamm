@@ -61,6 +61,15 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	else
 		Format(description, sizeof(description), "%T", "GetVIPMessage", LANG_SERVER, "");
 
+	new messages = STAMM_GetBlockOfName("messages");
+	new chat = STAMM_GetBlockOfName("chat");
+
+	if (messages == -1)
+		messages = 1;
+
+	if (chat == -1)
+		chat = 1;
+
 	STAMM_AddFeatureText(STAMM_GetLevel(STAMM_GetBlockOfName("messages")), description);
 
 	Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "#");

@@ -43,6 +43,15 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater"))
 		Updater_AddPlugin(urlString);
 
+	new welcome = STAMM_GetBlockOfName("welcome");
+	new leave = STAMM_GetBlockOfName("leave");
+
+	if (welcome == -1)
+		welcome = 1;
+
+	if (leave == -1)
+		leave = 1;
+
 	Format(description, sizeof(description), "%T", "GetWelcomeMessages", LANG_SERVER);
 	STAMM_AddFeatureText(STAMM_GetLevel(STAMM_GetBlockOfName("welcome")), description);
 
