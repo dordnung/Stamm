@@ -42,6 +42,59 @@ public otherlib_saveGame()
 		g_gameID = 4;
 }
 
+public Action:otherlib_commandListener(client, const String:command[], argc)
+{
+	decl String:arg[128];
+	new mode = 0;
+
+	if (argc == 3 && client == 0 && StrEqual(command, "sm", false))
+	{
+		GetCmdArg(1, arg, sizeof(arg));
+
+		if (StrEqual(arg, "plugins", false))
+		{
+			GetCmdArg(2, arg, sizeof(arg));
+
+			if (StrEqual(arg, "load", false))
+				mode = 1;
+
+			if (StrEqual(arg, "unload", false))
+				mode = 2;
+
+			if (StrEqual(arg, "reload", false))
+				mode = 3;
+
+			if (mode != 0)
+			{
+				GetCmdArgString(arg, sizeof(arg));
+
+				GetCmdArg(3, arg, sizeof(arg));
+
+				for (new i=0; i < g_features; i++)
+				{
+					if (StrEqual(arg, g_FeatureList[i][FEATURE_BASE], false) || StrEqual(arg, g_FeatureList[i][FEATURE_BASEREAL], false))
+					{
+						if (mode == 1)
+							featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+						if (mode == 2)
+							featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+						if (mode == 3)
+							featurelib_ReloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+
+						PrintToServer("Attention: Found Stamm Feature! Action will transmit to Stamm");
+
+						return Plugin_Handled;
+					}
+				}
+			}
+		}
+	}
+
+	return Plugin_Continue;
+}
+
 public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 {
 	CPrintToChatAll("%s %t", g_StammTag, "InfoTyp", g_texttowrite_f);

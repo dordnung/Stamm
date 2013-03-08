@@ -70,7 +70,9 @@ public OnPluginStart()
 
 	RegServerCmd("stamm_feature_list", featurelib_List, "List all features.");
 
-	RegServerCmd("stamm_convert_db", sqllib_convertDB, "Converts the stamm database to a file");
+	RegServerCmd("stamm_convert_db", sqllib_convertDB, "Converts the stamm database to a file. stamm_convert_db <mysql>");
+
+	AddCommandListener(otherlib_commandListener);
 	
 	otherlib_saveGame();
 	levellib_LoadLevels();

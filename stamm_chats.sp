@@ -15,6 +15,9 @@ new String:MessageTag[32];
 new String:OwnChatTag[32];
 new NeedTag;
 
+new messages;
+new chat;
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Chats",
@@ -61,8 +64,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	else
 		Format(description, sizeof(description), "%T", "GetVIPMessage", LANG_SERVER, "");
 
-	new messages = STAMM_GetBlockOfName("messages");
-	new chat = STAMM_GetBlockOfName("chat");
+	messages = STAMM_GetBlockOfName("messages");
+	chat = STAMM_GetBlockOfName("chat");
 
 	if (messages == -1)
 		messages = 1;
@@ -115,7 +118,7 @@ public Action:CmdSay(client, args)
 		if (!STAMM_WantClientFeature(client))
 			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "FeatureDisabled", LANG_SERVER);
 			
-		if (STAMM_HaveClientFeature(client, STAMM_GetBlockOfName("messages")))
+		if (STAMM_HaveClientFeature(client, messages))
 		{
 			if (!NeedTag || (FindCharInString(text, '*') == 0))
 			{
@@ -127,12 +130,15 @@ public Action:CmdSay(client, args)
 					
 				if (GetClientTeam(client) == 3) 
 					CPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", MessageTag, name, text);
+
+				else
+					CPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", MessageTag, name, text);
 				
 				return Plugin_Handled;
 			}
 		}
 
-		if (STAMM_HaveClientFeature(client, STAMM_GetBlockOfName("chat")))
+		if (STAMM_HaveClientFeature(client, chat))
 		{
 			new index2 = FindCharInString(text, '#');
 
@@ -151,6 +157,9 @@ public Action:CmdSay(client, args)
 								
 							if (GetClientTeam(i) == 3) 
 								CPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", OwnChatTag, name, text);
+
+							else
+								CPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", OwnChatTag, name, text);
 						}
 					}
 				}

@@ -29,7 +29,7 @@ public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:d
 	else
 		Format(g_databaseVersion, sizeof(g_databaseVersion), "0.0");
 
-	if (StringToFloat(g_databaseVersion) <= StringToFloat(g_Plugin_Version))
+	if (StringToFloat(g_databaseVersion) < StringToFloat(g_Plugin_Version))
 		sqlback_ModifyTableBackwards();
 	else
 		stammStarted();
@@ -139,6 +139,8 @@ public sqlback_ModifyTableBackwards()
 			SQL_TQuery(sqllib_db, sqlback_SQLModify1, query);
 		}
 	}
+	else
+		stammStarted();
 }
 
 public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:data)

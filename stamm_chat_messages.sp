@@ -6,6 +6,9 @@
 
 #pragma semicolon 1
 
+new welcome;
+new leave;
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Chat Messages",
@@ -43,8 +46,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater"))
 		Updater_AddPlugin(urlString);
 
-	new welcome = STAMM_GetBlockOfName("welcome");
-	new leave = STAMM_GetBlockOfName("leave");
+	welcome = STAMM_GetBlockOfName("welcome");
+	leave = STAMM_GetBlockOfName("leave");
 
 	if (welcome == -1)
 		welcome = 1;
@@ -65,7 +68,7 @@ public STAMM_OnClientReady(client)
 	
 	GetClientName(client, name, sizeof(name));
 	
-	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, STAMM_GetBlockOfName("welcome")))
+	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, welcome))
 		CPrintToChatAll("{lightgreen}[ {green}Stamm {lightgreen}] %T", "WelcomeMessage", LANG_SERVER, name);
 }
 
@@ -77,7 +80,7 @@ public OnClientDisconnect(client)
 		
 		GetClientName(client, name, sizeof(name));
 
-		if (STAMM_HaveClientFeature(client, STAMM_GetBlockOfName("leave")))
+		if (STAMM_HaveClientFeature(client, leave))
 			CPrintToChatAll("{lightgreen}[ {green}Stamm {lightgreen}] %T", "LeaveMessage", LANG_SERVER, name);
 	}
 }

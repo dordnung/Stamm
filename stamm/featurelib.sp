@@ -232,7 +232,7 @@ public featurelib_UnloadFeature(Handle:plugin)
 {
 	new index = featurelib_getFeatureByHandle(plugin);
 
-	ServerCommand("sm plugins unload %s", g_FeatureList[index][FEATURE_BASEREAL]);
+	ServerCommand("sm plugins unload %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
 
 	g_FeatureList[index][FEATURE_ENABLE] = 0;
 	CPrintToChatAll("%s %t", g_StammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
@@ -242,7 +242,7 @@ public featurelib_loadFeature(Handle:plugin)
 {
 	new index = featurelib_getFeatureByHandle(plugin);
 
-	ServerCommand("sm plugins load %s", g_FeatureList[index][FEATURE_BASEREAL]);
+	ServerCommand("sm plugins load %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
 
 	g_FeatureList[index][FEATURE_ENABLE] = 1;
 	CPrintToChatAll("%s %t", g_StammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
@@ -284,7 +284,7 @@ public Action:featurelib_Load(args)
 
 		PrintToServer("Feature %s was not loaded before, try to load it via SM...", basename);
 
-		ServerCommand("sm plugins load %s", basename);
+		ServerCommand("sm plugins load %s stamm", basename);
 	}
 	else
 		ReplyToCommand(0, "Usage: stamm_load_feature <basename>");
