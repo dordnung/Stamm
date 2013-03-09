@@ -54,7 +54,7 @@ public OnPluginStart()
 	
 	c_hp = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "spawnhp", "stamm/features");
 
 	AutoExecConfig_CleanFile();
 }

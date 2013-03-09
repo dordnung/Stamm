@@ -52,7 +52,7 @@ public OnPluginStart()
 
 	hear_all = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "holy_grenade", "stamm/features");
 	AutoExecConfig_CleanFile();
 	
 	HookEvent("weapon_fire", eventWeaponFire);

@@ -36,7 +36,7 @@ public OnPluginStart()
 	
 	c_speed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "morespeed", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

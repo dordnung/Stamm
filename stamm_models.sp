@@ -88,7 +88,7 @@ public OnPluginStart()
 	c_model_change_cmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
 	c_same_models = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
 
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "vip_models", "stamm/features");
 	AutoExecConfig_CleanFile();
 	
 	HookEvent("player_team", eventPlayerTeam);

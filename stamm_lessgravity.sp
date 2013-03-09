@@ -35,7 +35,7 @@ public OnPluginStart()
 	
 	c_grav = AutoExecConfig_CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each block!");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "lessgravity", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

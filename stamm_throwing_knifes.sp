@@ -57,7 +57,7 @@ public OnPluginStart()
 
 	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "throwing_knifes", "stamm/features");
 
 	AutoExecConfig_CleanFile();
 	

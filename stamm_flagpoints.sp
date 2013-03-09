@@ -34,7 +34,7 @@ public OnPluginStart()
 
 	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag a player needs to collect points");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "flagpoints", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 
