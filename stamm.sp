@@ -1,6 +1,8 @@
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
+
+// This is custom, so we include it locally
+#include "include/colors"
 #include <autoexecconfig>
 
 #include "stamm/globals.sp"
