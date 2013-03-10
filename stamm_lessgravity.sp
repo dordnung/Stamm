@@ -13,7 +13,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LessGravity",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "Give VIP's less gravity",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -24,7 +24,7 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP KnifeInfect", "");
+	STAMM_AddFeature("VIP Less Gravity", "");
 }
 
 public OnPluginStart()

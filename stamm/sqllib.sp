@@ -309,7 +309,7 @@ public sqllib_SQLErrorCheckCallback(Handle:owner, Handle:hndl, const String:erro
 
 public sqllib_SQLErrorCheckCallback2(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
-	if (!StrEqual("", error))
+	if (!StrEqual("", error) && StrContains(error, "Duplicate column name", false) == -1)
 	{
 		if (g_debug)
 			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Maybe VALID Database Error: %s", error);

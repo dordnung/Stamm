@@ -11,6 +11,7 @@
 #define MODELPATH 0
 #define MODELNAME 1
 #define MODELTEAM 2
+#define MODELLEVEL 3
 
 new PlayerHasModel[MAXPLAYERS + 1];
 new LastTeam[MAXPLAYERS + 1];
@@ -18,12 +19,11 @@ new modelCount;
 new model_change;
 new same_models;
 new admin_model;
-new TMODELS;
-new CTMODELS;
+new lowest;
 
 new String:PlayerModel[MAXPLAYERS + 1][PLATFORM_MAX_PATH + 1];
 
-new String:models[64][3][PLATFORM_MAX_PATH + 1];
+new String:models[64][4][PLATFORM_MAX_PATH + 1];
 
 new String:model_change_cmd[32];
 
@@ -38,7 +38,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Vip Models",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "Give VIP's VIP Models",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -71,12 +71,69 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater"))
 		Updater_AddPlugin(urlString);
 	
-	if (model_change)
+	if (model_change && same_models)
 		Format(description, sizeof(description), "%T", "GetModelChange", LANG_SERVER, model_change_cmd);
 	else 
 		Format(description, sizeof(description), "%T", "GetModel", LANG_SERVER);
+
+	if (!FileExists("cfg/stamm/features/ModelSettings.txt"))
+		SetFailState("Couldn't load Stamm Models. ModelSettings.txt missing.");
 	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
+	new Handle:model_settings = CreateKeyValues("ModelSettings");
+
+	lowest = STAMM_GetLevelCount();
+
+	FileToKeyValues(model_settings, "cfg/stamm/features/ModelSettings.txt");
+
+	if (KvGotoFirstSubKey(model_settings))
+	{
+		do
+		{
+			KvGetString(model_settings, "team", models[modelCount][MODELTEAM], sizeof(models[][]));
+			KvGetString(model_settings, "model", models[modelCount][MODELPATH], sizeof(models[][]));
+
+			if (!StrEqual(models[modelCount][MODELPATH], "") && !StrEqual(models[modelCount][MODELPATH], "0"))
+				PrecacheModel(models[modelCount][MODELPATH], true);
+
+			KvGetString(model_settings, "name", models[modelCount][MODELNAME], sizeof(models[][]));
+			KvGetString(model_settings, "level", models[modelCount][MODELLEVEL], sizeof(models[][]), "none");
+
+			if (StrEqual(models[modelCount][MODELLEVEL], "none"))
+			{
+				STAMM_WriteToLog(false, "ATTENTION: Level Config is now in ModelSettings.txt under the key \"level\"!");
+
+				if (STAMM_GetLevel() == 0)
+					STAMM_WriteToLog(false, "ATTENTION: Found no level for model %s. Zero assumed!!", models[modelCount][MODELNAME]);
+
+				Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", STAMM_GetLevel());
+
+				if (STAMM_GetLevel() < lowest)
+					lowest = STAMM_GetLevel();
+			}
+			else
+			{
+				new levelNumber = STAMM_GetLevelNumber(models[modelCount][MODELLEVEL]);
+
+				if (levelNumber != 0)
+					Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", levelNumber);
+				else if (StringToInt(models[modelCount][MODELLEVEL]) == 0)
+				{
+					STAMM_WriteToLog(false, "ATTENTION: Found incorrect level for model %s. One assumed!!", models[modelCount][MODELNAME]);
+					Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "1");
+				}
+
+				if (StringToInt(models[modelCount][MODELLEVEL]) < lowest)
+					lowest = StringToInt(models[modelCount][MODELLEVEL]);
+			}
+
+			modelCount++;
+		}
+		while (KvGotoNextKey(model_settings));
+	}
+	
+	CloseHandle(model_settings);
+	
+	STAMM_AddFeatureText(lowest, description);
 }
 
 public OnPluginStart()
@@ -107,39 +164,6 @@ public OnConfigsExecuted()
 	
 	GetConVarString(c_model_change_cmd, model_change_cmd, sizeof(model_change_cmd));
 
-	if (!FileExists("cfg/stamm/features/ModelSettings.txt"))
-		SetFailState("Couldn't load Stamm Models. ModelSettings.txt missing.");
-	
-	new Handle:model_settings = CreateKeyValues("ModelSettings");
-
-	FileToKeyValues(model_settings, "cfg/stamm/features/ModelSettings.txt");
-
-	if (KvGotoFirstSubKey(model_settings))
-	{
-		do
-		{
-			KvGetString(model_settings, "team", models[modelCount][MODELTEAM], sizeof(models[][]));
-			KvGetString(model_settings, "model", models[modelCount][MODELPATH], sizeof(models[][]));
-
-			if (!StrEqual(models[modelCount][MODELPATH], "") && !StrEqual(models[modelCount][MODELPATH], "0"))
-				PrecacheModel(models[modelCount][MODELPATH], true);
-
-			KvGetString(model_settings, "name", models[modelCount++][MODELNAME], sizeof(models[][]));
-		}
-		while (KvGotoNextKey(model_settings));
-	}
-	
-	CloseHandle(model_settings);
-
-	for (new item = 0; item < modelCount; item++)
-	{
-		if (StringToInt(models[item][MODELTEAM]) == 2)
-			TMODELS++;
-		else
-			CTMODELS++;
-	}
-
-	
 	if (!Loaded)
 	{
 		RegConsoleCmd(model_change_cmd, CmdModel);
@@ -171,8 +195,8 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 			}
 			
 			LastTeam[client] = GetClientTeam(client);
-			
-			if (STAMM_HaveClientFeature(client))
+
+			if (STAMM_WantClientFeature(client))
 			{
 				if (same_models) 
 					PrepareSameModels(client);
@@ -280,6 +304,8 @@ public PrepareSameModels(client)
 	{ 
 		decl String:ModelChooseLang[256];
 		decl String:StandardModel[256];
+
+		new bool:found = false;
 		
 		Format(ModelChooseLang, sizeof(ModelChooseLang), "%T", "ChooseModel", client);
 		Format(StandardModel, sizeof(StandardModel), "%T", "StandardModel", client);
@@ -291,48 +317,49 @@ public PrepareSameModels(client)
 
 		for (new item = 0; item < modelCount; item++)
 		{
-			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]))
+			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_IsClientVip(client, StringToInt(models[item][MODELLEVEL])))
 			{
 				if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
+				{
 					AddMenuItem(ModelMenu, models[item][MODELPATH], models[item][MODELNAME]);
+
+					found = true;
+				}
 			}
 		}
 		
 		AddMenuItem(ModelMenu, "standard", StandardModel);
 		
-		DisplayMenu(ModelMenu, client, MENU_TIME_FOREVER);
+		if (found)
+			DisplayMenu(ModelMenu, client, MENU_TIME_FOREVER);
 	}
-	else
-	{
-		if (PlayerHasModel[client] && !StrEqual(PlayerModel[client], "")) 
-			SetEntityModel(client, PlayerModel[client]);
-	}
+	else if (PlayerHasModel[client] && !StrEqual(PlayerModel[client], ""))
+		SetEntityModel(client, PlayerModel[client]);
 }
 
 public PrepareRandomModels(client)
 {
-	new team = GetClientTeam(client);
 	new randomValue;
+	new found = 0;
+	new modelsFound[64];
 
-	if (team == 2)
-		randomValue = GetRandomInt(1, TMODELS);
-	else
-		randomValue = GetRandomInt(1, CTMODELS);
-	
-	if ((!admin_model && !STAMM_IsClientAdmin(client)) || admin_model)
+	for (new item = 0; item < modelCount; item++)
 	{
-		new counter;
-
-		for (new item = 0; item < modelCount; item++)
+		if (StringToInt(models[item][MODELTEAM]) == GetClientTeam(client) && STAMM_IsClientVip(client, StringToInt(models[item][MODELLEVEL])))
 		{
-			if (StringToInt(models[item][MODELTEAM]) == team)
-			{
-				if (++counter == randomValue)
-				{
-					if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
-						SetEntityModel(client, models[item][MODELPATH]);
-				}
-			}
+			modelsFound[found] = item;
+			found++;
+		}
+	}
+
+	if (found > 0)
+	{
+		randomValue = GetRandomInt(1, found);
+		
+		if ((!admin_model && !STAMM_IsClientAdmin(client)) || admin_model)
+		{
+			if (!StrEqual(models[randomValue-1][MODELPATH], "") && !StrEqual(models[randomValue-1][MODELPATH], "0"))
+				SetEntityModel(client, models[randomValue-1][MODELPATH]);
 		}
 	}
 }

@@ -22,7 +22,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Chats",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "Give VIP's welcome and leave message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -128,7 +128,7 @@ public Action:CmdSay(client, args)
 				if (GetClientTeam(client) == 2) 
 					CPrintToChatAll("{red}[%s] {green}%s:{red} %s", MessageTag, name, text);
 					
-				if (GetClientTeam(client) == 3) 
+				else if (GetClientTeam(client) == 3) 
 					CPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", MessageTag, name, text);
 
 				else
@@ -155,7 +155,7 @@ public Action:CmdSay(client, args)
 							if (GetClientTeam(i) == 2) 
 								CPrintToChat(i, "{red}[%s] {green}%s:{red} %s", OwnChatTag, name, text);
 								
-							if (GetClientTeam(i) == 3) 
+							else if (GetClientTeam(i) == 3) 
 								CPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", OwnChatTag, name, text);
 
 							else
