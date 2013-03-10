@@ -75,7 +75,7 @@ public OnPluginStart()
 	mode_c = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
 	lhp_c = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "knife_infect", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

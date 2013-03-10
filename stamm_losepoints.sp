@@ -65,7 +65,7 @@ public OnPluginStart()
 	deathcount_c = AutoExecConfig_CreateConVar("death_count", "2", "How much deaths a player needs to lose points");
 	pointscount_c = AutoExecConfig_CreateConVar("points_count", "2", "How much points a player loses after <death_count> deaths");
 
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "losepoints", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

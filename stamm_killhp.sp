@@ -55,7 +55,7 @@ public OnPluginStart()
 	c_hp = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
 	m_hp = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "killhp", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

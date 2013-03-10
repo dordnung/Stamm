@@ -59,7 +59,7 @@ public OnPluginStart()
 	c_hp = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every x seconds per block");
 	c_time = AutoExecConfig_CreateConVar("regenerate_time", "1", "Time interval to regenerate (in Seconds)");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "regenerate", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

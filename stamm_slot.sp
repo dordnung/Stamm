@@ -59,7 +59,7 @@ public OnPluginStart()
 	c_vip_kick_message2 = AutoExecConfig_CreateConVar("slot_vip_kick_message2", "You get kicked, to let a VIP slot free", "Message for the random kicked person");
 	c_vip_slots = AutoExecConfig_CreateConVar("slot_vip_slots", "0", "How many Reserve Slots should there be ?");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "slot", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

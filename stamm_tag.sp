@@ -42,7 +42,7 @@ public OnPluginStart()
 	s_tag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
 	s_admin = AutoExecConfig_CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "tag", "stamm/features");
 
 	AutoExecConfig_CleanFile();
 	

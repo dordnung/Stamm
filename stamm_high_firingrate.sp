@@ -37,7 +37,7 @@ public OnPluginStart()
 	
 	c_firerate = AutoExecConfig_CreateConVar("firing_rate", "10", "Firing rate increase in percent each block!");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "higher_firingrate", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 
