@@ -6,7 +6,7 @@
 /**
  * Max. levels supported by Stamm
  */
-#define STAMM_MAX_LEVELS 100
+#define STAMM_MAX_LEVELS 80
 
 /**
  * Max. features supported by Stamm

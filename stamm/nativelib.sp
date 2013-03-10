@@ -216,7 +216,7 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 
 	if (feature != -1)
 	{
-		for (new j=0; j < 20; j++)
+		for (new j=0; j < 80; j++)
 		{
 			if (StrEqual(g_FeatureBlocks[feature][j], name))
 				return j+1;
@@ -452,7 +452,14 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 
 	if (feature != -1)
 	{
-		Format(g_FeatureHaveDesc[feature][level], sizeof(g_FeatureHaveDesc[][]), description);
+		new desc = g_FeatureList[feature][FEATURE_DESCS][level];
+
+		Format(g_FeatureHaveDesc[feature][level][desc], sizeof(g_FeatureHaveDesc[][][]), description);
+
+		g_FeatureList[feature][FEATURE_DESCS][level]++;
+
+		if (g_FeatureList[feature][FEATURE_DESCS][level] == 5)
+			g_FeatureList[feature][FEATURE_DESCS][level] = 0;
 		
 		return true;
 	}

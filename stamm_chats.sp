@@ -89,7 +89,7 @@ public OnPluginStart()
 	c_OwnChatTag = AutoExecConfig_CreateConVar("chats_ownchattag", "VIP Chat", "Tag when a player writes something in the VIP Chat");
 	c_NeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate it, 0 = Off");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "chats", "stamm/features");
 	AutoExecConfig_CleanFile();
 	
 	RegConsoleCmd("say", CmdSay);

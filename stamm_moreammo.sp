@@ -49,7 +49,7 @@ public OnPluginStart()
 	
 	c_ammo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
 	
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "moreammo", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

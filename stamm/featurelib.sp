@@ -41,6 +41,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	
 	g_FeatureList[g_features][FEATURE_HANDLE] = plugin;
 	g_FeatureList[g_features][FEATURE_ENABLE] = 1;
+	g_FeatureList[g_features][FEATURE_DESCS] = 0;
 	g_FeatureList[g_features][FEATURE_CHANGE] = allowChange;
 	g_FeatureList[g_features][FEATURE_STANDARD] = standard;
 	
@@ -95,15 +96,19 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				{
 					g_FeatureList[g_features][FEATURE_ENABLE] = 0;
 
-					ServerCommand("sm plugins unload %s", g_FeatureList[g_features][FEATURE_BASEREAL]);
+					ServerCommand("sm plugins unload %s stamm", g_FeatureList[g_features][FEATURE_BASEREAL]);
 					
 					LogToFile(g_LogFile, "[ STAMM ] Invalid Level %i for Feature: %s", value, g_FeatureList[g_features][FEATURE_BASEREAL]);
 
 					return;
 				}
 
+				new desc = g_FeatureList[g_features][FEATURE_DESCS][value];
+
 				g_FeatureList[g_features][FEATURE_LEVEL][start] = value;
-				Format(g_FeatureHaveDesc[g_features][value], sizeof(g_FeatureHaveDesc[]), description);
+				Format(g_FeatureHaveDesc[g_features][value][desc], sizeof(g_FeatureHaveDesc[][][]), description);
+
+				g_FeatureList[g_features][FEATURE_DESCS][value]++;
 
 				start++;
 

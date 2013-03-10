@@ -26,7 +26,7 @@ public OnPluginStart()
 
 	c_strong = AutoExecConfig_CreateConVar("longjump_strong", "6", "The longjump factor");
 
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "longjump", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

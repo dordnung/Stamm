@@ -2,8 +2,9 @@
 
 enum FeatureEnum
 {
-	FEATURE_LEVEL[20],
+	FEATURE_LEVEL[80],
 	FEATURE_ENABLE,
+	FEATURE_DESCS[80],
 	bool:FEATURE_CHANGE,
 	bool:FEATURE_STANDARD,
 	bool:WANT_FEATURE[MAXPLAYERS + 1],
@@ -28,7 +29,7 @@ new g_showpoints;
 new g_delete;
 new g_levels;
 new g_plevels;
-new g_LevelPoints[100];
+new g_LevelPoints[80];
 new g_pointsnumber[MAXPLAYERS + 1];
 new g_happynumber[MAXPLAYERS + 1];
 new g_happyfactor[MAXPLAYERS + 1];
@@ -47,7 +48,7 @@ new String:g_DebugFile[PLATFORM_MAX_PATH + 1];
 new String:g_StammFolder[PLATFORM_MAX_PATH + 1];
 new String:g_lvl_up_sound[PLATFORM_MAX_PATH + 1];
 new String:g_Plugin_Version[10] = "2.1";
-new String:g_Plugin_Version2[10] = "2.1.0";
+new String:g_Plugin_Version2[10] = "2.1.1";
 new String:g_tablename[64];
 new String:g_texttowrite[32];
 new String:g_texttowrite_f[32];
@@ -65,10 +66,10 @@ new String:g_StammTag[64];
 new String:g_adminflag[3];
 new String:g_databaseVersion[10];
 
-new String:g_LevelName[100][128];
-new String:g_LevelFlag[100][10];
-new String:g_FeatureHaveDesc[120][100][256];
-new String:g_FeatureBlocks[120][20][64];
+new String:g_LevelName[80][128];
+new String:g_LevelFlag[80][10];
+new String:g_FeatureHaveDesc[120][80][5][64];
+new String:g_FeatureBlocks[120][80][64];
 
 new bool:g_ClientReady[MAXPLAYERS + 1];
 new bool:g_pluginStarted;

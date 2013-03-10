@@ -40,7 +40,7 @@ public OnPluginStart()
 
 	c_strong = AutoExecConfig_CreateConVar("froggyjump_strong", "200", "The push up strong");
 
-	AutoExecConfig_AutoExecConfig();
+	AutoExecConfig(true, "froggyjump", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
 

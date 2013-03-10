@@ -233,10 +233,13 @@ public panellib_CreateUserPanels(client, mode)
 					
 					for (; index > 0; index--)
 					{
-						if (!StrEqual(g_FeatureHaveDesc[i][index], ""))
+						for (new j=0; j < g_FeatureList[i][FEATURE_DESCS][index]; j++)
 						{
-							AddMenuItem(melist, "", g_FeatureHaveDesc[i][index]);
-							found = true;
+							if (!StrEqual(g_FeatureHaveDesc[i][index][j], ""))
+							{
+								AddMenuItem(melist, "", g_FeatureHaveDesc[i][index][j]);
+								found = true;
+							}
 						}
 					}
 				}
@@ -496,11 +499,14 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 		{
 			if (g_FeatureList[i][FEATURE_ENABLE])
 			{
-				if (!StrEqual(g_FeatureHaveDesc[i][id], ""))
+				for (new j=0; j < g_FeatureList[i][FEATURE_DESCS][id]; j++)
 				{
-					Format(featuretext, sizeof(featuretext), "%s", g_FeatureHaveDesc[i][id]);
-					
-					AddMenuItem(featurelist, "", featuretext);
+					if (!StrEqual(g_FeatureHaveDesc[i][id][j], ""))
+					{
+						Format(featuretext, sizeof(featuretext), "%s", g_FeatureHaveDesc[i][id][j]);
+						
+						AddMenuItem(featurelist, "", featuretext);
+					}
 				}
 			}
 		}
