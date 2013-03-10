@@ -52,7 +52,7 @@ public configlib_CreateConfig()
 	configlib_sme = AutoExecConfig_CreateConVar("stamm_me_cmd", "sm_ssme", "Command to see ones current features");
 	configlib_viprank = AutoExecConfig_CreateConVar("stamm_viprank", "sm_srank", "Command for VIP Rank");
 
-	AutoExecConfig_AutoExecConfig(true);
+	AutoExecConfig(true, "stamm_config", "stamm");
 	
 	AutoExecConfig_CleanFile();
 }
