@@ -16,7 +16,7 @@ public levellib_LoadLevels()
 		{
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
 
-			if (StrEqual(flagTest, ""))
+			if (StrEqual(flagTest, "") && g_levels < MAXLEVELS)
 			{
 				new points = KvGetNum(all_levels, "points");
 				
@@ -49,7 +49,7 @@ public levellib_LoadLevels()
 		{
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
 
-			if (!StrEqual(flagTest, ""))
+			if (!StrEqual(flagTest, "") && g_levels + g_plevels < MAXLEVELS)
 			{
 				Format(g_LevelFlag[g_plevels], sizeof(g_LevelFlag[]), flagTest);
 

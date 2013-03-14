@@ -2,9 +2,9 @@
 
 enum FeatureEnum
 {
-	FEATURE_LEVEL[80],
+	FEATURE_LEVEL[MAXLEVELS],
 	FEATURE_ENABLE,
-	FEATURE_DESCS[80],
+	FEATURE_DESCS[MAXLEVELS],
 	bool:FEATURE_CHANGE,
 	bool:FEATURE_STANDARD,
 	bool:WANT_FEATURE[MAXPLAYERS + 1],
@@ -14,7 +14,7 @@ enum FeatureEnum
 	Handle:FEATURE_HANDLE,
 }
 
-new g_FeatureList[120][FeatureEnum];
+new g_FeatureList[MAXFEATURES][FeatureEnum];
 
 new g_giveflagadmin;
 new g_join_show;
@@ -29,7 +29,7 @@ new g_showpoints;
 new g_delete;
 new g_levels;
 new g_plevels;
-new g_LevelPoints[80];
+new g_LevelPoints[MAXLEVELS];
 new g_pointsnumber[MAXPLAYERS + 1];
 new g_happynumber[MAXPLAYERS + 1];
 new g_happyfactor[MAXPLAYERS + 1];
@@ -60,16 +60,14 @@ new String:g_sinfo[32];
 new String:g_sinfo_f[32];
 new String:g_schange[32];
 new String:g_schange_f[32];
-new String:g_sme[32];
-new String:g_sme_f[32];
 new String:g_StammTag[64];
 new String:g_adminflag[3];
 new String:g_databaseVersion[10];
 
-new String:g_LevelName[80][128];
-new String:g_LevelFlag[80][10];
-new String:g_FeatureHaveDesc[120][80][5][64];
-new String:g_FeatureBlocks[120][80][64];
+new String:g_LevelName[MAXLEVELS][128];
+new String:g_LevelFlag[MAXLEVELS][10];
+new String:g_FeatureHaveDesc[MAXFEATURES][MAXLEVELS][5][64];
+new String:g_FeatureBlocks[MAXFEATURES][MAXLEVELS][64];
 
 new bool:g_ClientReady[MAXPLAYERS + 1];
 new bool:g_pluginStarted;

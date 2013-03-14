@@ -385,8 +385,6 @@ public Action:clientlib_CmdSay(client, args)
 			panellib_CreateUserPanels(client, 3);
 		else if (StrEqual(text, g_schange) && StrContains(g_schange, "sm_") != 0)
 			panellib_CreateUserPanels(client, 1);
-		else if (StrEqual(text, g_sme) && StrContains(g_sme, "sm_") != 0)
-			panellib_CreateUserPanels(client, 2);
 		else if (StrEqual(text, g_texttowrite) && StrContains(g_texttowrite, "sm_") != 0)
 			pointlib_ShowPlayerPoints(client);
 		else if (StrEqual(text, g_admin_menu) && StrContains(g_admin_menu, "sm_") != 0 && clientlib_IsAdmin(client))

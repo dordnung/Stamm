@@ -1,5 +1,6 @@
 #include <sourcemod>
 #include <autoexecconfig>
+#include <colors>
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <updater>
@@ -13,7 +14,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature FlagPoints",
 	author = "Popoklopsi",
-	version = "1.0.0",
+	version = "1.0.1",
 	description = "Give only points to players with a specific flag",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -42,6 +43,14 @@ public OnAllPluginsLoaded()
 {
 	if (!LibraryExists("stamm")) 
 		SetFailState("Can't Load Feature, Stamm is not installed!");
+
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		else if (CColorAllowed(Color_Olive))
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+	}
 		
 	STAMM_AddFeature("VIP FlagPoints", "");
 }
@@ -55,6 +64,8 @@ public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 {
 	if (clientAllowed(client))
 		return Plugin_Continue;
+	else
+		CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "NoPoints", flagneed);
 
 	return Plugin_Handled;
 }

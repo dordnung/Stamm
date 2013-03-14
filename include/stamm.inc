@@ -6,12 +6,12 @@
 /**
  * Max. levels supported by Stamm
  */
-#define STAMM_MAX_LEVELS 80
+#define STAMM_MAX_LEVELS 100
 
 /**
  * Max. features supported by Stamm
  */
-#define STAMM_MAX_FEATURES 120
+#define STAMM_MAX_FEATURES 100
 
 /**
  * Return of function STAMM_GetGame()
@@ -119,6 +119,7 @@ forward STAMM_OnHappyHourEnd();
  * @param allowChange	true = Player can switch Feature on/off, false = he can't
  * @param standard		true = Plugin is standardly enabled, false = Player has to enable it first.
  * @noreturn
+ * @error            	Max features reached.
  */
 native STAMM_AddFeature(String:name[], String:description[], bool:allowChange=true, bool:standard=true);
 

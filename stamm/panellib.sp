@@ -12,7 +12,6 @@ public panellib_Start()
 		
 	Format(g_sinfo_f, sizeof(g_sinfo_f), g_sinfo);
 	Format(g_schange_f, sizeof(g_schange_f), g_schange);
-	Format(g_sme_f, sizeof(g_sme_f), g_sme);
 	
 	if (!StrContains(g_sinfo, "sm_"))
 	{
@@ -26,13 +25,6 @@ public panellib_Start()
 		RegConsoleCmd(g_schange, panellib_ChangePanel);
 		
 		ReplaceString(g_schange_f, sizeof(g_schange_f), "sm_", "!");
-	}
-	
-	if (!StrContains(g_sme, "sm_"))
-	{
-		RegConsoleCmd(g_sme, panellib_MePanel);
-		
-		ReplaceString(g_sme_f, sizeof(g_sme_f), "sm_", "!");
 	}
 	
 	if (!StrContains(g_admin_menu, "sm_")) 
@@ -153,9 +145,6 @@ public panellib_Start()
 	Format(infoString, sizeof(infoString), "%T", "StammFeatures", LANG_SERVER);
 	DrawPanelItem(panellib_info, infoString);
 	
-	Format(infoString, sizeof(infoString), "%T", "YourFeatures", LANG_SERVER);
-	DrawPanelItem(panellib_info, infoString);
-	
 	Format(infoString, sizeof(infoString), "%T", "StammCMD", LANG_SERVER);
 	DrawPanelItem(panellib_info, infoString);
 	
@@ -215,42 +204,6 @@ public panellib_CreateUserPanels(client, mode)
 			DisplayMenu(ChangeMenu, client, 60);
 		}
 	}
-	if (mode == 2)
-	{
-		if (clientlib_isValidClient(client))
-		{
-			new Handle:melist = CreateMenu(panellib_FeatureHandler2);
-			new bool:found = false;
-			
-			SetMenuTitle(melist, "%T", "HaveMe", client);
-			SetMenuExitBackButton(melist, true);
-			
-			for (new i=0; i < g_features; i++)
-			{
-				if (g_FeatureList[i][FEATURE_ENABLE])
-				{
-					new index = g_playerlevel[client];
-					
-					for (; index > 0; index--)
-					{
-						for (new j=0; j < g_FeatureList[i][FEATURE_DESCS][index]; j++)
-						{
-							if (!StrEqual(g_FeatureHaveDesc[i][index][j], ""))
-							{
-								AddMenuItem(melist, "", g_FeatureHaveDesc[i][index][j]);
-								found = true;
-							}
-						}
-					}
-				}
-			}
-			
-			if (found) 
-				DisplayMenu(melist, client, 60);
-			else 
-				CPrintToChat(client, "%s %T", g_StammTag, "NoFeatureFound", client);
-		}
-	}
 	if (mode == 3) 
 		SendPanelToClient(panellib_info, client, panellib_InfoHandler, 20);
 	if (mode == 4) 
@@ -261,13 +214,6 @@ public Action:panellib_InfoPanel(client, args)
 {
 	if (clientlib_isValidClient(client)) 
 		panellib_CreateUserPanels(client, 3);
-	
-	return Plugin_Handled;
-}
-
-public Action:panellib_MePanel(client, args)
-{
-	panellib_CreateUserPanels(client, 2);
 	
 	return Plugin_Handled;
 }
@@ -413,17 +359,6 @@ public panellib_FeatureHandler(Handle:menu, MenuAction:action, param1, param2)
 		CloseHandle(menu);
 }
 
-public panellib_FeatureHandler2(Handle:menu, MenuAction:action, param1, param2)
-{
-	if (action == MenuAction_Cancel)
-	{
-		if (param2 == MenuCancel_ExitBack && clientlib_isValidClient(param1))
-			SendPanelToClient(panellib_info, param1, panellib_InfoHandler, 20);
-	}
-	else if (action == MenuAction_End) 
-		CloseHandle(menu);
-}
-
 public panellib_CmdlistHandler(Handle:menu, MenuAction:action, param1, param2)
 {
 	if (action == MenuAction_Select)
@@ -450,14 +385,12 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 	{
 		if (clientlib_isValidClient(param1))
 		{
-			if (param2 == 5) 
-				SendPanelToClient(panellib_credits, param1, panellib_PanelHandler, 20);
 			if (param2 == 4) 
-				DisplayMenu(panellib_levels, param1, 20);
+				SendPanelToClient(panellib_credits, param1, panellib_PanelHandler, 20);
 			if (param2 == 3) 
-				SendPanelToClient(panellib_cmdlist, param1, panellib_CmdlistHandler, 20);
+				DisplayMenu(panellib_levels, param1, 20);
 			if (param2 == 2) 
-				FakeClientCommandEx(param1, "say %s", g_sme_f);
+				SendPanelToClient(panellib_cmdlist, param1, panellib_CmdlistHandler, 20);
 			if (param2 == 1)
 			{
 				new Handle:featurelist = CreateMenu(panellib_FeatureListHandler);

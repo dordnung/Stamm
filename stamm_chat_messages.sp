@@ -13,7 +13,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Chat Messages",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "Give VIP's VIP Chat and Message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -49,17 +49,17 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	welcome = STAMM_GetBlockOfName("welcome");
 	leave = STAMM_GetBlockOfName("leave");
 
-	if (welcome == -1)
-		welcome = 1;
+	if (welcome != -1)
+	{
+		Format(description, sizeof(description), "%T", "GetWelcomeMessages", LANG_SERVER);
+		STAMM_AddFeatureText(STAMM_GetLevel(welcome), description);
+	}
 
-	if (leave == -1)
-		leave = 1;
-
-	Format(description, sizeof(description), "%T", "GetWelcomeMessages", LANG_SERVER);
-	STAMM_AddFeatureText(STAMM_GetLevel(STAMM_GetBlockOfName("welcome")), description);
-
-	Format(description, sizeof(description), "%T", "GetLeaveMessages", LANG_SERVER);
-	STAMM_AddFeatureText(STAMM_GetLevel(STAMM_GetBlockOfName("leave")), description);
+	if (leave != -1)
+	{
+		Format(description, sizeof(description), "%T", "GetLeaveMessages", LANG_SERVER);
+		STAMM_AddFeatureText(STAMM_GetLevel(leave), description);
+	}
 }
 
 public STAMM_OnClientReady(client)
@@ -68,13 +68,13 @@ public STAMM_OnClientReady(client)
 	
 	GetClientName(client, name, sizeof(name));
 	
-	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, welcome))
+	if (welcome != -1 && STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, welcome))
 		CPrintToChatAll("{lightgreen}[ {green}Stamm {lightgreen}] %T", "WelcomeMessage", LANG_SERVER, name);
 }
 
 public OnClientDisconnect(client)
 {
-	if (STAMM_IsClientValid(client))
+	if (STAMM_IsClientValid(client) && leave != -1)
 	{
 		decl String:name[MAX_NAME_LENGTH + 1];
 		

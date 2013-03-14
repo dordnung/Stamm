@@ -3,6 +3,9 @@
 #include <colors>
 #include <autoexecconfig>
 
+#define MAXFEATURES 100
+#define MAXLEVELS 100
+
 #include "stamm/globals.sp"
 #include "stamm/configlib.sp"
 #include "stamm/levellib.sp"

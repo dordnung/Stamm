@@ -20,7 +20,6 @@ new Handle:configlib_time_point;
 new Handle:configlib_viplist;
 new Handle:configlib_sinfo;
 new Handle:configlib_schange;
-new Handle:configlib_sme;
 new Handle:configlib_viprank;
 
 public configlib_CreateConfig()
@@ -49,7 +48,6 @@ public configlib_CreateConfig()
 	configlib_tablename = AutoExecConfig_CreateConVar("stamm_table_name", "STAMM_DB", "Your Stamm Table Name. It appends '_<serverid>' at the end!");
 	configlib_sinfo = AutoExecConfig_CreateConVar("stamm_info_cmd", "sm_sinfo", "Command to see infos about stamm");
 	configlib_schange = AutoExecConfig_CreateConVar("stamm_change_cmd", "sm_schange", "Command to put ones features on/off");
-	configlib_sme = AutoExecConfig_CreateConVar("stamm_me_cmd", "sm_ssme", "Command to see ones current features");
 	configlib_viprank = AutoExecConfig_CreateConVar("stamm_viprank", "sm_srank", "Command for VIP Rank");
 
 	AutoExecConfig(true, "stamm_config", "stamm");
@@ -79,7 +77,6 @@ public configlib_LoadConfig()
 	GetConVarString(configlib_viprank, g_viprank, sizeof(g_viprank));
 	GetConVarString(configlib_schange, g_schange, sizeof(g_schange));
 	GetConVarString(configlib_sinfo, g_sinfo, sizeof(g_sinfo));
-	GetConVarString(configlib_sme, g_sme, sizeof(g_sme));
 	GetConVarString(configlib_tablename, g_tablename, sizeof(g_tablename));
 	GetConVarString(configlib_adminflag, g_adminflag, sizeof(g_adminflag));
 	

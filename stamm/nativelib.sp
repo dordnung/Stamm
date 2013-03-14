@@ -216,7 +216,7 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 
 	if (feature != -1)
 	{
-		for (new j=0; j < 80; j++)
+		for (new j=0; j < MAXLEVELS; j++)
 		{
 			if (StrEqual(g_FeatureBlocks[feature][j], name))
 				return j+1;
@@ -431,6 +431,9 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 
 public nativelib_AddFeature(Handle:plugin, numParams)
 {
+	if (g_features >= MAXFEATURES)
+		ThrowNativeError(1, "Attention: Max features of %i reached!", MAXFEATURES);
+
 	decl String:name[64];
 	decl String:description[256];
 	

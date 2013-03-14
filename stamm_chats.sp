@@ -22,7 +22,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Chats",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.2.2",
 	description = "Give VIP's welcome and leave message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -67,18 +67,16 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	messages = STAMM_GetBlockOfName("messages");
 	chat = STAMM_GetBlockOfName("chat");
 
-	if (messages == -1)
-		messages = 1;
+	if (messages != -1)
+		STAMM_AddFeatureText(STAMM_GetLevel(messages), description);
 
-	if (chat == -1)
-		chat = 1;
+	if (chat != -1)
+	{
+		Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "#");
+		Format(description, sizeof(description), "%T", "GetVIPChat", LANG_SERVER, activate);
 
-	STAMM_AddFeatureText(STAMM_GetLevel(STAMM_GetBlockOfName("messages")), description);
-
-	Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "#");
-	Format(description, sizeof(description), "%T", "GetVIPChat", LANG_SERVER, activate);
-
-	STAMM_AddFeatureText(STAMM_GetLevel(STAMM_GetBlockOfName("chat")), description);
+		STAMM_AddFeatureText(STAMM_GetLevel(chat), description);
+	}
 }
 
 public OnPluginStart()
@@ -118,7 +116,7 @@ public Action:CmdSay(client, args)
 		if (!STAMM_WantClientFeature(client))
 			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "FeatureDisabled", LANG_SERVER);
 			
-		if (STAMM_HaveClientFeature(client, messages))
+		if (messages != -1 && STAMM_HaveClientFeature(client, messages))
 		{
 			if (!NeedTag || (FindCharInString(text, '*') == 0))
 			{
@@ -138,7 +136,7 @@ public Action:CmdSay(client, args)
 			}
 		}
 
-		if (STAMM_HaveClientFeature(client, chat))
+		if (chat != -1 && STAMM_HaveClientFeature(client, chat))
 		{
 			new index2 = FindCharInString(text, '#');
 
