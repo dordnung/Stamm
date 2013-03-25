@@ -1,39 +1,81 @@
+/**
+ * -----------------------------------------------------
+ * File        stamm_icon.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+// Includes
 #include <sourcemod>
 #include <sdktools>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <updater>
 
+
 #pragma semicolon 1
 
+
 new stammview[MAXPLAYERS + 1];
+
+
+
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Icon",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "Adds an Stamm Icon on top of a player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
+
+
+// Auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
-	if (LibraryExists("updater"))
+	if (LibraryExists("updater") && STAMM_AutoUpdate())
+	{
 		Updater_AddPlugin(urlString);
+	}
 }
 
+
+
+// Add feature
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 
 	if (!LibraryExists("stamm")) 
+	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
-	
+	}
+
 	STAMM_LoadTranslation();
 		
 	Format(description, sizeof(description), "%T", "GetIcon", LANG_SERVER);
@@ -41,41 +83,62 @@ public OnAllPluginsLoaded()
 	STAMM_AddFeature("VIP Icon", description);
 }
 
+
+
+// Reset icons
 public OnPluginStart()
 {
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_death", eventPlayerDeath);
 	
 	for (new i=0; i <= MaxClients; i++) 
+	{
 		stammview[i] = 0;
+	}
 }
 
+
+
+// Client changed feature state
 public STAMM_OnClientChangedFeature(client, bool:mode)
 {
 	if (STAMM_IsClientValid(client))
 	{
+		// Disabled it
 		if (!mode)
 		{
 			if (stammview[client] != 0) 
 			{
+				// Delete old ICON
 				if (IsValidEntity(stammview[client]))
 				{
 					decl String:class[128];
 					
 					GetEdictClassname(stammview[client], class, sizeof(class));
 					
+
+
 					if (StrEqual(class, "prop_dynamic")) 
+					{
 						RemoveEdict(stammview[client]);
+					}
 				}
 				
 				stammview[client] = 0;
 			}
 		}
 		else if (STAMM_HaveClientFeature(client))
+		{
+			// Create an icon
 			CreateTimer(2.5, CreateStamm, client);
+		}
 	}
 }
 
+
+
+
+// Download Icon and preache it
 public OnMapStart()
 {
 	PrecacheModel("models/stamm/stammview.mdl", true);
@@ -90,6 +153,9 @@ public OnMapStart()
 	AddFileToDownloadsTable("models/stamm/stammview.dx90.vtx");
 }
 
+
+
+// Create icons for vips on spawn
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -99,15 +165,22 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 		if (STAMM_HaveClientFeature(client))
 		{
 			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
+			{
+				// Create timer
 				CreateTimer(2.5, CreateStamm, client);
+			}
 		}
 	}
 }
 
+
+
+// Delete icon on death
 public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
+	// Client have an icon
 	if (stammview[client] != 0) 
 	{
 		if (IsValidEntity(stammview[client]))
@@ -116,20 +189,28 @@ public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroad
 			
 			GetEdictClassname(stammview[client], class, sizeof(class));
 			
+			// Delete
 			if (StrEqual(class, "prop_dynamic")) 
+			{
 				RemoveEdict(stammview[client]);
+			}
 		}
 		
 		stammview[client] = 0;
 	}
 }
 
+
+
+// Create the icon
 public Action:CreateStamm(Handle:timer, any:client)
 {
 	if (STAMM_IsClientValid(client))
 	{
+		// Valid team
 		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 		{
+			// First delete old one
 			if (stammview[client] != 0) 
 			{
 				if (IsValidEntity(stammview[client]))
@@ -139,26 +220,34 @@ public Action:CreateStamm(Handle:timer, any:client)
 					GetEdictClassname(stammview[client], class, sizeof(class));
 					
 					if (StrEqual(class, "prop_dynamic")) 
+					{
 						RemoveEdict(stammview[client]);
+					}
 				}
 			}
 			
+			
+			// Create the new one
 			new view = CreateEntityByName("prop_dynamic");
 			
 			if (view != -1)
 			{
+				// Set up the entity
 				DispatchKeyValue(view, "DefaultAnim", "rotate");
 				DispatchKeyValue(view, "spawnflags", "256");
 				DispatchKeyValue(view, "model", "models/stamm/stammview.mdl");
 				DispatchKeyValue(view, "solid", "6");
 				
+				// Spawn it
 				if (DispatchSpawn(view))
 				{
 					decl Float:origin[3];
 					decl String:steamid[20];
 					
+					// Valid?
 					if (IsValidEntity(view))
 					{
+						// Mark players entity and spawn it to him
 						stammview[client] = view;
 						
 						GetClientAbsOrigin(client, origin);

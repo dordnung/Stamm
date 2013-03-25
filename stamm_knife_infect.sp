@@ -1,12 +1,42 @@
+/**
+ * -----------------------------------------------------
+ * File        stamm_knife_infect.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+// Includes
 #include <sourcemod>
 #include <colors>
 #include <sdktools>
 #include <autoexecconfig>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <updater>
 
 #pragma semicolon 1
+
+
+
 
 new dur;
 new mode_infect;
@@ -19,43 +49,65 @@ new Handle:lhp_c;
 
 new bool:Infected[MAXPLAYERS+1];
 
+
+
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature KnifeInfect",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "VIP's can infect players with knife",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
+
+
+// Auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
-	if (LibraryExists("updater"))
+	if (LibraryExists("updater") && STAMM_AutoUpdate())
+	{
 		Updater_AddPlugin(urlString);
+	}
 }
 
+
+
+// Add feature
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 
+	// Colors :)
 	if (!CColorAllowed(Color_Lightgreen))
 	{
 		if (CColorAllowed(Color_Lime))
+		{
 			CReplaceColor(Color_Lightgreen, Color_Lime);
+		}
 		else if (CColorAllowed(Color_Olive))
+		{
 			CReplaceColor(Color_Lightgreen, Color_Olive);
+		}
 	}
 
+
 	if (!LibraryExists("stamm")) 
+	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
-	
+	}
+
 	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
+	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
-		
+	}
+
+
 	STAMM_LoadTranslation();
 		
 	Format(description, sizeof(description), "%T", "GetKnifeInfect", LANG_SERVER);
@@ -63,6 +115,10 @@ public OnAllPluginsLoaded()
 	STAMM_AddFeature("VIP KnifeInfect", description);
 }
 
+
+
+
+// Create config and hook events
 public OnPluginStart()
 {
 	HookEvent("player_death", PlayerDeath);
@@ -79,6 +135,10 @@ public OnPluginStart()
 	AutoExecConfig_CleanFile();
 }
 
+
+
+
+// Load Config
 public OnConfigsExecuted()
 {
 	dur = GetConVarInt(dur_c);
@@ -86,32 +146,43 @@ public OnConfigsExecuted()
 	lhp = GetConVarInt(lhp_c);
 	
 	if (mode_infect != 1 || dur) 
+	{
 		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	}
 }
 
+
+
+// Timer to check for infected Players
 public Action:SecondTimer(Handle:timer, any:data)
 {
 	for (new i=1; i <= MaxClients; i++)
 	{
 		if (STAMM_IsClientValid(i))
 		{
+			// Client is infected
 			if (Infected[i])
 			{
+				// Only for a specific duration
 				if (dur)
 				{
 					timers[i]--;
 					
+					// Time is over
 					if (timers[i] <= 0)
 					{
 						Infected[i] = false;
 						
 						if (mode_infect) 
+						{
 							ClientCommand(i, "r_screenoverlay \"\"");
-						
+						}
+
 						continue;
 					}
 				}
 				
+				// Player lose health on infect
 				if (mode_infect != 1)
 				{
 					new newhp = GetClientHealth(i) - lhp;
@@ -132,6 +203,9 @@ public Action:SecondTimer(Handle:timer, any:data)
 	return Plugin_Continue;
 }
 
+
+
+// Player died, reset infect
 public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -141,10 +215,15 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 		Infected[client] = false;
 
 		if (mode_infect) 
+		{
 			ClientCommand(client, "r_screenoverlay \"\"");
+		}
 	}
 }
 
+
+
+// A Player gets hurted
 public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new String:weapon[64];
@@ -155,20 +234,27 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 	
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
 
+	// Clients are valid
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
+		// Weapon was knife
 		if (StrEqual(weapon, "knife") && !Infected[client])
 		{
+			// Attack was from a VIP
 			if (STAMM_HaveClientFeature(attacker))
 			{
 				Infected[client] = true;
 				
 				GetClientName(attacker, p_name, sizeof(p_name));
 				
+				// Infecte the player
 				if (mode_infect)
 				{
+					// With a Overlay
 					if (STAMM_GetGame() == GameCSS) 
+					{
 						ClientCommand(client, "r_screenoverlay effects/tp_eyefx/tp_eyefx");
+					}
 					else
 					{
 						ClientCommand(client, "r_drawscreenoverlay 1");
@@ -176,6 +262,7 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 					}
 				}
 				
+				// For specific time
 				if (dur)
 				{
 					timers[client] = dur;
@@ -183,7 +270,9 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotTimeInfected", LANG_SERVER, p_name, dur);
 				}
 				else 
+				{
 					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotRoundInfected", LANG_SERVER, p_name);
+				}
 			}
 		}
 	}

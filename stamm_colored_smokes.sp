@@ -1,11 +1,41 @@
+/**
+ * -----------------------------------------------------
+ * File        stamm_colored_smokes.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+// Includes
 #include <sourcemod>
 #include <sdktools>
 #include <autoexecconfig>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <updater>
 
 #pragma semicolon 1
+
+
+
 
 new Handle:colors_c;
 new Handle:mode_smoke_c;
@@ -13,35 +43,51 @@ new Handle:mode_smoke_c;
 new mode_smoke;
 new String:colors[64];
 
+
+
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Colored Smokes",
 	author = "Popoklopsi",
-	version = "1.2.0",
+	version = "1.2.1",
 	description = "Give VIP's colored smokes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
+
+
+// Add to auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
-	if (LibraryExists("updater"))
+	if (LibraryExists("updater") && STAMM_AutoUpdate())
+	{
 		Updater_AddPlugin(urlString);
+	}
 }
 
+
+
+
+// Add Feature
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 	
 	if (!LibraryExists("stamm")) 
+	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
-	
+	}
+
 	if (STAMM_GetGame() != GameCSS && STAMM_GetGame() != GameCSGO) 
+	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
+	}
 
 	STAMM_LoadTranslation();
 		
@@ -50,6 +96,9 @@ public OnAllPluginsLoaded()
 	STAMM_AddFeature("VIP Colored Smokes", description);
 }
 
+
+
+// Create config
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("colored_smokes", "stamm/features");
@@ -63,6 +112,10 @@ public OnPluginStart()
 	HookEvent("smokegrenade_detonate", eventHeDetonate);
 }
 
+
+
+
+// Load config
 public OnConfigsExecuted()
 {
 	mode_smoke = GetConVarInt(mode_smoke_c);
@@ -70,6 +123,10 @@ public OnConfigsExecuted()
 	GetConVarString(colors_c, colors, sizeof(colors));
 }
 
+
+
+
+// Smoke grenade Detonate
 public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -81,27 +138,37 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			new Float:origin[3];
 			decl String:sBuffer[64];
 			
+			// Get origin
 			origin[0] = GetEventFloat(event, "x");
 			origin[1] = GetEventFloat(event, "y");
 			origin[2] = GetEventFloat(event, "z");
 			
+			// Create a light ;D
 			new ent_light = CreateEntityByName("light_dynamic");
 			
+			// Could we create it?
 			if (ent_light != -1)
 			{
+				// Switch Mode
 				switch (mode_smoke)
 				{
 					case 0:
 					{
+						// Team color
 						new team = GetClientTeam(client);
 						
 						if (team == 2) 
+						{
 							DispatchKeyValue(ent_light, "_light", "255 0 0");
+						}
 						else if (team == 3) 
+						{
 							DispatchKeyValue(ent_light, "_light", "0 0 255");
+						}
 					}
 					case 1:
 					{
+						// Random color
 						new color_r = GetRandomInt(0, 255);
 						new color_g = GetRandomInt(0, 255);
 						new color_b = GetRandomInt(0, 255);
@@ -111,14 +178,17 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 					}			
 					case 2:
 					{
+						// Party Mode
 						CreateTimer(0.2, PartyLight, ent_light, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 					}
 					case 3:
 					{
+						// Own color
 						DispatchKeyValue(ent_light, "_light", sBuffer);
 					}
 				}	
 				
+				// Set it up
 				DispatchKeyValue(ent_light, "pitch", "-90");
 				DispatchKeyValue(ent_light, "distance", "256");
 				DispatchKeyValue(ent_light, "spotlight_radius", "96");
@@ -130,6 +200,7 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 				AcceptEntityInput(ent_light, "DisableShadow");
 				AcceptEntityInput(ent_light, "TurnOn");
 				
+				// Create and teleport to smoke
 				TeleportEntity(ent_light, origin, NULL_VECTOR, NULL_VECTOR);
 				
 				CreateTimer(20.0, delete, ent_light, TIMER_FLAG_NO_MAPCHANGE);
@@ -138,11 +209,20 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 	}
 }
 
+
+
+
+// Party Mode
 public Action:PartyLight(Handle:timer, any:light)
 {
+	// finish
 	if (!IsValidEntity(light)) 
+	{
 		return Plugin_Stop;
-	
+	}
+
+
+	// Always set up with random color
 	decl String:sBuffer[64];
 				
 	new color_r = GetRandomInt(0, 255);
@@ -155,6 +235,10 @@ public Action:PartyLight(Handle:timer, any:light)
 	return Plugin_Continue;
 }
 
+
+
+
+// Delete the light on finish
 public Action:delete(Handle:timer, any:light)
 {
 	if (IsValidEntity(light))
@@ -164,6 +248,8 @@ public Action:delete(Handle:timer, any:light)
 		GetEdictClassname(light, class, sizeof(class));
 		
 		if (StrEqual(class, "light_dynamic")) 
+		{
 			RemoveEdict(light);
+		}
 	}
 } 

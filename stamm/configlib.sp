@@ -1,5 +1,34 @@
+/**
+ * -----------------------------------------------------
+ * File        configlib.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+
+// Semicolon
 #pragma semicolon 1
 
+
+// Config handles 
 new Handle:configlib_admin_menu;
 new Handle:configlib_giveflagadmin;
 new Handle:configlib_infotime;
@@ -21,13 +50,18 @@ new Handle:configlib_viplist;
 new Handle:configlib_sinfo;
 new Handle:configlib_schange;
 new Handle:configlib_viprank;
+new Handle:configlib_wantUpdate;
 
+// Create the config
 public configlib_CreateConfig()
 {
+	// Set file
 	AutoExecConfig_SetFile("stamm_config", "stamm");
 	
+	// Global versions cvar
 	AutoExecConfig_CreateConVar("stamm_ver", g_Plugin_Version, "Stamm Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
+	// Add all the natives
 	configlib_admin_menu = AutoExecConfig_CreateConVar("stamm_admin_menu", "sm_sadmin", "Command for Admin Menu");
 	configlib_stamm_debug = AutoExecConfig_CreateConVar("stamm_debug", "0", "1=Log in an extra File lot of information, 0=disable");
 	configlib_extra_points = AutoExecConfig_CreateConVar("stamm_extrapoints", "0", "1 = Give less Players more Points, with factor: ((max players on your server) - (current players)), 0 = disable");
@@ -49,14 +83,19 @@ public configlib_CreateConfig()
 	configlib_sinfo = AutoExecConfig_CreateConVar("stamm_info_cmd", "sm_sinfo", "Command to see infos about stamm");
 	configlib_schange = AutoExecConfig_CreateConVar("stamm_change_cmd", "sm_schange", "Command to put ones features on/off");
 	configlib_viprank = AutoExecConfig_CreateConVar("stamm_viprank", "sm_srank", "Command for VIP Rank");
+	configlib_wantUpdate = AutoExecConfig_CreateConVar("stamm_autoupdate", "1", "1 = Auto Update Stamm and it's features (Needs the Auto Updater), 0 = Off");
 
+	// Autoexec
 	AutoExecConfig(true, "stamm_config", "stamm");
 	
 	AutoExecConfig_CleanFile();
 }
 
+
+// Load the config
 public configlib_LoadConfig()
 {
+	// Read all values from the cvars
 	g_giveflagadmin = GetConVarInt(configlib_giveflagadmin);
 	g_infotime = GetConVarFloat(configlib_infotime);
 	g_debug = GetConVarInt(configlib_stamm_debug);
@@ -79,9 +118,25 @@ public configlib_LoadConfig()
 	GetConVarString(configlib_sinfo, g_sinfo, sizeof(g_sinfo));
 	GetConVarString(configlib_tablename, g_tablename, sizeof(g_tablename));
 	GetConVarString(configlib_adminflag, g_adminflag, sizeof(g_adminflag));
+
+
+	// Auto update?
+	if (GetConVarInt(configlib_wantUpdate) == 1)
+	{
+		autoUpdate = true;
+	}
+	else
+	{
+		autoUpdate = false;
+	}
+
 	
+	// Format the tablename
 	Format(g_tablename, sizeof(g_tablename), "%s_%i", g_tablename, g_serverid);
 	
+	// Found any level?
 	if (g_levels <= 0 && g_plevels <= 0) 
+	{
 		SetFailState("[ STAMM ] Error!! Found no Stamm levels!!");
+	}
 }

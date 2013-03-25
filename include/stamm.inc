@@ -244,6 +244,13 @@ native StammType:STAMM_GetType();
 native StammGame:STAMM_GetGame();
 
 /**
+ * Return whether the admin want auto updates for Stamm
+ *
+ * @return					True if he want, false otherwise
+ */
+native bool:STAMM_AutoUpdate();
+
+/**
  * Add Points to a player
  *
  * @param client		Client.
@@ -364,13 +371,6 @@ native STAMM_UnloadFeature(Handle:plugin);
 native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 
 /**
- * Checks for new translations
- *
- * @noreturn
- */
-native STAMM_CheckTranslations();
-
-/**
  * Load the translation file of your feature in stamm/languages
  *
  * @noreturn
@@ -378,8 +378,6 @@ native STAMM_CheckTranslations();
 stock STAMM_LoadTranslation()
 {
 	decl String:basename[64];
-
-	STAMM_CheckTranslations();
 	
 	STAMM_GetBasename(basename, sizeof(basename));
 	
@@ -400,6 +398,7 @@ public SharedPlugin:__pl_stamm =
 };
 
 #if !defined REQUIRE_PLUGIN
+
 public __pl_stamm_SetNTVOptional()
 {
 	MarkNativeAsOptional("STAMM_AddFeature");
@@ -431,6 +430,6 @@ public __pl_stamm_SetNTVOptional()
 	MarkNativeAsOptional("STAMM_LoadFeature");
 	MarkNativeAsOptional("STAMM_UnloadFeature");
 	MarkNativeAsOptional("STAMM_WriteToLog");
-	MarkNativeAsOptional("STAMM_CheckTranslations");
+	MarkNativeAsOptional("STAMM_AutoUpdate");
 }
 #endif
