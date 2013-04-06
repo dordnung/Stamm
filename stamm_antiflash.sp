@@ -50,7 +50,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Anti Flash",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Give VIP's anti flash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -114,13 +114,13 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Antiflash translations
 	if (antiflash) 
 	{
-		Format(team2, sizeof(team2), "%T", "AntiTeamFlash", LANG_SERVER);
+		Format(team2, sizeof(team2), "%T", "AntiFlash", LANG_SERVER);
 	}
 
 	else 
 	{
 
-		Format(team2, sizeof(team2), "");
+		Format(team2, sizeof(team2), "%T", "AntiTeamFlash", LANG_SERVER);
 	}
 		
 	Format(description, sizeof(description), "%T", "GetAntiFlash", LANG_SERVER, team, team2);

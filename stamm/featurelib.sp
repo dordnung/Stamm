@@ -202,6 +202,12 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				// Updated description count
 				g_FeatureList[g_features][FEATURE_DESCS][value]++;
 
+				// Only max 5 descriptions per level
+				if (g_FeatureList[g_features][FEATURE_DESCS][value] == 5)
+				{
+					g_FeatureList[g_features][FEATURE_DESCS][value] = 0;
+				}
+
 				// Update start
 				start++;
 

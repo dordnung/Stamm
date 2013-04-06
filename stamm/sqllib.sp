@@ -23,6 +23,9 @@
  */
 
 
+#include <stringescape>
+
+
 // Semicolon
 #pragma semicolon 1
 
@@ -86,7 +89,7 @@ public sqllib_LoadDB()
 		decl String:query[620];
 		
 		// Create table if it's not exists
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
+		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
 		
 		if (g_debug) 
 		{
@@ -231,7 +234,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			if (!SQL_FetchRow(hndl))
 			{
 				// Insert the player 
-				Format(query, sizeof(query), "INSERT INTO `%s` (`steamid`, `name`, `version`, `last_visit`) VALUES ('%s', '%s', %s, %i)", g_tablename, steamid, name2, g_Plugin_Version, GetTime());
+				Format(query, sizeof(query), "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)", g_tablename, steamid, name2, (clientlib_IsAdmin(client) ? 1 : 0), GetTime());
 				
 				if (g_debug) 
 				{
@@ -249,6 +252,9 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				{ 
 					g_FeatureList[i][WANT_FEATURE][client] = g_FeatureList[i][FEATURE_STANDARD];
 				}
+
+				// Client is ready
+				clientlib_ClientReady(client);
 
 				// Sync the steamid with version 0.0
 				sqlback_syncSteamid(client, "0.0");
@@ -276,7 +282,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				
 
 				// Update version, name and last visit
-				Format(query, sizeof(query), "UPDATE `%s` SET `name`='%s', `version`=%s, `last_visit`=%i WHERE `steamid`='%s'", g_tablename, name2, g_Plugin_Version, GetTime(), steamid);
+				Format(query, sizeof(query), "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'", g_tablename, name2, (clientlib_IsAdmin(client) ? 1 : 0), g_Plugin_Version, GetTime(), steamid);
 				
 				if (g_debug) 
 				{
@@ -288,11 +294,10 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// Get the version of this client
 				SQL_FetchString(hndl, 2, versionSteamid, sizeof(versionSteamid));
 
+				clientlib_ClientReady(client);
+
 				// Sync old STEAM_1:
-				if (!sqlback_syncSteamid(client, versionSteamid))
-				{
-					clientlib_ClientReady(client);
-				}
+				sqlback_syncSteamid(client, versionSteamid);
 			}
 		}
 	}
@@ -421,7 +426,7 @@ public sqllib_GetVIPRankQuery(Handle:owner, Handle:hndl, const String:error[], a
 	// Found somehing valid?
 	if (hndl != INVALID_HANDLE)
 	{
-		if (clientlib_isValidClient(client))
+		if (clientlib_isValidClient(client) && SQL_FetchRow(hndl))
 		{
 			// print rank
 			CPrintToChat(client, "%s %t", g_StammTag, "Rank", SQL_FetchInt(hndl, 0), g_playerpoints[client]);
@@ -555,16 +560,21 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 				SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
 				SQL_FetchString(hndl, 3, name, sizeof(name));
 
-				// Escape the name
-				sqllib_escapeString(name, name2, sizeof(name2), sqllib_convert);
+				
 
 				// For sqlite just add a insert into line
 				if (sqllib_convert == 0)
 				{
+					// Escape Sqlite
+					EscapeStringSQLite(name, name2, sizeof(name2), true);
+
 					WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`) VALUES ('%s', %i, %i, '%s', %s);", g_tablename, steamid, level, points, name2, versionS);
 				}
 				else
 				{
+					// Escape Mysql
+					EscapeStringMySQL(name, name2, sizeof(name2), true);
+
 					// For mysql we insert up to 1000 users with one call
 					if (counter == 0)
 					{
@@ -613,103 +623,4 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 
 	// Reset state
 	sqllib_convert = -1;
-}
-
-// Escape a string
-public sqllib_escapeString(String:input[], String:output[], maxlen, mysql)
-{
-	new len = strlen(input);
-	new count = 0;
-
-	Format(output, maxlen, "");
-
-	// For mysql we need a different operation
-	if (mysql == 1)
-	{
-		// For each char in the string
-		for (new offset=0; offset < len; offset++)
-		{
-			new ch = input[offset];
-
-			// Switch the char
-			switch(ch)
-			{
-				// Found a '
-				case '\'':
-				{
-					// If we have it not a even time, replace with \'
-					if (count % 2 == 0)
-					{
-						Format(output, maxlen, "%s\\", output);
-					}
-					
-					count = 0;
-
-					// add it again
-					Format(output, maxlen, "%s%c", output, ch);
-				}
-				case '\\':
-				{
-					count++;
-
-					Format(output, maxlen, "%s%c", output, ch);
-				}
-				default:
-				{
-					// Other value -> reset counter
-					count = 0;
-
-					Format(output, maxlen, "%s%c", output, ch);
-				}
-			}
-		}
-
-		if (count != 0)
-		{
-			if (count % 2 == 1)
-			{
-				Format(output, maxlen, "%s\\", output);
-			}
-		}
-	}
-	else	
-	{
-		// For sqlite
-		for (new offset=0; offset < len; offset++)
-		{
-			new ch = input[offset];
-
-			switch(ch)
-			{
-				// Found a '
-				case '\'':
-				{
-					count++;
-
-					Format(output, maxlen, "%s%c", output, ch);
-				}
-				default:
-				{
-					// Found odd times of ' replace with ''
-					if (count % 2 == 1)
-					{
-						Format(output, maxlen, "%s'", output);
-					}
-
-					count = 0;
-
-					Format(output, maxlen, "%s%c", output, ch);
-				}
-			}
-		}
-
-		if (count != 0)
-		{
-			// End with '
-			if (count % 2 == 1)
-			{
-				Format(output, maxlen, "%s'", output);
-			}
-		}
-	}
 }

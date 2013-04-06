@@ -101,7 +101,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 public bool:sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
-	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13"))
+	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14"))
 	{
 		decl String:query[128];
 		decl String:steamid[64];
@@ -151,9 +151,6 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 	}
-
-	// Client is ready
-	clientlib_ClientReady(client);
 }
 
 // Version < 2.1
@@ -200,7 +197,7 @@ public sqlback_ModifyTableBackwards()
 	decl String:query[128];
 
 	// Version < 2.1 ?
-	if (!StrEqual(g_databaseVersion, "2.10") && !StrEqual(g_databaseVersion, "2.13"))
+	if (!StrEqual(g_databaseVersion, "2.10") && !StrEqual(g_databaseVersion, "2.13") && !StrEqual(g_databaseVersion, "2.14"))
 	{
 		if (sqllib_db != INVALID_HANDLE)
 		{
@@ -217,6 +214,23 @@ public sqlback_ModifyTableBackwards()
 
 			SQL_TQuery(sqllib_db, sqlback_SQLModify1, query);
 		}
+	}
+
+	// Version is 2.14 but database is 2.13
+	else if (StrEqual(g_databaseVersion, "2.13"))
+	{
+		// Add admin
+		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+		
+		if (g_debug) 
+		{
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+		// Start stamm
+		stammStarted();
 	}
 
 	// Version is 2.10
@@ -250,7 +264,7 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 		decl String:query[600];
 		
 		// Create new table as backup
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
+		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
 		
 		if (g_debug) 
 		{

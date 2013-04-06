@@ -142,7 +142,7 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 // Check if a client is a stamm admin
 public bool:clientlib_IsAdmin(client)
 {
-	if (clientlib_isValidClient(client))
+	if (clientlib_isValidClient_PRE(client))
 	{
 		new AdminId:adminid = GetUserAdmin(client);
 		new AdminFlag:flag;
