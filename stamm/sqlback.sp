@@ -101,7 +101,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 public bool:sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
-	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14"))
+	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14") && !StrEqual(version, "2.15"))
 	{
 		decl String:query[128];
 		decl String:steamid[64];
@@ -196,8 +196,57 @@ public sqlback_ModifyTableBackwards()
 {
 	decl String:query[128];
 
-	// Version < 2.1 ?
-	if (!StrEqual(g_databaseVersion, "2.10") && !StrEqual(g_databaseVersion, "2.13") && !StrEqual(g_databaseVersion, "2.14"))
+	// We want an detailed overview, so add all version Strings
+	// Version 2.15
+	if (StrEqual(g_databaseVersion, "2.15"))
+	{
+		// Start stamm
+		stammStarted();
+	}
+
+	// Version 2.14
+	else if (StrEqual(g_databaseVersion, "2.14"))
+	{
+		// Start stamm
+		stammStarted();
+	}
+
+	// Version 2.13
+	else if (StrEqual(g_databaseVersion, "2.13"))
+	{
+		// Add admin
+		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+		
+		if (g_debug) 
+		{
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+		// Start stamm
+		stammStarted();
+	}
+
+	// Version 2.10
+	else if (StrEqual(g_databaseVersion, "2.10"))
+	{
+		// Add last visit
+		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i", g_tablename, GetTime());
+		
+		if (g_debug) 
+		{
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+		// Start stamm
+		stammStarted();
+	}
+
+	// Version < 2.1
+	else
 	{
 		if (sqllib_db != INVALID_HANDLE)
 		{
@@ -215,46 +264,10 @@ public sqlback_ModifyTableBackwards()
 			SQL_TQuery(sqllib_db, sqlback_SQLModify1, query);
 		}
 	}
-
-	// Version is 2.14 but database is 2.13
-	else if (StrEqual(g_databaseVersion, "2.13"))
-	{
-		// Add admin
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
-		
-		if (g_debug) 
-		{
-			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
-		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-		// Start stamm
-		stammStarted();
-	}
-
-	// Version is 2.10
-	else if (StrEqual(g_databaseVersion, "2.10"))
-	{
-		// Add last visit
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i", g_tablename, GetTime());
-		
-		if (g_debug) 
-		{
-			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
-		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-		// Start stamm
-		stammStarted();
-	}
-	// No modify needed so start stamm now
-	else
-	{
-		stammStarted();
-	}
 }
+
+
+
 
 // Check for very old version
 public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:data)

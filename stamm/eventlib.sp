@@ -96,16 +96,19 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 	new client = GetClientOfUserId(GetEventInt(event, "attacker"));
 
 	// Are both valid?
-	if (clientlib_isValidClient(userid) && clientlib_isValidClient(client))
+	if (clientlib_isValidClient(userid))
 	{
-		// Get points with kills?
-		if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7)
+		if (clientlib_isValidClient(client))
 		{
-			// Valid Team? Enough Players? No suicide?
-			if (clientlib_GetPlayerCount() >= g_min_player && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
+			// Get points with kills?
+			if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7)
 			{
-				// Give global Points
-				pointlib_GivePlayerPoints(client, g_points, true);
+				// Valid Team? Enough Players? No suicide?
+				if (clientlib_GetPlayerCount() >= g_min_player && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
+				{
+					// Give global Points
+					pointlib_GivePlayerPoints(client, g_points, true);
+				}
 			}
 		}
 	}

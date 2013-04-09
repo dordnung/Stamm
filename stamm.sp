@@ -30,6 +30,10 @@
 #include <autoexecconfig>
 #include <regex>
 
+// Tf2
+#undef REQUIRE_EXTENSIONS
+#include <tf2_stocks>
+
 // Max Features and Max Levels
 #define MAXFEATURES 100
 #define MAXLEVELS 100
@@ -127,9 +131,9 @@ public OnPluginStart()
 	RegServerCmd("stamm_start_happyhour", otherlib_StartHappy, "Starts happy hour: stamm_start_happyhour <time> <factor>");
 	RegServerCmd("stamm_stop_happyhour", otherlib_StopHappy, "Stops happy hour");
 
-	RegServerCmd("stamm_load_feature", featurelib_Load, "Loads a feature: stamm_load_feature <basename>");
-	RegServerCmd("stamm_unload_feature", featurelib_UnLoad, "Unloads a feature: stamm_unload_feature <basename>");
-	RegServerCmd("stamm_reload_feature", featurelib_ReLoad, "Reloads a feature: stamm_reload_feature <basename>");
+	RegServerCmd("stamm_feature_load", featurelib_Load, "Loads a feature: stamm_feature_load <basename>");
+	RegServerCmd("stamm_feature_unload", featurelib_UnLoad, "Unloads a feature: stamm_feature_unload <basename>");
+	RegServerCmd("stamm_feature_reload", featurelib_ReLoad, "Reloads a feature: stamm_feature_reload <basename>");
 
 	RegServerCmd("stamm_feature_list", featurelib_List, "List all features.");
 
@@ -147,6 +151,9 @@ public OnPluginStart()
 	configlib_CreateConfig();
 	eventlib_Start();
 	
+
+	// Create Hud Sync
+	g_hHudSync = CreateHudSynchronizer();
 
 	// No, it's not started, yet
 	g_pluginStarted = false;
@@ -286,7 +293,7 @@ public OnConfigsExecuted()
 	}
 		
 	// Show points some times
-	if (g_showpoints && g_see_text == 0) 
+	if (g_showpoints) 
 	{
 		pointlib_showpointer = CreateTimer(float(g_showpoints), pointlib_PointShower, _, TIMER_REPEAT);
 	}
@@ -301,6 +308,12 @@ public OnConfigsExecuted()
 	if (g_delete) 
 	{
 		clientlib_olddelete = CreateTimer(36000.0, clientlib_deleteOlds, _, TIMER_REPEAT);
+	}
+
+	// Hud Text?
+	if (otherlib_getGame() == 3 && g_hudText == 1)
+	{
+		CreateTimer(0.5, clientlib_ShowHudText, _, TIMER_REPEAT);
 	}
 	
 

@@ -45,12 +45,15 @@ new Handle:configlib_serverid;
 new Handle:configlib_texttowrite;
 new Handle:configlib_vip_type;
 new Handle:configlib_tablename;
+new Handle:configlib_hudtext;
 new Handle:configlib_time_point;
 new Handle:configlib_viplist;
 new Handle:configlib_sinfo;
 new Handle:configlib_schange;
 new Handle:configlib_viprank;
 new Handle:configlib_wantUpdate;
+new Handle:configlib_stripTag;
+new Handle:configlib_useMenu;
 
 // Create the config
 public configlib_CreateConfig()
@@ -82,13 +85,28 @@ public configlib_CreateConfig()
 	configlib_tablename = AutoExecConfig_CreateConVar("stamm_table_name", "STAMM_DB", "Your Stamm Table Name. It appends '_<serverid>' at the end!");
 	configlib_sinfo = AutoExecConfig_CreateConVar("stamm_info_cmd", "sm_sinfo", "Command to see infos about stamm");
 	configlib_schange = AutoExecConfig_CreateConVar("stamm_change_cmd", "sm_schange", "Command to put ones features on/off");
+	configlib_hudtext = AutoExecConfig_CreateConVar("stamm_hudtext", "1", "(Only TF2) 1 = Show points always on HUD, 0 = Off");
 	configlib_viprank = AutoExecConfig_CreateConVar("stamm_viprank", "sm_srank", "Command for VIP Rank");
 	configlib_wantUpdate = AutoExecConfig_CreateConVar("stamm_autoupdate", "1", "1 = Auto Update Stamm and it's features (Needs the Auto Updater), 0 = Off");
+	configlib_stripTag = AutoExecConfig_CreateConVar("stamm_striptag", "0", "1 = Use level instead of VIP, 0 = Use term VIP");
+	configlib_useMenu = AutoExecConfig_CreateConVar("stamm_usemenu", "1", "1 = Player sees a menu when typing stamm command, 0 = Just a chat message");
 
 	// Autoexec
 	AutoExecConfig(true, "stamm_config", "stamm");
 	
 	AutoExecConfig_CleanFile();
+
+
+	// Hook Changes
+	HookConVarChange(configlib_stamm_debug, OnCvarChanged);
+	HookConVarChange(configlib_extra_points, OnCvarChanged);
+	HookConVarChange(configlib_giveflagadmin, OnCvarChanged);
+	HookConVarChange(configlib_adminflag, OnCvarChanged);
+	HookConVarChange(configlib_join_show, OnCvarChanged);
+	HookConVarChange(configlib_min_player, OnCvarChanged);
+	HookConVarChange(configlib_see_text, OnCvarChanged);
+	HookConVarChange(configlib_stripTag, OnCvarChanged);
+	HookConVarChange(configlib_useMenu, OnCvarChanged);
 }
 
 
@@ -108,7 +126,10 @@ public configlib_LoadConfig()
 	g_time_point = GetConVarInt(configlib_time_point);
 	g_serverid = GetConVarInt(configlib_serverid);
 	g_vip_type = GetConVarInt(configlib_vip_type);
-	
+	g_hudText = GetConVarInt(configlib_hudtext);
+	g_stripTag = GetConVarInt(configlib_stripTag);
+	g_useMenu = GetConVarInt(configlib_useMenu);
+
 	GetConVarString(configlib_admin_menu, g_admin_menu, sizeof(g_admin_menu));
 	GetConVarString(configlib_lvl_up_sound, g_lvl_up_sound, sizeof(g_lvl_up_sound));
 	GetConVarString(configlib_texttowrite, g_texttowrite, sizeof(g_texttowrite));
@@ -138,5 +159,55 @@ public configlib_LoadConfig()
 	if (g_levels <= 0 && g_plevels <= 0) 
 	{
 		SetFailState("[ STAMM ] Error!! Found no Stamm levels!!");
+	}
+}
+
+
+// A Convar Changed
+public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue[])
+{
+	if (cvar == configlib_stamm_debug)
+	{
+		g_debug = GetConVarInt(configlib_stamm_debug);
+	}
+
+	else if (cvar == configlib_extra_points)
+	{
+		g_extra_points = GetConVarInt(configlib_extra_points);
+	}
+
+	else if (cvar == configlib_giveflagadmin)
+	{
+		g_giveflagadmin = GetConVarInt(configlib_giveflagadmin);
+	}
+
+	else if (cvar == configlib_adminflag)
+	{
+		GetConVarString(configlib_adminflag, g_adminflag, sizeof(g_adminflag));
+	}
+
+	else if (cvar == configlib_join_show)
+	{
+		g_join_show = GetConVarInt(configlib_join_show);
+	}
+
+	else if (cvar == configlib_min_player)
+	{
+		g_min_player = GetConVarInt(configlib_min_player);
+	}
+
+	else if (cvar == configlib_see_text)
+	{
+		g_see_text = GetConVarInt(configlib_see_text);
+	}
+
+	else if (cvar == configlib_stripTag)
+	{
+		g_stripTag = GetConVarInt(configlib_stripTag);
+	}
+
+	else if (cvar == configlib_useMenu)
+	{
+		g_useMenu = GetConVarInt(configlib_useMenu);
 	}
 }

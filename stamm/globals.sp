@@ -70,7 +70,9 @@ new g_points;
 new g_extra_points;
 new g_happyhouron;
 new g_gameID;
-
+new g_hudText;
+new g_stripTag;
+new g_useMenu;
 
 // Float globals
 new Float:g_infotime;
@@ -116,3 +118,4 @@ new bool:autoUpdate;
 
 // Global handls
 new Handle:g_HappyTimer;
+new Handle:g_hHudSync;

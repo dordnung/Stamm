@@ -701,7 +701,7 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 		// Found feature und block higher than zero
 		if (feature != -1 && GetNativeCell(2) > 0)
 		{
-			// 
+			// Player level high enough and want feature?
 			if (g_playerlevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][GetNativeCell(2)-1] && g_FeatureList[feature][WANT_FEATURE][client])
 			{
 				return true;

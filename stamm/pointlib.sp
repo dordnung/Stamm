@@ -77,11 +77,13 @@ public Action:pointlib_PointShower(Handle:timer)
 	// Show points to each player
 	for (new i = 1; i <= MaxClients; i++) 
 	{
-		pointlib_ShowPlayerPoints(i);
+		pointlib_ShowPlayerPoints(i, true);
 	}
 
 	return Plugin_Continue;
 }
+
+
 
 // add points to a player
 public Action:pointlib_AddPlayerPoints(args)
@@ -288,23 +290,35 @@ public Action:pointlib_DelPlayerPoints(args)
 }
 
 
+
 // Points handler
 public Action:pointlib_ShowPoints2(Handle:timer, any:client)
 {
 	// Show points
-	pointlib_ShowPlayerPoints(client);
+	pointlib_ShowPlayerPoints(client, false);
 	
 	return Plugin_Handled;
 }
 
+
 // Console command to show points
 public Action:pointlib_ShowPoints(client, arg)
 {
-	// Show points
-	pointlib_ShowPlayerPoints(client);
+	// Show player points
+	if (!g_useMenu)
+	{
+		pointlib_ShowPlayerPoints(client, false);
+	}
+	else
+	{
+		SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
+	}
 	
 	return Plugin_Handled;
 }
+
+
+
 
 // Give points to player
 public pointlib_GivePlayerPoints(client, number, bool:check)
@@ -360,18 +374,24 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 
 
 // Show points
-public pointlib_ShowPlayerPoints(client)
+public pointlib_ShowPlayerPoints(client, bool:only)
 {
 	if (clientlib_isValidClient(client))
 	{
 		decl String:name[MAX_NAME_LENGTH+1];
-		
+		decl String:vip[32];
+
 		GetClientName(client, name, sizeof(name));
 		
 		// Get points
 		new restpoints = 0;
 		new index = g_playerlevel[client];
 		new points = g_playerpoints[client];
+
+
+		// Format VIP String
+		Format(vip, sizeof(vip), " %T", "VIP", client);
+
 		
 		// If not highest level, calculate rest points
 		if (index != g_levels && index < g_levels) 
@@ -380,27 +400,55 @@ public pointlib_ShowPlayerPoints(client)
 		}
 
 		// Show to all or only to client
-		if (!g_see_text)
+		if (!g_see_text || only)
 		{
 			// Highest level?
 			if (index != g_levels && index < g_levels) 
 			{
-				CPrintToChat(client, "%s %t", g_StammTag, "NoVIPClient", points, restpoints, g_LevelName[g_playerlevel[client]]);
+				if (!g_stripTag)
+				{
+					CPrintToChat(client, "%s %t", g_StammTag, "NoVIPClient", points, restpoints, g_LevelName[g_playerlevel[client]], vip);
+				}
+				else
+				{
+					CPrintToChat(client, "%s %t", g_StammTag, "NoVIPClient", points, restpoints, g_LevelName[g_playerlevel[client]], "");
+				}
 			}
 			else
 			{ 
-				CPrintToChat(client, "%s %t", g_StammTag, "VIPClient", points, g_LevelName[index-1]);
+				if (!g_stripTag)
+				{
+					CPrintToChat(client, "%s %t", g_StammTag, "VIPClient", points, g_LevelName[index-1], vip);
+				}
+				else
+				{
+					CPrintToChat(client, "%s %t", g_StammTag, "VIPClient", points, g_LevelName[index-1], "");
+				}
 			}
 		}
 		else
 		{
 			if (index != g_levels && index < g_levels) 
 			{
-				CPrintToChatAll("%s %t", g_StammTag, "NoVIPAll", name, points, restpoints, g_LevelName[g_playerlevel[client]]);
+				if (!g_stripTag)
+				{
+					CPrintToChatAll("%s %t", g_StammTag, "NoVIPAll", name, points, restpoints, g_LevelName[g_playerlevel[client]], vip);
+				}
+				else
+				{
+					CPrintToChatAll("%s %t", g_StammTag, "NoVIPAll", name, points, restpoints, g_LevelName[g_playerlevel[client]], "");
+				}
 			}
 			else
 			{ 
-				CPrintToChatAll("%s %t", g_StammTag, "VIPAll", name, points, g_LevelName[index-1]);
+				if (!g_stripTag)
+				{
+					CPrintToChatAll("%s %t", g_StammTag, "VIPAll", name, points, g_LevelName[index-1], vip);
+				}
+				else
+				{
+					CPrintToChatAll("%s %t", g_StammTag, "VIPAll", name, points, g_LevelName[index-1], "");
+				}
 			}
 		}
 	}

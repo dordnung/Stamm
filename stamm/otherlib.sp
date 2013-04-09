@@ -166,16 +166,24 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 }
 
 
+
+
 // Info timer updated
 public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 {
 	// Print infos to chat
 	CPrintToChatAll("%s %t", g_StammTag, "InfoTyp", g_texttowrite_f);
-	CPrintToChatAll("%s %t", g_StammTag, "InfoTypInfo", g_sinfo_f);
+
+	if (!g_useMenu)
+	{
+		CPrintToChatAll("%s %t", g_StammTag, "InfoTypInfo", g_sinfo_f);
+	}
 	
 	// Go on
 	return Plugin_Continue;
 }
+
+
 
 
 // Client want to start new Happy Hour
@@ -188,6 +196,8 @@ public otherlib_MakeHappyHour(client)
 	CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyTime");
 	CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyTimeInfo");
 }
+
+
 
 
 // End happy hour
@@ -228,6 +238,7 @@ public otherlib_EndHappyHour()
 }
 
 
+
 // Start happy hour
 public otherlib_StartHappyHour(time, factor)
 {
@@ -263,12 +274,19 @@ public otherlib_StartHappyHour(time, factor)
 	nativelib_HappyStart(time / 60, g_points);
 }
 
+
+
+
 // Timer to stop happy hour
 public Action:otherlib_StopHappyHour(Handle:timer)
 {
 	// Give it to other method
 	otherlib_EndHappyHour();
 }
+
+
+
+
 
 public Action:otherlib_StartHappy(args)
 {

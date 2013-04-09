@@ -66,6 +66,8 @@ public bool:clientlib_isValidClient(client)
 	return (clientlib_isValidClient_PRE(client) && g_ClientReady[client]);
 }
 
+
+
 // Insert player after admin check
 public OnClientPostAdminCheck(client)
 {
@@ -74,6 +76,40 @@ public OnClientPostAdminCheck(client)
 		sqllib_InsertPlayer(client);
 	}
 }
+
+
+
+// Set the Text for client!
+public Action:clientlib_ShowHudText(Handle:timer, any:data)
+{
+	// Client Loop
+	for (new client = 1; client <= MaxClients; client++)
+	{
+		// Client Valid?
+		if (clientlib_isValidClient(client))
+		{
+			new Float:startPos;
+			new Float:endPos;
+			
+			if (TF2_GetPlayerClass(client) != TFClass_Engineer)
+			{
+				startPos = 0.01;
+				endPos = 0.01;
+			}
+			else
+			{
+				startPos = 0.21;
+				endPos = 0.02;
+			}
+
+			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
+			ShowSyncHudText(client, g_hHudSync, "[STAMM] %T: %i", "Points", client, g_playerpoints[client]);
+		}
+	}
+
+	return Plugin_Continue;
+}
+
 
 
 // Check a client as ready
@@ -107,12 +143,17 @@ public clientlib_ClientReady(client)
 	}
 }
 
+
 // A client disconnected
 public OnClientDisconnect(client)
 {
+	// Save Player
+	clientlib_SavePlayer(client, 0);
+
 	// Check Players
 	clientlib_CheckPlayers();
 }
+
 
 
 // Checks if a steamid is connected
@@ -138,6 +179,8 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 
 	return 0;
 }
+
+
 
 // Check if a client is a stamm admin
 public bool:clientlib_IsAdmin(client)
@@ -195,6 +238,9 @@ public clientlib_CheckFlagAdmin(client)
 	if (g_giveflagadmin == 6 && GetAdminFlag(adminid, Admin_Custom6)) clientlib_GiveFastVIP(client);
 }
 
+
+
+
 // Set level to highest level
 public clientlib_GiveFastVIP(client)
 {
@@ -203,6 +249,7 @@ public clientlib_GiveFastVIP(client)
 		pointlib_GivePlayerPoints(client, g_LevelPoints[g_levels-1], false);
 	}
 }
+
 
 
 // Delete old players
@@ -225,6 +272,8 @@ public Action:clientlib_deleteOlds(Handle:timer, any:data)
 	
 	return Plugin_Continue;
 }
+
+
 
 
 // Check VIP state
@@ -268,8 +317,26 @@ public clientlib_CheckVip(client)
 			
 
 			// Notice to all
-			CPrintToChatAll("%s %t", g_StammTag, "LevelNowVIP", name, g_LevelName[levelstufe-1]);
-			CPrintToChat(client, "%s %t", g_StammTag, "JoinVIP");
+			if (!g_stripTag)
+			{
+				CPrintToChatAll("%s %t", g_StammTag, "LevelNowVIP", name, g_LevelName[levelstufe-1]);
+			}
+			else
+			{
+				CPrintToChatAll("%s %t", g_StammTag, "LevelNowLevel", name, g_LevelName[levelstufe-1]);
+			}
+
+
+			if (!g_stripTag)
+			{
+				// VIP
+				CPrintToChat(client, "%s %t", g_StammTag, "JoinVIP");
+			}
+			else
+			{
+				// Level
+				CPrintToChat(client, "%s %t", g_StammTag, "JoinLevel");
+			}
 			
 			// Play lvl up sound if wanted
 			if (!StrEqual(g_lvl_up_sound, "0") && isUP)
@@ -328,6 +395,7 @@ public clientlib_CheckVip(client)
 }
 
 
+
 // Saves player points and feature states
 public clientlib_SavePlayer(client, number)
 {
@@ -370,6 +438,8 @@ public clientlib_SavePlayer(client, number)
 	}
 }
 
+
+
 // Get the steamid
 public clientlib_getSteamid(client, String:steamid[], size)
 {
@@ -378,6 +448,7 @@ public clientlib_getSteamid(client, String:steamid[], size)
 	// Replace STEAM_1: with STEAM_0:
 	ReplaceString(steamid, size, "STEAM_1:", "STEAM_0:");
 }
+
 
 
 // Command Say filter
@@ -513,7 +584,14 @@ public Action:clientlib_CmdSay(client, args)
 		else if (StrEqual(text, g_texttowrite) && StrContains(g_texttowrite, "sm_") != 0)
 		{
 			// Show player points
-			pointlib_ShowPlayerPoints(client);
+			if (!g_useMenu)
+			{
+				pointlib_ShowPlayerPoints(client, false);
+			}
+			else
+			{
+				SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
+			}
 		}
 		else if (StrEqual(text, g_admin_menu) && StrContains(g_admin_menu, "sm_") != 0 && clientlib_IsAdmin(client))
 		{
@@ -524,6 +602,9 @@ public Action:clientlib_CmdSay(client, args)
 	
 	return Plugin_Continue;
 }
+
+
+
 
 // Check players
 public clientlib_CheckPlayers()
@@ -541,6 +622,7 @@ public clientlib_CheckPlayers()
 		}
 	}
 }
+
 
 
 // get current clients on server

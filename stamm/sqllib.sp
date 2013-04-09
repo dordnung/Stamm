@@ -89,7 +89,7 @@ public sqllib_LoadDB()
 		decl String:query[620];
 		
 		// Create table if it's not exists
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
+		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_tablename, GetTime());
 		
 		if (g_debug) 
 		{
@@ -184,11 +184,11 @@ public sqllib_AddColumn(String:name[], bool:standard)
 		// Standard off or on?
 		if (standard)
 		{
-			Format(query, sizeof(query), "ALTER TABLE `%s` ADD `%s` INT NOT NULL DEFAULT 1", g_tablename, name);
+			Format(query, sizeof(query), "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT 1", g_tablename, name);
 		}
 		else
 		{
-			Format(query, sizeof(query), "ALTER TABLE `%s` ADD `%s` INT NOT NULL DEFAULT 0", g_tablename, name);
+			Format(query, sizeof(query), "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT 0", g_tablename, name);
 		}
 
 
@@ -291,10 +291,14 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 
+
+
 				// Get the version of this client
 				SQL_FetchString(hndl, 2, versionSteamid, sizeof(versionSteamid));
 
 				clientlib_ClientReady(client);
+
+
 
 				// Sync old STEAM_1:
 				sqlback_syncSteamid(client, versionSteamid);
@@ -337,7 +341,16 @@ public Action:sqllib_GetVipRank(client, args)
 	// No VIP ?
 	if (g_playerlevel[client] <= 0)
 	{
-		CPrintToChat(client, "%s %t", g_StammTag, "NoVIP");
+		if (!g_stripTag)
+		{
+			// No VIP
+			CPrintToChat(client, "%s %t", g_StammTag, "NoVIP");
+		}
+		else
+		{
+			// No Level
+			CPrintToChat(client, "%s %t", g_StammTag, "NoRank");
+		}
 		
 		return Plugin_Handled;
 	}
@@ -375,7 +388,9 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			decl String:steamid[64];
 			
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
-			SetPanelTitle(Top10Menu, "TOP VIP's");
+
+			Format(top_text, sizeof(top_text), "%T", "StammTop", client);
+			SetPanelTitle(Top10Menu, top_text);
 
 			DrawPanelText(Top10Menu, "------------------------------------");
 
@@ -396,8 +411,16 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			// Found something?
 			if (!index)
 			{
-				// There are no vips
-				CPrintToChat(client, "%s %t", g_StammTag, "NoVips");
+				if (!g_stripTag)
+				{
+					// There are no vips
+					CPrintToChat(client, "%s %t", g_StammTag, "NoVips");
+				}
+				else
+				{
+					// There are no players
+					CPrintToChat(client, "%s %t", g_StammTag, "NoRanks");
+				}
 				
 				return;
 			}
@@ -498,7 +521,7 @@ public Action:sqllib_convertDB(args)
 
 	
 	// Select data from database
-	Format(query, sizeof(query), "SELECT `steamid`, `level`, `points`, `name`, `version` FROM `%s`", g_tablename);
+	Format(query, sizeof(query), "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`", g_tablename);
 
 	// Execute
 	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile, query);
@@ -534,13 +557,14 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 			}
 
 			// Write create statement
-			WriteFileLine(file, "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, PRIMARY KEY (`steamid`));", g_tablename);
+			WriteFileLine(file, "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`));", g_tablename, GetTime());
 
 			// Parse all database data
 			do
 			{
 				new level;
 				new points;
+				new last;
 				new Float:version;
 
 				decl String:steamid[64];
@@ -552,6 +576,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 				level = SQL_FetchInt(hndl, 1);
 				points = SQL_FetchInt(hndl, 2);
 				version = SQL_FetchFloat(hndl, 4);
+				last = SQL_FetchInt(hndl, 5);
 
 				// Convert version to string
 				FloatToString(version, versionS, sizeof(versionS));
@@ -568,7 +593,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 					// Escape Sqlite
 					EscapeStringSQLite(name, name2, sizeof(name2), true);
 
-					WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`) VALUES ('%s', %i, %i, '%s', %s);", g_tablename, steamid, level, points, name2, versionS);
+					WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES ('%s', %i, %i, '%s', %s, %i);", g_tablename, steamid, level, points, name2, versionS, last);
 				}
 				else
 				{
@@ -579,19 +604,19 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 					if (counter == 0)
 					{
 						// new line
-						WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`) VALUES", g_tablename);
+						WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES", g_tablename);
 					}
 
 					// Check if 1000 reached
 					if (++counter == 1000 || !SQL_MoreRows(hndl))
 					{
-						WriteFileLine(file, "('%s', %i, %i, '%s', %s);", steamid, level, points, name2, versionS);
+						WriteFileLine(file, "('%s', %i, %i, '%s', %s, %i);", steamid, level, points, name2, versionS, last);
 
 						counter = 0;
 					}
 					else
 					{
-						WriteFileLine(file, "('%s', %i, %i, '%s', %s),", steamid, level, points, name2, versionS);
+						WriteFileLine(file, "('%s', %i, %i, '%s', %s, %i),", steamid, level, points, name2, versionS, last);
 					}
 				}
 

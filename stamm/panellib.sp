@@ -27,7 +27,6 @@
 #pragma semicolon 1
 
 // Panels
-new Handle:panellib_info;
 new Handle:panellib_levels;
 new Handle:panellib_credits;
 new Handle:panellib_cmdlist;
@@ -67,7 +66,6 @@ public panellib_Start()
 	// Create new Panels
 	panellib_credits = CreatePanel();
 	panellib_levels = CreateMenu(panellib_PassPanelHandler);
-	panellib_info = CreatePanel();
 	panellib_cmdlist = CreatePanel();
 	panellib_adminpanel = CreatePanel();
 
@@ -170,61 +168,139 @@ public panellib_Start()
 	
 	Format(infoString, sizeof(infoString), "%T", "Close", LANG_SERVER);
 	DrawPanelItem(panellib_credits, infoString);
-	
+}
 
 
-	// Create Main info Panel
-	SetPanelTitle(panellib_info, "Stamm by Popoklopsi");
-	
-	DrawPanelText(panellib_info, "-------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T", "PointInfo", LANG_SERVER);
-	DrawPanelText(panellib_info, infoString);
-	
-
-	// Add points information
-	// Kill
-	Format(infoString, sizeof(infoString), "1 %T", "Kill", LANG_SERVER);
-
-	if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7) 
+public Handle:panellib_createInfoPanel(client)
+{
+	if (clientlib_isValidClient(client))
 	{
-		DrawPanelText(panellib_info, infoString);
-	}
+		// Create Info Panel
+		new Handle:panellib_info;
+
+		// Get points
+		new restpoints = 0;
+		new index = g_playerlevel[client];
+		new points = g_playerpoints[client];
+
+		// Strings
+		decl String:infoString[512];
+		decl String:name[MAX_NAME_LENGTH+1];
+		decl String:vip[32];
 
 
-	// Rounds
-	Format(infoString, sizeof(infoString), "1 %T", "Round", LANG_SERVER);
+		// Format VIP String
+		Format(vip, sizeof(vip), " %T", "VIP", client);
 
-	if (g_vip_type == 2 || g_vip_type == 4 || g_vip_type == 6 || g_vip_type == 7) 
-	{
-		DrawPanelText(panellib_info, infoString);
-	}
+
+		// Client Name
+		GetClientName(client, name, sizeof(name));
+
+
+		panellib_info = CreatePanel();
+
+		// Create Main info Panel
+		SetPanelTitle(panellib_info, "Stamm by Popoklopsi");
 		
 
-	// Time
-	Format(infoString, sizeof(infoString), "%i %T", g_time_point, "Minute", LANG_SERVER);
+		// Split Line
+		DrawPanelText(panellib_info, "-------------------------------------------");
 
-	if (g_vip_type == 3 || g_vip_type == 5 || g_vip_type == 6 || g_vip_type == 7) 
-	{
+
+		// Now add points text
+		// If not highest level, calculate rest points
+		if (index != g_levels && index < g_levels) 
+		{
+			restpoints = g_LevelPoints[index] - g_playerpoints[client];
+		}
+
+
+		// Highest level?
+		if (index != g_levels && index < g_levels) 
+		{
+			if (!g_stripTag)
+			{
+				Format(infoString, sizeof(infoString), "%T", "NoVIPClientPlain", client, points, restpoints, g_LevelName[g_playerlevel[client]], vip);
+			}
+			else
+			{
+				Format(infoString, sizeof(infoString), "%T", "NoVIPClientPlain", client, points, restpoints, g_LevelName[g_playerlevel[client]], "");
+			}
+		}
+		else
+		{ 
+			if (!g_stripTag)
+			{
+				Format(infoString, sizeof(infoString), "%T", "VIPClientPlain", client, points, g_LevelName[index-1], vip);
+			}
+			else
+			{
+				Format(infoString, sizeof(infoString), "%T", "VIPClientPlain", client, points, g_LevelName[index-1], "");
+			}
+		}
+
+
+		// Draw Infos
 		DrawPanelText(panellib_info, infoString);
-	}
+
+
+		// Split Line
+		DrawPanelText(panellib_info, "-------------------------------------------");
+
 		
-	DrawPanelText(panellib_info, "-------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T", "StammFeatures", LANG_SERVER);
-	DrawPanelItem(panellib_info, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "StammCMD", LANG_SERVER);
-	DrawPanelItem(panellib_info, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "AllLevels", LANG_SERVER);
-	DrawPanelItem(panellib_info, infoString);
-	
-	DrawPanelItem(panellib_info, "Credits");
-	DrawPanelText(panellib_info, "-------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T", "Close", LANG_SERVER);
-	DrawPanelItem(panellib_info, infoString);
+		Format(infoString, sizeof(infoString), "%T", "PointInfo", client);
+		DrawPanelText(panellib_info, infoString);
+		
+
+		// Add points information
+		// Kill
+		Format(infoString, sizeof(infoString), "1 %T", "Kill", client);
+
+		if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7) 
+		{
+			DrawPanelText(panellib_info, infoString);
+		}
+
+
+		// Rounds
+		Format(infoString, sizeof(infoString), "1 %T", "Round", client);
+
+		if (g_vip_type == 2 || g_vip_type == 4 || g_vip_type == 6 || g_vip_type == 7) 
+		{
+			DrawPanelText(panellib_info, infoString);
+		}
+			
+
+		// Time
+		Format(infoString, sizeof(infoString), "%i %T", g_time_point, "Minute", client);
+
+		if (g_vip_type == 3 || g_vip_type == 5 || g_vip_type == 6 || g_vip_type == 7) 
+		{
+			DrawPanelText(panellib_info, infoString);
+		}
+			
+		DrawPanelText(panellib_info, "-------------------------------------------");
+		
+		Format(infoString, sizeof(infoString), "%T", "StammFeatures", client);
+		DrawPanelItem(panellib_info, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "StammCMD", client);
+		DrawPanelItem(panellib_info, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "AllLevels", client);
+		DrawPanelItem(panellib_info, infoString);
+		
+		DrawPanelItem(panellib_info, "Credits");
+		DrawPanelText(panellib_info, "-------------------------------------------");
+		
+		Format(infoString, sizeof(infoString), "%T", "Close", client);
+		DrawPanelItem(panellib_info, infoString);
+
+		return panellib_info;
+	}
+
+	// Invalid Player -> Invalid Handle^^
+	return INVALID_HANDLE;
 }
 
 
@@ -239,6 +315,7 @@ public Action:panellib_OpenAdmin(client, args)
 
 	return Plugin_Handled;
 }
+
 
 // Open change panel
 public Action:panellib_ChangePanel(client, args)
@@ -258,6 +335,9 @@ public panellib_CreateUserPanels(client, mode)
 		// Only valid clients
 		if (clientlib_isValidClient(client))
 		{
+			// Do we found something?
+			new bool:found = false;
+
 			new Handle:ChangeMenu = CreateMenu(panellib_ChangePanelHandler);
 			decl String:MenuItem[100];
 			decl String:index[10];
@@ -271,8 +351,11 @@ public panellib_CreateUserPanels(client, mode)
 			for (new i=0; i < g_features; i++)
 			{
 				// Only enabled features and changeable features
-				if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_CHANGE])
+				if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_CHANGE] && g_playerlevel[client] >= g_FeatureList[i][FEATURE_LEVEL][0])
 				{
+					// found something
+					found = true;
+
 					// Text to enable or disable feature
 					if (g_FeatureList[i][WANT_FEATURE][client])
 					{ 
@@ -290,15 +373,22 @@ public panellib_CreateUserPanels(client, mode)
 				}
 			}
 
-			// Now display the menu
-			DisplayMenu(ChangeMenu, client, 60);
+			if (found)
+			{
+				// Now display the menu
+				DisplayMenu(ChangeMenu, client, 60);
+			}
+			else
+			{
+				CPrintToChat(client, "%s %t", g_StammTag, "NoFeatureFound");
+			}
 		}
 	}
 
 	// Open info handler
 	if (mode == 3) 
 	{
-		SendPanelToClient(panellib_info, client, panellib_InfoHandler, 20);
+		SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
 	}
 
 	// Open Admin menu
@@ -404,7 +494,7 @@ public panellib_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 	{
 		if (param2 == 2 && clientlib_isValidClient(param1)) 
 		{
-			SendPanelToClient(panellib_info, param1, panellib_InfoHandler, 20);
+			SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
 		}
 	}
 }
@@ -419,7 +509,7 @@ public panellib_PassPanelHandler(Handle:menu, MenuAction:action, param1, param2)
 		if (param2 == MenuCancel_ExitBack && clientlib_isValidClient(param1))
 		{
 			// Send info panel again
-			SendPanelToClient(panellib_info, param1, panellib_InfoHandler, 20);
+			SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
 		}
 	}
 }
@@ -552,7 +642,7 @@ public panellib_CmdlistHandler(Handle:menu, MenuAction:action, param1, param2)
 			if (param2 == 5)
 			{
 				// Go back
-				SendPanelToClient(panellib_info, param1, panellib_InfoHandler, 20);
+				SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
 			}
 		}
 	}
@@ -587,6 +677,9 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 			// Open feature list
 			if (param2 == 1)
 			{
+				// Found feature?
+				new bool:foundFeature = false;
+
 				new Handle:featurelist = CreateMenu(panellib_FeatureListHandler);
 				
 				// title and exit button
@@ -598,10 +691,41 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 				// Loop through levels
 				for (new i=0; i < g_levels+g_plevels; i++)
 				{
-					// Add level
-					Format(featureid, sizeof(featureid), "%i", i+1);
-					
-					AddMenuItem(featurelist, featureid, g_LevelName[i]);
+					// Found nothing
+					foundFeature = false;
+
+					// Loop through features, find one
+					for (new j=0; j < g_features; j++)
+					{
+						// Only enabled features and changeable features
+						if (g_FeatureList[j][FEATURE_ENABLE])
+						{
+							// Loop through all descriptions on this level
+							for (new k=0; k < g_FeatureList[j][FEATURE_DESCS][i]; k++)
+							{
+								// We have a description
+								if (!StrEqual(g_FeatureHaveDesc[j][i][k], ""))
+								{
+									// Add level
+									Format(featureid, sizeof(featureid), "%i", i+1);
+									
+									AddMenuItem(featurelist, featureid, g_LevelName[i]);
+
+									// Found Feature
+									foundFeature = true;
+
+									// Stop Feature loop
+									break;
+								}
+							}
+						}
+
+						// We Found a feature -> go to next level
+						if (foundFeature)
+						{
+							break;
+						}
+					}
 				}
 				
 
@@ -662,7 +786,7 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 		// Go back
 		if (param2 == MenuCancel_ExitBack && clientlib_isValidClient(param1))
 		{
-			SendPanelToClient(panellib_info, param1, panellib_InfoHandler, 20);
+			SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
 		}
 	}
 
