@@ -3,6 +3,10 @@
 #endif
 #define _stamm_included
 
+
+
+
+
 /**
  * Max. levels supported by Stamm
  */
@@ -12,6 +16,12 @@
  * Max. features supported by Stamm
  */
 #define STAMM_MAX_FEATURES 100
+
+
+
+
+
+
 
 /**
  * Return of function STAMM_GetGame()
@@ -38,6 +48,11 @@ enum StammType
 	ROUNDS_TIME,
 	KILLS_ROUNDS_TIME
 };
+
+
+
+
+
 
 /**
  * Executes when your feature is loaded by stamm
@@ -111,6 +126,11 @@ forward STAMM_OnHappyHourStart(time, factor);
  */
 forward STAMM_OnHappyHourEnd();
 
+
+
+
+
+
 /**
  * Adds a new Stamm Feature
  *
@@ -121,7 +141,7 @@ forward STAMM_OnHappyHourEnd();
  * @noreturn
  * @error            	Max features reached.
  */
-native STAMM_AddFeature(String:name[], String:description[], bool:allowChange=true, bool:standard=true);
+native STAMM_AddFeature(String:name[], String:description[] = "", bool:allowChange=true, bool:standard=true);
 
 /**
  * Adds information about what a player gets on a specific level with this feature (will be shown in the !sme list)
@@ -173,7 +193,15 @@ native STAMM_GetBlockOfName(String:name[]);
 native STAMM_GetBlockCount();
 
 /**
- * Return the Number of a clients level
+ * Returns the first block a client is in
+ *
+ * @param client		Client.
+ * @return				0 = no block, x = block
+ */
+native STAMM_GetClientBlock(client);
+
+/**
+ * Returns the level of a client
  *
  * @param client		Client.
  * @return				-1=invalid client, 0=no VIP, x=Level
@@ -181,7 +209,7 @@ native STAMM_GetBlockCount();
 native STAMM_GetClientLevel(client);
 
 /**
- * Return the Number of Points of a player
+ * Returns the points of a player
  *
  * @param client		Client.
  * @return				Points of Player or -1 on error.
@@ -189,7 +217,7 @@ native STAMM_GetClientLevel(client);
 native STAMM_GetClientPoints(client);
 
 /**
- * Return the name of a specific Level
+ * Returns the name of a specific Level
  *
  * @param level			x = Level.
  * @param name			String to save name in
@@ -199,15 +227,15 @@ native STAMM_GetClientPoints(client);
 native bool:STAMM_GetLevelName(level, String:name[], maxlength);
 
 /**
- * Return whether the level is private or not
+ * Returns whether the level is private or not
  *
  * @param level			x = Level.
  * @return				true=pivate, false=point based
  */
-native STAMM_IsLevelPrivate(level);
+native bool:STAMM_IsLevelPrivate(level);
 
 /**
- * Return the number of a specific Level
+ * Returns the level of a specific level name
  *
  * @param name			Name of the level.
  * @return				0 = not found, x = level number.
@@ -215,7 +243,7 @@ native STAMM_IsLevelPrivate(level);
 native STAMM_GetLevelNumber(String:name[]);
 
 /**
- * Return how much Points a player need for a specific Level
+ * Returns how much points a player need for a specific Level
  *
  * @param level			x = Level.
  * @return				How much Points a Client needs, or -1 on Error.
@@ -223,35 +251,35 @@ native STAMM_GetLevelNumber(String:name[]);
 native STAMM_GetLevelPoints(level);
 
 /**
- * Return how much levels are set
+ * Returns how much levels are set
  *
  * @return				How much levels are set
  */
 native STAMM_GetLevelCount();
 
 /**
- * Return how to get Points
+ * Returns how to get Points
  *
  * @return					KILLS, ROUNDS, TIME, KILLS_ROUNDS, KILLS_TIME, ROUNDS_TIME, KILLS_ROUNDS_TIME
  */
 native StammType:STAMM_GetType();
 
 /**
- * Return the game stamm is running on
+ * Returns the game stamm is running on
  *
  * @return					GameOTHER, GameCSS, GameCSGO, GameTF2, GameDOD
  */
 native StammGame:STAMM_GetGame();
 
 /**
- * Return whether the admin want auto updates for Stamm
+ * Returns whether the server admin want auto updates for Stamm
  *
  * @return					True if he want, false otherwise
  */
 native bool:STAMM_AutoUpdate();
 
 /**
- * Add Points to a player
+ * Adds points to a player
  *
  * @param client		Client.
  * @param number		Number of Points to add.
@@ -260,7 +288,7 @@ native bool:STAMM_AutoUpdate();
 native bool:STAMM_AddClientPoints(client, number);
 
 /**
- * Delete Points from a player
+ * Deletes points from a player
  *
  * @param client		Client.
  * @param number		Number of Points to delete.
@@ -269,7 +297,7 @@ native bool:STAMM_AddClientPoints(client, number);
 native bool:STAMM_DelClientPoints(client, number);
 
 /**
- * Set Points of a player
+ * Sets points of a player
  *
  * @param client		Client.
  * @param number		Number of Points to set.
@@ -278,7 +306,7 @@ native bool:STAMM_DelClientPoints(client, number);
 native bool:STAMM_SetClientPoints(client, number);
 
 /**
- * Return true when the specific player is VIP, otherwise false
+ * Returns true when the specific player is VIP, otherwise false
  *
  * @param client		Client.
  * @param type			x = Level.
@@ -288,7 +316,7 @@ native bool:STAMM_SetClientPoints(client, number);
 native bool:STAMM_IsClientVip(client, type, bool:min=true);
 
 /**
- * Return true when the clients level is high enough for the feature and wants it.
+ * Returns true when the clients level is high enough for the feature and wants it.
  *
  * @param client		Client.
  * @return				true if allowed, otherwise false.
@@ -296,7 +324,7 @@ native bool:STAMM_IsClientVip(client, type, bool:min=true);
 native bool:STAMM_HaveClientFeature(client, block=1);
 
 /**
- * Return true when the specific player is complete loaded by Stamm, otherwise false
+ * Returns true when the specific player is complete loaded by Stamm, otherwise false
  *
  * @param client		Client.
  * @return				true if fully loaded, otherwise false.
@@ -304,7 +332,7 @@ native bool:STAMM_HaveClientFeature(client, block=1);
 native bool:STAMM_IsClientValid(client);
 
 /**
- * Return true when the specific player is a Stamm admin, otherwise false
+ * Returns true when the specific player is a Stamm admin, otherwise false
  *
  * @param client		Client.
  * @return				true if admin, otherwise false.
@@ -312,7 +340,7 @@ native bool:STAMM_IsClientValid(client);
 native bool:STAMM_IsClientAdmin(client);
 
 /**
- * Return true when the specific player enabled this feature, false otherwise
+ * Returns true when the specific player enabled this feature, false otherwise
  *
  * @param client		Client.
  * @return				true if the player wants, otherwise false.
@@ -320,7 +348,7 @@ native bool:STAMM_IsClientAdmin(client);
 native bool:STAMM_WantClientFeature(client);
 
 /**
- * Return true when stamm is fully loaded.
+ * Returns true when stamm is fully loaded.
  *
  * @return				true if yes, otherwise false.
  */
@@ -370,8 +398,12 @@ native STAMM_UnloadFeature(Handle:plugin);
  */
 native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 
+
+
+
+
 /**
- * Load the translation file of your feature in stamm/languages
+ * Loads the translation file of your feature in stamm/languages
  *
  * @noreturn
  */
@@ -386,6 +418,12 @@ stock STAMM_LoadTranslation()
 	LoadTranslations(basename);
 }
 
+
+
+
+
+
+
 public SharedPlugin:__pl_stamm = 
 {
 	name = "stamm",
@@ -398,6 +436,9 @@ public SharedPlugin:__pl_stamm =
 };
 
 #if !defined REQUIRE_PLUGIN
+
+
+
 
 public __pl_stamm_SetNTVOptional()
 {
@@ -416,6 +457,7 @@ public __pl_stamm_SetNTVOptional()
 	MarkNativeAsOptional("STAMM_GetLevelCount");
 	MarkNativeAsOptional("STAMM_GetType");
 	MarkNativeAsOptional("STAMM_GetGame");
+	MarkNativeAsOptional("STAMM_GetClientBlock");
 	MarkNativeAsOptional("STAMM_AddClientPoints");
 	MarkNativeAsOptional("STAMM_DelClientPoints");
 	MarkNativeAsOptional("STAMM_SetClientPoints");

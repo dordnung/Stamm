@@ -51,6 +51,7 @@ public nativelib_Start()
 	CreateNative("STAMM_GetLevel", nativelib_GetLevel);
 	CreateNative("STAMM_GetClientPoints", nativelib_GetClientStammPoints);
 	CreateNative("STAMM_GetClientLevel", nativelib_GetClientStammLevel);
+	CreateNative("STAMM_GetClientBlock", nativelib_GetClientStammBlock);
 	CreateNative("STAMM_GetLevelPoints", nativelib_GetStammLevelPoints);
 	CreateNative("STAMM_GetLevelName", nativelib_GetStammLevelName);
 	CreateNative("STAMM_GetLevelNumber", nativelib_GetStammLevelNumber);
@@ -297,7 +298,7 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 	if (feature != -1)
 	{
 		// Go through all blocks and updated counter
-		for (new j=0; j < 20; j++)
+		for (new j=0; j < MAXLEVELS; j++)
 		{
 			if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0)
 			{
@@ -365,6 +366,42 @@ public nativelib_GetClientStammPoints(Handle:plugin, numParams)
 	}
 
 	return -1;
+}
+
+
+// Get the block of a client
+public nativelib_GetClientStammBlock(Handle:plugin, numParams)
+{
+	new client = GetNativeCell(1);
+	new feature = featurelib_getFeatureByHandle(plugin);
+
+
+	// Valid client?
+	if (clientlib_isValidClient(client))
+	{
+		// Found feature?
+		if (feature != -1)
+		{
+			// Go through all blocks and 
+			for (new j=MAXLEVELS-1; j >= 0; j--)
+			{
+				// Block exists?
+				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0)
+				{
+					// Client have Block?
+					if (g_playerlevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
+					{
+						// found highest
+						return j+1;
+					}
+				}
+			}
+		}
+	}
+
+
+	// Return 0 for not found
+	return 0;
 }
 
 

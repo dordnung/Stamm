@@ -42,7 +42,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LessGravity",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.2.3",
 	description = "Give VIP's less gravity",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -131,28 +131,26 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
 		new Float:newGrav;
-		
+		new clientBlock;
+
 		// Client want it
 		if (mode)
 		{
-			// Block loop
-			for (new i=STAMM_GetBlockCount(); i > 0; i--)
+			// Get highest client block
+			clientBlock = STAMM_GetClientBlock(client);
+
+			// Have the client the block?
+			if (clientBlock > 0)
 			{
-				// Have the client the block?
-				if (STAMM_HaveClientFeature(client, i))
+				// Calculate new gravity
+				newGrav = 1.0 - float(grav)/100.0 * clientBlock;
+
+				if (newGrav < 0.1) 
 				{
-					// Calculate new gravity
-					newGrav = 1.0 - float(grav)/100.0 * i;
-
-					if (newGrav < 0.1) 
-					{
-						newGrav = 0.1;
-					}
-
-					SetEntityGravity(client, newGrav);
-
-					break;
+					newGrav = 0.1;
 				}
+
+				SetEntityGravity(client, newGrav);
 			}
 		}
 		else

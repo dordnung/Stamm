@@ -45,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreSpeed",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.2.2",
 	description = "Give VIP's more speed",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -137,21 +137,19 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 		// He want more speed
 		if (mode)
 		{
-			// Check block of player
-			for (new i=STAMM_GetBlockCount(); i > 0; i--)
-			{
-				// Client have block?
-				if (STAMM_HaveClientFeature(client, i))
-				{
-					// Set new speed of player
-					new Float:newSpeed;
-					
-					newSpeed = 1.0 + float(pspeed)/100.0 * i;
-					
-					SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
+			// Get highest client block
+			new clientBlock = STAMM_GetClientBlock(client);
 
-					break;
-				}
+
+			// Client have block?
+			if (clientBlock > 0)
+			{
+				// Set new speed of player
+				new Float:newSpeed;
+				
+				newSpeed = 1.0 + float(pspeed)/100.0 * clientBlock;
+				
+				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
 			}
 		}
 		else

@@ -51,7 +51,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreAmmo",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.2.2",
 	description = "Give VIP's more ammo",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -189,47 +189,45 @@ public Action:CheckWeapons(Handle:timer, any:data)
 		// Client valid?
 		if (STAMM_IsClientValid(client) && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
 		{
-			// Block loop
-			for (new j=STAMM_GetBlockCount(); j > 0; j--)
+			// Get highest client block
+			new clientBlock = STAMM_GetClientBlock(client);
+
+
+			// Client have block?
+			if (clientBlock > 0)
 			{
-				// Client have block?
-				if (STAMM_HaveClientFeature(client, j))
+				// Weapon loop
+				for (new x=0; x < 2; x++)
 				{
-					// Weapon loop
-					for (new x=0; x < 2; x++)
+					// Player carry weapon?
+					new weapon = GetPlayerWeaponSlot(client, x);
+
+					if (weapon != -1 && !WeaponEdit[client][weapon])
 					{
-						// Player carry weapon?
-						new weapon = GetPlayerWeaponSlot(client, x);
+						// Get ammo index
+						new ammotype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
 
-						if (weapon != -1 && !WeaponEdit[client][weapon])
+						// Found ammo?
+						if (ammotype != -1)
 						{
-							// Get ammo index
-							new ammotype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-
-							// Found ammo?
-							if (ammotype != -1)
+							// Get ammo count
+							new cAmmo = GetEntProp(client, Prop_Send, "m_iAmmo", _, ammotype);
+							
+							// Found ammo count
+							if (cAmmo > 0)
 							{
-								// Get ammo count
-								new cAmmo = GetEntProp(client, Prop_Send, "m_iAmmo", _, ammotype);
+								// Calculate new Ammo
+								new newAmmo;
 								
-								// Found ammo count
-								if (cAmmo > 0)
-								{
-									// Calculate new Ammo
-									new newAmmo;
-									
-									newAmmo = RoundToZero(cAmmo + ((float(cAmmo)/100.0) * (j * ammo)));
-									
-									// Set ammo
-									SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, ammotype);
-									
-									WeaponEdit[client][weapon] = true;
-								}
+								newAmmo = RoundToZero(cAmmo + ((float(cAmmo)/100.0) * (clientBlock * ammo)));
+								
+								// Set ammo
+								SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, ammotype);
+								
+								WeaponEdit[client][weapon] = true;
 							}
 						}
 					}
-
-					break;
 				}
 			}
 		}

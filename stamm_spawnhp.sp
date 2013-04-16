@@ -48,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature SpawnHP",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Give VIP's more HP on spawn",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -141,20 +141,18 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 // Change here the health
 public Action:changeHealth(Handle:timer, any:client)
 {
-	// Check level client
-	for (new i=STAMM_GetBlockCount(); i > 0; i--)
-	{
-		// Have the client this block?
-		if (STAMM_HaveClientFeature(client, i))
-		{
-			// Set new HP
-			new newHP = GetClientHealth(client) + hp * i;
-			
-			// also increate max HP
-			SetEntProp(client, Prop_Data, "m_iMaxHealth", newHP);
-			SetEntityHealth(client, newHP);
+	// Get highest client block
+	new clientBlock = STAMM_GetClientBlock(client);
 
-			break;
-		}
+
+	// Have client block
+	if (clientBlock > 0)
+	{
+		// Set new HP
+		new newHP = GetClientHealth(client) + hp * clientBlock;
+		
+		// also increate max HP
+		SetEntProp(client, Prop_Data, "m_iMaxHealth", newHP);
+		SetEntityHealth(client, newHP);
 	}
 }

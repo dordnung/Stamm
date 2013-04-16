@@ -47,7 +47,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Higher Firing Rate",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.0.2",
 	description = "Give VIP's higher firing Rate",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -137,37 +137,35 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 	
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
-		// Block loop
-		for (new i=STAMM_GetBlockCount(); i > 0; i--)
+		// Get highest client block
+		new clientBlock = STAMM_GetClientBlock(client);
+
+
+		// Have client block
+		if (clientBlock > 0)
 		{
-			// Client have Block?
-			if (STAMM_HaveClientFeature(client, i))
+			// Create new item
+			hItem = TF2Items_CreateItem(OVERRIDE_ALL);
+			
+			TF2Items_SetItemIndex(hItem, -1);
+
+			new Float:newFire = 1.0 - float(firerate)/100.0 * clientBlock;
+
+
+			if (newFire < 0.1)
 			{
-				// Create new item
-				hItem = TF2Items_CreateItem(OVERRIDE_ALL);
-				
-				TF2Items_SetItemIndex(hItem, -1);
-
-				new Float:newFire = 1.0 - float(firerate)/100.0 * i;
-
-
-				if (newFire < 0.1)
-				{
-					newFire = 0.1;
-				}
-
-
-				// Set new firing rate of item
-				TF2Items_SetAttribute(hItem, 0, 6, newFire);
-					
-				// Override old
-				TF2Items_SetNumAttributes(hItem, 1);
-				TF2Items_SetFlags(hItem, OVERRIDE_ATTRIBUTES|PRESERVE_ATTRIBUTES);
-				
-				change = true;
-
-				break;
+				newFire = 0.1;
 			}
+
+
+			// Set new firing rate of item
+			TF2Items_SetAttribute(hItem, 0, 6, newFire);
+				
+			// Override old
+			TF2Items_SetNumAttributes(hItem, 1);
+			TF2Items_SetFlags(hItem, OVERRIDE_ATTRIBUTES|PRESERVE_ATTRIBUTES);
+			
+			change = true;
 		}
 	}
 	

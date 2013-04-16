@@ -188,6 +188,17 @@ public sqlback_ModifyVersion()
 	}
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
+	// Add admin
+	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+	
+	if (g_debug) 
+	{
+		LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+	}
+
+	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 }
 
 
@@ -197,9 +208,28 @@ public sqlback_ModifyTableBackwards()
 	decl String:query[128];
 
 	// We want an detailed overview, so add all version Strings
-	// Version 2.15
-	if (StrEqual(g_databaseVersion, "2.15"))
+	// Version 2.16
+	if (StrEqual(g_databaseVersion, "2.16"))
 	{
+		// Start stamm
+		stammStarted();
+	}
+
+
+	// Version 2.15
+	else if (StrEqual(g_databaseVersion, "2.15"))
+	{
+		// Add admin
+		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+		
+		if (g_debug) 
+		{
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
 		// Start stamm
 		stammStarted();
 	}
@@ -240,6 +270,18 @@ public sqlback_ModifyTableBackwards()
 		}
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
+		// Add admin
+		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+		
+		if (g_debug) 
+		{
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
 
 		// Start stamm
 		stammStarted();

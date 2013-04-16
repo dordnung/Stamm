@@ -154,13 +154,14 @@ public panellib_Start()
 
 
 	// Create Stamm Credits
-	SetPanelTitle(panellib_credits, "Stamm Credits");
+	SetPanelTitle(panellib_credits, "Stamm Beta Credits");
 	
 	DrawPanelText(panellib_credits, "-------------------------------------------");
 	DrawPanelText(panellib_credits, "Author:");
 	DrawPanelItem(panellib_credits, "Stamm Author is Popoklopsi");
 	DrawPanelText(panellib_credits, "-------------------------------------------");
 	DrawPanelText(panellib_credits, "Official Stamm Page: https://forums.alliedmods.net/showthread.php?t=142073");
+	DrawPanelText(panellib_credits, "Beta Link: http://popoklopsi.de/stamm/beta");
 	DrawPanelText(panellib_credits, "-------------------------------------------");
 	
 	Format(infoString, sizeof(infoString), "%T", "Back", LANG_SERVER);
@@ -701,10 +702,10 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 						if (g_FeatureList[j][FEATURE_ENABLE])
 						{
 							// Loop through all descriptions on this level
-							for (new k=0; k < g_FeatureList[j][FEATURE_DESCS][i]; k++)
+							for (new k=0; k < g_FeatureList[j][FEATURE_DESCS][i+1]; k++)
 							{
 								// We have a description
-								if (!StrEqual(g_FeatureHaveDesc[j][i][k], ""))
+								if (!StrEqual(g_FeatureHaveDesc[j][i+1][k], ""))
 								{
 									// Add level
 									Format(featureid, sizeof(featureid), "%i", i+1);

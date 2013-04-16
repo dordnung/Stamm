@@ -50,7 +50,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature RegenerateHP",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.2.2",
 	description = "Regenerate HP of VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -154,35 +154,35 @@ public Action:GiveHealth(Handle:timer, any:client)
 	// Is client valid?
 	if (STAMM_IsClientValid(client))
 	{
-		// Block loop
-		for (new i=STAMM_GetBlockCount(); i > 0; i--)
-		{
-			// Have client block and is player alive and in right team?
-			if (STAMM_HaveClientFeature(client, i) && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
-			{
-				// Get max Health and add regenerate HP
-				new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+		// Get highest client block
+		new clientBlock = STAMM_GetClientBlock(client);
 
-				new oldHP = GetClientHealth(client);
-				new newHP = oldHP + hp*i;
-				
-				// Only if not higher than max Health
-				if (newHP > maxHealth)
+
+		// Have client block and is player alive and in right team?
+		if (clientBlock > 0 && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
+		{
+			// Get max Health and add regenerate HP
+			new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+
+			new oldHP = GetClientHealth(client);
+			new newHP = oldHP + hp * clientBlock;
+			
+			// Only if not higher than max Health
+			if (newHP > maxHealth)
+			{
+				if (oldHP < maxHealth) 
 				{
-					if (oldHP < maxHealth) 
-					{
-						newHP = maxHealth;
-					}
-					else 
-					{
-						return Plugin_Continue;
-					}
+					newHP = maxHealth;
 				}
-				
-				SetEntityHealth(client, newHP);
-				
-				return Plugin_Continue;
+				else 
+				{
+					return Plugin_Continue;
+				}
 			}
+			
+			SetEntityHealth(client, newHP);
+			
+			return Plugin_Continue;
 		}
 	}
 	
