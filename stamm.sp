@@ -203,7 +203,6 @@ public OnPluginPauseChange(bool:pause)
 public CheckStammFolders()
 {
 	// Strings
-	decl String:StammFolderOld[PLATFORM_MAX_PATH +1];
 	decl String:LogFolder[PLATFORM_MAX_PATH +1];
 	decl String:LevelFolder[PLATFORM_MAX_PATH +1];
 	decl String:CurrentDate[20];
@@ -214,14 +213,7 @@ public CheckStammFolders()
 	
 
 	// Build Path to the needed folders
-	BuildPath(Path_SM, StammFolderOld, sizeof(StammFolderOld), "Stamm");
 	BuildPath(Path_SM, g_StammFolder, sizeof(g_StammFolder), "stamm");
-
-	if (DirExists(g_StammFolder))
-	{
-		// Maybe it work...
-		RenameFile(StammFolderOld, g_StammFolder);
-	}
 
 	BuildPath(Path_SM, g_LogFile, sizeof(g_LogFile), "stamm/logs/Stamm_Logs (%s).log", CurrentDate);
 	BuildPath(Path_SM, g_DebugFile, sizeof(g_DebugFile), "stamm/logs/Stamm_Debugs (%s).log", CurrentDate);
