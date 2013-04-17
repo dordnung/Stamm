@@ -84,8 +84,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	
 
 	// Save pathes
-	Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
-
+	Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_StammFolder, basename);
 
 	// Assign values of the new feature
 	Format(g_FeatureList[g_features][FEATURE_BASE], sizeof(basename), basename);
@@ -103,7 +102,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	if (!FileExists(levelPath))
 	{
 		// Backwards compatiblity, search in old path
-		Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_StammFolder, basename);
+		Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
 			
 		// If this doesnt exist, stop here, but don't abort, because maybe it needs no level config
 		if (!FileExists(levelPath))
@@ -120,7 +119,6 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	{
 		// Open file
 		new Handle:level_settings = CreateKeyValues("LevelSettings");
-		
 
 		// Load Keyvalues
 		FileToKeyValues(level_settings, levelPath);
@@ -136,10 +134,10 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 			// Start to parse it
 			new start=0;
 
-
 			// Loop for keyvalues
 			do
 			{
+
 				// Get the Section name
 				KvGetSectionName(level_settings, Svalue, sizeof(Svalue));
 				KvGoBack(level_settings);
@@ -173,7 +171,6 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					}
 				}
 
-
 				// Found an invalid value?
 				if (value <= 0 || value > g_levels+g_plevels)
 				{
@@ -190,7 +187,6 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					// Stop here
 					return;
 				}
-
 
 				// Load the description of this level
 				new desc = g_FeatureList[g_features][FEATURE_DESCS][value];

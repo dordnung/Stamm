@@ -214,8 +214,8 @@ public CheckStammFolders()
 
 	// Build Path to the needed folders
 	BuildPath(Path_SM, g_StammFolder, sizeof(g_StammFolder), "Stamm");
-	BuildPath(Path_SM, g_LogFile, sizeof(g_LogFile), "Stamm/logs/Stamm_Logs (%s).log", CurrentDate);
-	BuildPath(Path_SM, g_DebugFile, sizeof(g_DebugFile), "Stamm/logs/Stamm_Debugs (%s).log", CurrentDate);
+	BuildPath(Path_SM, g_LogFile, sizeof(g_LogFile), "stamm/logs/Stamm_Logs (%s).log", CurrentDate);
+	BuildPath(Path_SM, g_DebugFile, sizeof(g_DebugFile), "stamm/logs/Stamm_Debugs (%s).log", CurrentDate);
 	
 
 	// Format logs and levels folders
@@ -373,6 +373,9 @@ public stammStarted()
 		// Load all features
 		CreateTimer(2.0, featurelib_loadFeatures, -1);
 	}
+
+	// Print hint
+	PrintToServer("Stamm started succesfully with %i Features and %i Levels", g_features, g_levels+g_plevels);
 
 	// If debug, notice stamm started
 	if (g_debug)

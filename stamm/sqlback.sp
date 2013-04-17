@@ -101,7 +101,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 public bool:sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
-	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14") && !StrEqual(version, "2.15"))
+	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14") && !StrEqual(version, "2.15") && !StrEqual(version, "2.16") && !StrEqual(version, "2.17"))
 	{
 		decl String:query[128];
 		decl String:steamid[64];
@@ -208,6 +208,14 @@ public sqlback_ModifyTableBackwards()
 	decl String:query[128];
 
 	// We want an detailed overview, so add all version Strings
+	// Version 2.17
+	if (StrEqual(g_databaseVersion, "2.17"))
+	{
+		// Start stamm
+		stammStarted();
+	}
+
+
 	// Version 2.16
 	if (StrEqual(g_databaseVersion, "2.16"))
 	{
@@ -237,6 +245,16 @@ public sqlback_ModifyTableBackwards()
 	// Version 2.14
 	else if (StrEqual(g_databaseVersion, "2.14"))
 	{
+		// Add admin
+		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_tablename);
+		
+		if (g_debug) 
+		{
+			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
 		// Start stamm
 		stammStarted();
 	}
