@@ -213,7 +213,9 @@ public CheckStammFolders()
 	
 
 	// Build Path to the needed folders
-	BuildPath(Path_SM, g_StammFolder, sizeof(g_StammFolder), "Stamm");
+	BuildPath(Path_SM, g_StammFolder, sizeof(g_StammFolder), "stamm");
+
+
 	BuildPath(Path_SM, g_LogFile, sizeof(g_LogFile), "stamm/logs/Stamm_Logs (%s).log", CurrentDate);
 	BuildPath(Path_SM, g_DebugFile, sizeof(g_DebugFile), "stamm/logs/Stamm_Debugs (%s).log", CurrentDate);
 	
