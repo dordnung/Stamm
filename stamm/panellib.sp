@@ -74,6 +74,7 @@ public panellib_Start()
 	Format(infoString, sizeof(infoString), "%T", "AllLevels", LANG_SERVER);
 
 	SetMenuTitle(panellib_levels, infoString);
+	SetMenuExitBackButton(panellib_levels, true);
 	SetMenuExitButton(panellib_levels, true);
 
 	// Add all non privat levels

@@ -341,21 +341,7 @@ public clientlib_CheckVip(client)
 			// Play lvl up sound if wanted
 			if (!StrEqual(g_lvl_up_sound, "0") && isUP)
 			{
-				// for non CSGO
-				if (otherlib_getGame() != 2) 
-				{
-					EmitSoundToAll(g_lvl_up_sound);
-				}
-
-				// For CSGO
-				else
-				{
-					for (new i=0; i <= MaxClients; i++)
-					{
-						if (clientlib_isValidClient(i)) 
-							ClientCommand(i, "play %s", g_lvl_up_sound);
-					}
-				}
+				EmitSoundToAll(g_lvl_up_sound);
 			}
 
 			// Update client on database

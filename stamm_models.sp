@@ -328,7 +328,7 @@ public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadc
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	// Reset moedl
+	// Reset model
 	if (STAMM_IsClientValid(client))
 	{
 		PlayerHasModel[client] = 0;

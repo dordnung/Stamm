@@ -101,7 +101,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 public bool:sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
-	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14") && !StrEqual(version, "2.15") && !StrEqual(version, "2.16") && !StrEqual(version, "2.17"))
+	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14") && !StrEqual(version, "2.15") && !StrEqual(version, "2.16") && !StrEqual(version, "2.17") && !StrEqual(version, "2.18"))
 	{
 		decl String:query[128];
 		decl String:steamid[64];
@@ -208,8 +208,16 @@ public sqlback_ModifyTableBackwards()
 	decl String:query[128];
 
 	// We want an detailed overview, so add all version Strings
+	// Version 2.18
+	if (StrEqual(g_databaseVersion, "2.18"))
+	{
+		// Start stamm
+		stammStarted();
+	}
+
+
 	// Version 2.17
-	if (StrEqual(g_databaseVersion, "2.17"))
+	else if (StrEqual(g_databaseVersion, "2.17"))
 	{
 		// Start stamm
 		stammStarted();
@@ -217,7 +225,7 @@ public sqlback_ModifyTableBackwards()
 
 
 	// Version 2.16
-	if (StrEqual(g_databaseVersion, "2.16"))
+	else if (StrEqual(g_databaseVersion, "2.16"))
 	{
 		// Start stamm
 		stammStarted();

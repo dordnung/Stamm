@@ -39,13 +39,14 @@
 new Handle:hear_all;
 new hear;
 
+new bool:useNew = false;
 
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Holy Granade",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Give VIP's a holy granade",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -112,9 +113,26 @@ public OnPluginStart()
 public OnConfigsExecuted()
 {
 	hear = GetConVarInt(hear_all);
+
+	// Check new Sound path
+	if (FileExists("sound/stamm/throw.mp3"))
+	{
+		useNew = true;
+	}
 	
-	AddFileToDownloadsTable("sound/music/stamm/throw.mp3");
-	AddFileToDownloadsTable("sound/music/stamm/explode.mp3");
+
+	// Download all files
+	if (!useNew)
+	{
+		AddFileToDownloadsTable("sound/music/stamm/throw.mp3");
+		AddFileToDownloadsTable("sound/music/stamm/explode.mp3");
+	}
+	else
+	{
+		AddFileToDownloadsTable("sound/stamm/throw.mp3");
+		AddFileToDownloadsTable("sound/stamm/explode.mp3");
+	}
+
 	AddFileToDownloadsTable("materials/models/stamm/holy_grenade.vtf");
 	AddFileToDownloadsTable("models/stamm/holy_grenade.mdl");
 	AddFileToDownloadsTable("materials/models/stamm/holy_grenade.vmt");
@@ -124,10 +142,38 @@ public OnConfigsExecuted()
 	AddFileToDownloadsTable("models/stamm/holy_grenade.dx80.vtx");
 	AddFileToDownloadsTable("models/stamm/holy_grenade.dx90.vtx");
 	
+
+	// Precache
 	PrecacheModel("models/stamm/holy_grenade.mdl", true);
 	PrecacheModel("materials/sprites/splodesprite.vmt", true);
-	PrecacheSound("music/stamm/throw.mp3", true);
-	PrecacheSound("music/stamm/explode.mp3", true);
+
+	// Sound Stuff
+	if (!useNew)
+	{
+		if (STAMM_GetGame() == GameCSGO)
+		{
+			AddToStringTable(FindStringTable("soundprecache"), "music/stamm/throw.mp3");
+			AddToStringTable(FindStringTable("soundprecache"), "music/stamm/explode.mp3");
+		}
+		else
+		{
+			PrecacheSound("music/stamm/throw.mp3", true);
+			PrecacheSound("music/stamm/explode.mp3", true);
+		}
+	}
+	else
+	{
+		if (STAMM_GetGame() == GameCSGO)
+		{
+			AddToStringTable(FindStringTable("soundprecache"), "stamm/throw.mp3");
+			AddToStringTable(FindStringTable("soundprecache"), "stamm/explode.mp3");
+		}
+		else
+		{
+			PrecacheSound("stamm/throw.mp3", true);
+			PrecacheSound("stamm/explode.mp3", true);
+		}
+	}
 }
 
 
@@ -153,14 +199,14 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 				// Play a sound to client or to all?
 				if (hear) 
 				{
-					if (STAMM_GetGame() != GameCSGO)
+					if (!useNew)
 					{
 						EmitSoundToClient(client, "music/stamm/throw.mp3");
 					}
 
 					else 
 					{
-						ClientCommand(client, "play music/stamm/throw.mp3");
+						EmitSoundToClient(client, "stamm/throw.mp3");
 					}
 				}
 				else
@@ -249,33 +295,26 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			// Play sound
 			if (hear) 
 			{
-				if (STAMM_GetGame() != GameCSGO) 
+				if (!useNew)
 				{
 					EmitSoundToClient(client, "music/stamm/explode.mp3");
 				}
 
 				else 
 				{
-					ClientCommand(client, "play music/stamm/explode.mp3");
+					EmitSoundToClient(client, "stamm/explode.mp3");
 				}
 			}
-
 			else
 			{
-				if (STAMM_GetGame() != GameCSGO) 
+				if (!useNew)
 				{
 					EmitSoundToAll("music/stamm/explode.mp3");
 				}
 
 				else
 				{
-					for (new i=0; i <= MaxClients; i++)
-					{
-						if (STAMM_IsClientValid(i)) 
-						{
-							ClientCommand(i, "play music/stamm/explode.mp3");
-						}
-					}
+					EmitSoundToAll("stamm/explode.mp3");
 				}
 			}
 		}

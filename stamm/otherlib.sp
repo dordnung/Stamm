@@ -37,7 +37,16 @@ public otherlib_PrepareFiles()
 	{
 		// Download and precache it
 		otherlib_DownloadLevel();	
-		PrecacheSound(g_lvl_up_sound, true);
+
+		// CSGO Fix
+		if (otherlib_getGame() == 2)
+		{
+			AddToStringTable(FindStringTable("soundprecache"), g_lvl_up_sound);
+		}
+		else
+		{
+			PrecacheSound(g_lvl_up_sound, true);
+		}
 	}
 }
 
@@ -280,6 +289,8 @@ public otherlib_StartHappyHour(time, factor)
 // Timer to stop happy hour
 public Action:otherlib_StopHappyHour(Handle:timer)
 {
+	g_HappyTimer = INVALID_HANDLE;
+	
 	// Give it to other method
 	otherlib_EndHappyHour();
 }

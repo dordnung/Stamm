@@ -46,7 +46,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Joinsound",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Give VIP's a Joinsound",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -108,8 +108,15 @@ public OnConfigsExecuted()
 	
 	GetConVarString(j_path, path, sizeof(path));
 	
-	PrecacheSound(path, true);
-	
+	if (STAMM_GetGame() == GameCSGO)
+	{
+		PrecacheSound(path, true);
+	}
+	else
+	{
+		AddToStringTable(FindStringTable("soundprecache"), path);
+	}
+
 	Format(downloadfile, sizeof(downloadfile), "sound/%s", path);
 	AddFileToDownloadsTable(downloadfile);
 }
@@ -145,18 +152,5 @@ public Action:MapTimer_Change(Handle:timer)
 // Emit the sound
 public Action:StartSound(Handle:timer)
 {
-	if (STAMM_GetGame() != GameCSGO) 
-	{
-		EmitSoundToAll(path);
-	}
-	else
-	{
-		for (new i=0; i <= MaxClients; i++)
-		{
-			if (STAMM_IsClientValid(i)) 
-			{
-				ClientCommand(i, "play %s", path);
-			}
-		}
-	}
+	EmitSoundToAll(path);
 }

@@ -46,7 +46,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LongJump",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.0.2",
 	description = "VIP's have Long Jump",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -58,7 +58,7 @@ public OnPluginStart()
 {
 	AutoExecConfig_SetFile("longjump", "stamm/features");
 
-	c_strong = AutoExecConfig_CreateConVar("longjump_strong", "6", "The longjump factor");
+	c_strong = AutoExecConfig_CreateConVar("longjump_strong", "3", "The longjump factor");
 
 	AutoExecConfig(true, "longjump", "stamm/features");
 	AutoExecConfig_CleanFile();

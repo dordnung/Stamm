@@ -188,20 +188,27 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					return;
 				}
 
-				// Load the description of this level
-				new desc = g_FeatureList[g_features][FEATURE_DESCS][value];
 
 				// Save the level
 				g_FeatureList[g_features][FEATURE_LEVEL][start] = value;
-				Format(g_FeatureHaveDesc[g_features][value][desc], sizeof(g_FeatureHaveDesc[][][]), description);
 
-				// Updated description count
-				g_FeatureList[g_features][FEATURE_DESCS][value]++;
 
-				// Only max 5 descriptions per level
-				if (g_FeatureList[g_features][FEATURE_DESCS][value] == 5)
+				// Description not empty?
+				if (!StrEqual(description, ""))
 				{
-					g_FeatureList[g_features][FEATURE_DESCS][value] = 0;
+					// Load the description count of this level
+					new desc = g_FeatureList[g_features][FEATURE_DESCS][value];
+
+					Format(g_FeatureHaveDesc[g_features][value][desc], sizeof(g_FeatureHaveDesc[][][]), description);
+
+					// Updated description count
+					g_FeatureList[g_features][FEATURE_DESCS][value]++;
+
+					// Only max 5 descriptions per level
+					if (g_FeatureList[g_features][FEATURE_DESCS][value] == 5)
+					{
+						g_FeatureList[g_features][FEATURE_DESCS][value] = 0;
+					}
 				}
 
 				// Update start

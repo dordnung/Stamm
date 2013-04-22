@@ -48,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Weapons",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.2.2",
 	description = "Give VIP's weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -75,6 +75,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
+	decl String:path[PLATFORM_MAX_PATH + 1];
 
 	if (!LibraryExists("stamm")) 
 	{
@@ -91,28 +92,6 @@ public OnAllPluginsLoaded()
 	Format(description, sizeof(description), "%T", "GetWeapons", LANG_SERVER);
 	
 	STAMM_AddFeature("VIP Weapons", description);
-}
-
-
-
-// Load the configs
-public OnPluginStart()
-{
-	decl String:path[PLATFORM_MAX_PATH + 1];
-
-	// Good colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
 
 
 	if (STAMM_GetGame() == GameCSGO)
@@ -182,6 +161,28 @@ public OnPluginStart()
 		// Go Back
 		KvRewind(kv);
 	}
+}
+
+
+
+// Load the configs
+public OnPluginStart()
+{
+	// Good colors :)
+	if (!CColorAllowed(Color_Lightgreen))
+	{
+		if (CColorAllowed(Color_Lime))
+		{
+			CReplaceColor(Color_Lightgreen, Color_Lime);
+		}
+
+		else if (CColorAllowed(Color_Olive))
+		{
+			CReplaceColor(Color_Lightgreen, Color_Olive);
+		}
+	}
+
+
 
 	// Register commands
 	RegConsoleCmd("sm_sgive", GiveCallback, "Give VIP's Weapons");

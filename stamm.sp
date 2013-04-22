@@ -203,20 +203,28 @@ public OnPluginPauseChange(bool:pause)
 public CheckStammFolders()
 {
 	// Strings
-	decl String:LogFolder[PLATFORM_MAX_PATH +1];
-	decl String:LevelFolder[PLATFORM_MAX_PATH +1];
+	decl String:oldFolder[PLATFORM_MAX_PATH + 1];
+	decl String:LogFolder[PLATFORM_MAX_PATH + 1];
+	decl String:LevelFolder[PLATFORM_MAX_PATH + 1];
 	decl String:CurrentDate[20];
 	
 
 	// Current time
 	FormatTime(CurrentDate, sizeof(CurrentDate), "%d-%m-%y");
 	
-
 	// Build Path to the needed folders
 	BuildPath(Path_SM, g_StammFolder, sizeof(g_StammFolder), "stamm");
+	BuildPath(Path_SM, oldFolder, sizeof(oldFolder), "Stamm");
 
-	BuildPath(Path_SM, g_LogFile, sizeof(g_LogFile), "stamm/logs/Stamm_Logs (%s).log", CurrentDate);
-	BuildPath(Path_SM, g_DebugFile, sizeof(g_DebugFile), "stamm/logs/Stamm_Debugs (%s).log", CurrentDate);
+	Format(g_LogFile, sizeof(g_LogFile), "%s/logs/stamm_errors_(%s).log", g_StammFolder, CurrentDate);
+	Format(g_DebugFile, sizeof(g_DebugFile), "%s/logs/stamm_debugs_(%s).log", g_StammFolder, CurrentDate);
+
+
+	if (DirExists(oldFolder))
+	{
+		LogToFile(g_LogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please rename it to %s, or delete it!", oldFolder, g_StammFolder);
+		PrintToServer("[ STAMM ] ATTENTION: Found Folder %s. Please rename it to %s, or delete it!", oldFolder, g_StammFolder);
+	}
 	
 
 	// Format logs and levels folders

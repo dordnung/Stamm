@@ -29,17 +29,21 @@
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <restrict>
+#include <cstrike_weapons>
 #include <updater>
 
 #pragma semicolon 1
 
 
 
+new bool:weaponRestrict[WeaponID];
+
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Restrict",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.2.2",
 	description = "VIP's can use restricted weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -67,7 +71,10 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
-	
+	decl String:path[PLATFORM_MAX_PATH + 1];
+	new Handle:kv;
+
+
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -91,6 +98,63 @@ public OnAllPluginsLoaded()
 	Format(description, sizeof(description), "%T", "GetNoRestrict", LANG_SERVER);
 	
 	STAMM_AddFeature("VIP No Restrict", description);
+
+
+
+
+	if (STAMM_GetGame() == GameCSGO)
+	{
+		// Config for CSGO
+		Format(path, sizeof(path), "cfg/stamm/features/weapon_restricts_csgo.txt");
+	}
+
+	else
+	{
+		// Config for CSS
+	 	Format(path, sizeof(path), "cfg/stamm/features/weapon_restricts_css.txt");
+	}
+
+
+	// File doesn't exists? we cen abort here
+	if (!FileExists(path))
+	{
+		SetFailState("Couldn't find the config %s", path);
+	}
+
+
+
+	// Read the config
+	kv = CreateKeyValues("WeaponRestricts");
+	FileToKeyValues(kv, path);
+	
+
+
+	// Parse config
+	if (KvGotoFirstSubKey(kv, false))
+	{
+		decl String:buffer[120];
+
+		do
+		{
+			// Get Weaponname
+			KvGetSectionName(kv, buffer, sizeof(buffer));
+
+			// And go back
+			KvGoBack(kv);
+			
+			//  Get status of weapon
+			weaponRestrict[GetWeaponID(buffer)] = (KvGetNum(kv, buffer) == 1);
+			
+
+			KvJumpToKey(kv, buffer);
+		} 
+		while (KvGotoNextKey(kv, false));
+
+		// Go Back
+		KvRewind(kv);
+	}
+
+	CloseHandle(kv);
 }
 
 
@@ -104,7 +168,7 @@ public Action:Restrict_OnCanBuyWeapon(client, team, WeaponID:id, &CanBuyResult:r
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Normally he can't buy it
-			if (result != CanBuy_Allow)
+			if (result != CanBuy_Allow && weaponRestrict[id])
 			{
 				// But now he can :)
 				result = CanBuy_Allow;
@@ -128,7 +192,7 @@ public Action:Restrict_OnCanPickupWeapon(client, team, WeaponID:id, &bool:result
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Normally he can't pick it up
-			if (result != true)
+			if (result != true && weaponRestrict[id])
 			{
 				// Now he can :)
 				result = true;
