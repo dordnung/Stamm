@@ -79,9 +79,9 @@ public configlib_CreateConfig()
 	configlib_StammDebug = AutoExecConfig_CreateConVar("stamm_debug", "0", "1=Log in an extra File lot of information, 0=disable");
 	configlib_ExtraPoints = AutoExecConfig_CreateConVar("stamm_extrapoints", "0", "1 = Give less Players more Points, with factor: ((max players on your server) - (current players)), 0 = disable");
 	configlib_ShowPoints = AutoExecConfig_CreateConVar("stamm_showpoints", "480", "Shows every x Seconds all Players their Points (480 = 8 minutes), 0 = Off");
-	configlib_GiveFlagAdmin = AutoExecConfig_CreateConVar("stamm_oflag", "0", "not 0 = a Player with the a special Flag become VIP (1='o', 2='p' , 3='q', 4='r', 5='s', 6='t'), 0 = Off");
+	configlib_GiveFlagAdmin = AutoExecConfig_CreateConVar("stamm_oflag", "0", "Flags a player needs to get instantly highest VIP see addons/sourcemod/configs/admin_levels.cfg for all flags), 0 = Off");
 	configlib_Delete = AutoExecConfig_CreateConVar("stamm_delete", "0", "x = Days until a inactive player gets deleted, 0 = Off");
-	configlib_AdminFlag = AutoExecConfig_CreateConVar("stamm_adminflag", "t", "Flag a player needs to access the stamm admin menu (see addons/sourcemod/configs/admin_levels.cfg for all flags)");
+	configlib_AdminFlag = AutoExecConfig_CreateConVar("stamm_adminflag", "bt", "Flag a player needs to access the stamm admin menu (see addons/sourcemod/configs/admin_levels.cfg for all flags)");
 	configlib_InfoTime = AutoExecConfig_CreateConVar("stamm_infotime", "300", "Info Message Interval in seconds (300 = 5 minutes), 0 = Off");
 	configlib_JoinShow = AutoExecConfig_CreateConVar("stamm_join_show", "1", "1 = When a Player join, he see his points, 0 = OFF");
 	configlib_LvlUpSound = AutoExecConfig_CreateConVar("stamm_lvl_up_sound", "music/stamm/lvlup.mp3", "Path to the level up sound, beginning after sound/, 0 = Off");
@@ -131,7 +131,6 @@ public configlib_CreateConfig()
 public configlib_LoadConfig()
 {
 	// Read all values from the cvars
-	g_iGiveFlagAdmin = GetConVarInt(configlib_GiveFlagAdmin);
 	g_fInfoTime = GetConVarFloat(configlib_InfoTime);
 	g_iShowPoints = GetConVarInt(configlib_ShowPoints);
 	g_iDelete = GetConVarInt(configlib_Delete);
@@ -152,6 +151,9 @@ public configlib_LoadConfig()
 	GetConVarString(configlib_Info, g_sInfo, sizeof(g_sInfo));
 	GetConVarString(configlib_TableName, g_sTableName, sizeof(g_sTableName));
 	GetConVarString(configlib_AdminFlag, g_sAdminFlag, sizeof(g_sAdminFlag));
+	GetConVarString(configlib_GiveFlagAdmin, g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin));
+	configlib_FixGiveFlagAdmin();
+
 
 
 	// Bools
@@ -202,7 +204,8 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 
 	else if (cvar == configlib_GiveFlagAdmin)
 	{
-		g_iGiveFlagAdmin = GetConVarInt(configlib_GiveFlagAdmin);
+		GetConVarString(configlib_GiveFlagAdmin, g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin));
+		configlib_FixGiveFlagAdmin();
 	}
 
 	else if (cvar == configlib_AdminFlag)
@@ -233,5 +236,45 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 	else if (cvar == configlib_UseMenu)
 	{
 		g_bUseMenu = GetConVarBool(configlib_UseMenu);
+	}
+}
+
+
+
+
+
+// Backwards Compatiblity
+public configlib_FixGiveFlagAdmin()
+{
+	// Before we had numbers, now we have flags
+	// Replace numbers with flags
+	if (StrEqual(g_sGiveFlagAdmin, "1"))
+	{
+		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "o");
+	}
+
+	else if (StrEqual(g_sGiveFlagAdmin, "2"))
+	{
+		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "p");
+	}
+
+	else if (StrEqual(g_sGiveFlagAdmin, "3"))
+	{
+		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "q");
+	}
+
+	else if (StrEqual(g_sGiveFlagAdmin, "4"))
+	{
+		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "r");
+	}
+
+	else if (StrEqual(g_sGiveFlagAdmin, "5"))
+	{
+		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "s");
+	}
+
+	else if (StrEqual(g_sGiveFlagAdmin, "6"))
+	{
+		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "t");
 	}
 }

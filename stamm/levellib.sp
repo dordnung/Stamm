@@ -28,6 +28,8 @@
 
 
 
+
+
 // Load all levels
 public levellib_LoadLevels()
 {
@@ -35,15 +37,23 @@ public levellib_LoadLevels()
 	new Handle:all_levels = CreateKeyValues("StammLevels");
 	decl String:flagTest[64];
 
+
+
+
 	// Didn't find the stamm level file -> Stop plugin, we can't do anything here
 	if (!FileExists("cfg/stamm/StammLevels.txt"))
 	{
 		SetFailState("Attention: Couldn't load cfg/stamm/StammLevels.txt. File doesn't exist!");
 	}
 
+
+
+
 	// Load the file to keyvalue
 	FileToKeyValues(all_levels, "cfg/stamm/StammLevels.txt");
 	
+
+
 
 	// First go through all non private levels
 	if (KvGotoFirstSubKey(all_levels))
@@ -60,6 +70,7 @@ public levellib_LoadLevels()
 				new points = KvGetNum(all_levels, "points");
 				
 
+
 				// Check for duplicate
 				for (new i=0; i < g_iLevels; i++)
 				{
@@ -74,18 +85,23 @@ public levellib_LoadLevels()
 				}
 				
 
+
 				// Save this level
 				g_iLevelPoints[g_iLevels] = points;
 				
 
+
 				// Get the name of this level
 				KvGetString(all_levels, "name", g_sLevelName[g_iLevels], sizeof(g_sLevelName[]));
+
+
 
 				// save on debug
 				if (g_bDebug) 
 				{
 					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added non priavte Level %s", g_sLevelName[g_iLevels]);
 				}
+
 
 				// Update level counter
 				g_iLevels++;
@@ -94,13 +110,16 @@ public levellib_LoadLevels()
 		while (KvGotoNextKey(all_levels));
 		
 
+
 		// Sort the levels
 		levellib_sortLevels();
 	}
 
 
+
 	// Rewind to start
 	KvRewind(all_levels);
+
 
 
 	// Now search for all privat levels
@@ -112,6 +131,7 @@ public levellib_LoadLevels()
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
 
 
+
 			// Yes it exists
 			if (!StrEqual(flagTest, "") && g_iLevels + g_iPLevels < MAXLEVELS)
 			{
@@ -121,11 +141,15 @@ public levellib_LoadLevels()
 				// Get the name
 				KvGetString(all_levels, "name", g_sLevelName[g_iLevels+g_iPLevels], sizeof(g_sLevelName[]));
 
+
+
 				// Notice that it loaded the level
 				if (g_bDebug) 
 				{
 					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added priavte Level %s", g_sLevelName[g_iLevels+g_iPLevels]);
 				}
+
+
 
 				// Update privat counter
 				g_iPLevels++;
@@ -134,6 +158,9 @@ public levellib_LoadLevels()
 		while (KvGotoNextKey(all_levels));
 	}
 }
+
+
+
 
 
 // Sort levels ASC
@@ -149,6 +176,7 @@ public levellib_sortLevels()
 				// helper value
 				new save = g_iLevelPoints[j];
 				
+
 				// Change them
 				g_iLevelPoints[j] = g_iLevelPoints[j+1];
 				g_iLevelPoints[j+1] = save;
@@ -158,17 +186,23 @@ public levellib_sortLevels()
 }
 
 
+
+
+
 // Find the level of clients points
 public levellib_PointsToID(client, points)
 {
 	// First check if he's a special vip
 	new spec = clientlib_IsSpecialVIP(client);
 
+
+
 	// if so, just give it's level back
 	if (spec != -1)
 	{
 		return g_iLevels+spec+1;
 	}
+
 
 
 	// Do we have levels?
@@ -180,6 +214,9 @@ public levellib_PointsToID(client, points)
 			// helper var
 			new l_points = g_iLevelPoints[i];
 			
+
+
+
 			// Are we at the end?
 			if (i == g_iLevels-1)
 			{
@@ -195,6 +232,8 @@ public levellib_PointsToID(client, points)
 				// helper var for next point level
 				new n_points = g_iLevelPoints[i+1];
 				
+
+
 				// Check if players points between current and next point level
 				if (l_points <= points && points < n_points) 
 				{
@@ -204,10 +243,14 @@ public levellib_PointsToID(client, points)
 			}
 		}
 		
+
+
 		// No VIP
 		return 0;
 	}
 	
+
+
 	// Something went terrible wrong
 	return -1;
 }

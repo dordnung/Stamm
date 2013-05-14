@@ -29,6 +29,9 @@
 new Handle:clientlib_olddelete;
 
 
+
+
+
 // Is Client valid, without ready state
 public bool:clientlib_isValidClient_PRE(client)
 {
@@ -41,15 +44,7 @@ public bool:clientlib_isValidClient_PRE(client)
 				// No fake client
 				if (!IsClientSourceTV(client) && !IsClientReplay(client) && !IsFakeClient(client))
 				{
-					decl String:steamid[32];
-					
-					clientlib_getSteamid(client, steamid, sizeof(steamid));
-					
-					// Good steamid format
-					if (SimpleRegexMatch(steamid, "^STEAM_[0-1]{1}:[0-1]{1}:[0-9]+$") == 1)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -57,6 +52,9 @@ public bool:clientlib_isValidClient_PRE(client)
 	
 	return false;
 }
+
+
+
 
 
 // Is valid client
@@ -68,6 +66,9 @@ public bool:clientlib_isValidClient(client)
 
 
 
+
+
+
 // Insert player after admin check
 public OnClientPostAdminCheck(client)
 {
@@ -76,6 +77,9 @@ public OnClientPostAdminCheck(client)
 		sqllib_InsertPlayer(client);
 	}
 }
+
+
+
 
 
 
@@ -91,6 +95,8 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 			new Float:startPos;
 			new Float:endPos;
 			
+
+
 			if (TF2_GetPlayerClass(client) != TFClass_Engineer)
 			{
 				startPos = 0.01;
@@ -102,13 +108,20 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 				endPos = 0.02;
 			}
 
+
+
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
 			ShowSyncHudText(client, g_hHudSync, "[STAMM] %T: %i", "Points", client, g_iPlayerPoints[client]);
 		}
 	}
 
+
+
 	return Plugin_Continue;
 }
+
+
+
 
 
 
@@ -123,8 +136,11 @@ public clientlib_ClientReady(client)
 		// Check VIP state
 		clientlib_CheckVip(client);
 		
+
+
+
 		// check admin flag
-		if (g_iGiveFlagAdmin)
+		if (!StrEqual(g_sGiveFlagAdmin, "0"))
 		{ 
 			clientlib_CheckFlagAdmin(client);
 		}
@@ -134,6 +150,9 @@ public clientlib_ClientReady(client)
 		{ 
 			CreateTimer(5.0, pointlib_ShowPoints2, client);
 		}
+
+
+
 
 		// Check Players again
 		clientlib_CheckPlayers();
@@ -156,6 +175,9 @@ public OnClientDisconnect(client)
 
 
 
+
+
+
 // Checks if a steamid is connected
 public clientlib_IsSteamIDConnected(String:steamid[])
 {
@@ -169,6 +191,8 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 			// Get steamid and check if it's equal
 			clientlib_getSteamid(client, cSteamid, sizeof(cSteamid));
 
+
+
 			if (StrEqual(steamid, cSteamid, false))
 			{
 				// return client
@@ -177,8 +201,12 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 		}
 	}
 
+
 	return 0;
 }
+
+
+
 
 
 
@@ -187,17 +215,15 @@ public bool:clientlib_IsAdmin(client)
 {
 	if (clientlib_isValidClient_PRE(client))
 	{
-		new AdminId:adminid = GetUserAdmin(client);
-		new AdminFlag:flag;
-
-		// Get AdminFlag of char
-		FindFlagByChar(g_sAdminFlag[0], flag);
-
-		return GetAdminFlag(adminid, flag);
+		return (GetUserFlagBits(client) & ReadFlagString(g_sAdminFlag) || GetUserFlagBits(client) & ADMFLAG_ROOT);
 	}
 	
+
 	return false;
 }
+
+
+
 
 
 // Check if a client is a special VIP
@@ -227,15 +253,11 @@ public clientlib_IsSpecialVIP(client)
 // Give Player fast VIP
 public clientlib_CheckFlagAdmin(client)
 {
-	new AdminId:adminid = GetUserAdmin(client);
-	
-	// and again, flag checking , oh man...
-	if (g_iGiveFlagAdmin == 1 && GetAdminFlag(adminid, Admin_Custom1)) clientlib_GiveFastVIP(client);
-	if (g_iGiveFlagAdmin == 2 && GetAdminFlag(adminid, Admin_Custom2)) clientlib_GiveFastVIP(client);
-	if (g_iGiveFlagAdmin == 3 && GetAdminFlag(adminid, Admin_Custom3)) clientlib_GiveFastVIP(client);
-	if (g_iGiveFlagAdmin == 4 && GetAdminFlag(adminid, Admin_Custom4)) clientlib_GiveFastVIP(client);
-	if (g_iGiveFlagAdmin == 5 && GetAdminFlag(adminid, Admin_Custom5)) clientlib_GiveFastVIP(client);
-	if (g_iGiveFlagAdmin == 6 && GetAdminFlag(adminid, Admin_Custom6)) clientlib_GiveFastVIP(client);
+	// Flag checking
+	if ((GetUserFlagBits(client) & ReadFlagString(g_sGiveFlagAdmin) || GetUserFlagBits(client) & ADMFLAG_ROOT))
+	{
+		clientlib_GiveFastVIP(client);
+	}
 }
 
 

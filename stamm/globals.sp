@@ -73,7 +73,6 @@ new g_FeatureList[MAXFEATURES][FeatureEnum];
 
 
 // Cell globals
-new g_iGiveFlagAdmin;
 new g_iFeatures;
 new g_iMinPlayer;
 new g_iServerID;
@@ -123,8 +122,9 @@ new String:g_sInfoF[32];
 new String:g_sChange[32];
 new String:g_sChangeF[32];
 new String:g_sStammTag[64];
-new String:g_sAdminFlag[3];
+new String:g_sAdminFlag[26];
 new String:g_sDatabaseVersion[10];
+new String:g_sGiveFlagAdmin[26];
 
 
 // Level and Feature string globals
