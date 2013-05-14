@@ -33,12 +33,12 @@ public eventlib_Start()
 {
 
 	// Event Round start for TF2
-	if (otherlib_getGame() == 3)
+	if (otherlib_getGame() == GAME_TF2)
 	{
 		HookEvent("teamplay_round_start", eventlib_RoundStart);
 		HookEvent("arena_round_start", eventlib_RoundStart);
 	}
-	else if (otherlib_getGame() == 4)
+	else if (otherlib_getGame() == GAME_DOD)
 	{
 		// Event Round start for DOD
 		HookEvent("dod_round_start", eventlib_RoundStart);
@@ -60,7 +60,7 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 {
 
 	// Get points with rounds and enough players on server?
-	if ((g_vip_type == 2 || g_vip_type == 4 || g_vip_type == 6 || g_vip_type == 7) && clientlib_GetPlayerCount() >= g_min_player)
+	if ((g_iVipType == 2 || g_iVipType == 4 || g_iVipType == 6 || g_iVipType == 7) && clientlib_GetPlayerCount() >= g_iMinPlayer)
 	{
 		// Client loop
 		for (new client = 1; client <= MaxClients; client++)
@@ -72,7 +72,7 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 				if (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)
 				{
 					// Give global points
-					pointlib_GivePlayerPoints(client, g_points, true);
+					pointlib_GivePlayerPoints(client, g_iPoints, true);
 				}
 			}
 		}
@@ -80,9 +80,16 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 	
 
 	// Announce Happy hour
-	if (g_happyhouron) 
+	if (g_bHappyHourON) 
 	{
-		CPrintToChatAll("%s %t", g_StammTag, "HappyActive", g_points);
+		if (!g_bMoreColors)
+		{
+			CPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+		}
+		else
+		{
+			MCPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+		}
 	}
 }
 
@@ -101,13 +108,13 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 		if (clientlib_isValidClient(client))
 		{
 			// Get points with kills?
-			if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7)
+			if (g_iVipType == 1 || g_iVipType == 4 || g_iVipType == 5 || g_iVipType == 7)
 			{
 				// Valid Team? Enough Players? No suicide?
-				if (clientlib_GetPlayerCount() >= g_min_player && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
+				if (clientlib_GetPlayerCount() >= g_iMinPlayer && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
 				{
 					// Give global Points
-					pointlib_GivePlayerPoints(client, g_points, true);
+					pointlib_GivePlayerPoints(client, g_iPoints, true);
 				}
 			}
 		}

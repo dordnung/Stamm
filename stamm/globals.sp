@@ -27,6 +27,10 @@
 #pragma semicolon 1
 
 
+
+
+
+
 // This we need to save all information about a feature
 enum FeatureEnum
 {
@@ -42,80 +46,116 @@ enum FeatureEnum
 	Handle:FEATURE_HANDLE,
 }
 
+
+
+
+
+// Games
+enum StammGames
+{
+	GAME_UNSUPPORTED=0,
+	GAME_CSS,
+	GAME_CSGO,
+	GAME_TF2,
+	GAME_DOD,
+}
+
+
+
+
+
+
+
 // Save information about MAXFEATURES features
 new g_FeatureList[MAXFEATURES][FeatureEnum];
 
 
+
+
 // Cell globals
-new g_giveflagadmin;
-new g_join_show;
-new g_features;
-new g_min_player;
-new g_see_text;
-new g_serverid;
-new g_debug;
-new g_vip_type;
-new g_time_point;
-new g_showpoints;
-new g_delete;
-new g_levels;
-new g_plevels;
-new g_LevelPoints[MAXLEVELS];
-new g_pointsnumber[MAXPLAYERS + 1];
-new g_happynumber[MAXPLAYERS + 1];
-new g_happyfactor[MAXPLAYERS + 1];
-new g_playerpoints[MAXPLAYERS + 1];
-new g_playerlevel[MAXPLAYERS + 1];
-new g_points;
-new g_extra_points;
-new g_happyhouron;
-new g_gameID;
-new g_hudText;
-new g_stripTag;
-new g_useMenu;
+new g_iGiveFlagAdmin;
+new g_iFeatures;
+new g_iMinPlayer;
+new g_iServerID;
+new g_iVipType;
+new g_iTimePoint;
+new g_iShowPoints;
+new g_iDelete;
+new g_iLevels;
+new g_iPLevels;
+new g_iLevelPoints[MAXLEVELS];
+new g_iPointsNumber[MAXPLAYERS + 1];
+new g_iHappyNumber[MAXPLAYERS + 1];
+new g_iHappyFactor[MAXPLAYERS + 1];
+new g_iPlayerPoints[MAXPLAYERS + 1];
+new g_iPlayerLevel[MAXPLAYERS + 1];
+new g_iPoints;
+new StammGames:g_iGameID;
+
+
+
+
 
 // Float globals
-new Float:g_infotime;
+new Float:g_fInfoTime;
+
+
 
 
 
 // String globals
-new String:g_admin_menu[32];
-new String:g_LogFile[PLATFORM_MAX_PATH + 1];
-new String:g_DebugFile[PLATFORM_MAX_PATH + 1];
-new String:g_StammFolder[PLATFORM_MAX_PATH + 1];
-new String:g_lvl_up_sound[PLATFORM_MAX_PATH + 1];
-new String:g_Plugin_Version[10] = "2.18";
-new String:g_Plugin_Version2[10] = "2.1.8";
-new String:g_tablename[64];
-new String:g_texttowrite[32];
-new String:g_texttowrite_f[32];
-new String:g_viplist[32];
-new String:g_viplist_f[32];
-new String:g_viprank[32];
-new String:g_viprank_f[32];
-new String:g_sinfo[32];
-new String:g_sinfo_f[32];
-new String:g_schange[32];
-new String:g_schange_f[32];
-new String:g_StammTag[64];
-new String:g_adminflag[3];
-new String:g_databaseVersion[10];
+new String:g_sAdminMenu[32];
+new String:g_sLogFile[PLATFORM_MAX_PATH + 1];
+new String:g_sDebugFile[PLATFORM_MAX_PATH + 1];
+new String:g_sStammFolder[PLATFORM_MAX_PATH + 1];
+new String:g_sLvlUpSound[PLATFORM_MAX_PATH + 1];
+new String:g_sPluginVersion[10] = "2.18";
+new String:g_sPluginVersionUpdate[10] = "2.1.8";
+new String:g_sTableName[64];
+new String:g_sTextToWrite[32];
+new String:g_sTextToWriteF[32];
+new String:g_sVipList[32];
+new String:g_sVipListF[32];
+new String:g_sVipRank[32];
+new String:g_sVipRankF[32];
+new String:g_sInfo[32];
+new String:g_sInfoF[32];
+new String:g_sChange[32];
+new String:g_sChangeF[32];
+new String:g_sStammTag[64];
+new String:g_sAdminFlag[3];
+new String:g_sDatabaseVersion[10];
 
 
 // Level and Feature string globals
-new String:g_LevelName[MAXLEVELS][128];
-new String:g_LevelFlag[MAXLEVELS][10];
+new String:g_sLevelName[MAXLEVELS][128];
+new String:g_sLevelFlag[MAXLEVELS][10];
 // This is VERY nasty, try to keep it as small as possible
-new String:g_FeatureHaveDesc[MAXFEATURES][MAXLEVELS][5][64];
-new String:g_FeatureBlocks[MAXFEATURES][MAXLEVELS][64];
+new String:g_sFeatureHaveDesc[MAXFEATURES][MAXLEVELS][5][64];
+new String:g_sFeatureBlocks[MAXFEATURES][MAXLEVELS][64];
+
+
+
+
+
 
 // Global bools
-new bool:g_ClientReady[MAXPLAYERS + 1];
-new bool:g_pluginStarted;
-new bool:g_isLate;
-new bool:autoUpdate;
+new bool:g_bClientReady[MAXPLAYERS + 1];
+new bool:g_sPluginStarted;
+new bool:g_bIsLate;
+new bool:g_bAutoUpdate;
+new bool:g_bJoinShow;
+new bool:g_bSeeText;
+new bool:g_bDebug;
+new bool:g_bExtraPoints;
+new bool:g_bHudText;
+new bool:g_bStripTag;
+new bool:g_bUseMenu;
+new bool:g_bHappyHourON;
+new bool:g_bMoreColors;
 
-// Global handls
-new Handle:g_HappyTimer;
+
+
+// Global handles
+new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;

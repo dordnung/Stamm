@@ -54,20 +54,20 @@ public levellib_LoadLevels()
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
 
 			// Check now, and check if we under the maxlevels line
-			if (StrEqual(flagTest, "") && g_levels < MAXLEVELS)
+			if (StrEqual(flagTest, "") && g_iLevels < MAXLEVELS)
 			{
 				// Get point count
 				new points = KvGetNum(all_levels, "points");
 				
 
 				// Check for duplicate
-				for (new i=0; i < g_levels; i++)
+				for (new i=0; i < g_iLevels; i++)
 				{
 					// if found duplicate, skip this level
-					if (points == g_LevelPoints[i])
+					if (points == g_iLevelPoints[i])
 					{
 						// But first say it 
-						LogToFile(g_LogFile, "[ STAMM ] Stamm Level with %i Points duplicated!!", points);
+						LogToFile(g_sLogFile, "[ STAMM ] Stamm Level with %i Points duplicated!!", points);
 
 						continue;
 					}
@@ -75,20 +75,20 @@ public levellib_LoadLevels()
 				
 
 				// Save this level
-				g_LevelPoints[g_levels] = points;
+				g_iLevelPoints[g_iLevels] = points;
 				
 
 				// Get the name of this level
-				KvGetString(all_levels, "name", g_LevelName[g_levels], sizeof(g_LevelName[]));
+				KvGetString(all_levels, "name", g_sLevelName[g_iLevels], sizeof(g_sLevelName[]));
 
 				// save on debug
-				if (g_debug) 
+				if (g_bDebug) 
 				{
-					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Added non priavte Level %s", g_LevelName[g_levels]);
+					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added non priavte Level %s", g_sLevelName[g_iLevels]);
 				}
 
 				// Update level counter
-				g_levels++;
+				g_iLevels++;
 			}
 		} 
 		while (KvGotoNextKey(all_levels));
@@ -113,22 +113,22 @@ public levellib_LoadLevels()
 
 
 			// Yes it exists
-			if (!StrEqual(flagTest, "") && g_levels + g_plevels < MAXLEVELS)
+			if (!StrEqual(flagTest, "") && g_iLevels + g_iPLevels < MAXLEVELS)
 			{
 				// Get the flag
-				Format(g_LevelFlag[g_plevels], sizeof(g_LevelFlag[]), flagTest);
+				Format(g_sLevelFlag[g_iPLevels], sizeof(g_sLevelFlag[]), flagTest);
 
 				// Get the name
-				KvGetString(all_levels, "name", g_LevelName[g_levels+g_plevels], sizeof(g_LevelName[]));
+				KvGetString(all_levels, "name", g_sLevelName[g_iLevels+g_iPLevels], sizeof(g_sLevelName[]));
 
 				// Notice that it loaded the level
-				if (g_debug) 
+				if (g_bDebug) 
 				{
-					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Added priavte Level %s", g_LevelName[g_levels+g_plevels]);
+					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added priavte Level %s", g_sLevelName[g_iLevels+g_iPLevels]);
 				}
 
 				// Update privat counter
-				g_plevels++;
+				g_iPLevels++;
 			}
 		} 
 		while (KvGotoNextKey(all_levels));
@@ -139,19 +139,19 @@ public levellib_LoadLevels()
 // Sort levels ASC
 public levellib_sortLevels()
 {
-	for (new i=0; i < g_levels; i++)
+	for (new i=0; i < g_iLevels; i++)
 	{
-		for (new j=0; j < g_levels-1; j++)
+		for (new j=0; j < g_iLevels-1; j++)
 		{
 			// Check if next item is less than current item
-			if (g_LevelPoints[j+1] < g_LevelPoints[j])
+			if (g_iLevelPoints[j+1] < g_iLevelPoints[j])
 			{
 				// helper value
-				new save = g_LevelPoints[j];
+				new save = g_iLevelPoints[j];
 				
 				// Change them
-				g_LevelPoints[j] = g_LevelPoints[j+1];
-				g_LevelPoints[j+1] = save;
+				g_iLevelPoints[j] = g_iLevelPoints[j+1];
+				g_iLevelPoints[j+1] = save;
 			}
 		}
 	}
@@ -167,21 +167,21 @@ public levellib_PointsToID(client, points)
 	// if so, just give it's level back
 	if (spec != -1)
 	{
-		return g_levels+spec+1;
+		return g_iLevels+spec+1;
 	}
 
 
 	// Do we have levels?
-	if (g_levels > 0)
+	if (g_iLevels > 0)
 	{
 		// Loop through all levels
-		for (new i=0; i < g_levels; i++)
+		for (new i=0; i < g_iLevels; i++)
 		{
 			// helper var
-			new l_points = g_LevelPoints[i];
+			new l_points = g_iLevelPoints[i];
 			
 			// Are we at the end?
-			if (i == g_levels-1)
+			if (i == g_iLevels-1)
 			{
 				// Does the player is higher than the point level
 				if (points >= l_points) 
@@ -193,7 +193,7 @@ public levellib_PointsToID(client, points)
 			else
 			{
 				// helper var for next point level
-				new n_points = g_LevelPoints[i+1];
+				new n_points = g_iLevelPoints[i+1];
 				
 				// Check if players points between current and next point level
 				if (l_points <= points && points < n_points) 

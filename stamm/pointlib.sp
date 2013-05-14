@@ -33,7 +33,7 @@ new Handle:pointlib_showpointer;
 // Init. pointslib
 public pointlib_Start()
 {
-	Format(g_texttowrite_f, sizeof(g_texttowrite_f), g_texttowrite);
+	Format(g_sTextToWriteF, sizeof(g_sTextToWriteF), g_sTextToWrite);
 	
 	// Register commands for add, del and set points
 	RegServerCmd("stamm_add_points", pointlib_AddPlayerPoints, "Add Points of a Player: stamm_add_points <userid|steamid> <points>");
@@ -42,11 +42,11 @@ public pointlib_Start()
 
 
 	// Register main stamm command and strip "sm_"
-	if (!StrContains(g_texttowrite, "sm_"))
+	if (!StrContains(g_sTextToWrite, "sm_"))
 	{
-		RegConsoleCmd(g_texttowrite, pointlib_ShowPoints);
+		RegConsoleCmd(g_sTextToWrite, pointlib_ShowPoints);
 		
-		ReplaceString(g_texttowrite_f, sizeof(g_texttowrite_f), "sm_", "!");
+		ReplaceString(g_sTextToWriteF, sizeof(g_sTextToWriteF), "sm_", "!");
 	}
 }
 
@@ -60,9 +60,9 @@ public Action:pointlib_PlayerTime(Handle:timer)
 		if (clientlib_isValidClient(i))
 		{
 			// right team -> add global points
-			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && g_min_player <= clientlib_GetPlayerCount())
+			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && g_iMinPlayer <= clientlib_GetPlayerCount())
 			{
-				pointlib_GivePlayerPoints(i, g_points, true);
+				pointlib_GivePlayerPoints(i, g_iPoints, true);
 			}
 		}
 	}
@@ -136,13 +136,13 @@ public Action:pointlib_AddPlayerPoints(args)
 				// Else update on database
 				decl String:query[128];
 
-				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_tablename, number, useridString);
+				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_sTableName, number, useridString);
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
-				if (g_debug) 
+				if (g_bDebug) 
 				{
-					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 				}
 			}
 		}
@@ -180,7 +180,7 @@ public Action:pointlib_SetPlayerPoints(args)
 			if (clientlib_isValidClient(client) && number >= 0)
 			{
 				// Diff and add
-				new diff = number - g_playerpoints[client];
+				new diff = number - g_iPlayerPoints[client];
 
 				pointlib_GivePlayerPoints(client, diff, false);
 			}
@@ -198,7 +198,7 @@ public Action:pointlib_SetPlayerPoints(args)
 
 			if (client > 0)
 			{
-				new diff = number - g_playerpoints[client];
+				new diff = number - g_iPlayerPoints[client];
 
 				pointlib_GivePlayerPoints(client, diff, false);
 			}
@@ -206,13 +206,13 @@ public Action:pointlib_SetPlayerPoints(args)
 			{
 				decl String:query[128];
 
-				Format(query, sizeof(query), "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'", g_tablename, number, useridString);
+				Format(query, sizeof(query), "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'", g_sTableName, number, useridString);
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
-				if (g_debug) 
+				if (g_bDebug) 
 				{
-					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 				}
 			}
 		}
@@ -269,13 +269,13 @@ public Action:pointlib_DelPlayerPoints(args)
 			{
 				decl String:query[128];
 
-				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_tablename, number, useridString);
+				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_sTableName, number, useridString);
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
-				if (g_debug) 
+				if (g_bDebug) 
 				{
-					LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 				}
 			}
 		}
@@ -305,7 +305,7 @@ public Action:pointlib_ShowPoints2(Handle:timer, any:client)
 public Action:pointlib_ShowPoints(client, arg)
 {
 	// Show player points
-	if (!g_useMenu)
+	if (!g_bUseMenu)
 	{
 		pointlib_ShowPlayerPoints(client, false);
 	}
@@ -324,10 +324,10 @@ public Action:pointlib_ShowPoints(client, arg)
 public pointlib_GivePlayerPoints(client, number, bool:check)
 {
 	// Negativ number? and on delete less than zero?
-	if (number < 0 && g_playerpoints[client] + number < 0)
+	if (number < 0 && g_iPlayerPoints[client] + number < 0)
 	{
 		// Delete zo zero
-		number = -g_playerpoints[client];
+		number = -g_iPlayerPoints[client];
 	}
 
 	// Check if a feature stop getting points
@@ -335,33 +335,25 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 	{
 		new Action:result;
 
-		// Feature loop
-		for (new i=0; i < g_features; i++)
+		// Get result of API
+		result = nativelib_PublicPlayerGetPointsPlugin(client, number);
+		
+		// maybe block?
+		if (result != Plugin_Changed && result != Plugin_Continue)
 		{
-			// Only enabled feature
-			if (g_FeatureList[i][FEATURE_ENABLE] == 1)
-			{
-				// Get result of API
-				result = nativelib_PublicPlayerGetPointsPlugin(g_FeatureList[i][FEATURE_HANDLE], client, number);
-				
-				// maybe block?
-				if (result != Plugin_Changed && result != Plugin_Continue)
-				{
-					return;
-				}
-			}
+			return;
 		}
 	}
 
 	// Handle less than zero
-	if (number < 0 && g_playerpoints[client] + number < 0)
+	if (number < 0 && g_iPlayerPoints[client] + number < 0)
 	{
-		g_playerpoints[client] = 0;
+		g_iPlayerPoints[client] = 0;
 	}
 	else
 	{
 		// Finally add points
-		g_playerpoints[client] = g_playerpoints[client] + number;
+		g_iPlayerPoints[client] = g_iPlayerPoints[client] + number;
 	}
 
 	// Check vip and save him
@@ -385,8 +377,8 @@ public pointlib_ShowPlayerPoints(client, bool:only)
 		
 		// Get points
 		new restpoints = 0;
-		new index = g_playerlevel[client];
-		new points = g_playerpoints[client];
+		new index = g_iPlayerLevel[client];
+		new points = g_iPlayerPoints[client];
 
 
 		// Format VIP String
@@ -394,60 +386,116 @@ public pointlib_ShowPlayerPoints(client, bool:only)
 
 		
 		// If not highest level, calculate rest points
-		if (index != g_levels && index < g_levels) 
+		if (index != g_iLevels && index < g_iLevels) 
 		{
-			restpoints = g_LevelPoints[index] - g_playerpoints[client];
+			restpoints = g_iLevelPoints[index] - g_iPlayerPoints[client];
 		}
 
 		// Show to all or only to client
-		if (!g_see_text || only)
+		if (!g_bSeeText || only)
 		{
 			// Highest level?
-			if (index != g_levels && index < g_levels) 
+			if (index != g_iLevels && index < g_iLevels) 
 			{
-				if (!g_stripTag)
+				if (!g_bStripTag)
 				{
-					CPrintToChat(client, "%s %t", g_StammTag, "NoVIPClient", points, restpoints, g_LevelName[g_playerlevel[client]], vip);
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "NoVIPClient", points, restpoints, g_sLevelName[g_iPlayerLevel[client]], vip);
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "NoVIPClient", points, restpoints, g_sLevelName[g_iPlayerLevel[client]], vip);
+					}
 				}
 				else
 				{
-					CPrintToChat(client, "%s %t", g_StammTag, "NoVIPClient", points, restpoints, g_LevelName[g_playerlevel[client]], "");
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "NoVIPClient", points, restpoints, g_sLevelName[g_iPlayerLevel[client]], "");
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "NoVIPClient", points, restpoints, g_sLevelName[g_iPlayerLevel[client]], "");
+					}
 				}
 			}
 			else
 			{ 
-				if (!g_stripTag)
+				if (!g_bStripTag)
 				{
-					CPrintToChat(client, "%s %t", g_StammTag, "VIPClient", points, g_LevelName[index-1], vip);
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "VIPClient", points, g_sLevelName[index-1], vip);
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "VIPClient", points, g_sLevelName[index-1], vip);
+					}
 				}
 				else
 				{
-					CPrintToChat(client, "%s %t", g_StammTag, "VIPClient", points, g_LevelName[index-1], "");
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "VIPClient", points, g_sLevelName[index-1], "");
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "VIPClient", points, g_sLevelName[index-1], "");
+					}
 				}
 			}
 		}
 		else
 		{
-			if (index != g_levels && index < g_levels) 
+			if (index != g_iLevels && index < g_iLevels) 
 			{
-				if (!g_stripTag)
+				if (!g_bStripTag)
 				{
-					CPrintToChatAll("%s %t", g_StammTag, "NoVIPAll", name, points, restpoints, g_LevelName[g_playerlevel[client]], vip);
+					if (!g_bMoreColors)
+					{
+						CPrintToChatAll("%s %t", g_sStammTag, "NoVIPAll", name, points, restpoints, g_sLevelName[g_iPlayerLevel[client]], vip);
+					}
+					else
+					{
+						MCPrintToChatAll("%s %t", g_sStammTag, "NoVIPAll", name, points, restpoints, g_sLevelName[g_iPlayerLevel[client]], vip);
+					}
 				}
 				else
 				{
-					CPrintToChatAll("%s %t", g_StammTag, "NoVIPAll", name, points, restpoints, g_LevelName[g_playerlevel[client]], "");
+					if (!g_bMoreColors)
+					{
+						CPrintToChatAll("%s %t", g_sStammTag, "NoVIPAll", name, points, restpoints, g_sLevelName[g_iPlayerLevel[client]], "");
+					}
+					else
+					{
+						MCPrintToChatAll("%s %t", g_sStammTag, "NoVIPAll", name, points, restpoints, g_sLevelName[g_iPlayerLevel[client]], "");
+					}
 				}
 			}
 			else
 			{ 
-				if (!g_stripTag)
+				if (!g_bStripTag)
 				{
-					CPrintToChatAll("%s %t", g_StammTag, "VIPAll", name, points, g_LevelName[index-1], vip);
+					if (!g_bMoreColors)
+					{
+						CPrintToChatAll("%s %t", g_sStammTag, "VIPAll", name, points, g_sLevelName[index-1], vip);
+					}
+					else
+					{
+						MCPrintToChatAll("%s %t", g_sStammTag, "VIPAll", name, points, g_sLevelName[index-1], vip);
+					}
 				}
 				else
 				{
-					CPrintToChatAll("%s %t", g_StammTag, "VIPAll", name, points, g_LevelName[index-1], "");
+					if (!g_bMoreColors)
+					{
+						CPrintToChatAll("%s %t", g_sStammTag, "VIPAll", name, points, g_sLevelName[index-1], "");
+					}
+					else
+					{
+						MCPrintToChatAll("%s %t", g_sStammTag, "VIPAll", name, points, g_sLevelName[index-1], "");
+					}
 				}
 			}
 		}

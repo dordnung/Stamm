@@ -33,19 +33,19 @@ new Handle:otherlib_inftimer;
 public otherlib_PrepareFiles()
 {
 	// Want a lvl up sound?
-	if (!StrEqual(g_lvl_up_sound, "0")) 
+	if (!StrEqual(g_sLvlUpSound, "0")) 
 	{
 		// Download and precache it
 		otherlib_DownloadLevel();	
 
 		// CSGO Fix
-		if (otherlib_getGame() == 2)
+		if (otherlib_getGame() == GAME_CSGO)
 		{
-			AddToStringTable(FindStringTable("soundprecache"), g_lvl_up_sound);
+			AddToStringTable(FindStringTable("soundprecache"), g_sLvlUpSound);
 		}
 		else
 		{
-			PrecacheSound(g_lvl_up_sound, true);
+			PrecacheSound(g_sLvlUpSound, true);
 		}
 	}
 }
@@ -56,17 +56,17 @@ public otherlib_DownloadLevel()
 	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
 	
 	// Add with sound/
-	Format(downloadfile, sizeof(downloadfile), "sound/%s", g_lvl_up_sound);
+	Format(downloadfile, sizeof(downloadfile), "sound/%s", g_sLvlUpSound);
 	
 	AddFileToDownloadsTable(downloadfile);
 }
 
 
 // return the gameID
-public otherlib_getGame()
+public StammGames:otherlib_getGame()
 {
 	// We saved it globally
-	return g_gameID;
+	return g_iGameID;
 }
 
 
@@ -74,7 +74,7 @@ public otherlib_getGame()
 public otherlib_saveGame()
 {
 	new String:GameName[12];
-	g_gameID = 0;
+	g_iGameID = GAME_UNSUPPORTED;
 	
 	// Get gamefolder name
 	GetGameFolderName(GameName, sizeof(GameName));
@@ -82,19 +82,19 @@ public otherlib_saveGame()
 	// Save cstrike, dod, tf or csgo
 	if (StrEqual(GameName, "cstrike"))
 	{ 
-		g_gameID = 1;
+		g_iGameID = GAME_CSS;
 	}
 	if (StrEqual(GameName, "csgo")) 
 	{ 
-		g_gameID = 2;
+		g_iGameID = GAME_CSGO;
 	}
 	if (StrEqual(GameName, "tf")) 
 	{ 
-		g_gameID = 3;
+		g_iGameID = GAME_TF2;
 	}
 	if (StrEqual(GameName, "dod"))
 	{ 
-		g_gameID = 4;
+		g_iGameID = GAME_DOD;
 	}
 }
 
@@ -136,7 +136,7 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 				GetCmdArg(3, arg, sizeof(arg));
 
 				// Loop through features and find the given basename
-				for (new i=0; i < g_features; i++)
+				for (new i=0; i < g_iFeatures; i++)
 				{
 					// Check short and real basename
 					if (StrEqual(arg, g_FeatureList[i][FEATURE_BASE], false) || StrEqual(arg, g_FeatureList[i][FEATURE_BASEREAL], false))
@@ -181,11 +181,27 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 {
 	// Print infos to chat
-	CPrintToChatAll("%s %t", g_StammTag, "InfoTyp", g_texttowrite_f);
-
-	if (!g_useMenu)
+	if (!g_bMoreColors)
 	{
-		CPrintToChatAll("%s %t", g_StammTag, "InfoTypInfo", g_sinfo_f);
+		CPrintToChatAll("%s %t", g_sStammTag, "InfoTyp", g_sTextToWriteF);
+	}
+	else
+	{
+		MCPrintToChatAll("%s %t", g_sStammTag, "InfoTyp", g_sTextToWriteF);
+	}
+
+
+
+	if (!g_bUseMenu)
+	{
+		if (!g_bMoreColors)
+		{
+			CPrintToChatAll("%s %t", g_sStammTag, "InfoTypInfo", g_sInfoF);
+		}
+		else
+		{
+			MCPrintToChatAll("%s %t", g_sStammTag, "InfoTypInfo", g_sInfoF);
+		}
 	}
 	
 	// Go on
@@ -199,11 +215,19 @@ public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 public otherlib_MakeHappyHour(client)
 {
 	// Mark that client want to set
-	g_happynumber[client] = 1;
+	g_iHappyNumber[client] = 1;
 	
 	// Notice next step
-	CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyTime");
-	CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyTimeInfo");
+	if (!g_bMoreColors)
+	{
+		CPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyTime");
+		CPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyTimeInfo");
+	}
+	else
+	{
+		MCPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyTime");
+		MCPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyTimeInfo");
+	}
 }
 
 
@@ -212,31 +236,38 @@ public otherlib_MakeHappyHour(client)
 // End happy hour
 public otherlib_EndHappyHour()
 {
-	if (g_happyhouron)
+	if (g_bHappyHourON)
 	{
 		decl String:query[128];
 
 		// Delete out of database
-		Format(query, sizeof(query), "DELETE FROM `%s_happy`", g_tablename);
+		Format(query, sizeof(query), "DELETE FROM `%s_happy`", g_sTableName);
 		
 		// Announce step
-		if (g_debug) 
+		if (g_bDebug) 
 		{
-			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 
 
 		// Reset
-		g_points = 1;
-		g_happyhouron = 0;
+		g_iPoints = 1;
+		g_bHappyHourON = false;
 		
 		// Delete old timer
-		otherlib_checkTimer(g_HappyTimer);
+		otherlib_checkTimer(g_hHappyTimer);
 		
 		// Print end
-		CPrintToChatAll("%s %t", g_StammTag, "HappyEnded");
+		if (!g_bMoreColors)
+		{
+			CPrintToChatAll("%s %t", g_sStammTag, "HappyEnded");
+		}
+		else
+		{
+			MCPrintToChatAll("%s %t", g_sStammTag, "HappyEnded");
+		}
 	
 		// Notice to API
 		nativelib_HappyEnd();
@@ -254,11 +285,11 @@ public otherlib_StartHappyHour(time, factor)
 	decl String:query[128];
 
 	// Insert new happy gour
-	Format(query, sizeof(query), "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)", g_tablename, GetTime() + time, factor);
+	Format(query, sizeof(query), "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)", g_sTableName, GetTime() + time, factor);
 	
-	if (g_debug) 
+	if (g_bDebug) 
 	{
-		LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 	}
 
 	// Query
@@ -266,21 +297,28 @@ public otherlib_StartHappyHour(time, factor)
 
 
 	// Set global Points and mark as happy hour on 
-	g_points = factor;
-	g_happyhouron = 1;
+	g_iPoints = factor;
+	g_bHappyHourON = true;
 	
 	// Announce happy hour
-	CPrintToChatAll("%s %t", g_StammTag, "HappyActive", g_points);
+	if (!g_bMoreColors)
+	{
+		CPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+	}
+	else
+	{
+		MCPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+	}
 	
 	// Check old timer
-	otherlib_checkTimer(g_HappyTimer);
+	otherlib_checkTimer(g_hHappyTimer);
 
 	// And start new
-	g_HappyTimer = CreateTimer(float(time), otherlib_StopHappyHour);
+	g_hHappyTimer = CreateTimer(float(time), otherlib_StopHappyHour);
 	
 
 	// Notice to api
-	nativelib_HappyStart(time / 60, g_points);
+	nativelib_HappyStart(time / 60, g_iPoints);
 }
 
 
@@ -289,7 +327,7 @@ public otherlib_StartHappyHour(time, factor)
 // Timer to stop happy hour
 public Action:otherlib_StopHappyHour(Handle:timer)
 {
-	g_HappyTimer = INVALID_HANDLE;
+	g_hHappyTimer = INVALID_HANDLE;
 	
 	// Give it to other method
 	otherlib_EndHappyHour();
@@ -302,7 +340,7 @@ public Action:otherlib_StopHappyHour(Handle:timer)
 public Action:otherlib_StartHappy(args)
 {
 	// Only when it's not running
-	if (GetCmdArgs() == 2 && !g_happyhouron)
+	if (GetCmdArgs() == 2 && !g_bHappyHourON)
 	{
 		decl String:timeString[25];
 		decl String:factorString[25];

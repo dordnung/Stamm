@@ -28,6 +28,10 @@
 
 
 
+
+
+
+
 // Add a new Feature
 public featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:allowChange, bool:standard)
 {
@@ -44,17 +48,22 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	new value = -1;
 
 
+
+
+
 	// Get the short basename and the real basename
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
-	GetPluginFilename(plugin, g_FeatureList[g_features][FEATURE_BASEREAL], sizeof(basename));
+	GetPluginFilename(plugin, g_FeatureList[g_iFeatures][FEATURE_BASEREAL], sizeof(basename));
 
 
 	// Cut out .smx
-	ReplaceString(g_FeatureList[g_features][FEATURE_BASEREAL], sizeof(basename), ".smx", "", false);
+	ReplaceString(g_FeatureList[g_iFeatures][FEATURE_BASEREAL], sizeof(basename), ".smx", "", false);
+
+
 
 
 	// Search for duplicates
-	for (new i=0; i < g_features; i++)
+	for (new i=0; i < g_iFeatures; i++)
 	{
 		if (StrEqual(g_FeatureList[i][FEATURE_BASE], basename, false))
 		{
@@ -64,16 +73,21 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 			g_FeatureList[i][FEATURE_CHANGE] = allowChange;
 			g_FeatureList[i][FEATURE_STANDARD] = standard;
 
+
+
+
 			// if plugin already started load the feature
-			if (g_pluginStarted)
+			if (g_sPluginStarted)
 			{
 				CreateTimer(0.5, featurelib_loadFeatures, i);
 			}
 
+
+
 			// Announce new feature if debug is on
-			if (g_debug)
+			if (g_bDebug)
 			{
-				LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s again", basename);
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s again", basename);
 			}
 
 
@@ -83,19 +97,24 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	}
 	
 
+
+
+
 	// Save pathes
-	Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_StammFolder, basename);
+	Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_sStammFolder, basename);
 
 	// Assign values of the new feature
-	Format(g_FeatureList[g_features][FEATURE_BASE], sizeof(basename), basename);
-	Format(g_FeatureList[g_features][FEATURE_NAME], sizeof(basename), name);
+	Format(g_FeatureList[g_iFeatures][FEATURE_BASE], sizeof(basename), basename);
+	Format(g_FeatureList[g_iFeatures][FEATURE_NAME], sizeof(basename), name);
 	
-	g_FeatureList[g_features][FEATURE_HANDLE] = plugin;
-	g_FeatureList[g_features][FEATURE_ENABLE] = 1;
-	g_FeatureList[g_features][FEATURE_DESCS] = 0;
-	g_FeatureList[g_features][FEATURE_CHANGE] = allowChange;
-	g_FeatureList[g_features][FEATURE_STANDARD] = standard;
+
+	g_FeatureList[g_iFeatures][FEATURE_HANDLE] = plugin;
+	g_FeatureList[g_iFeatures][FEATURE_ENABLE] = 1;
+	g_FeatureList[g_iFeatures][FEATURE_DESCS] = 0;
+	g_FeatureList[g_iFeatures][FEATURE_CHANGE] = allowChange;
+	g_FeatureList[g_iFeatures][FEATURE_STANDARD] = standard;
 	
+
 
 
 	// Check if level File exists
@@ -109,9 +128,12 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		{
 			// Mark features as zero level
 			goON = false;
-			g_FeatureList[g_features][FEATURE_LEVEL][0] = 0;
+			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
 		}
 	}
+
+
+
 
 
 	// If we have a level config, parse it
@@ -124,10 +146,12 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		FileToKeyValues(level_settings, levelPath);
 
 
+
+
 		// File is invalid, mark level as zero
 		if (!KvGotoFirstSubKey(level_settings, false))
 		{
-			g_FeatureList[g_features][FEATURE_LEVEL][0] = 0;
+			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
 		}
 		else
 		{
@@ -147,7 +171,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				KvGetString(level_settings, Svalue, Svalue2, sizeof(Svalue2));
 
 				// Save Block
-				Format(g_FeatureBlocks[g_features][start], sizeof(g_FeatureBlocks[][]), Svalue);
+				Format(g_sFeatureBlocks[g_iFeatures][start], sizeof(g_sFeatureBlocks[][]), Svalue);
+
+
 
 
 				// When it's a int, just load it
@@ -158,9 +184,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				else
 				{
 					// Else search for the value of the level name with this loop
-					for (new i=0; i < g_levels+g_plevels; i++)
+					for (new i=0; i < g_iLevels+g_iPLevels; i++)
 					{
-						if (StrEqual(Svalue2, g_LevelName[i]))
+						if (StrEqual(Svalue2, g_sLevelName[i]))
 						{
 							// Update value
 							value = i+1; 
@@ -171,45 +197,56 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					}
 				}
 
+
+
+
 				// Found an invalid value?
-				if (value <= 0 || value > g_levels+g_plevels)
+				if (value <= 0 || value > g_iLevels+g_iPLevels)
 				{
 					// Mark as disabled
-					g_FeatureList[g_features][FEATURE_ENABLE] = 0;
+					g_FeatureList[g_iFeatures][FEATURE_ENABLE] = 0;
 
 					// Unload it
-					ServerCommand("sm plugins unload %s stamm", g_FeatureList[g_features][FEATURE_BASEREAL]);
+					ServerCommand("sm plugins unload %s stamm", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
 					
 
 					// Log the error
-					LogToFile(g_LogFile, "[ STAMM ] Invalid Level %i for Feature: %s", value, g_FeatureList[g_features][FEATURE_BASEREAL]);
+					LogToFile(g_sLogFile, "[ STAMM ] Invalid Level %i for Feature: %s", value, g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
 
 					// Stop here
 					return;
 				}
 
 
+
 				// Save the level
-				g_FeatureList[g_features][FEATURE_LEVEL][start] = value;
+				g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = value;
+
+
 
 
 				// Description not empty?
 				if (!StrEqual(description, ""))
 				{
 					// Load the description count of this level
-					new desc = g_FeatureList[g_features][FEATURE_DESCS][value];
+					new desc = g_FeatureList[g_iFeatures][FEATURE_DESCS][value];
 
-					Format(g_FeatureHaveDesc[g_features][value][desc], sizeof(g_FeatureHaveDesc[][][]), description);
+					Format(g_sFeatureHaveDesc[g_iFeatures][value][desc], sizeof(g_sFeatureHaveDesc[][][]), description);
+
+
 
 					// Updated description count
-					g_FeatureList[g_features][FEATURE_DESCS][value]++;
+					g_FeatureList[g_iFeatures][FEATURE_DESCS][value]++;
 
 					// Only max 5 descriptions per level
-					if (g_FeatureList[g_features][FEATURE_DESCS][value] == 5)
+					if (g_FeatureList[g_iFeatures][FEATURE_DESCS][value] == 5)
 					{
-						g_FeatureList[g_features][FEATURE_DESCS][value] = 0;
+						g_FeatureList[g_iFeatures][FEATURE_DESCS][value] = 0;
 					}
 				}
+
+
+
 
 				// Update start
 				start++;
@@ -228,16 +265,22 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	}
 
 
+
 	// Update feature count
-	g_features++;
+	g_iFeatures++;
+
 
 
 	// Load feature if plugin already started
-	if (g_pluginStarted)
+	if (g_sPluginStarted)
 	{
-		CreateTimer(0.5, featurelib_loadFeatures, g_features-1);
+		CreateTimer(0.5, featurelib_loadFeatures, g_iFeatures-1);
 	}
 }
+
+
+
+
 
 
 // Load a feature or all features
@@ -248,10 +291,13 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 	if (featureIndex != -1)
 	{
 		// Announce if debug
-		if (g_debug) 
+		if (g_bDebug) 
 		{
-			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
+			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
 		}
+
+
+
 
 		// Add new Column for this feature
 		sqllib_AddColumn(g_FeatureList[featureIndex][FEATURE_BASE], g_FeatureList[featureIndex][FEATURE_STANDARD]);
@@ -263,11 +309,11 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 	else
 	{
 		// Finally stamm is loaded
-		g_pluginStarted = true;
+		g_sPluginStarted = true;
 		
 
 		// Loop through all feature and load them
-		for (new i = 0; i < g_features; i++)
+		for (new i = 0; i < g_iFeatures; i++)
 		{
 			// Add column
 			sqllib_AddColumn(g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][FEATURE_STANDARD]);
@@ -277,27 +323,32 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 			nativelib_startLoaded(g_FeatureList[i][FEATURE_HANDLE], g_FeatureList[i][FEATURE_BASE]);
 			
 
+
 			// Notice to all if debug
-			if (g_debug) 
+			if (g_bDebug) 
 			{
-				LogToFile(g_DebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[i][FEATURE_BASE]);
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[i][FEATURE_BASE]);
 			}
 		}
 		
+
 
 		// Notice API that stamm is ready to use
 		nativelib_StammReady();
 		
 
+
 		// Handle late load
-		if (g_isLate)
+		if (g_bIsLate)
 		{
 			// Insert all players on the Server
 			for (new i=1; i <= MaxClients; i++)
 			{
 				// Mark client as invalid
-				g_ClientReady[i] = false;
+				g_bClientReady[i] = false;
 				
+
+
 				// Check valid PRE
 				if (clientlib_isValidClient_PRE(i))
 				{
@@ -310,6 +361,9 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 	
 	return Plugin_Handled;
 }
+
+
+
 
 
 
@@ -332,6 +386,10 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 	ReplaceString(basename, sizeof(basename), ".smx", "");
 	
 
+
+
+
+
 	// Now explore it (Linux style)
 	retriev = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	
@@ -341,6 +399,9 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 		// Explore it again (Windows Style)
 		retriev = ExplodeString(basename, "\\", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	}
+
+
+
 
 	// Nothing found to explore? Just save basename
 	if (retriev <= 1)
@@ -353,9 +414,13 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 		Format(name, size, explodedBasename[retriev-1]);
 	}
 
+
 	// Always true? hm...
 	return true;
 }
+
+
+
 
 
 
@@ -365,6 +430,7 @@ public featurelib_UnloadFeature(Handle:plugin)
 	// Get intern index of the plugin
 	new index = featurelib_getFeatureByHandle(plugin);
 
+
 	// Unlload it
 	ServerCommand("sm plugins unload %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
 
@@ -373,8 +439,19 @@ public featurelib_UnloadFeature(Handle:plugin)
 
 
 	// Announce unload
-	CPrintToChatAll("%s %t", g_StammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
+	if (!g_bMoreColors)
+	{
+		CPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
+	}
+	else
+	{
+		MCPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
+	}
 }
+
+
+
+
 
 
 // Load a Feautre
@@ -389,8 +466,17 @@ public featurelib_loadFeature(Handle:plugin)
 
 	// Mark as enabled, and announce it
 	g_FeatureList[index][FEATURE_ENABLE] = 1;
-	CPrintToChatAll("%s %t", g_StammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
+
+	if (!g_bMoreColors)
+	{
+		CPrintToChatAll("%s %t", g_sStammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
+	}
+	else
+	{
+		MCPrintToChatAll("%s %t", g_sStammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
+	}
 }
+
 
 
 
@@ -401,6 +487,9 @@ public featurelib_ReloadFeature(Handle:plugin)
 	featurelib_UnloadFeature(plugin);
 	featurelib_loadFeature(plugin);
 }
+
+
+
 
 
 // Load feature for console
@@ -416,7 +505,7 @@ public Action:featurelib_Load(args)
 
 
 		// Find the feature
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (g_FeatureList[i][FEATURE_ENABLE] == 0 && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
 			{
@@ -430,7 +519,7 @@ public Action:featurelib_Load(args)
 		
 
 		// Not found, search with real Basename
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (g_FeatureList[i][FEATURE_ENABLE] == 0 && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
 			{
@@ -457,6 +546,10 @@ public Action:featurelib_Load(args)
 }
 
 
+
+
+
+
 // And console unload
 public Action:featurelib_UnLoad(args)
 {
@@ -470,7 +563,7 @@ public Action:featurelib_UnLoad(args)
 
 
 		// Search it
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (g_FeatureList[i][FEATURE_ENABLE] == 1 && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
 			{
@@ -483,7 +576,7 @@ public Action:featurelib_UnLoad(args)
 		
 
 		// search with real basename
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (g_FeatureList[i][FEATURE_ENABLE] == 1 && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
 			{
@@ -508,6 +601,11 @@ public Action:featurelib_UnLoad(args)
 }
 
 
+
+
+
+
+
 // And also reload ;)
 public Action:featurelib_ReLoad(args)
 {
@@ -523,7 +621,7 @@ public Action:featurelib_ReLoad(args)
 
 
 		// Loops again, see above!
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
 			{
@@ -533,7 +631,7 @@ public Action:featurelib_ReLoad(args)
 			}
 		}
 		
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
 			{
@@ -556,15 +654,19 @@ public Action:featurelib_ReLoad(args)
 }
 
 
+
+
+
+
 // List all features
 public Action:featurelib_List(args)
 {
 	// Header
-	PrintToServer("[STAMM] Listing %d Feature(s):", g_features);
+	PrintToServer("[STAMM] Listing %d Feature(s):", g_iFeatures);
 
 
 	// Go through all Features
-	for (new i=0; i < g_features; i++)
+	for (new i=0; i < g_iFeatures; i++)
 	{
 		// Print with enabled and disabled mark
 		if (g_FeatureList[i][FEATURE_ENABLE])
@@ -582,11 +684,13 @@ public Action:featurelib_List(args)
 
 
 
+
+
 // returns the index by given Handle
 public featurelib_getFeatureByHandle(Handle:plugin)
 {
 	// Go through all features
-	for (new i=0; i < g_features; i++)
+	for (new i=0; i < g_iFeatures; i++)
 	{
 		// Handle the same?
 		if (g_FeatureList[i][FEATURE_HANDLE] == plugin)

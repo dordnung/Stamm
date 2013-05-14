@@ -30,11 +30,16 @@
 // Forwards
 new Handle:nativelib_player_stamm;
 new Handle:nativelib_stamm_get;
+new Handle:nativelib_stamm_get_pre;
 new Handle:nativelib_stamm_ready;
 new Handle:nativelib_client_ready;
 new Handle:nativelib_client_save;
 new Handle:nativelib_happy_start;
 new Handle:nativelib_happy_end;
+
+
+
+
 
 
 // Init. Nativelib
@@ -79,19 +84,27 @@ public nativelib_Start()
 	CreateNative("STAMM_WriteToLog", nativelib_WriteToStammLog);
 	
 
+
 	// And create all the global forwards
 	nativelib_stamm_ready = CreateGlobalForward("STAMM_OnReady", ET_Ignore);
 	nativelib_client_ready = CreateGlobalForward("STAMM_OnClientReady", ET_Ignore, Param_Cell);
 	nativelib_client_save = CreateGlobalForward("STAMM_OnSaveClient", ET_Ignore, Param_Cell);
 	nativelib_player_stamm = CreateGlobalForward("STAMM_OnClientBecomeVip", ET_Ignore, Param_Cell);
 	nativelib_stamm_get = CreateGlobalForward("STAMM_OnClientGetPoints", ET_Ignore, Param_Cell, Param_Cell);
+	nativelib_stamm_get_pre = CreateGlobalForward("STAMM_OnClientGetPoints_PRE", ET_Event, Param_Cell, Param_CellByRef);
 	nativelib_happy_start = CreateGlobalForward("STAMM_OnHappyHourStart", ET_Ignore, Param_Cell, Param_Cell);
 	nativelib_happy_end = CreateGlobalForward("STAMM_OnHappyHourEnd", ET_Ignore);
+
 
 
 	// Register stamm library
 	RegPluginLibrary("stamm");
 }
+
+
+
+
+
 
 
 // Local forwards, let feature notice that it's loaded
@@ -114,30 +127,33 @@ public nativelib_startLoaded(Handle:plugin, String:basename[])
 }
 
 
+
+
+
+
 // a local forward for feature to change points a player get
-public Action:nativelib_PublicPlayerGetPointsPlugin(Handle:plugin, client, &number)
+public Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 {
-	// Search for the function
-	new Action:result = Plugin_Continue;
-	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientGetPoints_PRE");
+	new Action:result;
 
-	// Found it?
-	if (id != INVALID_FUNCTION)
-	{
-		// Execute it with param client and points count
-		Call_StartFunction(plugin, id);
 
-		Call_PushCell(client);
-		Call_PushCellRef(number);
-		
-		// Save result
-		Call_Finish(result);
-	}
+	// Execute it with param client and points count
+	Call_StartForward(nativelib_stamm_get_pre);
+
+	Call_PushCell(client);
+	Call_PushCellRef(number);
+	
+	// Save result
+	Call_Finish(result);
 
 
 	// Pushback result
 	return result;
 }
+
+
+
+
 
 
 // Notice to all plugins, that a player got points
@@ -154,6 +170,9 @@ public nativelib_PublicPlayerGetPoints(client, number)
 
 
 
+
+
+
 // Notice to all plugins, that a player got VIP
 public nativelib_PublicPlayerBecomeVip(client)
 {
@@ -166,6 +185,9 @@ public nativelib_PublicPlayerBecomeVip(client)
 
 
 
+
+
+
 // Notice to all plugins, that Stamm is ready
 public nativelib_StammReady()
 {
@@ -173,6 +195,9 @@ public nativelib_StammReady()
 	
 	Call_Finish();
 }
+
+
+
 
 
 
@@ -188,6 +213,9 @@ public nativelib_ClientReady(client)
 
 
 
+
+
+
 // Notice to all plugins, that a player got save
 public nativelib_ClientSave(client)
 {
@@ -197,6 +225,10 @@ public nativelib_ClientSave(client)
 	
 	Call_Finish();
 }
+
+
+
+
 
 
 
@@ -221,6 +253,10 @@ public nativelib_ClientChanged(client, index, bool:status)
 }
 
 
+
+
+
+
 // Notice to all plugins, that happy hour started
 public nativelib_HappyStart(time, factor)
 {
@@ -233,6 +269,10 @@ public nativelib_HappyStart(time, factor)
 }
 
 
+
+
+
+
 // Notice to all plugins, that happy hour ended
 public nativelib_HappyEnd()
 {
@@ -240,6 +280,9 @@ public nativelib_HappyEnd()
 	
 	Call_Finish();
 }
+
+
+
 
 
 
@@ -328,7 +371,7 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 		for (new j=0; j < MAXLEVELS; j++)
 		{
 			// Check if name equals
-			if (StrEqual(g_FeatureBlocks[feature][j], name))
+			if (StrEqual(g_sFeatureBlocks[feature][j], name))
 			{
 				return j+1;
 			}
@@ -362,7 +405,7 @@ public nativelib_GetClientStammPoints(Handle:plugin, numParams)
 	// Check client is valid
 	if (clientlib_isValidClient(client)) 
 	{
-		return g_playerpoints[client];
+		return g_iPlayerPoints[client];
 	}
 
 	return -1;
@@ -389,7 +432,7 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0)
 				{
 					// Client have Block?
-					if (g_playerlevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
+					if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
 					{
 						// found highest
 						return j+1;
@@ -414,7 +457,7 @@ public nativelib_GetClientStammLevel(Handle:plugin, numParams)
 	// Client valid?
 	if (clientlib_isValidClient(client)) 
 	{
-		return g_playerlevel[client];
+		return g_iPlayerLevel[client];
 	}
 
 	return -1;
@@ -427,9 +470,9 @@ public nativelib_GetStammLevelPoints(Handle:plugin, numParams)
 	new type = GetNativeCell(1);
 	
 	// Check if level is valid
-	if (type <= g_levels && type > 0) 
+	if (type <= g_iLevels && type > 0) 
 	{
-		return g_LevelPoints[type-1];
+		return g_iLevelPoints[type-1];
 	}
 
 	return -1;
@@ -439,7 +482,7 @@ public nativelib_GetStammLevelPoints(Handle:plugin, numParams)
 // Returns total count of levels
 public nativelib_GetStammLevelCount(Handle:plugin, numParams)
 {
-	return g_levels+g_plevels;
+	return g_iLevels+g_iPLevels;
 }
 
 
@@ -451,10 +494,10 @@ public nativelib_GetStammLevelName(Handle:plugin, numParams)
 	
 
 	// Valid level?
-	if (type <= g_levels+g_plevels && type > 0)
+	if (type <= g_iLevels+g_iPLevels && type > 0)
 	{
 		// Save name
-		SetNativeString(2, g_LevelName[type-1], len, false);
+		SetNativeString(2, g_sLevelName[type-1], len, false);
 		
 		return true;
 	}
@@ -474,10 +517,10 @@ public nativelib_GetStammLevelNumber(Handle:plugin, numParams)
 	GetNativeString(1, name, sizeof(name));
 	
 	// Loop through levels
-	for (new i=0; i < g_levels+g_plevels; i++)
+	for (new i=0; i < g_iLevels+g_iPLevels; i++)
 	{
 		// Check name
-		if (StrEqual(g_LevelName[i], name, false)) 	
+		if (StrEqual(g_sLevelName[i], name, false)) 	
 		{
 			return i+1;
 		}
@@ -493,7 +536,7 @@ public nativelib_IsLevelPrivate(Handle:plugin, numParams)
 	new type = GetNativeCell(1);
 	
 	// greater than normal levels?
-	if (type > g_levels)
+	if (type > g_iLevels)
 	{
 		return true;
 	}
@@ -505,20 +548,20 @@ public nativelib_IsLevelPrivate(Handle:plugin, numParams)
 // Returns how a player get his points
 public nativelib_GetStammType(Handle:plugin, numParams)
 {
-	return g_vip_type;
+	return g_iVipType;
 }
 
 
 // Returns the game stamm is running on
 public nativelib_GetStammGame(Handle:plugin, numParams)
 {
-	return otherlib_getGame();
+	return _:otherlib_getGame();
 }
 
 // Returns if the player want autoupdates
 public nativelib_AutoUpdate(Handle:plugin, numParams)
 {
-	return autoUpdate;
+	return g_bAutoUpdate;
 }
 
 
@@ -534,22 +577,29 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 		if (factor > 1)
 		{
 			// Only when it's not running already
-			if (!g_happyhouron)
+			if (!g_bHappyHourON)
 			{
 				// Update global points
-				g_points = factor;
-				g_happyhouron = 1;
+				g_iPoints = factor;
+				g_bHappyHourON = true;
 
 				// Delete old timer and start new
-				otherlib_checkTimer(g_HappyTimer);
-				g_HappyTimer = CreateTimer(float(time)*60, otherlib_StopHappyHour);
+				otherlib_checkTimer(g_hHappyTimer);
+				g_hHappyTimer = CreateTimer(float(time)*60, otherlib_StopHappyHour);
 				
 
 				// Notice to all that happy hour sarted
 				nativelib_HappyStart(time, factor);
 				
 				// And announce to players
-				CPrintToChatAll("%s %t", g_StammTag, "HappyActive", g_points);
+				if (!g_bMoreColors)
+				{
+					CPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+				}
+				else
+				{
+					MCPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+				}
 				
 				return true;
 			}
@@ -566,7 +616,7 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 public nativelib_EndHappyHour(Handle:plugin, numParams)
 {
 	// Only when it's running
-	if (g_happyhouron)
+	if (g_bHappyHourON)
 	{
 		// End it
 		otherlib_EndHappyHour();
@@ -652,7 +702,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 		if (pointschange >= 0)
 		{
 			// get difference
-			new diff = pointschange - g_playerpoints[client];
+			new diff = pointschange - g_iPlayerPoints[client];
 
 			// Add / Delete difference
 			pointlib_GivePlayerPoints(client, diff, false);
@@ -669,7 +719,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 public nativelib_AddFeature(Handle:plugin, numParams)
 {
 	// Max features reached?
-	if (g_features >= MAXFEATURES)
+	if (g_iFeatures >= MAXFEATURES)
 	{
 		ThrowNativeError(1, "Attention: Max features of %i reached!", MAXFEATURES);
 	}
@@ -707,7 +757,7 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 		// Save the description to plugin and to level
 		new desc = g_FeatureList[feature][FEATURE_DESCS][level];
 
-		Format(g_FeatureHaveDesc[feature][level][desc], sizeof(g_FeatureHaveDesc[][][]), description);
+		Format(g_sFeatureHaveDesc[feature][level][desc], sizeof(g_sFeatureHaveDesc[][][]), description);
 
 		// Updated level count
 		g_FeatureList[feature][FEATURE_DESCS][level]++;
@@ -739,7 +789,7 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 		if (feature != -1 && GetNativeCell(2) > 0)
 		{
 			// Player level high enough and want feature?
-			if (g_playerlevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][GetNativeCell(2)-1] && g_FeatureList[feature][WANT_FEATURE][client])
+			if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][GetNativeCell(2)-1] && g_FeatureList[feature][WANT_FEATURE][client])
 			{
 				return true;
 			}
@@ -784,7 +834,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 		if (!type)
 		{
 			// Level higher than zero?
-			if (g_playerlevel[client] > 0)
+			if (g_iPlayerLevel[client] > 0)
 			{ 
 				return true;
 			}
@@ -796,7 +846,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 		if (min)
 		{
 			// Level Higher than?
-			if (g_playerlevel[client] >= type) 
+			if (g_iPlayerLevel[client] >= type) 
 			{
 				return true;
 			}
@@ -804,7 +854,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 		else
 		{
 			// Level equal?
-			if (g_playerlevel[client] == type) 
+			if (g_iPlayerLevel[client] == type) 
 			{
 				return true;
 			}
@@ -819,7 +869,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 public nativelib_IsLoaded(Handle:plugin, numParams)
 {
 	// yeah, just return the value
-	return g_pluginStarted;
+	return g_sPluginStarted;
 }
 
 
@@ -883,13 +933,13 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 	FormatNativeString(0, 2, 3, sizeof(buffer), _, buffer);
 
 	// Write to debug only if debug is enabled
-	if (useDebug && g_debug)
+	if (useDebug && g_bDebug)
 	{
-	 	LogToFile(g_DebugFile, "[ STAMM-%s ] %s", basename, buffer);
+	 	LogToFile(g_sDebugFile, "[ STAMM-%s ] %s", basename, buffer);
 	}
 	else if (!useDebug)
 	{
 		// Seems to be an error
-		LogToFile(g_LogFile, "[ STAMM-%s ] %s", basename, buffer);
+		LogToFile(g_sLogFile, "[ STAMM-%s ] %s", basename, buffer);
 	}
 }
