@@ -26,6 +26,8 @@
 #include <stringescape>
 
 
+
+
 // Semicolon
 #pragma semicolon 1
 
@@ -33,11 +35,16 @@ new Handle:sqllib_db;
 new sqllib_convert = -1;
 
 
+
+
+
 // Init. sqllib
 public sqllib_Start()
 {
 	Format(g_sVipListF, sizeof(g_sVipListF), g_sVipList);
 	Format(g_sVipRankF, sizeof(g_sVipRankF), g_sVipRank);
+
+
 
 	// Register viplist and viprank command
 	if (!StrContains(g_sVipList, "sm_"))
@@ -58,6 +65,8 @@ public sqllib_Start()
 
 
 
+
+
 // Load the database
 public sqllib_LoadDB()
 {
@@ -67,6 +76,7 @@ public sqllib_LoadDB()
 	if (!SQL_CheckConfig("stamm_sql")) 
 	{
 		new Handle:keys = sqllib_createDB();
+
 
 		// If not load a default one
 		sqllib_db = SQL_ConnectCustom(keys, sqlError, sizeof(sqlError), true);
@@ -78,6 +88,10 @@ public sqllib_LoadDB()
 		// if so, load the connection out of the config
 		sqllib_db = SQL_Connect("stamm_sql", true, sqlError, sizeof(sqlError));
 	}
+
+
+
+
 
 	// Not connected?
 	if (sqllib_db == INVALID_HANDLE)
@@ -91,6 +105,8 @@ public sqllib_LoadDB()
 	{
 		decl String:query[620];
 		
+
+
 		// Create table if it's not exists
 		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_sTableName, GetTime());
 		
@@ -98,6 +114,13 @@ public sqllib_LoadDB()
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
+
+
+
+
+		// Lock DB
+		SQL_LockDatabase(sqllib_db);
+
 
 		// Fast query
 		if (!SQL_FastQuery(sqllib_db, query))
@@ -107,6 +130,8 @@ public sqllib_LoadDB()
 			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Table. Error: %s", sqlError);
 		}
 
+
+
 		// Create happy hour table
 		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)", g_sTableName);
 		
@@ -115,7 +140,9 @@ public sqllib_LoadDB()
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
 
-		// Create fasst
+
+
+		// Create fast
 		if (!SQL_FastQuery(sqllib_db, query))
 		{
 			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
@@ -127,8 +154,16 @@ public sqllib_LoadDB()
 		{ 
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Connected to Database successfully");
 		}
+
+
+		// unLock DB
+		SQL_UnlockDatabase(sqllib_db);
 	}
 }
+
+
+
+
 
 
 // Create database config
@@ -145,6 +180,11 @@ public Handle:sqllib_createDB()
 }
 
 
+
+
+
+
+
 // Insert new Player
 public sqllib_InsertPlayer(client)
 {
@@ -153,16 +193,23 @@ public sqllib_InsertPlayer(client)
 		decl String:query[4024];
 		decl String:steamid[64];
 		
+
+
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		
 		// Select points of the player
 		Format(query, sizeof(query), "SELECT `points`, `level`, `version`");
 		
+
+
+
 		// And state of all features
 		for (new i=0; i < g_iFeatures; i++)
 		{ 
 			Format(query, sizeof(query), "%s, `%s`", query, g_FeatureList[i][FEATURE_BASE]);
 		}
+
+
 
 		Format(query, sizeof(query), "%s FROM `%s` WHERE steamid = '%s'", query, g_sTableName, steamid);
 		
@@ -171,10 +218,16 @@ public sqllib_InsertPlayer(client)
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
 
+
 		// Get it
 		SQL_TQuery(sqllib_db, sqllib_InsertHandler, query, client);
 	}
 }
+
+
+
+
+
 
 
 // Add new column for a feature
@@ -184,6 +237,8 @@ public sqllib_AddColumn(String:name[], bool:standard)
 	{
 		decl String:query[256];
 		
+
+
 		// Standard off or on?
 		if (standard)
 		{
@@ -195,6 +250,8 @@ public sqllib_AddColumn(String:name[], bool:standard)
 		}
 
 
+
+
 		if (g_bDebug) 
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -204,6 +261,12 @@ public sqllib_AddColumn(String:name[], bool:standard)
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 	}
 }
+
+
+
+
+
+
 
 
 // Clint insert handler
@@ -218,6 +281,8 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 		decl String:query[512];
 		
 
+
+
 		// Only valid clients
 		if (clientlib_isValidClient_PRE(client))
 		{
@@ -226,12 +291,17 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			g_iHappyFactor[client] = 0;
 			g_bClientReady[client] = false;
 
+
+
 			// Get name and steamid
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
 			GetClientName(client, name, sizeof(name));
 			
 			// escape bad names
 			SQL_EscapeString(sqllib_db, name, name2, sizeof(name2));
+
+
+
 
 			// Found no entry?
 			if (!SQL_FetchRow(hndl))
@@ -246,6 +316,9 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
+
+
+
 				// Set level and points to zero
 				g_iPlayerPoints[client] = 0;
 				g_iPlayerLevel[client] = 0;
@@ -255,6 +328,8 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				{ 
 					g_FeatureList[i][WANT_FEATURE][client] = g_FeatureList[i][FEATURE_STANDARD];
 				}
+
+
 
 				// Client is ready
 				clientlib_ClientReady(client);
@@ -267,6 +342,9 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// Get all values from the database
 				g_iPlayerLevel[client] = SQL_FetchInt(hndl, 1);
 				
+
+
+
 				// Also all feature state
 				for (new i=0; i < g_iFeatures; i++)
 				{
@@ -280,9 +358,13 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 					}
 				}
 				
+
+
+
 				// Get points
 				g_iPlayerPoints[client] = SQL_FetchInt(hndl, 0);
 				
+
 
 				// Update version, name and last visit
 				Format(query, sizeof(query), "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'", g_sTableName, name2, (clientlib_IsAdmin(client) ? 1 : 0), g_sPluginVersion, GetTime(), steamid);
@@ -293,6 +375,8 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				}
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+
+
 
 
 
@@ -316,6 +400,11 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 }
 
 
+
+
+
+
+
 // Get the vip top 10
 public Action:sqllib_GetVipTop(client, args)
 {
@@ -323,6 +412,9 @@ public Action:sqllib_GetVipTop(client, args)
 	{
 		decl String:query[128];
 		
+
+
+
 		// Select all vips DESC by points
 		Format(query, sizeof(query), "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10", g_sTableName);
 		
@@ -336,6 +428,11 @@ public Action:sqllib_GetVipTop(client, args)
 	
 	return Plugin_Handled;
 }
+
+
+
+
+
 
 
 // Get the rank of the client
@@ -369,9 +466,14 @@ public Action:sqllib_GetVipRank(client, args)
 			}
 		}
 		
+
+
 		return Plugin_Handled;
 	}
 	
+
+
+
 	if (sqllib_db != INVALID_HANDLE)
 	{
 		decl String:query[128];
@@ -387,8 +489,16 @@ public Action:sqllib_GetVipRank(client, args)
 		SQL_TQuery(sqllib_db, sqllib_GetVIPRankQuery, query, client);
 	}
 	
+
+
 	return Plugin_Handled;
 }
+
+
+
+
+
+
 
 
 // Vip Top query handle
@@ -404,12 +514,19 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			decl String:top_text[128];
 			decl String:steamid[64];
 			
+
+
+
+
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
 
 			Format(top_text, sizeof(top_text), "%T", "StammTop", client);
 			SetPanelTitle(Top10Menu, top_text);
 
 			DrawPanelText(Top10Menu, "------------------------------------");
+
+
+
 
 			// Fetch all founded
 			while (SQL_FetchRow(hndl))
@@ -425,6 +542,9 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 				DrawPanelText(Top10Menu, top_text);
 			}
 			
+
+
+
 			// Found something?
 			if (!index)
 			{
@@ -464,6 +584,9 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 				DrawPanelItem(Top10Menu, top_text);
 			}
 
+
+
+
 			// Send the menu
 			SendPanelToClient(Top10Menu, client, panellib_FeatureHandler, 60);
 		}
@@ -473,6 +596,12 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 		LogToFile(g_sLogFile, "[ STAMM ] Database Error:   %s", error);
 	}
 }
+
+
+
+
+
+
 
 // VIP rank handler
 public sqllib_GetVIPRankQuery(Handle:owner, Handle:hndl, const String:error[], any:client)
@@ -500,6 +629,10 @@ public sqllib_GetVIPRankQuery(Handle:owner, Handle:hndl, const String:error[], a
 }
 
 
+
+
+
+
 // Error check callback
 public sqllib_SQLErrorCheckCallback(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
@@ -509,6 +642,10 @@ public sqllib_SQLErrorCheckCallback(Handle:owner, Handle:hndl, const String:erro
 		LogToFile(g_sLogFile, "[ STAMM ] Database Error: %s", error);
 	}
 }
+
+
+
+
 
 // For maybe vali database errors
 public sqllib_SQLErrorCheckCallback2(Handle:owner, Handle:hndl, const String:error[], any:data)
@@ -523,11 +660,19 @@ public sqllib_SQLErrorCheckCallback2(Handle:owner, Handle:hndl, const String:err
 	}
 }
 
+
+
+
+
+
 // Convert the database to a file
 public Action:sqllib_convertDB(args)
 {
 	decl String:mysqlString[12];
 	decl String:query[128];
+
+
+
 
 	// Right use
 	if (GetCmdArgs() != 1)
@@ -537,6 +682,8 @@ public Action:sqllib_convertDB(args)
 		return Plugin_Handled;
 	}
 
+
+
 	// Not converting right now?
 	if (sqllib_convert > -1)
 	{
@@ -545,7 +692,11 @@ public Action:sqllib_convertDB(args)
 		return Plugin_Handled;
 	}
 
+
+
 	GetCmdArg(1, mysqlString, sizeof(mysqlString));
+
+
 
 	// Valid argument?
 	if (StringToInt(mysqlString) > 1 || StringToInt(mysqlString) < 0)
@@ -554,6 +705,9 @@ public Action:sqllib_convertDB(args)
 
 		return Plugin_Handled;
 	}
+
+
+
 
 	sqllib_convert = StringToInt(mysqlString);
 
@@ -564,11 +718,18 @@ public Action:sqllib_convertDB(args)
 	// Execute
 	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile, query);
 
+
+
 	// Notice status
 	ReplyToCommand(0, "Converting now Stamm database to a file. Please wait. This could take a bit!");
 
 	return Plugin_Handled;
 }
+
+
+
+
+
 
 
 // Convert Handler
@@ -580,10 +741,15 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 		new String:filename[64];
 		new counter = 0;
 
+
+
 		// Format filename
 		Format(filename, sizeof(filename), "%s.sql", g_sTableName);
 
 		new Handle:file = OpenFile(filename, "wb");
+
+
+
 
 		// Could open file?
 		if (file != INVALID_HANDLE)
@@ -594,8 +760,12 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 				WriteFileLine(file, "BEGIN TRANSACTION;");
 			}
 
+
+
 			// Write create statement
 			WriteFileLine(file, "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`));", g_sTableName, GetTime());
+
+
 
 			// Parse all database data
 			do
@@ -616,12 +786,15 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 				version = SQL_FetchFloat(hndl, 4);
 				last = SQL_FetchInt(hndl, 5);
 
+
+
 				// Convert version to string
 				FloatToString(version, versionS, sizeof(versionS));
 
 				// Fetch steamid and name
 				SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
 				SQL_FetchString(hndl, 3, name, sizeof(name));
+
 
 				
 
@@ -661,11 +834,17 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 			} 
 			while (SQL_FetchRow(hndl));
 
+
+
+
 			// And we need a end for sqlite
 			if (sqllib_convert == 0)
 			{
 				WriteFileLine(file, "COMMIT;");
 			}
+
+
+
 
 			// Close file
 			CloseHandle(file);

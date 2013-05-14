@@ -138,8 +138,10 @@ public levellib_LoadLevels()
 				// Get the flag
 				Format(g_sLevelFlag[g_iPLevels], sizeof(g_sLevelFlag[]), flagTest);
 
+
 				// Get the name
 				KvGetString(all_levels, "name", g_sLevelName[g_iLevels+g_iPLevels], sizeof(g_sLevelName[]));
+
 
 
 
@@ -148,6 +150,7 @@ public levellib_LoadLevels()
 				{
 					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added priavte Level %s", g_sLevelName[g_iLevels+g_iPLevels]);
 				}
+
 
 
 
@@ -184,6 +187,7 @@ public levellib_sortLevels()
 		}
 	}
 }
+
 
 
 

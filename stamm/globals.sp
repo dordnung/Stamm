@@ -129,7 +129,7 @@ new String:g_sGiveFlagAdmin[26];
 
 // Level and Feature string globals
 new String:g_sLevelName[MAXLEVELS][128];
-new String:g_sLevelFlag[MAXLEVELS][10];
+new String:g_sLevelFlag[MAXLEVELS][26];
 // This is VERY nasty, try to keep it as small as possible
 new String:g_sFeatureHaveDesc[MAXFEATURES][MAXLEVELS][5][64];
 new String:g_sFeatureBlocks[MAXFEATURES][MAXLEVELS][64];

@@ -23,8 +23,13 @@
  */
 
 
+
+
 // Use Semicolons
 #pragma semicolon 1
+
+
+
 
 
 
@@ -38,20 +43,29 @@ public eventlib_Start()
 		HookEvent("teamplay_round_start", eventlib_RoundStart);
 		HookEvent("arena_round_start", eventlib_RoundStart);
 	}
+
 	else if (otherlib_getGame() == GAME_DOD)
 	{
 		// Event Round start for DOD
 		HookEvent("dod_round_start", eventlib_RoundStart);
 	}
+
 	else
 	{
 		// Event Round start for CSS and CSGO
 		HookEvent("round_start", eventlib_RoundStart);
 	}
 
+
+
+
 	// Player Death
 	HookEvent("player_death", eventlib_PlayerDeath);
 }
+
+
+
+
 
 
 
@@ -79,6 +93,8 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 	}
 	
 
+
+
 	// Announce Happy hour
 	if (g_bHappyHourON) 
 	{
@@ -92,6 +108,11 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 		}
 	}
 }
+
+
+
+
+
 
 
 // A Player died

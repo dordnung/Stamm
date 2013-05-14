@@ -57,6 +57,7 @@ public bool:clientlib_isValidClient_PRE(client)
 
 
 
+
 // Is valid client
 public bool:clientlib_isValidClient(client)
 {
@@ -125,6 +126,7 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 
 
 
+
 // Check a client as ready
 public clientlib_ClientReady(client)
 {
@@ -140,7 +142,7 @@ public clientlib_ClientReady(client)
 
 
 		// check admin flag
-		if (!StrEqual(g_sGiveFlagAdmin, "0"))
+		if (!StrEqual(g_sGiveFlagAdmin, "0") && !StrEqual(g_sGiveFlagAdmin, ""))
 		{ 
 			clientlib_CheckFlagAdmin(client);
 		}
@@ -161,6 +163,10 @@ public clientlib_ClientReady(client)
 		nativelib_ClientReady(client);
 	}
 }
+
+
+
+
 
 
 // A client disconnected
@@ -226,29 +232,31 @@ public bool:clientlib_IsAdmin(client)
 
 
 
+
+
 // Check if a client is a special VIP
 public clientlib_IsSpecialVIP(client)
 {
 	if (clientlib_isValidClient(client))
 	{
-		new AdminId:adminid = GetUserAdmin(client);
-		new AdminFlag:flag;
-
 		// Private level loop
 		for (new i=0; i < g_iPLevels; i++)
 		{		
-			// Check all flags, YEAH :D
-			FindFlagByChar(g_sLevelFlag[i][0], flag);
-
-			if (GetAdminFlag(adminid, flag))
+			if ((GetUserFlagBits(client) & ReadFlagString(g_sLevelFlag[i])))
 			{
 				return i;
 			}
 		}
 	}
 	
+
+	// No special
 	return -1;
 }
+
+
+
+
 
 // Give Player fast VIP
 public clientlib_CheckFlagAdmin(client)
@@ -263,37 +271,51 @@ public clientlib_CheckFlagAdmin(client)
 
 
 
+
+
 // Set level to highest level
 public clientlib_GiveFastVIP(client)
 {
 	if (g_iPlayerLevel[client] < g_iLevels)
 	{
+		// Set points to highest level
 		pointlib_GivePlayerPoints(client, g_iLevelPoints[g_iLevels-1], false);
 	}
 }
 
 
 
+
+
+
 // Delete old players
 public Action:clientlib_deleteOlds(Handle:timer, any:data)
 {
+	decl String:query[128];
+
 	// check last valid entry
 	new lastEntry = GetTime() - (g_iDelete * 24 * 60 * 60);
 
-	decl String:query[128];
+
 
 	// Delete all players less this line
 	Format(query, sizeof(query), "DELETE FROM `%s` WHERE `last_visit` < %i", g_sTableName, lastEntry);
+
+
 
 	if (g_bDebug) 
 	{
 		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 	}
 
+
+
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 	
 	return Plugin_Continue;
 }
+
+
 
 
 
@@ -305,18 +327,24 @@ public clientlib_CheckVip(client)
 	{
 		decl String:steamid[64];
 		new clientpoints = g_iPlayerPoints[client];
-		
+		new levelstufe;
+
+
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		
 		// Get level with client points
-		new levelstufe = levellib_PointsToID(client, clientpoints);
+		levelstufe = levellib_PointsToID(client, clientpoints);
 		
+
 
 		// is a private vip
 		if (levelstufe == -1)
 		{ 
 			return;
 		}
+
+
+
 
 		// Only when level is a new one
 		if (levelstufe > 0 && levelstufe != g_iPlayerLevel[client])
@@ -326,17 +354,24 @@ public clientlib_CheckVip(client)
 
 			new bool:isUP = true;
 
+
+
 			// new level not higher?
 			if (g_iPlayerLevel[client] > levelstufe)
 			{
 				isUP = false;
 			}
 
+
+
 			// Set new level
 			g_iPlayerLevel[client] = levelstufe;
 			
 			GetClientName(client, name, sizeof(name));
 			
+
+
+
 
 			// Notice to all
 			if (!g_bStripTag)
@@ -361,6 +396,10 @@ public clientlib_CheckVip(client)
 					MCPrintToChatAll("%s %t", g_sStammTag, "LevelNowLevel", name, g_sLevelName[levelstufe-1]);
 				}
 			}
+
+
+
+
 
 
 			if (!g_bStripTag)
@@ -388,11 +427,18 @@ public clientlib_CheckVip(client)
 				}
 			}
 			
+
+
+
 			// Play lvl up sound if wanted
 			if (!StrEqual(g_sLvlUpSound, "0") && isUP)
 			{
 				EmitSoundToAll(g_sLvlUpSound);
 			}
+
+
+
+
 
 			// Update client on database
 			Format(setquery, sizeof(setquery), "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'", g_sTableName, levelstufe, steamid);
@@ -405,6 +451,8 @@ public clientlib_CheckVip(client)
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, setquery);
 
 
+
+
 			// Notice to API
 			nativelib_PublicPlayerBecomeVip(client);
 		}
@@ -415,6 +463,8 @@ public clientlib_CheckVip(client)
 							
 			// set to zero
 			g_iPlayerLevel[client] = 0;
+
+
 
 
 			// Update to database
@@ -432,6 +482,10 @@ public clientlib_CheckVip(client)
 
 
 
+
+
+
+
 // Saves player points and feature states
 public clientlib_SavePlayer(client, number)
 {
@@ -440,8 +494,13 @@ public clientlib_SavePlayer(client, number)
 		decl String:query[4024];
 		decl String:steamid[64];
 		
+
+
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		
+
+
+
 		// Zero points only?
 		if (g_iPlayerPoints[client] == 0)
 		{
@@ -453,14 +512,21 @@ public clientlib_SavePlayer(client, number)
 			Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) ", g_sTableName, number);
 		}
 
+
+
+
 		// Add all features to the call
 		for (new i=0; i < g_iFeatures; i++)
 		{
 			Format(query, sizeof(query), "%s, `%s`=%i", query, g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][WANT_FEATURE][client]);
 		}
 
+
 		Format(query, sizeof(query), "%s WHERE `steamid`='%s'", query, steamid);
 		
+
+
+
 		// Execute
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 		
@@ -468,6 +534,8 @@ public clientlib_SavePlayer(client, number)
 		{ 
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
+
+
 
 		// Notice to API
 		nativelib_ClientSave(client);
@@ -487,6 +555,9 @@ public clientlib_getSteamid(client, String:steamid[], size)
 
 
 
+
+
+
 // Command Say filter
 public Action:clientlib_CmdSay(client, args)
 {
@@ -496,9 +567,13 @@ public Action:clientlib_CmdSay(client, args)
 	GetClientName(client, name, sizeof(name));
 	GetCmdArgString(text, sizeof(text));
 	
+
+
 	// Parse out "
 	ReplaceString(text, sizeof(text), "\"", "");
 	
+
+
 	if (clientlib_isValidClient(client))
 	{
 		// Want the player start happy hour?
@@ -507,6 +582,8 @@ public Action:clientlib_CmdSay(client, args)
 			// get the time
 			new timetoset = StringToInt(text);
 			
+
+
 			// valid time?
 			if (timetoset > 1)
 			{  
@@ -516,6 +593,8 @@ public Action:clientlib_CmdSay(client, args)
 			{
 				// Else abort
 				g_iHappyNumber[client] = 0;
+
+
 
 				if (!g_bMoreColors)
 				{
@@ -550,11 +629,14 @@ public Action:clientlib_CmdSay(client, args)
 				
 			return Plugin_Handled;	
 		}
+
 		else if (g_iHappyFactor[client] == 1)
 		{
 			// Get factor
 			new factortoset = StringToInt(text);
 			
+
+
 			// Valid factor and happy hour not started?
 			if (factortoset > 1 && !g_bHappyHourON) 
 			{
@@ -578,6 +660,8 @@ public Action:clientlib_CmdSay(client, args)
 					MCPrintToChat(client, "%s %t", g_sStammTag, "aborted");
 				}
 				
+
+
 				g_iHappyNumber[client] = 0;
 				g_iHappyFactor[client] = 0;
 			}
@@ -604,9 +688,13 @@ public Action:clientlib_CmdSay(client, args)
 				return Plugin_Handled;
 			}
 			
+
+
 			new choose = g_iPointsNumber[client];
 			new pointstoset = StringToInt(text);
 			
+
+
 			if (clientlib_isValidClient(choose))
 			{
 				new String:names[MAX_NAME_LENGTH+1];
@@ -631,6 +719,8 @@ public Action:clientlib_CmdSay(client, args)
 				}
 			}
 			
+
+
 			g_iPointsNumber[client] = 0;
 			
 			return Plugin_Handled;
@@ -655,11 +745,13 @@ public Action:clientlib_CmdSay(client, args)
 			// show info panel
 			panellib_CreateUserPanels(client, 3);
 		}
+
 		else if (StrEqual(text, g_sChange) && StrContains(g_sChange, "sm_") != 0)
 		{
 			// Show change list
 			panellib_CreateUserPanels(client, 1);
 		}
+
 		else if (StrEqual(text, g_sTextToWrite) && StrContains(g_sTextToWrite, "sm_") != 0)
 		{
 			// Show player points
@@ -672,6 +764,7 @@ public Action:clientlib_CmdSay(client, args)
 				SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
 			}
 		}
+
 		else if (StrEqual(text, g_sAdminMenu) && StrContains(g_sAdminMenu, "sm_") != 0 && clientlib_IsAdmin(client))
 		{
 			// Open admin menu
@@ -679,8 +772,13 @@ public Action:clientlib_CmdSay(client, args)
 		}
 	}
 	
+
+
 	return Plugin_Continue;
 }
+
+
+
 
 
 
@@ -690,6 +788,8 @@ public clientlib_CheckPlayers()
 {
 	new players = clientlib_GetPlayerCount();
 	new factor = (MaxClients - players) + 1;
+
+
 
 	// update global points	
 	if (g_bExtraPoints)
@@ -701,6 +801,9 @@ public clientlib_CheckPlayers()
 		}
 	}
 }
+
+
+
 
 
 

@@ -267,7 +267,7 @@ public CheckStammFolders()
 
 
 
-
+	
 	if (DirExists(oldFolder))
 	{
 		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please rename it to %s, or delete it!", oldFolder, g_sStammFolder);

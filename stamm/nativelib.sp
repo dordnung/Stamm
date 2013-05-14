@@ -27,6 +27,8 @@
 #pragma semicolon 1
 
 
+
+
 // Forwards
 new Handle:nativelib_player_stamm;
 new Handle:nativelib_stamm_get;
@@ -107,12 +109,14 @@ public nativelib_Start()
 
 
 
+
 // Local forwards, let feature notice that it's loaded
 public nativelib_startLoaded(Handle:plugin, String:basename[])
 {
 	// Get function id
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnFeatureLoaded");
 	
+
 
 	// Function found?
 	if (id != INVALID_FUNCTION)
@@ -131,10 +135,13 @@ public nativelib_startLoaded(Handle:plugin, String:basename[])
 
 
 
+
+
 // a local forward for feature to change points a player get
 public Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 {
 	new Action:result;
+
 
 
 	// Execute it with param client and points count
@@ -147,9 +154,11 @@ public Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 	Call_Finish(result);
 
 
+
 	// Pushback result
 	return result;
 }
+
 
 
 
@@ -232,6 +241,7 @@ public nativelib_ClientSave(client)
 
 
 
+
 // Notice to feature, that a player changed the status of him
 public nativelib_ClientChanged(client, index, bool:status)
 {
@@ -239,6 +249,9 @@ public nativelib_ClientChanged(client, index, bool:status)
 	new Handle:plugin = g_FeatureList[index][FEATURE_HANDLE];
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
 	
+
+
+
 	// Found?
 	if (id != INVALID_FUNCTION)
 	{
@@ -294,6 +307,7 @@ public nativelib_IsMyFeature(Handle:plugin, numParams)
 	decl String:basename_orig[64];
 	
 
+
 	// Get basename
 	GetNativeString(1, basename, sizeof(basename));
 	
@@ -303,15 +317,22 @@ public nativelib_IsMyFeature(Handle:plugin, numParams)
 	GetPluginFilename(plugin, basename_orig, sizeof(basename_orig));
 
 
+
 	// Check if it's equal
 	if (StrEqual(basename, basename2, false) || StrEqual(basename_orig, basename, false))
 	{
 		return true;
 	}
 
+
+
 	// Not equal	
 	return false;
 }
+
+
+
+
 
 
 // Get the level of a block
@@ -319,15 +340,21 @@ public nativelib_GetLevel(Handle:plugin, numParams)
 {
 	new feature = featurelib_getFeatureByHandle(plugin);
 
+
 	// Found feature
 	if (feature != -1)
 	{
 		return g_FeatureList[feature][FEATURE_LEVEL][GetNativeCell(1)-1];
 	}
 
+
 	// no? hm...
 	return 0;
 }
+
+
+
+
 
 
 // Returns the number of blocks found
@@ -335,6 +362,8 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 {
 	new found = 0;
 	new feature = featurelib_getFeatureByHandle(plugin);
+
+
 
 
 	// Found feature?
@@ -351,9 +380,15 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 		}
 	}
 
+
+
 	// Return the found counter
 	return found;
 }
+
+
+
+
 
 
 // Get the block index of a named block
@@ -363,6 +398,8 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 	new feature = featurelib_getFeatureByHandle(plugin);
 
 	GetNativeString(1, name, sizeof(name));
+
+
 
 	// Feature found?
 	if (feature != -1)
@@ -378,9 +415,13 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 		}
 	}
 
+
 	// Not found
 	return -1;
 }
+
+
+
 
 
 
@@ -397,6 +438,9 @@ public nativelib_GetFeatureBasename(Handle:plugin, numParams)
 }
 
 
+
+
+
 // Get points of a player
 public nativelib_GetClientStammPoints(Handle:plugin, numParams)
 {
@@ -410,6 +454,9 @@ public nativelib_GetClientStammPoints(Handle:plugin, numParams)
 
 	return -1;
 }
+
+
+
 
 
 // Get the block of a client
@@ -448,6 +495,10 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 }
 
 
+
+
+
+
 // Get the level of a client
 public nativelib_GetClientStammLevel(Handle:plugin, numParams)
 {
@@ -462,6 +513,10 @@ public nativelib_GetClientStammLevel(Handle:plugin, numParams)
 
 	return -1;
 }
+
+
+
+
 
 
 // Get the points a level needs
@@ -479,11 +534,19 @@ public nativelib_GetStammLevelPoints(Handle:plugin, numParams)
 }
 
 
+
+
+
+
 // Returns total count of levels
 public nativelib_GetStammLevelCount(Handle:plugin, numParams)
 {
 	return g_iLevels+g_iPLevels;
 }
+
+
+
+
 
 
 // Get the name of a level
@@ -502,11 +565,19 @@ public nativelib_GetStammLevelName(Handle:plugin, numParams)
 		return true;
 	}
 
+
+
 	// Not found -> save empty string
 	SetNativeString(2, "", len, false);	
 	
 	return false;
 }
+
+
+
+
+
+
 
 
 // Get the number of a level name
@@ -516,6 +587,8 @@ public nativelib_GetStammLevelNumber(Handle:plugin, numParams)
 	
 	GetNativeString(1, name, sizeof(name));
 	
+
+
 	// Loop through levels
 	for (new i=0; i < g_iLevels+g_iPLevels; i++)
 	{
@@ -525,9 +598,13 @@ public nativelib_GetStammLevelNumber(Handle:plugin, numParams)
 			return i+1;
 		}
 	}
-	
+
+
 	return 0;
 }
+
+
+
 
 
 // Checks if a level is private
@@ -535,14 +612,20 @@ public nativelib_IsLevelPrivate(Handle:plugin, numParams)
 {
 	new type = GetNativeCell(1);
 	
+
 	// greater than normal levels?
 	if (type > g_iLevels)
 	{
 		return true;
 	}
 
+
 	return false;
 }
+
+
+
+
 
 
 // Returns how a player get his points
@@ -552,11 +635,17 @@ public nativelib_GetStammType(Handle:plugin, numParams)
 }
 
 
+
+
+
 // Returns the game stamm is running on
 public nativelib_GetStammGame(Handle:plugin, numParams)
 {
 	return _:otherlib_getGame();
 }
+
+
+
 
 // Returns if the player want autoupdates
 public nativelib_AutoUpdate(Handle:plugin, numParams)
@@ -565,12 +654,18 @@ public nativelib_AutoUpdate(Handle:plugin, numParams)
 }
 
 
+
+
+
 // Start happy hour
 public nativelib_StartHappyHour(Handle:plugin, numParams)
 {
 	new time = GetNativeCell(1);
 	new factor = GetNativeCell(2);
 	
+
+
+
 	// Check for valid time and factor
 	if (time > 1)
 	{
@@ -583,6 +678,7 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 				g_iPoints = factor;
 				g_bHappyHourON = true;
 
+
 				// Delete old timer and start new
 				otherlib_checkTimer(g_hHappyTimer);
 				g_hHappyTimer = CreateTimer(float(time)*60, otherlib_StopHappyHour);
@@ -591,6 +687,9 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 				// Notice to all that happy hour sarted
 				nativelib_HappyStart(time, factor);
 				
+
+
+
 				// And announce to players
 				if (!g_bMoreColors)
 				{
@@ -604,12 +703,24 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 				return true;
 			}
 		}
-		else ThrowNativeError(2, "[ Stamm ] Factor must be greater than 1");
+		else
+		{
+			ThrowNativeError(2, "[ Stamm ] Factor must be greater than 1");
+		}
 	}
-	else ThrowNativeError(1, "[ Stamm ] Time must be greater than 1");
+	else 
+	{
+		ThrowNativeError(1, "[ Stamm ] Time must be greater than 1");
+	}
 	
+
+
 	return false;
 }
+
+
+
+
 
 
 // Ends happy hour
@@ -624,8 +735,14 @@ public nativelib_EndHappyHour(Handle:plugin, numParams)
 		return true;
 	}
 
+
 	return false;
 }
+
+
+
+
+
 
 
 // Checks whether a client want the feature
@@ -638,6 +755,7 @@ public nativelib_ClientWantStammFeature(Handle:plugin, numParams)
 	{
 		new feature = featurelib_getFeatureByHandle(plugin);
 
+
 		// Valid feature
 		if (feature != -1)
 		{
@@ -648,6 +766,10 @@ public nativelib_ClientWantStammFeature(Handle:plugin, numParams)
 	
 	return false;
 }
+
+
+
+
 
 
 // Add points
@@ -670,6 +792,9 @@ public nativelib_AddClientStammPoints(Handle:plugin, numParams)
 }
 
 
+
+
+
 // Delete Points
 public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 {
@@ -687,6 +812,10 @@ public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 
 	return false;
 }
+
+
+
+
 
 
 // Set points
@@ -715,6 +844,9 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 }
 
 
+
+
+
 // Add a Feature
 public nativelib_AddFeature(Handle:plugin, numParams)
 {
@@ -737,6 +869,11 @@ public nativelib_AddFeature(Handle:plugin, numParams)
 }
 
 
+
+
+
+
+
 // Add a text to display
 public nativelib_AddFeatureText(Handle:plugin, numParams)
 {
@@ -745,10 +882,13 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 	// Level to add
 	new level = GetNativeCell(1);
 	
+
+
 	// Get the description
 	GetNativeString(2, description, sizeof(description));
 	
 	new feature = featurelib_getFeatureByHandle(plugin);
+
 
 
 	// Valid feature?
@@ -759,8 +899,12 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 
 		Format(g_sFeatureHaveDesc[feature][level][desc], sizeof(g_sFeatureHaveDesc[][][]), description);
 
+
+
 		// Updated level count
 		g_FeatureList[feature][FEATURE_DESCS][level]++;
+
+
 
 		// For performance only 5 descriptions per level and feature
 		if (g_FeatureList[feature][FEATURE_DESCS][level] == 5)
@@ -771,8 +915,15 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 		return true;
 	}
 
+
+
 	return false;
 }
+
+
+
+
+
 
 
 // Checks if the players level is high enough, and he want the feature
@@ -784,6 +935,8 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 	if (clientlib_isValidClient(client))
 	{
 		new feature = featurelib_getFeatureByHandle(plugin);
+
+
 
 		// Found feature und block higher than zero
 		if (feature != -1 && GetNativeCell(2) > 0)
@@ -800,6 +953,9 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 }
 
 
+
+
+
 // Checks if a client is stamm valid
 public nativelib_IsClientValid(Handle:plugin, numParams)
 {
@@ -810,6 +966,10 @@ public nativelib_IsClientValid(Handle:plugin, numParams)
 }
 
 
+
+
+
+
 // Checks if a client has stamm admin flags
 public nativelib_IsClientStammAdmin(Handle:plugin, numParams)
 {
@@ -818,6 +978,9 @@ public nativelib_IsClientStammAdmin(Handle:plugin, numParams)
 	// Intern function
 	return clientlib_IsAdmin(client);
 }
+
+
+
 
 
 // Is Client VIP?
@@ -865,12 +1028,21 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 }
 
 
+
+
+
+
+
 // Stamm is loaded?
 public nativelib_IsLoaded(Handle:plugin, numParams)
 {
 	// yeah, just return the value
 	return g_sPluginStarted;
 }
+
+
+
+
 
 
 // Load a feature
@@ -895,6 +1067,10 @@ public nativelib_LoadFeature(Handle:plugin, numParams)
 }
 
 
+
+
+
+
 // Unload feature
 public nativelib_UnloadFeature(Handle:plugin, numParams)
 {
@@ -917,6 +1093,10 @@ public nativelib_UnloadFeature(Handle:plugin, numParams)
 }
 
 
+
+
+
+
 // Write something to the stamm log
 public nativelib_WriteToStammLog(Handle:plugin, numParams)
 {
@@ -925,12 +1105,19 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 
 	new bool:useDebug = GetNativeCell(1);
 
+
+
+
 	// Get basename
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
 	
 
+
 	// Format text parameter
 	FormatNativeString(0, 2, 3, sizeof(buffer), _, buffer);
+
+
+
 
 	// Write to debug only if debug is enabled
 	if (useDebug && g_bDebug)

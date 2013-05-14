@@ -431,11 +431,14 @@ public featurelib_UnloadFeature(Handle:plugin)
 	new index = featurelib_getFeatureByHandle(plugin);
 
 
+
 	// Unlload it
 	ServerCommand("sm plugins unload %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
 
 	// Mark as disabled
 	g_FeatureList[index][FEATURE_ENABLE] = 0;
+
+
 
 
 	// Announce unload
@@ -448,6 +451,7 @@ public featurelib_UnloadFeature(Handle:plugin)
 		MCPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
 	}
 }
+
 
 
 
@@ -504,6 +508,7 @@ public Action:featurelib_Load(args)
 		GetCmdArg(1, basename, sizeof(basename));
 
 
+
 		// Find the feature
 		for (new i=0; i < g_iFeatures; i++)
 		{
@@ -518,6 +523,7 @@ public Action:featurelib_Load(args)
 		}
 		
 
+
 		// Not found, search with real Basename
 		for (new i=0; i < g_iFeatures; i++)
 		{
@@ -529,6 +535,8 @@ public Action:featurelib_Load(args)
 				return Plugin_Handled;
 			}
 		}
+
+
 
 		// Not found, load it with sm
 		PrintToServer("Feature %s was not loaded before, try to load it via SM...", basename);
@@ -562,6 +570,7 @@ public Action:featurelib_UnLoad(args)
 		GetCmdArg(1, basename, sizeof(basename));
 
 
+
 		// Search it
 		for (new i=0; i < g_iFeatures; i++)
 		{
@@ -586,6 +595,8 @@ public Action:featurelib_UnLoad(args)
 				return Plugin_Handled;
 			}
 		}
+
+
 
 		// Doesn't found or already loaded
 		ReplyToCommand(0, "Error. Feature not found or already unloaded.");
@@ -620,6 +631,8 @@ public Action:featurelib_ReLoad(args)
 		GetCmdArg(1, basename, sizeof(basename));
 
 
+
+
 		// Loops again, see above!
 		for (new i=0; i < g_iFeatures; i++)
 		{
@@ -631,6 +644,8 @@ public Action:featurelib_ReLoad(args)
 			}
 		}
 		
+
+
 		for (new i=0; i < g_iFeatures; i++)
 		{
 			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
@@ -652,6 +667,7 @@ public Action:featurelib_ReLoad(args)
 
 	return Plugin_Handled;
 }
+
 
 
 

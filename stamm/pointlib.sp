@@ -26,8 +26,12 @@
 // Use semicolon
 #pragma semicolon 1
 
+
+
 new Handle:pointlib_timetimer;
 new Handle:pointlib_showpointer;
+
+
 
 
 // Init. pointslib
@@ -51,6 +55,9 @@ public pointlib_Start()
 }
 
 
+
+
+
 // Handle timer to add points
 public Action:pointlib_PlayerTime(Handle:timer)
 {
@@ -67,8 +74,12 @@ public Action:pointlib_PlayerTime(Handle:timer)
 		}
 	}
 
+
 	return Plugin_Continue;
 }
+
+
+
 
 
 // Timer to show points
@@ -85,6 +96,10 @@ public Action:pointlib_PointShower(Handle:timer)
 
 
 
+
+
+
+
 // add points to a player
 public Action:pointlib_AddPlayerPoints(args)
 {
@@ -93,18 +108,25 @@ public Action:pointlib_AddPlayerPoints(args)
 		decl String:useridString[64];
 		decl String:numberString[25];
 		
+
+
 		// Get userid or steamid and number
 		GetCmdArg(1, useridString, sizeof(useridString));
 		GetCmdArg(2, numberString, sizeof(numberString));
 
+
+
 		// Get number
 		new number = StringToInt(numberString);
+
+
 
 		// check if it's a userid
 		if (StrContains(useridString, "STEAM_", false) < 0)
 		{
 			new client = GetClientOfUserId(StringToInt(useridString));
 			
+
 			// Add points
 			if (clientlib_isValidClient(client))
 			{
@@ -125,6 +147,8 @@ public Action:pointlib_AddPlayerPoints(args)
 			// get client of steamid
 			new client = clientlib_IsSteamIDConnected(useridString);
 
+
+
 			// Found on server?
 			if (client > 0)
 			{
@@ -136,7 +160,11 @@ public Action:pointlib_AddPlayerPoints(args)
 				// Else update on database
 				decl String:query[128];
 
+
+
 				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_sTableName, number, useridString);
+
+
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
@@ -158,6 +186,11 @@ public Action:pointlib_AddPlayerPoints(args)
 }
 
 
+
+
+
+
+
 // Set Player points
 public Action:pointlib_SetPlayerPoints(args)
 {
@@ -166,16 +199,24 @@ public Action:pointlib_SetPlayerPoints(args)
 		decl String:useridString[64];
 		decl String:numberString[25];
 		
+
+
 		GetCmdArg(1, useridString, sizeof(useridString));
 		GetCmdArg(2, numberString, sizeof(numberString));
 
+
+
 		new number = StringToInt(numberString);
+
+
 
 		// Steamid handle
 		if (StrContains(useridString, "STEAM_", false) < 0)
 		{
 			new client = GetClientOfUserId(StringToInt(useridString));
 			
+
+
 			// valid client and number greate or equal zero
 			if (clientlib_isValidClient(client) && number >= 0)
 			{
@@ -196,6 +237,8 @@ public Action:pointlib_SetPlayerPoints(args)
 
 			new client = clientlib_IsSteamIDConnected(useridString);
 
+
+
 			if (client > 0)
 			{
 				new diff = number - g_iPlayerPoints[client];
@@ -207,6 +250,8 @@ public Action:pointlib_SetPlayerPoints(args)
 				decl String:query[128];
 
 				Format(query, sizeof(query), "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'", g_sTableName, number, useridString);
+
+
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
@@ -222,8 +267,14 @@ public Action:pointlib_SetPlayerPoints(args)
 		ReplyToCommand(0, "Usage: stamm_set_points <userid|steamid> <points>");
 	}
 
+
+
 	return Plugin_Handled;
 }
+
+
+
+
 
 
 // And delete points
@@ -234,11 +285,16 @@ public Action:pointlib_DelPlayerPoints(args)
 		decl String:useridString[64];
 		decl String:numberString[25];
 		
+
+
 		GetCmdArg(1, useridString, sizeof(useridString));
 		GetCmdArg(2, numberString, sizeof(numberString));
 
+
 		new number = StringToInt(numberString) *-1;
 		
+
+
 		// Again steamid handle
 		if (StrContains(useridString, "STEAM_", false) < 0)
 		{
@@ -259,7 +315,11 @@ public Action:pointlib_DelPlayerPoints(args)
 			// Check if client is ingame -> when not delete on database
 			ReplaceString(useridString, sizeof(useridString), "STEAM_1:", "STEAM_0:", false);
 
+
+
 			new client = clientlib_IsSteamIDConnected(useridString);
+
+
 
 			if (client > 0)
 			{
@@ -269,7 +329,11 @@ public Action:pointlib_DelPlayerPoints(args)
 			{
 				decl String:query[128];
 
+
+
 				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_sTableName, number, useridString);
+
+
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
@@ -291,6 +355,10 @@ public Action:pointlib_DelPlayerPoints(args)
 
 
 
+
+
+
+
 // Points handler
 public Action:pointlib_ShowPoints2(Handle:timer, any:client)
 {
@@ -299,6 +367,10 @@ public Action:pointlib_ShowPoints2(Handle:timer, any:client)
 	
 	return Plugin_Handled;
 }
+
+
+
+
 
 
 // Console command to show points
@@ -320,6 +392,8 @@ public Action:pointlib_ShowPoints(client, arg)
 
 
 
+
+
 // Give points to player
 public pointlib_GivePlayerPoints(client, number, bool:check)
 {
@@ -330,6 +404,8 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 		number = -g_iPlayerPoints[client];
 	}
 
+
+
 	// Check if a feature stop getting points
 	if (check)
 	{
@@ -338,12 +414,15 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 		// Get result of API
 		result = nativelib_PublicPlayerGetPointsPlugin(client, number);
 		
+
 		// maybe block?
 		if (result != Plugin_Changed && result != Plugin_Continue)
 		{
 			return;
 		}
 	}
+
+
 
 	// Handle less than zero
 	if (number < 0 && g_iPlayerPoints[client] + number < 0)
@@ -356,13 +435,20 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 		g_iPlayerPoints[client] = g_iPlayerPoints[client] + number;
 	}
 
+
+
 	// Check vip and save him
 	clientlib_CheckVip(client);
 	clientlib_SavePlayer(client, number);
 
+
 	// Notice to API
 	nativelib_PublicPlayerGetPoints(client, number);
 }
+
+
+
+
 
 
 // Show points
@@ -373,16 +459,24 @@ public pointlib_ShowPlayerPoints(client, bool:only)
 		decl String:name[MAX_NAME_LENGTH+1];
 		decl String:vip[32];
 
+
+
 		GetClientName(client, name, sizeof(name));
 		
+
+
 		// Get points
 		new restpoints = 0;
 		new index = g_iPlayerLevel[client];
 		new points = g_iPlayerPoints[client];
 
 
+
 		// Format VIP String
 		Format(vip, sizeof(vip), " %T", "VIP", client);
+
+
+
 
 		
 		// If not highest level, calculate rest points
@@ -390,6 +484,9 @@ public pointlib_ShowPlayerPoints(client, bool:only)
 		{
 			restpoints = g_iLevelPoints[index] - g_iPlayerPoints[client];
 		}
+
+
+
 
 		// Show to all or only to client
 		if (!g_bSeeText || only)

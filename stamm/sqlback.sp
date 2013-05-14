@@ -26,6 +26,9 @@
 #pragma semicolon 1
 
 
+
+
+
 // Get current databe version
 public sqlback_getDatabaseVersion()
 {
@@ -33,6 +36,9 @@ public sqlback_getDatabaseVersion()
 	{
 		decl String:query[128];
 		
+
+
+
 		// Get highest version
 		Format(query, sizeof(query), "SELECT `version` FROM `%s` ORDER BY `version` DESC LIMIT 1", g_sTableName);
 		
@@ -42,6 +48,10 @@ public sqlback_getDatabaseVersion()
 		}
 
 		SQL_TQuery(sqllib_db, sqlback_getVersion, query);
+
+
+
+
 
 		// Get running happy hour
 		Format(query, sizeof(query), "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1", g_sTableName, GetTime());
@@ -54,6 +64,12 @@ public sqlback_getDatabaseVersion()
 		SQL_TQuery(sqllib_db, sqlback_getHappy, query);
 	}
 }
+
+
+
+
+
+
 
 // get the version
 public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:data)
@@ -69,12 +85,19 @@ public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:d
 		Format(g_sDatabaseVersion, sizeof(g_sDatabaseVersion), "0.0");
 	}
 
+
+
 	// We need only 3 numbers
 	g_sDatabaseVersion[4] = '\0';
+
+
 
 	// Check if we need to modify
 	sqlback_ModifyTableBackwards();
 }
+
+
+
 
 // Get running happy hour
 public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:data)
@@ -88,6 +111,8 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 
 		new time = GetTime();
 
+
+
 		// is end in future?
 		if (end > time)
 		{
@@ -95,6 +120,9 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 		}
 	}
 }
+
+
+
 
 
 // Sync steamid game indepentend
@@ -106,25 +134,41 @@ public bool:sqlback_syncSteamid(client, const String:version[])
 		decl String:query[128];
 		decl String:steamid[64];
 		
+
+
+
 		// Get new steamid and replace
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		ReplaceString(steamid, sizeof(steamid), "STEAM_0:", "STEAM_1:");
 		
+
+
 		// get points of maybe existing STEAM_1: entry
 		Format(query, sizeof(query), "SELECT `points` FROM `%s` WHERE `steamid`='%s'", g_sTableName, steamid);
 		
+
+
 		if (g_bDebug) 
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
 
+
 		SQL_TQuery(sqllib_db, sqlback_syncSteamid1, query, client);
+
+
 
 		return true;
 	}
 
+
+
 	return false;
 }
+
+
+
+
 
 // SQL handler
 public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any:client)
@@ -135,11 +179,18 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 		decl String:query[128];
 		decl String:steamid[64];
 		
+
+
 		// Updated client points of STEAM_1: entry
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		ReplaceString(steamid, sizeof(steamid), "STEAM_0:", "STEAM_1:");
 		
+
 		pointlib_GivePlayerPoints(client, SQL_FetchInt(hndl, 0), false);
+
+
+
+
 
 		// Delete STEAM_1: entry
 		Format(query, sizeof(query), "DELETE FROM `%s` WHERE `steamid`='%s'", g_sTableName, steamid);
@@ -153,11 +204,19 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 	}
 }
 
+
+
+
+
+
+
 // Version < 2.1
 public sqlback_ModifyVersion()
 {
 	decl String:query[128];
 			
+
+
 	// Add version column
 	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `version` FLOAT NOT NULL DEFAULT 0.0", g_sTableName);
 	
@@ -168,6 +227,9 @@ public sqlback_ModifyVersion()
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
+
+
+
 	// Add last visit
 	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i", g_sTableName, GetTime());
 	
@@ -177,6 +239,8 @@ public sqlback_ModifyVersion()
 	}
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
 
 
 	// Drop payed	
@@ -190,6 +254,9 @@ public sqlback_ModifyVersion()
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
 
+
+
+
 	// Add admin
 	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
 	
@@ -200,6 +267,12 @@ public sqlback_ModifyVersion()
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 }
+
+
+
+
+
+
 
 
 // Check for needed modify
@@ -246,6 +319,8 @@ public sqlback_ModifyTableBackwards()
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
 
+
+
 		// Start stamm
 		stammStarted();
 	}
@@ -263,6 +338,9 @@ public sqlback_ModifyTableBackwards()
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
+
+
+
 		// Start stamm
 		stammStarted();
 	}
@@ -279,6 +357,9 @@ public sqlback_ModifyTableBackwards()
 		}
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
+
 
 		// Start stamm
 		stammStarted();
@@ -298,6 +379,8 @@ public sqlback_ModifyTableBackwards()
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
 
+
+
 		// Add admin
 		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
 		
@@ -307,6 +390,9 @@ public sqlback_ModifyTableBackwards()
 		}
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
+
 
 
 		// Start stamm
@@ -321,6 +407,9 @@ public sqlback_ModifyTableBackwards()
 			// Modify
 			sqlback_ModifyVersion();
 			
+
+
+
 			// Maybe we came from and old 1. version?
 			Format(query, sizeof(query), "SELECT `points` FROM `%s`", g_sTableName);
 			
@@ -337,6 +426,9 @@ public sqlback_ModifyTableBackwards()
 
 
 
+
+
+
 // Check for very old version
 public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
@@ -344,6 +436,9 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[600];
 		
+
+
+
 		// Create new table as backup
 		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_sTableName, GetTime());
 		
@@ -369,24 +464,52 @@ public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[600];
 		
+
+
 		// Insert from old database
-		if (g_iVipType == 1) 
+		if (g_iVipType == 1)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills` FROM `%s`", g_sTableName, g_sTableName);
-		else if (g_iVipType == 2) 
+		}
+
+		else if (g_iVipType == 2)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds` FROM `%s`", g_sTableName, g_sTableName);
-		else if (g_iVipType == 3) 
+		}
+
+		else if (g_iVipType == 3)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `time` FROM `%s`", g_sTableName, g_sTableName);
-		else if (g_iVipType == 4) 
+		}
+
+		else if (g_iVipType == 4)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds` FROM `%s`", g_sTableName, g_sTableName);
-		else if (g_iVipType == 5) 
+		}
+
+		else if (g_iVipType == 5)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`time` FROM `%s`", g_sTableName, g_sTableName);
-		else if (g_iVipType == 6) 
+		}
+
+		else if (g_iVipType == 6)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds`+`time` FROM `%s`", g_sTableName, g_sTableName);
-		else if (g_iVipType == 7) 
+		}
+
+		else if (g_iVipType == 7)
+		{
 			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`", g_sTableName, g_sTableName);
-		else 
+		}
+
+		else
+		{
 			return;
+		}
 			
+
+
+
 		if (g_bDebug) 
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -401,6 +524,11 @@ public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:d
 	}
 }
 
+
+
+
+
+
 // Next step
 public sqlback_SQLModify3(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
@@ -408,6 +536,9 @@ public sqlback_SQLModify3(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[128];
 		
+
+
+
 		// Rename old database to old
 		Format(query, sizeof(query), "ALTER TABLE `%s` RENAME TO `%s_old`", g_sTableName, g_sTableName);
 		
@@ -425,6 +556,11 @@ public sqlback_SQLModify3(Handle:owner, Handle:hndl, const String:error[], any:d
 }
 
 
+
+
+
+
+
 // Next step
 public sqlback_SQLModify4(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
@@ -432,6 +568,9 @@ public sqlback_SQLModify4(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[128];
 		
+
+
+
 		// Make new database to main
 		Format(query, sizeof(query), "ALTER TABLE `%s_backup` RENAME TO `%s`", g_sTableName, g_sTableName);
 		
@@ -447,6 +586,11 @@ public sqlback_SQLModify4(Handle:owner, Handle:hndl, const String:error[], any:d
 		SetFailState("Error converting Stamm to the newest database structur. Error:   %s", error);
 	}
 }
+
+
+
+
+
 
 public sqlback_SQLModify5(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
