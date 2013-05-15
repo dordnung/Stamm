@@ -299,7 +299,7 @@ public Action:clientlib_deleteOlds(Handle:timer, any:data)
 
 
 	// Delete all players less this line
-	Format(query, sizeof(query), "DELETE FROM `%s` WHERE `last_visit` < %i", g_sTableName, lastEntry);
+	Format(query, sizeof(query), g_sDeleteOldQuery, g_sTableName, lastEntry);
 
 
 
@@ -441,7 +441,7 @@ public clientlib_CheckVip(client)
 
 
 			// Update client on database
-			Format(setquery, sizeof(setquery), "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'", g_sTableName, levelstufe, steamid);
+			Format(setquery, sizeof(setquery), g_sUpdatePlayerQuery, g_sTableName, levelstufe, steamid);
 			
 			if (g_bDebug) 
 			{
@@ -468,7 +468,7 @@ public clientlib_CheckVip(client)
 
 
 			// Update to database
-			Format(queryback, sizeof(queryback), "UPDATE `%s` SET `level`=0 WHERE `steamid`='%s'", g_sTableName, steamid);
+			Format(queryback, sizeof(queryback), g_sUpdatePlayerQuery, g_sTableName, 0, steamid);
 			
 			if (g_bDebug) 
 			{
@@ -479,6 +479,7 @@ public clientlib_CheckVip(client)
 		}
 	}
 }
+
 
 
 
@@ -504,12 +505,12 @@ public clientlib_SavePlayer(client, number)
 		// Zero points only?
 		if (g_iPlayerPoints[client] == 0)
 		{
-			Format(query, sizeof(query), "UPDATE `%s` SET `points`=0 ", g_sTableName);
+			Format(query, sizeof(query), g_sUpdateSetPointsZeroQuery, g_sTableName);
 		}
 		else
 		{
 			// Add new points
-			Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) ", g_sTableName, number);
+			Format(query, sizeof(query), g_sUpdateAddPointsQuery, g_sTableName, number);
 		}
 
 
@@ -541,6 +542,9 @@ public clientlib_SavePlayer(client, number)
 		nativelib_ClientSave(client);
 	}
 }
+
+
+
 
 
 

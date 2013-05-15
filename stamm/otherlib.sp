@@ -295,7 +295,7 @@ public otherlib_EndHappyHour()
 
 
 		// Delete out of database
-		Format(query, sizeof(query), "DELETE FROM `%s_happy`", g_sTableName);
+		Format(query, sizeof(query), g_sDeleteHappyQuery, g_sTableName);
 		
 		// Announce step
 		if (g_bDebug) 
@@ -357,7 +357,7 @@ public otherlib_StartHappyHour(time, factor)
 
 
 	// Insert new happy gour
-	Format(query, sizeof(query), "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)", g_sTableName, GetTime() + time, factor);
+	Format(query, sizeof(query), g_sInsertHappyQuery, g_sTableName, GetTime() + time, factor);
 	
 	if (g_bDebug) 
 	{

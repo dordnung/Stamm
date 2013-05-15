@@ -108,7 +108,7 @@ public sqllib_LoadDB()
 
 
 		// Create table if it's not exists
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_sTableName, GetTime());
+		Format(query, sizeof(query), g_sCreateTableQuery, g_sTableName, GetTime());
 		
 		if (g_bDebug) 
 		{
@@ -133,7 +133,7 @@ public sqllib_LoadDB()
 
 
 		// Create happy hour table
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)", g_sTableName);
+		Format(query, sizeof(query), g_sCreatHappyQuery, g_sTableName);
 		
 		if (g_bDebug) 
 		{
@@ -211,7 +211,7 @@ public sqllib_InsertPlayer(client)
 
 
 
-		Format(query, sizeof(query), "%s FROM `%s` WHERE steamid = '%s'", query, g_sTableName, steamid);
+		Format(query, sizeof(query), g_sInsertMiddleQuery, query, g_sTableName, steamid);
 		
 		if (g_bDebug) 
 		{
@@ -242,11 +242,11 @@ public sqllib_AddColumn(String:name[], bool:standard)
 		// Standard off or on?
 		if (standard)
 		{
-			Format(query, sizeof(query), "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT 1", g_sTableName, name);
+			Format(query, sizeof(query), g_sAlterFeatureQuery, g_sTableName, name, 1);
 		}
 		else
 		{
-			Format(query, sizeof(query), "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT 0", g_sTableName, name);
+			Format(query, sizeof(query), g_sAlterFeatureQuery, g_sTableName, name, 0);
 		}
 
 
@@ -307,7 +307,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			if (!SQL_FetchRow(hndl))
 			{
 				// Insert the player 
-				Format(query, sizeof(query), "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)", g_sTableName, steamid, name2, (clientlib_IsAdmin(client) ? 1 : 0), GetTime());
+				Format(query, sizeof(query), g_sInsertPlayerQuery, g_sTableName, steamid, name2, (clientlib_IsAdmin(client) ? 1 : 0), GetTime());
 				
 				if (g_bDebug) 
 				{
@@ -334,8 +334,8 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// Client is ready
 				clientlib_ClientReady(client);
 
-				// Sync the steamid with version 0.0
-				sqlback_syncSteamid(client, "0.0");
+				// Sync the steamid with version 0.00
+				sqlback_syncSteamid(client, "0.00");
 			}
 			else
 			{
@@ -367,7 +367,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 
 				// Update version, name and last visit
-				Format(query, sizeof(query), "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'", g_sTableName, name2, (clientlib_IsAdmin(client) ? 1 : 0), g_sPluginVersion, GetTime(), steamid);
+				Format(query, sizeof(query), g_sUpdatePlayer2Query, g_sTableName, name2, (clientlib_IsAdmin(client) ? 1 : 0), g_sPluginVersion, GetTime(), steamid);
 				
 				if (g_bDebug) 
 				{
@@ -416,7 +416,7 @@ public Action:sqllib_GetVipTop(client, args)
 
 
 		// Select all vips DESC by points
-		Format(query, sizeof(query), "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10", g_sTableName);
+		Format(query, sizeof(query), g_sSelectTop10Query, g_sTableName);
 		
 		if (g_bDebug) 
 		{
@@ -478,8 +478,10 @@ public Action:sqllib_GetVipRank(client, args)
 	{
 		decl String:query[128];
 		
+
+
 		// Get the count of players with points higher than that of the client
-		Format(query, sizeof(query), "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i", g_sTableName, g_iPlayerPoints[client]);
+		Format(query, sizeof(query), g_sSelectRankQuery, g_sTableName, g_iPlayerPoints[client]);
 		
 		if (g_bDebug) 
 		{
@@ -713,7 +715,7 @@ public Action:sqllib_convertDB(args)
 
 	
 	// Select data from database
-	Format(query, sizeof(query), "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`", g_sTableName);
+	Format(query, sizeof(query), g_sSelectPlayerQuery, g_sTableName);
 
 	// Execute
 	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile, query);
@@ -763,7 +765,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 
 
 			// Write create statement
-			WriteFileLine(file, "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`));", g_sTableName, GetTime());
+			WriteFileLine(file, g_sCreateTableQuery, g_sTableName, GetTime());
 
 
 
@@ -804,7 +806,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 					// Escape Sqlite
 					EscapeStringSQLite(name, name2, sizeof(name2), true);
 
-					WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES ('%s', %i, %i, '%s', %s, %i);", g_sTableName, steamid, level, points, name2, versionS, last);
+					WriteFileLine(file, g_sInsertPlayerSaveQuery, g_sTableName, steamid, level, points, name2, versionS, last);
 				}
 				else
 				{
@@ -815,19 +817,19 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 					if (counter == 0)
 					{
 						// new line
-						WriteFileLine(file, "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES", g_sTableName);
+						WriteFileLine(file, g_sInsertPlayerSave2Query, g_sTableName);
 					}
 
 					// Check if 1000 reached
 					if (++counter == 1000 || !SQL_MoreRows(hndl))
 					{
-						WriteFileLine(file, "('%s', %i, %i, '%s', %s, %i);", steamid, level, points, name2, versionS, last);
+						WriteFileLine(file, g_sInsertPlayerSave2DataQuery, steamid, level, points, name2, versionS, last);
 
 						counter = 0;
 					}
 					else
 					{
-						WriteFileLine(file, "('%s', %i, %i, '%s', %s, %i),", steamid, level, points, name2, versionS, last);
+						WriteFileLine(file, g_sInsertPlayerSave2Data2Query, steamid, level, points, name2, versionS, last);
 					}
 				}
 

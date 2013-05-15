@@ -279,8 +279,8 @@ public CheckStammFolders()
 	// Check for old folder
 	if (DirExists(oldFolder2) || DirExists(oldFolder))
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\"!", oldFolder2);
-		PrintToServer("[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\"!", oldFolder2);
+		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\". Then delete it!", oldFolder2);
+		PrintToServer("[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\". Then delete it!", oldFolder2);
 	}
 }
 

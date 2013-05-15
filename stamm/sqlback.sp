@@ -40,7 +40,7 @@ public sqlback_getDatabaseVersion()
 
 
 		// Get highest version
-		Format(query, sizeof(query), "SELECT `version` FROM `%s` ORDER BY `version` DESC LIMIT 1", g_sTableName);
+		Format(query, sizeof(query), g_sSelectVersionQuery, g_sTableName);
 		
 		if (g_bDebug) 
 		{
@@ -54,7 +54,7 @@ public sqlback_getDatabaseVersion()
 
 
 		// Get running happy hour
-		Format(query, sizeof(query), "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1", g_sTableName, GetTime());
+		Format(query, sizeof(query), g_sSelectHappyQuery, g_sTableName, GetTime());
 		
 		if (g_bDebug) 
 		{
@@ -74,21 +74,26 @@ public sqlback_getDatabaseVersion()
 // get the version
 public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
+	decl String:version[10];
+
+
 	// Found a value?
 	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl))
 	{
-		SQL_FetchString(hndl, 0, g_sDatabaseVersion, sizeof(g_sDatabaseVersion));
+		SQL_FetchString(hndl, 0, version, sizeof(version));
 	}
 	else
 	{
 		// Not found -> set to 0.0
-		Format(g_sDatabaseVersion, sizeof(g_sDatabaseVersion), "0.0");
+		Format(version, sizeof(version), "0.00");
 	}
 
 
 
-	// We need only 3 numbers
-	g_sDatabaseVersion[4] = '\0';
+	// Convert Version
+	g_iDatabaseVersion[MAJOR] = StringToInt(version[0]);
+	g_iDatabaseVersion[MINOR] = StringToInt(version[2]);
+	g_iDatabaseVersion[PATCH] = StringToInt(version[3]);
 
 
 
@@ -129,7 +134,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 public bool:sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
-	if (sqllib_db != INVALID_HANDLE && !StrEqual(version, "2.10") && !StrEqual(version, "2.13") && !StrEqual(version, "2.14") && !StrEqual(version, "2.15") && !StrEqual(version, "2.16") && !StrEqual(version, "2.17") && !StrEqual(version, "2.18"))
+	if (sqllib_db != INVALID_HANDLE && StringToInt(version[0]) <= 2 && StringToInt(version[2]) < 1 && StringToInt(version[3]) <= 9)
 	{
 		decl String:query[128];
 		decl String:steamid[64];
@@ -144,7 +149,7 @@ public bool:sqlback_syncSteamid(client, const String:version[])
 
 
 		// get points of maybe existing STEAM_1: entry
-		Format(query, sizeof(query), "SELECT `points` FROM `%s` WHERE `steamid`='%s'", g_sTableName, steamid);
+		Format(query, sizeof(query), g_sSelectPointsQuery, g_sTableName, steamid);
 		
 
 
@@ -193,7 +198,7 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 
 
 		// Delete STEAM_1: entry
-		Format(query, sizeof(query), "DELETE FROM `%s` WHERE `steamid`='%s'", g_sTableName, steamid);
+		Format(query, sizeof(query), g_sDeletePlayerQuery, g_sTableName, steamid);
 		
 		if (g_bDebug) 
 		{
@@ -209,107 +214,18 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 
 
 
-
-// Version < 2.1
-public sqlback_ModifyVersion()
-{
-	decl String:query[128];
-			
-
-
-	// Add version column
-	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `version` FLOAT NOT NULL DEFAULT 0.0", g_sTableName);
-	
-	if (g_bDebug) 
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
-
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-	// Add last visit
-	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i", g_sTableName, GetTime());
-	
-	if (g_bDebug) 
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
-
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-	// Drop payed	
-	Format(query, sizeof(query), "ALTER TABLE `%s` DROP `payed`", g_sTableName);
-	
-	if (g_bDebug) 
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
-
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-
-	// Add admin
-	Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
-	
-	if (g_bDebug) 
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
-
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-}
-
-
-
-
-
-
-
-
 // Check for needed modify
 public sqlback_ModifyTableBackwards()
 {
-	decl String:query[128];
-
-	// We want an detailed overview, so add all version Strings
-	// Version 2.18
-	if (StrEqual(g_sDatabaseVersion, "2.18"))
-	{
-		// Start stamm
-		stammStarted();
-	}
+	decl String:query[256];
 
 
-	// Version 2.17
-	else if (StrEqual(g_sDatabaseVersion, "2.17"))
-	{
-		// Start stamm
-		stammStarted();
-	}
 
-
-	// Version 2.16
-	else if (StrEqual(g_sDatabaseVersion, "2.16"))
-	{
-		// Start stamm
-		stammStarted();
-	}
-
-
-	// Version 2.15
-	else if (StrEqual(g_sDatabaseVersion, "2.15"))
+	// Version <= 2.15
+	if (g_iDatabaseVersion[MAJOR] <= 2 && g_iDatabaseVersion[MINOR] <= 1 && g_iDatabaseVersion[PATCH] <= 5)
 	{
 		// Add admin
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
+		Format(query, sizeof(query), g_sAlterAdminQuery, g_sTableName);
 		
 		if (g_bDebug) 
 		{
@@ -317,59 +233,16 @@ public sqlback_ModifyTableBackwards()
 		}
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-		// Start stamm
-		stammStarted();
 	}
 
-	// Version 2.14
-	else if (StrEqual(g_sDatabaseVersion, "2.14"))
-	{
-		// Add admin
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
-		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
-		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
 
 
-
-		// Start stamm
-		stammStarted();
-	}
-
-	// Version 2.13
-	else if (StrEqual(g_sDatabaseVersion, "2.13"))
-	{
-		// Add admin
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
-		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
-		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-		// Start stamm
-		stammStarted();
-	}
-
-	// Version 2.10
-	else if (StrEqual(g_sDatabaseVersion, "2.10"))
+	// Version <= 2.10
+	if (g_iDatabaseVersion[MAJOR] <= 2 && g_iDatabaseVersion[MINOR] <= 1 && g_iDatabaseVersion[PATCH] <= 0)
 	{
 		// Add last visit
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i", g_sTableName, GetTime());
+		Format(query, sizeof(query), g_sAlterLastVisitQuery, g_sTableName, GetTime());
 		
 		if (g_bDebug) 
 		{
@@ -377,41 +250,45 @@ public sqlback_ModifyTableBackwards()
 		}
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-		// Add admin
-		Format(query, sizeof(query), "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0", g_sTableName);
-		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
-		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
-
-
-
-
-
-		// Start stamm
-		stammStarted();
 	}
 
+
+
+
 	// Version < 2.1
-	else
+	if (g_iDatabaseVersion[MAJOR] <= 2 && g_iDatabaseVersion[MINOR] < 1 && g_iDatabaseVersion[PATCH] <= 9)
 	{
 		if (sqllib_db != INVALID_HANDLE)
 		{
-			// Modify
-			sqlback_ModifyVersion();
+			// Add version column
+			Format(query, sizeof(query), g_sAlterVersionQuery, g_sTableName);
 			
+			if (g_bDebug) 
+			{
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
+			}
+
+			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+
+
+
+			// Drop payed	
+			Format(query, sizeof(query), g_sAlterPayedQuery, g_sTableName);
+			
+			if (g_bDebug) 
+			{
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
+			}
+
+			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+			
+
+
 
 
 
 			// Maybe we came from and old 1. version?
-			Format(query, sizeof(query), "SELECT `points` FROM `%s`", g_sTableName);
+			Format(query, sizeof(query), g_sSelectAllPointsQuery, g_sTableName);
 			
 			if (g_bDebug) 
 			{
@@ -420,6 +297,11 @@ public sqlback_ModifyTableBackwards()
 
 			SQL_TQuery(sqllib_db, sqlback_SQLModify1, query);
 		}
+	}
+	else
+	{
+		// Start stamm
+		stammStarted();
 	}
 }
 
@@ -440,7 +322,7 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 
 
 		// Create new table as backup
-		Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))", g_sTableName, GetTime());
+		Format(query, sizeof(query), g_sCreateBackupQuery, g_sTableName, GetTime());
 		
 		if (g_bDebug) 
 		{
@@ -457,6 +339,8 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 }
 
 
+
+
 // Convert from old database
 public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
@@ -469,37 +353,37 @@ public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:d
 		// Insert from old database
 		if (g_iVipType == 1)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup1Query, g_sTableName, g_sTableName);
 		}
 
 		else if (g_iVipType == 2)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup2Query, g_sTableName, g_sTableName);
 		}
 
 		else if (g_iVipType == 3)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `time` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup3Query, g_sTableName, g_sTableName);
 		}
 
 		else if (g_iVipType == 4)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup4Query, g_sTableName, g_sTableName);
 		}
 
 		else if (g_iVipType == 5)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`time` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup5Query, g_sTableName, g_sTableName);
 		}
 
 		else if (g_iVipType == 6)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds`+`time` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup6Query, g_sTableName, g_sTableName);
 		}
 
 		else if (g_iVipType == 7)
 		{
-			Format(query, sizeof(query), "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`", g_sTableName, g_sTableName);
+			Format(query, sizeof(query), g_sInsertBackup7Query, g_sTableName, g_sTableName);
 		}
 
 		else
@@ -540,7 +424,7 @@ public sqlback_SQLModify3(Handle:owner, Handle:hndl, const String:error[], any:d
 
 
 		// Rename old database to old
-		Format(query, sizeof(query), "ALTER TABLE `%s` RENAME TO `%s_old`", g_sTableName, g_sTableName);
+		Format(query, sizeof(query), g_sAlterRenameQuery, g_sTableName, g_sTableName);
 		
 		if (g_bDebug) 
 		{
@@ -572,7 +456,7 @@ public sqlback_SQLModify4(Handle:owner, Handle:hndl, const String:error[], any:d
 
 
 		// Make new database to main
-		Format(query, sizeof(query), "ALTER TABLE `%s_backup` RENAME TO `%s`", g_sTableName, g_sTableName);
+		Format(query, sizeof(query), g_sAlterRename2Query, g_sTableName, g_sTableName);
 		
 		if (g_bDebug) 
 		{

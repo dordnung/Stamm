@@ -162,7 +162,7 @@ public Action:pointlib_AddPlayerPoints(args)
 
 
 
-				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_sTableName, number, useridString);
+				Format(query, sizeof(query), g_sUpdateAddPointsSteamidQuery, g_sTableName, number, useridString);
 
 
 
@@ -249,7 +249,7 @@ public Action:pointlib_SetPlayerPoints(args)
 			{
 				decl String:query[128];
 
-				Format(query, sizeof(query), "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'", g_sTableName, number, useridString);
+				Format(query, sizeof(query), g_sUpdateSetPointsQuery, g_sTableName, number, useridString);
 
 
 
@@ -331,7 +331,7 @@ public Action:pointlib_DelPlayerPoints(args)
 
 
 
-				Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'", g_sTableName, number, useridString);
+				Format(query, sizeof(query), g_sUpdateAddPointsSteamidQuery, g_sTableName, number, useridString);
 
 
 

@@ -30,6 +30,13 @@
 
 
 
+#define MAJOR 0
+#define MINOR 1
+#define PATCH 2
+
+
+
+
 
 // This we need to save all information about a feature
 enum FeatureEnum
@@ -88,6 +95,7 @@ new g_iHappyNumber[MAXPLAYERS + 1];
 new g_iHappyFactor[MAXPLAYERS + 1];
 new g_iPlayerPoints[MAXPLAYERS + 1];
 new g_iPlayerLevel[MAXPLAYERS + 1];
+new g_iDatabaseVersion[3];
 new g_iPoints;
 new StammGames:g_iGameID;
 
@@ -122,7 +130,6 @@ new String:g_sChange[32];
 new String:g_sChangeF[32];
 new String:g_sStammTag[64];
 new String:g_sAdminFlag[26];
-new String:g_sDatabaseVersion[10];
 new String:g_sGiveFlagAdmin[26];
 
 
@@ -156,3 +163,62 @@ new bool:g_bMoreColors;
 // Global handles
 new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;
+
+
+
+
+
+
+
+// Define here the SQL querys
+new String:g_sCreateBackupQuery[] = "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(255) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))";
+new String:g_sCreateTableQuery[] = "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))";
+new String:g_sCreatHappyQuery[] = "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)";
+
+
+new String:g_sDeleteOldQuery[] = "DELETE FROM `%s` WHERE `last_visit` < %i";
+new String:g_sDeletePlayerQuery[] = "DELETE FROM `%s` WHERE `steamid`='%s'";
+new String:g_sDeleteHappyQuery[] = "DELETE FROM `%s_happy`";
+
+
+new String:g_sUpdatePlayerQuery[] = "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'";
+new String:g_sUpdateSetPointsLevelZeroQuery[] = "UPDATE `%s` SET `level`=0,`points`=0 WHERE `steamid`='%s'";
+new String:g_sUpdateSetPointsZeroQuery[] = "UPDATE `%s` SET `points`=0 ";
+new String:g_sUpdateSetPointsQuery[] = "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'";
+new String:g_sUpdateAddPointsQuery[] = "UPDATE `%s` SET `points`=`points`+(%i) ";
+new String:g_sUpdateAddPointsSteamidQuery[] = "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'";
+new String:g_sUpdatePlayer2Query[] = "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'";
+
+
+new String:g_sInsertHappyQuery[] = "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)";
+new String:g_sInsertMiddleQuery[] = "%s FROM `%s` WHERE steamid = '%s'";
+new String:g_sInsertPlayerQuery[] = "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)";
+new String:g_sInsertPlayerSaveQuery[] = "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES ('%s', %i, %i, '%s', %s, %i);";
+new String:g_sInsertPlayerSave2Query[] = "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES";
+new String:g_sInsertPlayerSave2DataQuery[] = "('%s', %i, %i, '%s', %s, %i);";
+new String:g_sInsertPlayerSave2Data2Query[] = "('%s', %i, %i, '%s', %s, %i),";
+new String:g_sInsertBackup1Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills` FROM `%s`";
+new String:g_sInsertBackup2Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds` FROM `%s`";
+new String:g_sInsertBackup3Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `time` FROM `%s`";
+new String:g_sInsertBackup4Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds` FROM `%s`";
+new String:g_sInsertBackup5Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`time` FROM `%s`";
+new String:g_sInsertBackup6Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds`+`time` FROM `%s`";
+new String:g_sInsertBackup7Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`";
+
+
+new String:g_sSelectVersionQuery[] = "SELECT `version` FROM `%s` ORDER BY `version` DESC LIMIT 1";
+new String:g_sSelectHappyQuery[] = "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1";
+new String:g_sSelectPointsQuery[] = "SELECT `points` FROM `%s` WHERE `steamid`='%s'";
+new String:g_sSelectAllPointsQuery[] = "SELECT `points` FROM `%s`";
+new String:g_sSelectTop10Query[] = "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10";
+new String:g_sSelectRankQuery[] = "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i";
+new String:g_sSelectPlayerQuery[] = "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`";
+
+
+new String:g_sAlterAdminQuery[] = "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0";
+new String:g_sAlterLastVisitQuery[] = "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i";
+new String:g_sAlterVersionQuery[] = "ALTER TABLE `%s` ADD `version` FLOAT NOT NULL DEFAULT 0.0";
+new String:g_sAlterPayedQuery[] = "ALTER TABLE `%s` DROP `payed`";
+new String:g_sAlterRenameQuery[] = "ALTER TABLE `%s` RENAME TO `%s_old`";
+new String:g_sAlterRename2Query[] = "ALTER TABLE `%s_backup` RENAME TO `%s`";
+new String:g_sAlterFeatureQuery[] = "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT %i";
