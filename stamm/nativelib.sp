@@ -253,7 +253,7 @@ public nativelib_ClientChanged(client, index, bool:status)
 
 
 	// Found?
-	if (id != INVALID_FUNCTION)
+	if (id != INVALID_FUNCTION && g_FeatureList[index][FEATURE_ENABLE])
 	{
 		Call_StartFunction(plugin, id);
 		
@@ -894,23 +894,7 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 	// Valid feature?
 	if (feature != -1)
 	{
-		// Save the description to plugin and to level
-		new desc = g_FeatureList[feature][FEATURE_DESCS][level];
-
-		Format(g_sFeatureHaveDesc[feature][level][desc], sizeof(g_sFeatureHaveDesc[][][]), description);
-
-
-
-		// Updated level count
-		g_FeatureList[feature][FEATURE_DESCS][level]++;
-
-
-
-		// For performance only 5 descriptions per level and feature
-		if (g_FeatureList[feature][FEATURE_DESCS][level] == 5)
-		{
-			g_FeatureList[feature][FEATURE_DESCS][level] = 0;
-		}
+		PushArrayString(g_FeatureList[feature][FEATURE_DESCS][level], description);
 
 		return true;
 	}
@@ -1053,7 +1037,7 @@ public nativelib_LoadFeature(Handle:plugin, numParams)
 	new feature = featurelib_getFeatureByHandle(plugin);
 
 	// Feature already enabled?
-	if (g_FeatureList[feature][FEATURE_ENABLE] == 1) 
+	if (g_FeatureList[feature][FEATURE_ENABLE]) 
 	{
 		return -1;
 	}
@@ -1079,7 +1063,7 @@ public nativelib_UnloadFeature(Handle:plugin, numParams)
 	new feature = featurelib_getFeatureByHandle(plugin);
 
 	// Is not loaded?
-	if (g_FeatureList[feature][FEATURE_ENABLE] == 0) 
+	if (!g_FeatureList[feature][FEATURE_ENABLE]) 
 	{
 		return -1;
 	}

@@ -22,6 +22,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
  */
 
+#pragma dynamic 131072
+
+
 
 // Include Sourcemod API's
 #include <sourcemod>
@@ -210,7 +213,7 @@ public OnPluginEnd()
 {
 	for (new i=0; i < g_iFeatures; i++)
 	{
-		if (g_FeatureList[i][FEATURE_ENABLE] == 1)
+		if (g_FeatureList[i][FEATURE_ENABLE])
 		{
 			// Unload all Features
 			featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
@@ -234,7 +237,7 @@ public OnPluginPauseChange(bool:pause)
 		// On unpause load all features again
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] == 1)
+			if (g_FeatureList[i][FEATURE_ENABLE])
 			{
 				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
 			}
@@ -250,62 +253,34 @@ public CheckStammFolders()
 {
 	// Strings
 	decl String:oldFolder[PLATFORM_MAX_PATH + 1];
-	decl String:LogFolder[PLATFORM_MAX_PATH + 1];
-	decl String:LevelFolder[PLATFORM_MAX_PATH + 1];
+	decl String:oldFolder2[PLATFORM_MAX_PATH + 1];
+	decl String:smFolder[PLATFORM_MAX_PATH + 1];
 	decl String:CurrentDate[20];
 	
+
 
 	// Current time
 	FormatTime(CurrentDate, sizeof(CurrentDate), "%d-%m-%y");
 	
 	// Build Path to the needed folders
-	BuildPath(Path_SM, g_sStammFolder, sizeof(g_sStammFolder), "stamm");
+	BuildPath(Path_SM, smFolder, sizeof(smFolder), "logs");
+	BuildPath(Path_SM, oldFolder2, sizeof(oldFolder2), "stamm");
 	BuildPath(Path_SM, oldFolder, sizeof(oldFolder), "Stamm");
 
-	Format(g_sLogFile, sizeof(g_sLogFile), "%s/logs/stamm_errors_(%s).log", g_sStammFolder, CurrentDate);
-	Format(g_sDebugFile, sizeof(g_sDebugFile), "%s/logs/stamm_debugs_(%s).log", g_sStammFolder, CurrentDate);
 
 
 
-	
-	if (DirExists(oldFolder))
+	Format(g_sLogFile, sizeof(g_sLogFile), "%s/stamm_errors_(%s).log", smFolder, CurrentDate);
+	Format(g_sDebugFile, sizeof(g_sDebugFile), "%s/stamm_debugs_(%s).log", smFolder, CurrentDate);
+
+
+
+
+	// Check for old folder
+	if (DirExists(oldFolder2) || DirExists(oldFolder))
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please rename it to %s, or delete it!", oldFolder, g_sStammFolder);
-		PrintToServer("[ STAMM ] ATTENTION: Found Folder %s. Please rename it to %s, or delete it!", oldFolder, g_sStammFolder);
-	}
-	
-
-
-
-	// Format logs and levels folders
-	Format(LogFolder, sizeof(LogFolder), "%s/logs", g_sStammFolder);
-	Format(LevelFolder, sizeof(LevelFolder), "%s/levels", g_sStammFolder);
-	
-
-
-	
-	// Check if main stamm folder exists
-	if (DirExists(g_sStammFolder))
-	{
-		// Check log folder
-		if (!DirExists(LogFolder)) 
-		{
-			CreateDirectory(LogFolder, 511);
-		}
-			
-
-		// Check level folder
-		if (!DirExists(LevelFolder)) 
-		{
-			CreateDirectory(LevelFolder, 511);
-		}
-	}
-	else
-	{
-		// If not create all
-		CreateDirectory(g_sStammFolder, 511);
-		CreateDirectory(LogFolder, 511);
-		CreateDirectory(LevelFolder, 511);
+		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\"!", oldFolder2);
+		PrintToServer("[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\"!", oldFolder2);
 	}
 }
 
@@ -530,7 +505,7 @@ public Action:checkFeatures(Handle:timer, any:data)
 		// Plugin seems to be disabled
 		if (!found)
 		{
-			g_FeatureList[i][FEATURE_ENABLE] = 0;
+			g_FeatureList[i][FEATURE_ENABLE] = false;
 		}
 	}
 

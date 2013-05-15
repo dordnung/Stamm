@@ -68,7 +68,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		if (StrEqual(g_FeatureList[i][FEATURE_BASE], basename, false))
 		{
 			// Duplicate found, assign new values
-			g_FeatureList[i][FEATURE_ENABLE] = 1;
+			g_FeatureList[i][FEATURE_ENABLE] = true;
 			g_FeatureList[i][FEATURE_HANDLE] = plugin;
 			g_FeatureList[i][FEATURE_CHANGE] = allowChange;
 			g_FeatureList[i][FEATURE_STANDARD] = standard;
@@ -101,7 +101,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 	// Save pathes
-	Format(levelPath, sizeof(levelPath), "%s/levels/%s.txt", g_sStammFolder, basename);
+	Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
+
+
 
 	// Assign values of the new feature
 	Format(g_FeatureList[g_iFeatures][FEATURE_BASE], sizeof(basename), basename);
@@ -109,8 +111,8 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	
 
 	g_FeatureList[g_iFeatures][FEATURE_HANDLE] = plugin;
-	g_FeatureList[g_iFeatures][FEATURE_ENABLE] = 1;
-	g_FeatureList[g_iFeatures][FEATURE_DESCS] = 0;
+	g_FeatureList[g_iFeatures][FEATURE_ENABLE] = true;
+	g_FeatureList[g_iFeatures][FEATURE_DESCS] = CreateArray(128);
 	g_FeatureList[g_iFeatures][FEATURE_CHANGE] = allowChange;
 	g_FeatureList[g_iFeatures][FEATURE_STANDARD] = standard;
 	
@@ -121,8 +123,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	if (!FileExists(levelPath))
 	{
 		// Backwards compatiblity, search in old path
-		Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
+		BuildPath(Path_SM, levelPath, sizeof(levelPath), "stamm/levels/%s.txt", basename);
 			
+
 		// If this doesnt exist, stop here, but don't abort, because maybe it needs no level config
 		if (!FileExists(levelPath))
 		{
@@ -204,7 +207,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				if (value <= 0 || value > g_iLevels+g_iPLevels)
 				{
 					// Mark as disabled
-					g_FeatureList[g_iFeatures][FEATURE_ENABLE] = 0;
+					g_FeatureList[g_iFeatures][FEATURE_ENABLE] = false;
 
 					// Unload it
 					ServerCommand("sm plugins unload %s stamm", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
@@ -228,21 +231,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				// Description not empty?
 				if (!StrEqual(description, ""))
 				{
-					// Load the description count of this level
-					new desc = g_FeatureList[g_iFeatures][FEATURE_DESCS][value];
-
-					Format(g_sFeatureHaveDesc[g_iFeatures][value][desc], sizeof(g_sFeatureHaveDesc[][][]), description);
-
-
-
-					// Updated description count
-					g_FeatureList[g_iFeatures][FEATURE_DESCS][value]++;
-
-					// Only max 5 descriptions per level
-					if (g_FeatureList[g_iFeatures][FEATURE_DESCS][value] == 5)
-					{
-						g_FeatureList[g_iFeatures][FEATURE_DESCS][value] = 0;
-					}
+					PushArrayString(g_FeatureList[g_iFeatures][FEATURE_DESCS][value], description);
 				}
 
 
@@ -436,7 +425,7 @@ public featurelib_UnloadFeature(Handle:plugin)
 	ServerCommand("sm plugins unload %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
 
 	// Mark as disabled
-	g_FeatureList[index][FEATURE_ENABLE] = 0;
+	g_FeatureList[index][FEATURE_ENABLE] = false;
 
 
 
@@ -469,7 +458,7 @@ public featurelib_loadFeature(Handle:plugin)
 
 
 	// Mark as enabled, and announce it
-	g_FeatureList[index][FEATURE_ENABLE] = 1;
+	g_FeatureList[index][FEATURE_ENABLE] = true;
 
 	if (!g_bMoreColors)
 	{
@@ -512,7 +501,7 @@ public Action:featurelib_Load(args)
 		// Find the feature
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] == 0 && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			if (!g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
 			{
 				// Load it
 				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
@@ -527,7 +516,7 @@ public Action:featurelib_Load(args)
 		// Not found, search with real Basename
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] == 0 && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			if (!g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
 			{
 				// Load it
 				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
@@ -574,7 +563,7 @@ public Action:featurelib_UnLoad(args)
 		// Search it
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] == 1 && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			if (g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
 			{
 				// Unload it
 				featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
@@ -587,7 +576,7 @@ public Action:featurelib_UnLoad(args)
 		// search with real basename
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] == 1 && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			if (g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
 			{
 				// Unload on found
 				featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);

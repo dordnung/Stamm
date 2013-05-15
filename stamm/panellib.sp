@@ -894,7 +894,7 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 
 
 				decl String:featureid[10];
-				
+				decl String:arrayItem[128];
 
 
 				// Loop through levels
@@ -910,10 +910,13 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 						if (g_FeatureList[j][FEATURE_ENABLE])
 						{
 							// Loop through all descriptions on this level
-							for (new k=0; k < g_FeatureList[j][FEATURE_DESCS][i+1]; k++)
+							for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][i+1]); k++)
 							{
+								GetArrayString(g_FeatureList[j][FEATURE_DESCS][i+1], k, arrayItem, sizeof(arrayItem));
+
+
 								// We have a description
-								if (!StrEqual(g_sFeatureHaveDesc[j][i+1][k], ""))
+								if (!StrEqual(arrayItem, ""))
 								{
 									// Add level
 									Format(featureid, sizeof(featureid), "%i", i+1);
@@ -966,7 +969,8 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 	{
 		decl String:Chooseit[10];
 		decl String:featuretext[128];
-		
+		decl String:arrayItem[128];
+
 		GetMenuItem(menu, param2, Chooseit, sizeof(Chooseit));
 		
 
@@ -989,13 +993,16 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 			if (g_FeatureList[i][FEATURE_ENABLE])
 			{
 				// Loop through all descriptions on this level
-				for (new j=0; j < g_FeatureList[i][FEATURE_DESCS][id]; j++)
+				for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][id]); j++)
 				{
+					GetArrayString(g_FeatureList[i][FEATURE_DESCS][id], j, arrayItem, sizeof(arrayItem));
+
+
 					// Only valid textes
-					if (!StrEqual(g_sFeatureHaveDesc[i][id][j], ""))
+					if (!StrEqual(arrayItem, ""))
 					{
 						// Add text
-						Format(featuretext, sizeof(featuretext), "%s", g_sFeatureHaveDesc[i][id][j]);
+						Format(featuretext, sizeof(featuretext), "%s", arrayItem);
 						
 						AddMenuItem(featurelist, "", featuretext);
 					}
@@ -1176,7 +1183,7 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 				for (new i=0; i < g_iFeatures; i++)
 				{
 					// Check enable or disabled
-					if ((g_FeatureList[i][FEATURE_ENABLE] == 0 && param2 == 5) || (g_FeatureList[i][FEATURE_ENABLE] == 1 && param2 == 6))
+					if ((!g_FeatureList[i][FEATURE_ENABLE] && param2 == 5) || (g_FeatureList[i][FEATURE_ENABLE] && param2 == 6))
 					{
 						// ADD 
 						Format(itemString, sizeof(itemString), "%i", i);

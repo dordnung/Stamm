@@ -35,15 +35,15 @@
 enum FeatureEnum
 {
 	FEATURE_LEVEL[MAXLEVELS],
-	FEATURE_ENABLE,
-	FEATURE_DESCS[MAXLEVELS],
 	bool:FEATURE_CHANGE,
 	bool:FEATURE_STANDARD,
+	bool:FEATURE_ENABLE,
 	bool:WANT_FEATURE[MAXPLAYERS + 1],
 	String:FEATURE_BASE[64],
 	String:FEATURE_BASEREAL[64],
 	String:FEATURE_NAME[64],
 	Handle:FEATURE_HANDLE,
+	Handle:FEATURE_DESCS[MAXLEVELS],
 }
 
 
@@ -106,7 +106,6 @@ new Float:g_fInfoTime;
 new String:g_sAdminMenu[32];
 new String:g_sLogFile[PLATFORM_MAX_PATH + 1];
 new String:g_sDebugFile[PLATFORM_MAX_PATH + 1];
-new String:g_sStammFolder[PLATFORM_MAX_PATH + 1];
 new String:g_sLvlUpSound[PLATFORM_MAX_PATH + 1];
 new String:g_sPluginVersion[10] = "2.18";
 new String:g_sPluginVersionUpdate[10] = "2.1.8";
@@ -128,11 +127,9 @@ new String:g_sGiveFlagAdmin[26];
 
 
 // Level and Feature string globals
-new String:g_sLevelName[MAXLEVELS][128];
+new String:g_sLevelName[MAXLEVELS][32];
 new String:g_sLevelFlag[MAXLEVELS][26];
-// This is VERY nasty, try to keep it as small as possible
-new String:g_sFeatureHaveDesc[MAXFEATURES][MAXLEVELS][5][64];
-new String:g_sFeatureBlocks[MAXFEATURES][MAXLEVELS][64];
+new String:g_sFeatureBlocks[MAXFEATURES][MAXLEVELS][32];
 
 
 
