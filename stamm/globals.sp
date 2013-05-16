@@ -28,13 +28,14 @@
 
 
 
+// Max Features and Max Levels
+#define MAXFEATURES 100
+#define MAXLEVELS 100
 
 
-#define MAJOR 0
-#define MINOR 1
-#define PATCH 2
 
-
+// Updater
+#define UPDATE_URL "http://popoklopsi.de/stamm/updater/update.php?plugin=stamm"
 
 
 
@@ -95,7 +96,6 @@ new g_iHappyNumber[MAXPLAYERS + 1];
 new g_iHappyFactor[MAXPLAYERS + 1];
 new g_iPlayerPoints[MAXPLAYERS + 1];
 new g_iPlayerLevel[MAXPLAYERS + 1];
-new g_iDatabaseVersion[3];
 new g_iPoints;
 new StammGames:g_iGameID;
 
@@ -131,10 +131,12 @@ new String:g_sChangeF[32];
 new String:g_sStammTag[64];
 new String:g_sAdminFlag[26];
 new String:g_sGiveFlagAdmin[26];
+new String:g_sDatabaseVersion[12];
 
 
 // Level and Feature string globals
 new String:g_sLevelName[MAXLEVELS][32];
+new String:g_sLevelKey[MAXLEVELS][32];
 new String:g_sLevelFlag[MAXLEVELS][26];
 new String:g_sFeatureBlocks[MAXFEATURES][MAXLEVELS][32];
 
@@ -206,13 +208,14 @@ new String:g_sInsertBackup6Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`
 new String:g_sInsertBackup7Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`";
 
 
-new String:g_sSelectVersionQuery[] = "SELECT `version` FROM `%s` ORDER BY `version` DESC LIMIT 1";
+new String:g_sSelectVersionQuery[] = "SELECT REPLACE(`version`, '.', '') FROM `%s` ORDER BY `version` DESC LIMIT 1";
 new String:g_sSelectHappyQuery[] = "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1";
 new String:g_sSelectPointsQuery[] = "SELECT `points` FROM `%s` WHERE `steamid`='%s'";
 new String:g_sSelectAllPointsQuery[] = "SELECT `points` FROM `%s`";
 new String:g_sSelectTop10Query[] = "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10";
 new String:g_sSelectRankQuery[] = "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i";
 new String:g_sSelectPlayerQuery[] = "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`";
+new String:g_sSelectPlayerStartQuery[] = "SELECT `points`, `level`, `version`";
 
 
 new String:g_sAlterAdminQuery[] = "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0";

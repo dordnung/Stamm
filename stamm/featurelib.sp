@@ -167,11 +167,11 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 				// Get the Section name
 				KvGetSectionName(level_settings, Svalue, sizeof(Svalue));
-				KvGoBack(level_settings);
-
 
 				// Get level of the section
-				KvGetString(level_settings, Svalue, Svalue2, sizeof(Svalue2));
+				KvGetString(level_settings, NULL_STRING, Svalue2, sizeof(Svalue2));
+
+
 
 				// Save Block
 				Format(g_sFeatureBlocks[g_iFeatures][start], sizeof(g_sFeatureBlocks[][]), Svalue);
@@ -189,7 +189,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					// Else search for the value of the level name with this loop
 					for (new i=0; i < g_iLevels+g_iPLevels; i++)
 					{
-						if (StrEqual(Svalue2, g_sLevelName[i]))
+						if (StrEqual(Svalue2, g_sLevelName[i], false) || StrEqual(Svalue2, g_sLevelKey[i], false))
 						{
 							// Update value
 							value = i+1; 
@@ -216,6 +216,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					// Log the error
 					LogToFile(g_sLogFile, "[ STAMM ] Invalid Level %i for Feature: %s", value, g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
 
+
 					// Stop here
 					return;
 				}
@@ -236,12 +237,8 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 
-
 				// Update start
 				start++;
-
-				// Jump to block
-				KvJumpToKey(level_settings, Svalue);
 
 			} 
 			// Next Block
@@ -357,7 +354,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 
 
 // Return short basename
-public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
+public featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 {
 	new retriev;
 	
@@ -377,8 +374,6 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 
 
 
-
-
 	// Now explore it (Linux style)
 	retriev = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	
@@ -391,21 +386,8 @@ public bool:featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 
 
 
-
-	// Nothing found to explore? Just save basename
-	if (retriev <= 1)
-	{
-		Format(name, size, basename);
-	}
-	else
-	{	
-		// Save the short path (filename hehe^^)
-		Format(name, size, explodedBasename[retriev-1]);
-	}
-
-
-	// Always true? hm...
-	return true;
+	// Save the short path (filename hehe^^)
+	Format(name, size, explodedBasename[retriev-1]);
 }
 
 
@@ -457,8 +439,11 @@ public featurelib_loadFeature(Handle:plugin)
 	ServerCommand("sm plugins load %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
 
 
+
 	// Mark as enabled, and announce it
 	g_FeatureList[index][FEATURE_ENABLE] = true;
+
+
 
 	if (!g_bMoreColors)
 	{
@@ -473,6 +458,9 @@ public featurelib_loadFeature(Handle:plugin)
 
 
 
+
+
+
 // Reloads a feature
 public featurelib_ReloadFeature(Handle:plugin)
 {
@@ -480,6 +468,7 @@ public featurelib_ReloadFeature(Handle:plugin)
 	featurelib_UnloadFeature(plugin);
 	featurelib_loadFeature(plugin);
 }
+
 
 
 
@@ -686,6 +675,7 @@ public Action:featurelib_List(args)
 	
 	return Plugin_Handled;
 }
+
 
 
 

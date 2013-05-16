@@ -189,6 +189,7 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 {
 	decl String:cSteamid[64];
 
+
 	// Client Loop
 	for (new client = 1; client <= MaxClients; client++)
 	{
@@ -328,6 +329,7 @@ public clientlib_CheckVip(client)
 		decl String:steamid[64];
 		new clientpoints = g_iPlayerPoints[client];
 		new levelstufe;
+
 
 
 		clientlib_getSteamid(client, steamid, sizeof(steamid));

@@ -42,7 +42,7 @@ public otherlib_PrepareFiles()
 		otherlib_DownloadLevel();	
 
 		// CSGO Fix
-		if (otherlib_getGame() == GAME_CSGO)
+		if (g_iGameID == GAME_CSGO)
 		{
 			AddToStringTable(FindStringTable("soundprecache"), g_sLvlUpSound);
 		}
@@ -66,17 +66,6 @@ public otherlib_DownloadLevel()
 	Format(downloadfile, sizeof(downloadfile), "sound/%s", g_sLvlUpSound);
 	
 	AddFileToDownloadsTable(downloadfile);
-}
-
-
-
-
-
-// return the gameID
-public StammGames:otherlib_getGame()
-{
-	// We saved it globally
-	return g_iGameID;
 }
 
 
@@ -129,6 +118,7 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 {
 	decl String:arg[128];
 	new mode = 0;
+
 
 	// Listen only for sm commands with 3 arguments and only for server commands 
 	if (argc == 3 && client == 0 && StrEqual(command, "sm", false))

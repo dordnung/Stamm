@@ -38,13 +38,13 @@ public eventlib_Start()
 {
 
 	// Event Round start for TF2
-	if (otherlib_getGame() == GAME_TF2)
+	if (g_iGameID == GAME_TF2)
 	{
 		HookEvent("teamplay_round_start", eventlib_RoundStart);
 		HookEvent("arena_round_start", eventlib_RoundStart);
 	}
 
-	else if (otherlib_getGame() == GAME_DOD)
+	else if (g_iGameID == GAME_DOD)
 	{
 		// Event Round start for DOD
 		HookEvent("dod_round_start", eventlib_RoundStart);

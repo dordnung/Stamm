@@ -70,30 +70,36 @@ public sqlback_getDatabaseVersion()
 
 
 
+// check version
+public bool:sqlback_isVersionNewer(String:version[])
+{
+	new String:version2[strlen(version) + 1];
+
+	// Replace dot
+	strcopy(version2, strlen(version) + 1, version);
+	ReplaceString(version2, strlen(version) + 1, ".", "");
+
+
+	// Check
+	return (strcmp(g_sDatabaseVersion, version2, false) == -1);
+}
+
+
+
+
 
 // get the version
 public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
-	decl String:version[10];
-
-
 	// Found a value?
 	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl))
 	{
-		SQL_FetchString(hndl, 0, version, sizeof(version));
+		SQL_FetchString(hndl, 0, g_sDatabaseVersion, sizeof(g_sDatabaseVersion));
 	}
 	else
 	{
-		// Not found -> set to 0.0
-		Format(version, sizeof(version), "0.00");
+		Format(g_sDatabaseVersion, sizeof(g_sDatabaseVersion), "000");
 	}
-
-
-
-	// Convert Version
-	g_iDatabaseVersion[MAJOR] = StringToInt(version[0]);
-	g_iDatabaseVersion[MINOR] = StringToInt(version[2]);
-	g_iDatabaseVersion[PATCH] = StringToInt(version[3]);
 
 
 
@@ -131,7 +137,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 
 
 // Sync steamid game indepentend
-public bool:sqlback_syncSteamid(client, const String:version[])
+public sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
 	if (sqllib_db != INVALID_HANDLE && StringToInt(version[0]) <= 2 && StringToInt(version[2]) < 1 && StringToInt(version[3]) <= 9)
@@ -139,7 +145,6 @@ public bool:sqlback_syncSteamid(client, const String:version[])
 		decl String:query[128];
 		decl String:steamid[64];
 		
-
 
 
 		// Get new steamid and replace
@@ -160,15 +165,7 @@ public bool:sqlback_syncSteamid(client, const String:version[])
 
 
 		SQL_TQuery(sqllib_db, sqlback_syncSteamid1, query, client);
-
-
-
-		return true;
 	}
-
-
-
-	return false;
 }
 
 
@@ -222,7 +219,7 @@ public sqlback_ModifyTableBackwards()
 
 
 	// Version <= 2.15
-	if (g_iDatabaseVersion[MAJOR] <= 2 && g_iDatabaseVersion[MINOR] <= 1 && g_iDatabaseVersion[PATCH] <= 5)
+	if (sqlback_isVersionNewer("2.16"))
 	{
 		// Add admin
 		Format(query, sizeof(query), g_sAlterAdminQuery, g_sTableName);
@@ -239,7 +236,7 @@ public sqlback_ModifyTableBackwards()
 
 
 	// Version <= 2.10
-	if (g_iDatabaseVersion[MAJOR] <= 2 && g_iDatabaseVersion[MINOR] <= 1 && g_iDatabaseVersion[PATCH] <= 0)
+	if (sqlback_isVersionNewer("2.11"))
 	{
 		// Add last visit
 		Format(query, sizeof(query), g_sAlterLastVisitQuery, g_sTableName, GetTime());
@@ -256,7 +253,7 @@ public sqlback_ModifyTableBackwards()
 
 
 	// Version < 2.1
-	if (g_iDatabaseVersion[MAJOR] <= 2 && g_iDatabaseVersion[MINOR] < 1 && g_iDatabaseVersion[PATCH] <= 9)
+	if (sqlback_isVersionNewer("2.10"))
 	{
 		if (sqllib_db != INVALID_HANDLE)
 		{
@@ -318,7 +315,6 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[600];
 		
-
 
 
 		// Create new table as backup

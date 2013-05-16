@@ -63,6 +63,8 @@ public levellib_LoadLevels()
 			// Check if it's a non private level
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
 
+
+
 			// Check now, and check if we under the maxlevels line
 			if (StrEqual(flagTest, "") && g_iLevels < MAXLEVELS)
 			{
@@ -92,6 +94,7 @@ public levellib_LoadLevels()
 
 
 				// Get the name of this level
+				KvGetSectionName(all_levels, g_sLevelKey[g_iLevels], sizeof(g_sLevelKey[]));
 				KvGetString(all_levels, "name", g_sLevelName[g_iLevels], sizeof(g_sLevelName[]));
 
 
@@ -140,6 +143,7 @@ public levellib_LoadLevels()
 
 
 				// Get the name
+				KvGetSectionName(all_levels, g_sLevelKey[g_iLevels+g_iPLevels], sizeof(g_sLevelKey[]));
 				KvGetString(all_levels, "name", g_sLevelName[g_iLevels+g_iPLevels], sizeof(g_sLevelName[]));
 
 

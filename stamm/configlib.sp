@@ -111,6 +111,7 @@ public configlib_CreateConfig()
 
 
 	// Hook Changes
+	HookConVarChange(configlib_StammTag, OnCvarChanged);
 	HookConVarChange(configlib_StammDebug, OnCvarChanged);
 	HookConVarChange(configlib_ExtraPoints, OnCvarChanged);
 	HookConVarChange(configlib_GiveFlagAdmin, OnCvarChanged);
@@ -120,6 +121,7 @@ public configlib_CreateConfig()
 	HookConVarChange(configlib_SeeText, OnCvarChanged);
 	HookConVarChange(configlib_StripTag, OnCvarChanged);
 	HookConVarChange(configlib_UseMenu, OnCvarChanged);
+	HookConVarChange(configlib_WantUpdate, OnCvarChanged);
 }
 
 
@@ -197,9 +199,19 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 		g_bDebug = GetConVarBool(configlib_StammDebug);
 	}
 
+	else if (cvar == configlib_StammTag)
+	{
+		GetConVarString(configlib_StammTag, g_sStammTag, sizeof(g_sStammTag));
+	}
+
 	else if (cvar == configlib_ExtraPoints)
 	{
 		g_bExtraPoints = GetConVarBool(configlib_ExtraPoints);
+	}
+
+	else if (cvar == configlib_WantUpdate)
+	{
+		g_bAutoUpdate = GetConVarBool(configlib_WantUpdate);
 	}
 
 	else if (cvar == configlib_GiveFlagAdmin)

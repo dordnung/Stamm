@@ -541,9 +541,14 @@ public panellib_ChangePanelHandler(Handle:menu, MenuAction:action, param1, param
 			
 
 
+			// Only if enabled
+			if (g_FeatureList[index][FEATURE_ENABLE])
+			{
+				// Notice to API
+				nativelib_ClientChanged(param1, g_FeatureList[index][FEATURE_HANDLE], g_FeatureList[index][WANT_FEATURE][param1]);
+			}
 
-			// Notice to API
-			nativelib_ClientChanged(param1, index, g_FeatureList[index][WANT_FEATURE][param1]);
+
 
 			//Open it again
 			panellib_CreateUserPanels(param1, 1);
@@ -760,6 +765,7 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 			g_iPlayerPoints[client] = 0;
 			g_iPlayerLevel[client] = 0;
 					
+			
 			// Update in database
 			Format(query, sizeof(query), g_sUpdateSetPointsLevelZeroQuery, g_sTableName, steamid);
 			

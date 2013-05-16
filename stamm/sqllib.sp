@@ -23,10 +23,6 @@
  */
 
 
-#include <stringescape>
-
-
-
 
 // Semicolon
 #pragma semicolon 1
@@ -72,6 +68,7 @@ public sqllib_LoadDB()
 {
 	decl String:sqlError[255];
 
+
 	// Do we have a stamm database config?
 	if (!SQL_CheckConfig("stamm_sql")) 
 	{
@@ -97,7 +94,7 @@ public sqllib_LoadDB()
 	if (sqllib_db == INVALID_HANDLE)
 	{
 		// Log error and stop plugin
-		LogToFile(g_sLogFile, "[ STAMM DEBUG ] Stamm couldn't connect to the Database!! Error: %s", sqlError);
+		LogToFile(g_sLogFile, "[ STAMM ] Stamm couldn't connect to the Database!! Error: %s", sqlError);
 
 		SetFailState("[ STAMM ] Stamm couldn't connect to the Database!! Error: %s", sqlError);
 	}
@@ -198,7 +195,7 @@ public sqllib_InsertPlayer(client)
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		
 		// Select points of the player
-		Format(query, sizeof(query), "SELECT `points`, `level`, `version`");
+		Format(query, sizeof(query), g_sSelectPlayerStartQuery);
 		
 
 
@@ -323,6 +320,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				g_iPlayerPoints[client] = 0;
 				g_iPlayerLevel[client] = 0;
 				
+
 				// set feature state to standard
 				for (new i=0; i < g_iFeatures; i++)
 				{ 
@@ -413,8 +411,6 @@ public Action:sqllib_GetVipTop(client, args)
 		decl String:query[128];
 		
 
-
-
 		// Select all vips DESC by points
 		Format(query, sizeof(query), g_sSelectTop10Query, g_sTableName);
 		
@@ -465,7 +461,6 @@ public Action:sqllib_GetVipRank(client, args)
 				MCPrintToChat(client, "%s %t", g_sStammTag, "NoRank");
 			}
 		}
-		
 
 
 		return Plugin_Handled;
@@ -534,10 +529,13 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			while (SQL_FetchRow(hndl))
 			{
 				decl String:name[MAX_NAME_LENGTH+1];
+				new top_points;
+
+
 				SQL_FetchString(hndl, 0, name, sizeof(name));
+				top_points = SQL_FetchInt(hndl, 1);
 				
-				new top_points = SQL_FetchInt(hndl, 1);
-				
+
 				// Add to menu
 				Format(top_text, sizeof(top_text), "%i. %s - %i %T", ++index, name, top_points, "Points", client);
 				
@@ -775,7 +773,6 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 				new level;
 				new points;
 				new last;
-				new Float:version;
 
 				decl String:steamid[64];
 				decl String:name[128];
@@ -785,18 +782,14 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 				// Get values
 				level = SQL_FetchInt(hndl, 1);
 				points = SQL_FetchInt(hndl, 2);
-				version = SQL_FetchFloat(hndl, 4);
 				last = SQL_FetchInt(hndl, 5);
 
 
 
-				// Convert version to string
-				FloatToString(version, versionS, sizeof(versionS));
-
 				// Fetch steamid and name
 				SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
 				SQL_FetchString(hndl, 3, name, sizeof(name));
-
+				SQL_FetchString(hndl, 4, versionS, sizeof(versionS));
 
 				
 
@@ -819,6 +812,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 						// new line
 						WriteFileLine(file, g_sInsertPlayerSave2Query, g_sTableName);
 					}
+
 
 					// Check if 1000 reached
 					if (++counter == 1000 || !SQL_MoreRows(hndl))

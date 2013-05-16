@@ -33,19 +33,11 @@
 #include <morecolors_stamm>
 #include <autoexecconfig>
 #include <regex>
-
-
+#include <stringescape>
 
 // Tf2
 #undef REQUIRE_EXTENSIONS
 #include <tf2_stocks>
-
-// Max Features and Max Levels
-#define MAXFEATURES 100
-#define MAXLEVELS 100
-
-
-
 
 // Stamm Includes
 #include "stamm/globals.sp"
@@ -61,11 +53,11 @@
 #include "stamm/featurelib.sp"
 #include "stamm/otherlib.sp"
 
-
-
 // Maybe include the updater if exists
 #undef REQUIRE_PLUGIN
 #include <updater>
+
+
 
 
 // Use Semicolon
@@ -128,6 +120,10 @@ public OnPluginStart()
 		{
 			CReplaceColor(Color_Lightgreen, Color_Lime);
 		}
+		else if (CColorAllowed(Color_Lightred))
+		{
+			CReplaceColor(Color_Lightgreen, Color_Lightred);
+		}
 		else if (CColorAllowed(Color_Olive))
 		{
 			CReplaceColor(Color_Lightgreen, Color_Olive);
@@ -185,7 +181,7 @@ public OnPluginStart()
 
 
 	// check for morecolor support
-	if (otherlib_getGame() == GAME_CSGO)
+	if (g_iGameID == GAME_CSGO)
 	{
 		g_bMoreColors = false;
 	}
@@ -198,6 +194,7 @@ public OnPluginStart()
 
 	// Create Hud Sync
 	g_hHudSync = CreateHudSynchronizer();
+
 
 	// No, it's not started, yet
 	g_sPluginStarted = false;
@@ -300,7 +297,7 @@ public OnConfigsExecuted()
 	// Add Auto Updater if exit and want
 	if (LibraryExists("updater") && g_bAutoUpdate)
 	{
-		Updater_AddPlugin("http://popoklopsi.de/stamm/updater/update.php?plugin=stamm");
+		Updater_AddPlugin(UPDATE_URL);
 	}
 	
 
@@ -317,6 +314,7 @@ public OnConfigsExecuted()
 	
 		panellib_Start();
 		
+
 		// Get the database version
 		sqlback_getDatabaseVersion();
 
@@ -359,7 +357,7 @@ public OnConfigsExecuted()
 
 
 		// Hud Text?
-		if (otherlib_getGame() == GAME_TF2 && g_bHudText)
+		if (g_iGameID == GAME_TF2 && g_bHudText)
 		{
 			CreateTimer(0.5, clientlib_ShowHudText, _, TIMER_REPEAT);
 		}

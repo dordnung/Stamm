@@ -39,10 +39,12 @@ public pointlib_Start()
 {
 	Format(g_sTextToWriteF, sizeof(g_sTextToWriteF), g_sTextToWrite);
 	
+
 	// Register commands for add, del and set points
 	RegServerCmd("stamm_add_points", pointlib_AddPlayerPoints, "Add Points of a Player: stamm_add_points <userid|steamid> <points>");
 	RegServerCmd("stamm_del_points", pointlib_DelPlayerPoints, "Del Points of a Player: stamm_del_points <userid|steamid> <points>");
 	RegServerCmd("stamm_set_points", pointlib_SetPlayerPoints, "Set Points of a Player: stamm_set_points <userid|steamid> <points>");
+
 
 
 	// Register main stamm command and strip "sm_"
@@ -409,10 +411,8 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 	// Check if a feature stop getting points
 	if (check)
 	{
-		new Action:result;
-
 		// Get result of API
-		result = nativelib_PublicPlayerGetPointsPlugin(client, number);
+		new Action:result = nativelib_PublicPlayerGetPointsPlugin(client, number);
 		
 
 		// maybe block?

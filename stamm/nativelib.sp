@@ -137,11 +137,10 @@ public nativelib_startLoaded(Handle:plugin, String:basename[])
 
 
 
-// a local forward for feature to change points a player get
+// forward to change points a player get
 public Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 {
 	new Action:result;
-
 
 
 	// Execute it with param client and points count
@@ -243,21 +242,20 @@ public nativelib_ClientSave(client)
 
 
 // Notice to feature, that a player changed the status of him
-public nativelib_ClientChanged(client, index, bool:status)
+public nativelib_ClientChanged(client, Handle:plugin, bool:status)
 {
 	// Search for the function 
-	new Handle:plugin = g_FeatureList[index][FEATURE_HANDLE];
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
 	
 
 
 
 	// Found?
-	if (id != INVALID_FUNCTION && g_FeatureList[index][FEATURE_ENABLE])
+	if (id != INVALID_FUNCTION)
 	{
 		Call_StartFunction(plugin, id);
 		
-		// Pish with client and new status
+		// Push with client and new status
 		Call_PushCell(client);
 		Call_PushCell(status);
 		
@@ -339,12 +337,12 @@ public nativelib_IsMyFeature(Handle:plugin, numParams)
 public nativelib_GetLevel(Handle:plugin, numParams)
 {
 	new feature = featurelib_getFeatureByHandle(plugin);
-
+	new block = GetNativeCell(1);
 
 	// Found feature
-	if (feature != -1)
+	if (feature != -1 && block > 0 && block <= MAXLEVELS)
 	{
-		return g_FeatureList[feature][FEATURE_LEVEL][GetNativeCell(1)-1];
+		return g_FeatureList[feature][FEATURE_LEVEL][block-1];
 	}
 
 
@@ -362,7 +360,6 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 {
 	new found = 0;
 	new feature = featurelib_getFeatureByHandle(plugin);
-
 
 
 
@@ -408,7 +405,7 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 		for (new j=0; j < MAXLEVELS; j++)
 		{
 			// Check if name equals
-			if (StrEqual(g_sFeatureBlocks[feature][j], name))
+			if (StrEqual(g_sFeatureBlocks[feature][j], name, false))
 			{
 				return j+1;
 			}
@@ -593,7 +590,7 @@ public nativelib_GetStammLevelNumber(Handle:plugin, numParams)
 	for (new i=0; i < g_iLevels+g_iPLevels; i++)
 	{
 		// Check name
-		if (StrEqual(g_sLevelName[i], name, false)) 	
+		if (StrEqual(g_sLevelName[i], name, false) || StrEqual(g_sLevelKey[i], name, false)) 	
 		{
 			return i+1;
 		}
@@ -641,7 +638,7 @@ public nativelib_GetStammType(Handle:plugin, numParams)
 // Returns the game stamm is running on
 public nativelib_GetStammGame(Handle:plugin, numParams)
 {
-	return _:otherlib_getGame();
+	return _:g_iGameID;
 }
 
 
@@ -687,7 +684,6 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 				// Notice to all that happy hour sarted
 				nativelib_HappyStart(time, factor);
 				
-
 
 
 				// And announce to players
@@ -764,6 +760,7 @@ public nativelib_ClientWantStammFeature(Handle:plugin, numParams)
 		}
 	}
 	
+
 	return false;
 }
 
@@ -788,6 +785,7 @@ public nativelib_AddClientStammPoints(Handle:plugin, numParams)
 		return true;
 	}
 
+
 	return false;
 }
 
@@ -801,6 +799,7 @@ public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 	new client = GetNativeCell(1);
 	new pointschange = GetNativeCell(2);
 	
+
 	// Valid client?
 	if (clientlib_isValidClient(client)) 
 	{
@@ -809,6 +808,7 @@ public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 		
 		return true;
 	}
+
 
 	return false;
 }
@@ -824,6 +824,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 	new client = GetNativeCell(1);
 	new pointschange = GetNativeCell(2);
 	
+
 	// Valid client
 	if (clientlib_isValidClient(client)) 
 	{
@@ -839,6 +840,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 			return true;
 		}
 	}
+
 
 	return false;
 }
@@ -864,6 +866,7 @@ public nativelib_AddFeature(Handle:plugin, numParams)
 	GetNativeString(1, name, sizeof(name));
 	GetNativeString(2, description, sizeof(description));
 	
+
 	// Give work to the featurelib
 	featurelib_addFeature(plugin, name, description, GetNativeCell(3), GetNativeCell(4));
 }
@@ -919,14 +922,13 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 	if (clientlib_isValidClient(client))
 	{
 		new feature = featurelib_getFeatureByHandle(plugin);
-
-
+		new block = GetNativeCell(2);
 
 		// Found feature und block higher than zero
-		if (feature != -1 && GetNativeCell(2) > 0)
+		if (feature != -1 && block > 0 && block <= MAXLEVELS)
 		{
 			// Player level high enough and want feature?
-			if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][GetNativeCell(2)-1] && g_FeatureList[feature][WANT_FEATURE][client])
+			if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1] && g_FeatureList[feature][WANT_FEATURE][client])
 			{
 				return true;
 			}
@@ -974,6 +976,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 	new type = GetNativeCell(2);
 	new bool:min = GetNativeCell(3);
 	
+
 	// Client valid?
 	if (clientlib_isValidClient(client)) 
 	{
@@ -1008,6 +1011,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 		}
 	}
 
+
 	return false;
 }
 
@@ -1036,6 +1040,7 @@ public nativelib_LoadFeature(Handle:plugin, numParams)
 
 	new feature = featurelib_getFeatureByHandle(plugin);
 
+
 	// Feature already enabled?
 	if (g_FeatureList[feature][FEATURE_ENABLE]) 
 	{
@@ -1046,6 +1051,7 @@ public nativelib_LoadFeature(Handle:plugin, numParams)
 		// Load it
 		featurelib_loadFeature(plugin);
 	}
+
 
 	return 1;
 }
@@ -1062,6 +1068,7 @@ public nativelib_UnloadFeature(Handle:plugin, numParams)
 
 	new feature = featurelib_getFeatureByHandle(plugin);
 
+
 	// Is not loaded?
 	if (!g_FeatureList[feature][FEATURE_ENABLE]) 
 	{
@@ -1072,6 +1079,7 @@ public nativelib_UnloadFeature(Handle:plugin, numParams)
 		// Unload it
 		featurelib_UnloadFeature(plugin);
 	}
+
 
 	return 1;
 }
