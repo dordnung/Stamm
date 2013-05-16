@@ -112,7 +112,6 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 	g_FeatureList[g_iFeatures][FEATURE_HANDLE] = plugin;
 	g_FeatureList[g_iFeatures][FEATURE_ENABLE] = true;
-	g_FeatureList[g_iFeatures][FEATURE_DESCS] = CreateArray(128);
 	g_FeatureList[g_iFeatures][FEATURE_CHANGE] = allowChange;
 	g_FeatureList[g_iFeatures][FEATURE_STANDARD] = standard;
 	
@@ -232,6 +231,13 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				// Description not empty?
 				if (!StrEqual(description, ""))
 				{
+					// Create description array
+					if (g_FeatureList[g_iFeatures][FEATURE_DESCS][value] == INVALID_HANDLE)
+					{
+						g_FeatureList[g_iFeatures][FEATURE_DESCS][value] = CreateArray(128);
+					}
+
+
 					PushArrayString(g_FeatureList[g_iFeatures][FEATURE_DESCS][value], description);
 				}
 

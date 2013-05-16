@@ -897,6 +897,12 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 	// Valid feature?
 	if (feature != -1)
 	{
+		// Create description array
+		if (g_FeatureList[feature][FEATURE_DESCS][level] == INVALID_HANDLE)
+		{
+			g_FeatureList[feature][FEATURE_DESCS][level] = CreateArray(128);
+		}
+
 		PushArrayString(g_FeatureList[feature][FEATURE_DESCS][level], description);
 
 		return true;

@@ -199,19 +199,13 @@ new String:g_sInsertPlayerSaveQuery[] = "INSERT INTO `%s` (`steamid`, `level`, `
 new String:g_sInsertPlayerSave2Query[] = "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES";
 new String:g_sInsertPlayerSave2DataQuery[] = "('%s', %i, %i, '%s', %s, %i);";
 new String:g_sInsertPlayerSave2Data2Query[] = "('%s', %i, %i, '%s', %s, %i),";
-new String:g_sInsertBackup1Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills` FROM `%s`";
-new String:g_sInsertBackup2Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds` FROM `%s`";
-new String:g_sInsertBackup3Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `time` FROM `%s`";
-new String:g_sInsertBackup4Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds` FROM `%s`";
-new String:g_sInsertBackup5Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`time` FROM `%s`";
-new String:g_sInsertBackup6Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `rounds`+`time` FROM `%s`";
-new String:g_sInsertBackup7Query[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`";
+new String:g_sInsertBackupQuery[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`";
 
 
 new String:g_sSelectVersionQuery[] = "SELECT REPLACE(`version`, '.', '') FROM `%s` ORDER BY `version` DESC LIMIT 1";
 new String:g_sSelectHappyQuery[] = "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1";
 new String:g_sSelectPointsQuery[] = "SELECT `points` FROM `%s` WHERE `steamid`='%s'";
-new String:g_sSelectAllPointsQuery[] = "SELECT `points` FROM `%s`";
+new String:g_sSelectAllPointsQuery[] = "SELECT `VIP` FROM `%s` LIMIT 1";
 new String:g_sSelectTop10Query[] = "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10";
 new String:g_sSelectRankQuery[] = "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i";
 new String:g_sSelectPlayerQuery[] = "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`";

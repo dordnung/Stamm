@@ -79,9 +79,8 @@ public bool:sqlback_isVersionNewer(String:version[])
 	strcopy(version2, strlen(version) + 1, version);
 	ReplaceString(version2, strlen(version) + 1, ".", "");
 
-
 	// Check
-	return (strcmp(g_sDatabaseVersion, version2, false) == -1);
+	return (strcmp(g_sDatabaseVersion, version2, false) < 0);
 }
 
 
@@ -311,7 +310,7 @@ public sqlback_ModifyTableBackwards()
 // Check for very old version
 public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
-	if (hndl == INVALID_HANDLE || !StrEqual(error, ""))
+	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl))
 	{
 		decl String:query[600];
 		
@@ -347,48 +346,9 @@ public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:d
 
 
 		// Insert from old database
-		if (g_iVipType == 1)
-		{
-			Format(query, sizeof(query), g_sInsertBackup1Query, g_sTableName, g_sTableName);
-		}
-
-		else if (g_iVipType == 2)
-		{
-			Format(query, sizeof(query), g_sInsertBackup2Query, g_sTableName, g_sTableName);
-		}
-
-		else if (g_iVipType == 3)
-		{
-			Format(query, sizeof(query), g_sInsertBackup3Query, g_sTableName, g_sTableName);
-		}
-
-		else if (g_iVipType == 4)
-		{
-			Format(query, sizeof(query), g_sInsertBackup4Query, g_sTableName, g_sTableName);
-		}
-
-		else if (g_iVipType == 5)
-		{
-			Format(query, sizeof(query), g_sInsertBackup5Query, g_sTableName, g_sTableName);
-		}
-
-		else if (g_iVipType == 6)
-		{
-			Format(query, sizeof(query), g_sInsertBackup6Query, g_sTableName, g_sTableName);
-		}
-
-		else if (g_iVipType == 7)
-		{
-			Format(query, sizeof(query), g_sInsertBackup7Query, g_sTableName, g_sTableName);
-		}
-
-		else
-		{
-			return;
-		}
+		Format(query, sizeof(query), g_sInsertBackupQuery, g_sTableName, g_sTableName);
+	
 			
-
-
 
 		if (g_bDebug) 
 		{

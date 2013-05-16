@@ -913,7 +913,7 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 					for (new j=0; j < g_iFeatures; j++)
 					{
 						// Only enabled features and changeable features
-						if (g_FeatureList[j][FEATURE_ENABLE])
+						if (g_FeatureList[j][FEATURE_ENABLE] && g_FeatureList[j][FEATURE_DESCS][i+1] != INVALID_HANDLE)
 						{
 							// Loop through all descriptions on this level
 							for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][i+1]); k++)
@@ -996,7 +996,7 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 		for (new i=0; i < g_iFeatures; i++)
 		{
 			// Only enabled ones
-			if (g_FeatureList[i][FEATURE_ENABLE])
+			if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_DESCS][id] != INVALID_HANDLE)
 			{
 				// Loop through all descriptions on this level
 				for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][id]); j++)
