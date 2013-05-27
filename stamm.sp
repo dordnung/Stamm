@@ -27,7 +27,7 @@
 
 
 // Include Sourcemod API's
-#include <sourcemod>
+#include <simillimum>
 #include <sdktools>
 #include <colors>
 #include <morecolors_stamm>
@@ -461,6 +461,21 @@ public stammStarted()
 // Check if features are valid
 public Action:checkFeatures(Handle:timer, any:data)
 {
+	// Do we run Simillimum?
+	if (IsSimillimumAvailable())
+	{
+		for (new i=0; i < g_iFeatures; i++)
+		{
+			if (GetHandleStatus(g_FeatureList[i][FEATURE_HANDLE]) != HandleError_None)
+			{
+				g_FeatureList[i][FEATURE_ENABLE] = false;
+			}
+		}
+
+		return Plugin_Continue;
+	}
+
+
 	new current = 0;
 	new Handle:runningPlugins[128] = INVALID_HANDLE;
 

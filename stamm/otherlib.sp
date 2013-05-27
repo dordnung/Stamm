@@ -41,6 +41,7 @@ public otherlib_PrepareFiles()
 		// Download and precache it
 		otherlib_DownloadLevel();	
 
+
 		// CSGO Fix
 		if (g_iGameID == GAME_CSGO)
 		{
@@ -62,6 +63,7 @@ public otherlib_DownloadLevel()
 {
 	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
 	
+
 	// Add with sound/
 	Format(downloadfile, sizeof(downloadfile), "sound/%s", g_sLvlUpSound);
 	
@@ -127,7 +129,6 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 
 
 
-
 		// Is first argument plugins?
 		if (StrEqual(arg, "plugins", false))
 		{
@@ -190,6 +191,7 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 
 						// Announce that we give it to stamm
 						PrintToServer("Attention: Found Stamm Feature! Action will transmit also to Stamm");
+
 
 						// Handled, but we can't stop original command to stop
 						return Plugin_Handled;
@@ -475,7 +477,7 @@ public Action:otherlib_StopHappy(args)
 
 
 
-// Checks a timer, end it when it's running and resetz it
+// Checks a timer, end it when it's running and reset it
 public otherlib_checkTimer(Handle:timer)
 {
 	// End it

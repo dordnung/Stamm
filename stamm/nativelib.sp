@@ -84,7 +84,7 @@ public nativelib_Start()
 	CreateNative("STAMM_LoadFeature", nativelib_LoadFeature);
 	CreateNative("STAMM_UnloadFeature", nativelib_UnloadFeature);
 	CreateNative("STAMM_WriteToLog", nativelib_WriteToStammLog);
-	
+	CreateNative("STAMM_GetTag", nativelib_GetStammTag);
 
 
 	// And create all the global forwards
@@ -113,6 +113,17 @@ public nativelib_Start()
 // Local forwards, let feature notice that it's loaded
 public nativelib_startLoaded(Handle:plugin, String:basename[])
 {
+	// Do we run Simillimum?
+	if (IsSimillimumAvailable())
+	{
+		if (GetHandleStatus(plugin) != HandleError_None)
+		{
+			g_FeatureList[plugin][FEATURE_ENABLE] = false;
+			return;
+		}
+	}
+
+
 	// Get function id
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnFeatureLoaded");
 	
@@ -244,10 +255,20 @@ public nativelib_ClientSave(client)
 // Notice to feature, that a player changed the status of him
 public nativelib_ClientChanged(client, Handle:plugin, bool:status)
 {
+	// Do we run Simillimum?
+	if (IsSimillimumAvailable())
+	{
+		if (GetHandleStatus(plugin) != HandleError_None)
+		{
+			g_FeatureList[plugin][FEATURE_ENABLE] = false;
+			return;
+		}
+	}
+
+
 	// Search for the function 
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
 	
-
 
 
 	// Found?
@@ -662,7 +683,6 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 	
 
 
-
 	// Check for valid time and factor
 	if (time > 1)
 	{
@@ -728,6 +748,7 @@ public nativelib_EndHappyHour(Handle:plugin, numParams)
 		// End it
 		otherlib_EndHappyHour();
 		
+
 		return true;
 	}
 
@@ -782,6 +803,7 @@ public nativelib_AddClientStammPoints(Handle:plugin, numParams)
 		// Give points
 		pointlib_GivePlayerPoints(client, pointschange, false);
 		
+
 		return true;
 	}
 
@@ -806,6 +828,7 @@ public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 		// Delete points
 		pointlib_GivePlayerPoints(client, pointschange*-1, false);
 		
+
 		return true;
 	}
 
@@ -837,6 +860,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 			// Add / Delete difference
 			pointlib_GivePlayerPoints(client, diff, false);
 			
+
 			return true;
 		}
 	}
@@ -929,6 +953,8 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 	{
 		new feature = featurelib_getFeatureByHandle(plugin);
 		new block = GetNativeCell(2);
+
+
 
 		// Found feature und block higher than zero
 		if (feature != -1 && block > 0 && block <= MAXLEVELS)
@@ -1048,7 +1074,7 @@ public nativelib_LoadFeature(Handle:plugin, numParams)
 
 
 	// Feature already enabled?
-	if (g_FeatureList[feature][FEATURE_ENABLE]) 
+	if (feature == -1 || g_FeatureList[feature][FEATURE_ENABLE]) 
 	{
 		return -1;
 	}
@@ -1076,7 +1102,7 @@ public nativelib_UnloadFeature(Handle:plugin, numParams)
 
 
 	// Is not loaded?
-	if (!g_FeatureList[feature][FEATURE_ENABLE]) 
+	if (feature == -1 || !g_FeatureList[feature][FEATURE_ENABLE]) 
 	{
 		return -1;
 	}
@@ -1127,4 +1153,16 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 		// Seems to be an error
 		LogToFile(g_sLogFile, "[ STAMM-%s ] %s", basename, buffer);
 	}
+}
+
+
+
+
+
+
+// Gets the stamm chat tag
+public nativelib_GetStammTag(Handle:plugin, numParams)
+{
+	// Save tag
+	SetNativeString(1, g_sStammTag, GetNativeCell(2), false);
 }

@@ -58,7 +58,6 @@ public eventlib_Start()
 
 
 
-
 	// Player Death
 	HookEvent("player_death", eventlib_PlayerDeath);
 }
@@ -92,7 +91,6 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 		}
 	}
 	
-
 
 
 	// Announce Happy hour

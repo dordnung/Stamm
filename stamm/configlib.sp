@@ -30,6 +30,7 @@
 
 
 // Config handles 
+new Handle:configlib_StammVersion;
 new Handle:configlib_StammTag;
 new Handle:configlib_AdminMenu;
 new Handle:configlib_GiveFlagAdmin;
@@ -68,7 +69,7 @@ public configlib_CreateConfig()
 	AutoExecConfig_SetFile("stamm_config", "stamm");
 	
 	// Global versions cvar
-	AutoExecConfig_CreateConVar("stamm_ver", g_sPluginVersion, "Stamm Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
+	configlib_StammVersion = AutoExecConfig_CreateConVar("stamm_ver", g_sPluginVersion, "Stamm Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
 
 
@@ -111,6 +112,8 @@ public configlib_CreateConfig()
 
 
 	// Hook Changes
+	SetConVarString(configlib_StammVersion, g_sPluginVersion);
+	HookConVarChange(configlib_StammVersion, OnCvarChanged);
 	HookConVarChange(configlib_StammTag, OnCvarChanged);
 	HookConVarChange(configlib_StammDebug, OnCvarChanged);
 	HookConVarChange(configlib_ExtraPoints, OnCvarChanged);
@@ -174,8 +177,6 @@ public configlib_LoadConfig()
 	// Format the tablename
 	Format(g_sTableName, sizeof(g_sTableName), "%s_%i", g_sTableName, g_iServerID);
 
-	// Format Stamm Tag
-	Format(g_sStammTag, sizeof(g_sStammTag), "{lightgreen}[ {green}Stamm {lightgreen}]");
 	
 
 
@@ -194,7 +195,15 @@ public configlib_LoadConfig()
 // A Convar Changed
 public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue[])
 {
-	if (cvar == configlib_StammDebug)
+	if (cvar == configlib_StammVersion)
+	{
+		if (!StrEqual(newValue, g_sPluginVersion))
+		{
+			SetConVarString(configlib_StammVersion, g_sPluginVersion);
+		}
+	}
+
+	else if (cvar == configlib_StammDebug)
 	{
 		g_bDebug = GetConVarBool(configlib_StammDebug);
 	}

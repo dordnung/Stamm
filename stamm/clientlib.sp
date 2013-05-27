@@ -458,6 +458,7 @@ public clientlib_CheckVip(client)
 			// Notice to API
 			nativelib_PublicPlayerBecomeVip(client);
 		}
+		
 		else if (levelstufe == 0 && levelstufe != g_iPlayerLevel[client])
 		{
 			// New level is no level, poor player ):

@@ -442,6 +442,17 @@ native STAMM_UnloadFeature(Handle:plugin);
 native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 
 
+/**
+ * Gets the Stamm Chat Tag
+ *
+ * @param tag			String to save tag in.
+ * @param maxlength		Maxlength of string.
+ *
+ * @noreturn
+ */
+native STAMM_GetTag(String:tag[], maxlength);
+
+
 
 
 
@@ -518,5 +529,6 @@ public __pl_stamm_SetNTVOptional()
 	MarkNativeAsOptional("STAMM_UnloadFeature");
 	MarkNativeAsOptional("STAMM_WriteToLog");
 	MarkNativeAsOptional("STAMM_AutoUpdate");
+	MarkNativeAsOptional("STAMM_GetTag");
 }
 #endif
