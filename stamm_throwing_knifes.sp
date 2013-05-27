@@ -23,6 +23,7 @@
  */
 
 
+
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
@@ -34,9 +35,13 @@
 
 #pragma semicolon 1
 
+
+
 new Handle:c_throwingknife;
 
 new throwingknife;
+
+
 
 public Plugin:myinfo =
 {
@@ -46,6 +51,7 @@ public Plugin:myinfo =
 	description = "Give VIP's every Round x Throwing Knifes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -69,10 +75,12 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 
+
 	STAMM_LoadTranslation();
 		
-	STAMM_AddFeature("VIP Throwing Knife", "");
+	STAMM_AddFeature("VIP Throwing Knife");
 }
+
 
 
 
@@ -82,12 +90,15 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	decl String:description[64];
 	decl String:urlString[256];
 
+
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
 	}
+
 
 	Format(description, sizeof(description), "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
 	
@@ -101,12 +112,14 @@ public OnPluginStart()
 {
 	AutoExecConfig_SetFile("throwing_knifes", "stamm/features");
 
+
 	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
 	
+	
 	AutoExecConfig(true, "throwing_knifes", "stamm/features");
-
 	AutoExecConfig_CleanFile();
 	
+
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
 

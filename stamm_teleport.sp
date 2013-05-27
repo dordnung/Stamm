@@ -27,12 +27,14 @@
 #include <sourcemod>
 #include <sdktools>
 #include <colors>
+#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <updater>
 
 #pragma semicolon 1
+
 
 
 
@@ -65,6 +67,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -72,6 +76,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
+
 
 
 
@@ -85,12 +90,14 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
 		
 	Format(description, sizeof(description), "%T", "GetTeleport", LANG_SERVER);
 	
 	STAMM_AddFeature("VIP Teleport", description);
 }
+
 
 
 
@@ -140,6 +147,9 @@ public OnMapStart()
 // Add a new Teleport to the list
 public Action:AddTele(client, args)
 {
+	decl String:tag[64];
+
+
 	if (STAMM_IsClientValid(client))
 	{
 		// Only if client is valid
@@ -148,17 +158,30 @@ public Action:AddTele(client, args)
 			// Get clients location
 			GetClientAbsAngles(client, TeleportList[client][1]);
 			GetClientAbsOrigin(client, TeleportList[client][0]);
+
+
+			// Get Stamm tag
+			STAMM_GetTag(tag, sizeof(tag));
+
 			
 			// Add
 			Teleports[client][0] = 1;
 			
 			// Notice that added
-			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "TeleportAdded", LANG_SERVER);
+			if (STAMM_GetGame() == GameCSGO)
+			{
+				CPrintToChat(client, "%s %t", "TeleportAdded");
+			}
+			else
+			{
+				MCPrintToChat(client, "%s %t", "TeleportAdded");
+			}
 		}
 	}
 	
 	return Plugin_Handled;
 }
+
 
 
 
@@ -181,6 +204,7 @@ public Action:Tele(client, args)
 
 
 
+
 // The client can't leave the Teleporter hehe
 public OnGameFrame()
 {
@@ -193,6 +217,7 @@ public OnGameFrame()
 			{
 				timer[i]--;
 				
+
 				// Now we can teleport
 				if (timer[i] <= 0)
 				{
@@ -225,6 +250,7 @@ public OnGameFrame()
 
 
 
+
 // Create the teleporter
 public createEnt(client)
 {
@@ -232,6 +258,8 @@ public createEnt(client)
 	new ent = CreateEntityByName("env_smokestack");
 	
 	GetClientAbsOrigin(client, TeleportList[client][2]);
+	
+
 	
 	// Could we create it?
 	if (ent != -1)

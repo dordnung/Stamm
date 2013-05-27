@@ -101,14 +101,16 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	decl String:description[64];
 	decl String:urlString[256];
 
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	// Add to auto updater
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
 	}
+	
 
 	Format(description, sizeof(description), "%T", "GetTag", LANG_SERVER, tag);
 	

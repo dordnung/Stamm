@@ -56,6 +56,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -71,6 +72,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
+
 
 	if (!LibraryExists("stamm")) 
 	{
@@ -89,6 +91,8 @@ public OnAllPluginsLoaded()
 	Format(description, sizeof(description), "%T", "GetNoReload", LANG_SERVER);
 	
 	STAMM_AddFeature("VIP No Reload", description);
+
+
 
 	// Weapon fire for non TF2 games
 	if (STAMM_GetGame() != GameTF2)
@@ -127,6 +131,7 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 
 
 
+
 // Give no reload to a weapon
 public giveNoReload(client, String:weapons[])
 {
@@ -141,7 +146,8 @@ public giveNoReload(client, String:weapons[])
 			new pri_i = GetPlayerWeaponSlot(client, 0);
 			new sec_i = GetPlayerWeaponSlot(client, 1);
 			new weapon;
-			
+
+
 			// Found prim. weapon?
 			if (pri_i != -1)
 			{
@@ -166,6 +172,7 @@ public giveNoReload(client, String:weapons[])
 				}
 			}
 
+
 			// Is weapon the prim. weapon?
 			if (StrEqual(weapons, Pri))
 			{
@@ -183,6 +190,8 @@ public giveNoReload(client, String:weapons[])
 				// Something went wrong here
 				return;
 			}
+
+
 
 			// Get clip annd ammo
 			new clip = GetEntProp(weapon, Prop_Send, "m_iClip1");

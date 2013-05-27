@@ -27,6 +27,7 @@
 #include <sourcemod>
 #include <autoexecconfig>
 #include <colors>
+#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -38,7 +39,7 @@
 
 
 new Handle:flagneed_c;
-new String:flagneed[12];
+new String:flagneed[32];
 
 
 
@@ -58,6 +59,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -73,7 +76,7 @@ public OnPluginStart()
 {
 	AutoExecConfig_SetFile("flagpoints", "stamm/features");
 
-	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag a player needs to collect points");
+	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag string a player needs to collect points");
 	
 	AutoExecConfig(true, "flagpoints", "stamm/features");
 	AutoExecConfig_CleanFile();
@@ -88,6 +91,7 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
+
 
 	// Good colors
 	if (!CColorAllowed(Color_Lightgreen))
@@ -105,7 +109,7 @@ public OnAllPluginsLoaded()
 	// Load Translation
 	STAMM_LoadTranslation();
 		
-	STAMM_AddFeature("VIP FlagPoints", "");
+	STAMM_AddFeature("VIP FlagPoints");
 }
 
 
@@ -121,33 +125,27 @@ public OnConfigsExecuted()
 // Stop non VIP's getting points
 public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 {
-	if (clientAllowed(client))
+	decl String:tag[64];
+
+
+	if ((GetUserFlagBits(client) & ReadFlagString(flagneed) || GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
 		return Plugin_Continue;
 	}
 	else
 	{
-		CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "NoPoints", flagneed);
+		STAMM_GetTag(tag, sizeof(tag));
+
+
+		if (STAMM_GetGame() == GameCSGO)
+		{
+			CPrintToChat(client, "%s %t", tag, "NoPoints", flagneed);
+		}
+		else
+		{
+			MCPrintToChat(client, "%s %t", tag, "NoPoints", flagneed);
+		}
 	}
 
 	return Plugin_Handled;
-}
-
-
-
-// Check client flags
-// Hugh stuff oO
-public bool:clientAllowed(client)
-{
-	if (STAMM_IsClientValid(client))
-	{
-		new AdminId:adminid = GetUserAdmin(client);
-		new AdminFlag:flag;
-
-		FindFlagByChar(flagneed[0], flag);
-
-		return GetAdminFlag(adminid, flag);
-	}
-	
-	return false;
 }

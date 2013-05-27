@@ -63,6 +63,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -79,6 +80,7 @@ public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 	
+
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -88,6 +90,7 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
+
 
 	STAMM_LoadTranslation();
 		
@@ -229,6 +232,7 @@ public Action:PartyLight(Handle:timer, any:light)
 	new color_g = GetRandomInt(0, 255);
 	new color_b = GetRandomInt(0, 255);
 	
+
 	Format(sBuffer, sizeof(sBuffer), "%i %i %i 200", color_r, color_g, color_b);
 	DispatchKeyValue(light, "_light", sBuffer);
 	
@@ -246,6 +250,7 @@ public Action:delete(Handle:timer, any:light)
 		decl String:class[128];
 		
 		GetEdictClassname(light, class, sizeof(class));
+		
 		
 		if (StrEqual(class, "light_dynamic")) 
 		{

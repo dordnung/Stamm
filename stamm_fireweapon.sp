@@ -35,6 +35,7 @@
 
 
 
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature FireWeapon",
@@ -46,10 +47,13 @@ public Plugin:myinfo =
 
 
 
+
 // Add to auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
+
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -58,6 +62,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
+
 
 
 
@@ -72,6 +77,7 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
 
 	Format(haveDescription, sizeof(haveDescription), "%T", "GetFireWeapon", LANG_SERVER);
@@ -81,11 +87,13 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Hook player hurt
 public OnPluginStart()
 {
 	HookEvent("player_hurt", PlayerHurt);
 }
+
 
 
 

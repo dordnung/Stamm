@@ -27,6 +27,7 @@
 #include <sourcemod>
 #include <autoexecconfig>
 #include <colors>
+#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -84,6 +85,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -113,6 +115,8 @@ public OnPluginStart()
 
 
 	HookEvent("player_death", PlayerDeath);
+
+
 
 	AutoExecConfig_SetFile("losepoints", "stamm/features");
 
@@ -146,9 +150,12 @@ public OnClientAuthorized(client, const String:auth[])
 // A Player died
 public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
+	decl String:tag[64];
+
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
 	
+
 	if (STAMM_IsClientValid(client) && attacker > 0 && client != attacker)
 	{
 		// Client doesn't have the feature
@@ -160,7 +167,16 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 				// Delete points ):
 				STAMM_DelClientPoints(client, pointscount);
 
-				CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "LosePoints", pointscount, deathcount);
+
+				if (STAMM_GetGame() == GameCSGO)
+				{
+					CPrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
+				}
+				else
+				{
+					MCPrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
+				}
+
 
 				deathCounter[client] = 0;
 			}

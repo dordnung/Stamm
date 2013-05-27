@@ -27,6 +27,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <colors>
+#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -61,6 +62,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -77,6 +79,7 @@ public OnAllPluginsLoaded()
 	decl String:description[64];
 	decl String:path[PLATFORM_MAX_PATH + 1];
 
+
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -86,6 +89,7 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
+
 
 	STAMM_LoadTranslation();
 		
@@ -249,6 +253,9 @@ public Action:InfoCallback(client, args)
 // Give a weapon
 public Action:GiveCallback(client, args)
 {
+	decl String:tag[64];
+
+
 	if (GetCmdArgs() == 1)
 	{
 		if (STAMM_IsClientValid(client))
@@ -261,9 +268,12 @@ public Action:GiveCallback(client, args)
 					decl String:WeaponName[64];
 					
 					GetCmdArg(1, WeaponName, sizeof(WeaponName));
-					
+					STAMM_GetTag(tag, sizeof(tag));
+
+
 					// Add weapon tag
 					Format(WeaponName, sizeof(WeaponName), "weapon_%s", WeaponName);
+
 
 					// Enabled?
 					if (KvGetNum(kv, WeaponName))
@@ -274,15 +284,30 @@ public Action:GiveCallback(client, args)
 						Usages[client]++;
 					}
 
+
 					else 
 					{
-						CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "WeaponFailed", LANG_SERVER);
+						if (STAMM_GetGame() == GameCSGO)
+						{
+							CPrintToChat(client, "%s %T", tag, "WeaponFailed");
+						}
+						else
+						{
+							MCPrintToChat(client, "%s %T", tag, "WeaponFailed");
+						}
 					}
 				}
 				
 				else
 				{
-					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "MaximumReached", LANG_SERVER);
+					if (STAMM_GetGame() == GameCSGO)
+					{
+						CPrintToChat(client, "%s %T", tag, "MaximumReached");
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %T", tag, "MaximumReached");
+					}
 				}
 			}
 		}

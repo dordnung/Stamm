@@ -76,9 +76,10 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, you need to install flashtools!");
 	}
 
+
 	STAMM_LoadTranslation();
 		
-	STAMM_AddFeature("VIP Anti Flash", "");
+	STAMM_AddFeature("VIP Anti Flash");
 }
 
 
@@ -90,6 +91,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	decl String:team[64];
 	decl String:team2[64];
 	decl String:urlString[256];
+
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -122,7 +125,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 		Format(team2, sizeof(team2), "%T", "AntiTeamFlash", LANG_SERVER);
 	}
-		
+	
+
 	Format(description, sizeof(description), "%T", "GetAntiFlash", LANG_SERVER, team, team2);
 	
 	STAMM_AddFeatureText(STAMM_GetLevel(), description);
@@ -157,6 +161,7 @@ public Action:OnGetPercentageOfFlashForPlayer(client, entity, Float:pos[3], &Flo
 	new owner = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
 	new team = GetClientTeam(client);
 	new team2 = GetClientTeam(owner);
+
 
 	// Anti team flash	
 	if (STAMM_IsClientValid(owner) && STAMM_IsClientValid(client))

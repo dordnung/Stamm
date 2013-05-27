@@ -61,10 +61,12 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 
 
+
 // Add Feature
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
+
 
 	if (!LibraryExists("stamm")) 
 	{
@@ -86,11 +88,13 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Hook defuse begin
 public OnPluginStart()
 {
 	HookEvent("bomb_begindefuse", Event_Defuse);
 }
+
 
 
 

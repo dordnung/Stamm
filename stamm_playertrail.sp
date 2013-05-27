@@ -62,10 +62,12 @@ public Plugin:myinfo =
 
 
 
+
 // Add auto update
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -98,6 +100,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Create config
 public OnPluginStart()
 {
@@ -115,10 +118,13 @@ public OnPluginStart()
 
 
 
+
 // Load config
 public OnConfigsExecuted()
 {
 	decl String:materialPrecache[PLATFORM_MAX_PATH + 1];
+
+
 
 	lifetime = GetConVarFloat(c_lifeTime);
 
@@ -155,6 +161,7 @@ public OnMapStart()
 
 
 
+
 // Add Trails for VIP's
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {	
@@ -175,6 +182,7 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 		}
 	}
 }
+
 
 
 
@@ -241,13 +249,16 @@ public Action:CreateTrail(Handle:timer, any:client)
 		decl Float:velocity[3];
 		new color[4];
 
+
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);		
+
 
 		// Move?
 		if (!(velocity[0] == 0.0 && velocity[1] == 0.0 && velocity[2] == 0.0))
 		{
 			return Plugin_Continue;
 		}
+
 
 		// Create on weapon high
 		new ent = GetPlayerWeaponSlot(client, 2);
@@ -267,6 +278,7 @@ public Action:CreateTrail(Handle:timer, any:client)
 			color[2] = 255;
 		}
 
+
 		color[3] = 255;
 
 		// Setup
@@ -283,6 +295,7 @@ public Action:CreateTrail(Handle:timer, any:client)
 	
 	return Plugin_Continue;
 }
+
 
 
 
@@ -360,7 +373,10 @@ public DeleteTrail(client)
 		CloseHandle(beamTimer[client]);
 	}
 
+
 	beamTimer[client] = INVALID_HANDLE;
+
+
 
 	// Get trail of player
 	new ent = haveBeam[client];

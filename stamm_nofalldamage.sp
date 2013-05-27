@@ -50,10 +50,12 @@ public Plugin:myinfo =
 
 
 
+
 // Auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -70,6 +72,7 @@ public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 	
+
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -80,12 +83,14 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, SDKHooks is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
 		
 	Format(description, sizeof(description), "%T", "GetNoFallDamage", LANG_SERVER);
 	
 	STAMM_AddFeature("VIP No Fall Damage", description);
 }
+
 
 
 

@@ -31,6 +31,7 @@
 #include <stamm>
 #include <updater>
 
+
 // Colors for the diffent grenades
 #define HEColor 	{225,0,0,225}
 #define FlashColor 	{255,255,0,225}
@@ -42,6 +43,7 @@
 
 
 new BeamSprite;
+
 
 
 
@@ -61,6 +63,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
+
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -76,6 +80,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
+
 
 	if (!LibraryExists("stamm")) 
 	{

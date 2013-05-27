@@ -59,10 +59,13 @@ public Plugin:myinfo =
 
 
 
+
 // Auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
+
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -101,10 +104,12 @@ public OnAllPluginsLoaded()
 {
 	decl String:haveDescription[64];
 
+
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
+
 
 	STAMM_LoadTranslation();
 
@@ -131,7 +136,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 	}
 
 
-	// For TF2, not for Scout
+	// In TF2, not for Scout
 	if (STAMM_GetGame() == GameTF2)
 	{
 		if (TF2_GetPlayerClass(client) == TFClass_Scout)
@@ -176,22 +181,38 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 
 
 				// calculate new velocity^^
-				if (velocity2 < 150.0) 
+				if (velocity2 < 150.0)
+				{
 					velocity2_new = velocity2_new + 20.0;
+				}
 				if (velocity2 < 100.0) 
+				{
 					velocity2_new = velocity2_new + 30.0;
+				}
 				if (velocity2 < 50.0) 
+				{
 					velocity2_new = velocity2_new + 40.0;
+				}
 				if (velocity2 < 0.0) 
+				{
 					velocity2_new = velocity2_new + 50.0;
+				}
 				if (velocity2 < -50.0) 
+				{
 					velocity2_new = velocity2_new + 60.0;
+				}
 				if (velocity2 < -100.0) 
+				{
 					velocity2_new = velocity2_new + 70.0;
+				}
 				if (velocity2 < -150.0) 
+				{
 					velocity2_new = velocity2_new + 80.0;
+				}
 				if (velocity2 < -200.0) 
+				{
 					velocity2_new = velocity2_new + 90.0;
+				}
 
 
 

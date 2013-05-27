@@ -89,6 +89,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Create config and hook round start
 public OnPluginStart()
 {
@@ -105,6 +106,7 @@ public OnPluginStart()
 
 
 
+
 // Feature loaded, add desc. and auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
@@ -117,6 +119,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+
 
 	// Add dscriptions for block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)

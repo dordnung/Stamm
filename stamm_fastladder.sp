@@ -34,6 +34,7 @@
 
 
 
+
 public Plugin:myinfo = 
 {
 	name = "FastLadder",
@@ -42,6 +43,7 @@ public Plugin:myinfo =
 	version = "1.0.1",
 	url = "www.bara.in"
 };
+
 
 
 
@@ -83,6 +85,7 @@ public OnAllPluginsLoaded()
 
 	STAMM_AddFeature("VIP FastLadder", description, false);
 }
+
 
 
 

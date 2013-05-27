@@ -47,6 +47,7 @@ new String:unitString[12];
 new String:unitStringOne[12];
 
 
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Distance",
@@ -55,6 +56,8 @@ public Plugin:myinfo =
 	description = "VIP's see the distance and direction to the nearest player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
+
 
 
 // Hook spawning
@@ -67,6 +70,7 @@ public OnPluginStart()
 	AutoExecConfig(true, "distance", "stamm/features");
 	AutoExecConfig_CleanFile();
 
+
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
 
@@ -76,6 +80,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 	decl String:description[64];
+
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -100,6 +106,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		blockDirection = STAMM_GetBlockOfName("direction");
 		blockDistance = STAMM_GetBlockOfName("distance");
 		blockName = STAMM_GetBlockOfName("name");
+
 
 		// Check valid?
 		if (blockDirection != -1)
@@ -138,8 +145,9 @@ public OnAllPluginsLoaded()
 
 	STAMM_LoadTranslation();
 	
-	STAMM_AddFeature("VIP Distance", "");
+	STAMM_AddFeature("VIP Distance");
 }
+
 
 
 
@@ -151,8 +159,10 @@ public OnConfigsExecuted()
 		SetConVarInt(FindConVar("sv_hudhint_sound"), 0);
 	}
 
+
 	// Get unit to take
 	unit = GetConVarInt(unit_c);
+
 
 	// Get unit text
 	if (unit == 1)
