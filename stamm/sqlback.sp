@@ -313,12 +313,23 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl))
 	{
 		decl String:query[600];
-		
+		decl String:ident[32];
 
+
+		// Get Driver
+		new Handle:driver = SQL_ReadDriver(sqllib_db, ident, sizeof(ident));
 
 		// Create new table as backup
-		Format(query, sizeof(query), g_sCreateBackupQuery, g_sTableName, GetTime());
+		if (driver != INVALID_HANDLE && StrEqual(ident, "mysql"))
+		{
+			Format(query, sizeof(query), g_sCreateBackupQuery, g_sTableName, GetTime());
+		}
+		else
+		{
+			Format(query, sizeof(query), g_sCreateBackupQueryMySQL, g_sTableName, GetTime());
+		}
 		
+
 		if (g_bDebug) 
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);

@@ -67,6 +67,7 @@ public sqllib_Start()
 public sqllib_LoadDB()
 {
 	decl String:sqlError[255];
+	decl String:ident[32];
 
 
 	// Do we have a stamm database config?
@@ -103,10 +104,21 @@ public sqllib_LoadDB()
 		decl String:query[620];
 		
 
+		// Get Driver
+		new Handle:driver = SQL_ReadDriver(sqllib_db, ident, sizeof(ident));
 
-		// Create table if it's not exists
-		Format(query, sizeof(query), g_sCreateTableQuery, g_sTableName, GetTime());
-		
+
+		// Create new table 
+		if (driver != INVALID_HANDLE && StrEqual(ident, "mysql"))
+		{
+			Format(query, sizeof(query), g_sCreateTableQuery, g_sTableName, GetTime());
+		}
+		else
+		{
+			Format(query, sizeof(query), g_sCreateTableQueryMySQL, g_sTableName, GetTime());
+		}
+
+
 		if (g_bDebug) 
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -758,12 +770,15 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 			if (sqllib_convert == 0)
 			{
 				WriteFileLine(file, "BEGIN TRANSACTION;");
+
+				// Write create statement
+				WriteFileLine(file, g_sCreateTableQuery, g_sTableName, GetTime());
 			}
-
-
-
-			// Write create statement
-			WriteFileLine(file, g_sCreateTableQuery, g_sTableName, GetTime());
+			else
+			{
+				// Write create statement
+				WriteFileLine(file, g_sCreateTableQueryMySQL, g_sTableName, GetTime());
+			}
 
 
 
