@@ -62,7 +62,7 @@ enum StammType
  *
  * @param basename 		Basename of your feature.
  */
-forward STAMM_OnFeatureLoaded(String:basename[]);
+forward STAMM_OnFeatureLoaded(const String:basename[]);
 
 
 /**
@@ -96,31 +96,32 @@ forward STAMM_OnSaveClient(client);
 
 
 /**
- * Executes when a player switched your feature on or off
+ * Executes when a player switched your feature on/off or bought/sold it
  *
  * @param client		Client.
- * @param mode			true = Switched on, false = Switched off.
+ * @param turnedOn		true = Switched on (bought), false = Switched off (sold).
+ * @param isShop		true = Was called from shop, false = Was called from menu
  */
-forward STAMM_OnClientChangedFeature(client, bool:mode);
+forward STAMM_OnClientChangedFeature(client, bool:turnedOn, bool:isShop);
 
 
 /**
  * Executes when a player gets Stamm points
  *
  * @param client		Client.
- * @param number		The number of points, the player get.
+ * @param points		The number of points, the player get.
  */
-forward STAMM_OnClientGetPoints(client, number);
+forward STAMM_OnClientGetPoints(client, points);
 
 
 /**
  * Executes before a player get Stamm points
  *
  * @param client		Client.
- * @param number		The number of points the player get.
+ * @param points		The number of points the player get.
  * @return  			Plugin_Continue, Plugin_Changed to give points, anything else to prevent it.
  */
-forward Action:STAMM_OnClientGetPoints_PRE(client, &number);
+forward Action:STAMM_OnClientGetPoints_PRE(client, &points);
 
 
 /**
@@ -153,17 +154,32 @@ forward STAMM_OnHappyHourEnd();
  * @noreturn
  * @error            	Max features reached.
  */
-native STAMM_AddFeature(String:name[], String:description[] = "", bool:allowChange=true, bool:standard=true);
+native STAMM_AddFeature(String:name[], const String:description[] = "", bool:allowChange=true, bool:standard=true);
 
 
 /**
- * Adds information about what a player get on a specific level with this feature (will be shown in the !sme list)
+ * DEPRECATED! USE STAMM_AddBlockDescription INSTEAD!
  *
- * @param level			The level, 0=No VIP, x=Level
+ * Adds information about what a player get on a specific level with this feature
+ *
+ * @param level			The level, 0=No VIP, x=Level.
  * @param description	What a player get on this level.
  * @return				true = success, false = error.
  */
-native bool:STAMM_AddFeatureText(level, String:description[]);
+#pragma deprecated Use STAMM_AddBlockDescription instead!
+native bool:STAMM_AddFeatureText(level, const String:description[]);
+
+
+/**
+ * Adds information about what a player get on a specific block with this feature.
+ *
+ * @param level			The block.
+ * @param description	Description for this block.
+ * @param ...         	Format arguments.
+ * @return				true = success, false = error.
+ */
+native bool:STAMM_AddBlockDescription(block, const String:description[], any:...);
+
 
 
 /**
@@ -172,26 +188,35 @@ native bool:STAMM_AddFeatureText(level, String:description[]);
  * @param basename		Basename to look for.
  * @return				true = your feature, false = other feature.
  */
-native bool:STAMM_IsMyFeature(String:basename[]);
+native bool:STAMM_IsMyFeature(const String:basename[]);
 
 
 /**
  * Returns the basename for your plugin
  *
  * @param basename		String to store basename in.
- * @param size			Size of the basename.
+ * @param maxlength		Maxlength of the basename.
  * @noreturn
  */
-native STAMM_GetBasename(String:basename[], size);
+native STAMM_GetBasename(String:basename[], maxlength);
 
 
 /**
- * Returns the level a block needs
+ * Returns the level or points a block needs
  *
  * @param block			Block to search for.
- * @return 				The level.
+ * @return 				The level/points to get that block.
  */
 native STAMM_GetLevel(block=1);
+
+
+/**
+ * Returns whether the block is for buying or not
+ *
+ * @param block			Block to check.
+ * @return 				true when the block needs to be bought, otherwise false.
+ */
+native STAMM_IsShop(block=1);
 
 
 /**
@@ -200,7 +225,7 @@ native STAMM_GetLevel(block=1);
  * @param name 			The name.
  * @return 				The block number.
  */
-native STAMM_GetBlockOfName(String:name[]);
+native STAMM_GetBlockOfName(const String:name[]);
 
 
 /**
@@ -264,7 +289,7 @@ native bool:STAMM_IsLevelPrivate(level);
  * @param name			Name of the level.
  * @return				0 = not found, x = level number.
  */
-native STAMM_GetLevelNumber(String:name[]);
+native STAMM_GetLevelNumber(const String:name[]);
 
 
 /**
@@ -312,30 +337,30 @@ native bool:STAMM_AutoUpdate();
  * Adds points to a player
  *
  * @param client		Client.
- * @param number		Number of points to add.
+ * @param points		Number of points to add.
  * @return				true = Success, false = fail.
  */
-native bool:STAMM_AddClientPoints(client, number);
+native bool:STAMM_AddClientPoints(client, points);
 
 
 /**
  * Deletes points from a player
  *
  * @param client		Client.
- * @param number		Number of points to delete.
+ * @param points		Number of points to delete.
  * @return				true = Success, false = Fail.
  */
-native bool:STAMM_DelClientPoints(client, number);
+native bool:STAMM_DelClientPoints(client, points);
 
 
 /**
  * Sets points of a player
  *
  * @param client		Client.
- * @param number		Number of points to set.
+ * @param points		Number of points to set.
  * @return				true = Success, false = Fail.
  */
-native bool:STAMM_SetClientPoints(client, number);
+native bool:STAMM_SetClientPoints(client, points);
 
 
 /**
@@ -350,7 +375,7 @@ native bool:STAMM_IsClientVip(client, type, bool:min=true);
 
 
 /**
- * Returns true when the clients level is high enough for your feature and wants it.
+ * Returns true when the clients level is high enough for your feature or he bought it and wants it.
  *
  * @param client		Client.
  * @return				true if client have feature, otherwise false.
@@ -491,44 +516,44 @@ public SharedPlugin:__pl_stamm =
 #endif
 };
 
+
+
 #if !defined REQUIRE_PLUGIN
-
-
-
-
-public __pl_stamm_SetNTVOptional()
-{
-	MarkNativeAsOptional("STAMM_AddFeature");
-	MarkNativeAsOptional("STAMM_AddFeatureText");
-	MarkNativeAsOptional("STAMM_IsMyFeature");
-	MarkNativeAsOptional("STAMM_GetLevel");
-	MarkNativeAsOptional("STAMM_GetBlockCount");
-	MarkNativeAsOptional("STAMM_GetBasename");
-	MarkNativeAsOptional("STAMM_GetClientPoints");
-	MarkNativeAsOptional("STAMM_GetClientLevel");
-	MarkNativeAsOptional("STAMM_GetLevelName");
-	MarkNativeAsOptional("STAMM_IsLevelPrivate");
-	MarkNativeAsOptional("STAMM_GetLevelNumber");
-	MarkNativeAsOptional("STAMM_GetLevelPoints");
-	MarkNativeAsOptional("STAMM_GetLevelCount");
-	MarkNativeAsOptional("STAMM_GetType");
-	MarkNativeAsOptional("STAMM_GetGame");
-	MarkNativeAsOptional("STAMM_GetClientBlock");
-	MarkNativeAsOptional("STAMM_AddClientPoints");
-	MarkNativeAsOptional("STAMM_DelClientPoints");
-	MarkNativeAsOptional("STAMM_SetClientPoints");
-	MarkNativeAsOptional("STAMM_HaveClientFeature");
-	MarkNativeAsOptional("STAMM_IsClientVip");
-	MarkNativeAsOptional("STAMM_IsClientValid");
-	MarkNativeAsOptional("STAMM_IsClientAdmin");
-	MarkNativeAsOptional("STAMM_IsLoaded");
-	MarkNativeAsOptional("STAMM_WantClientFeature");
-	MarkNativeAsOptional("STAMM_StartHappyHour");
-	MarkNativeAsOptional("STAMM_EndHappyHour");
-	MarkNativeAsOptional("STAMM_LoadFeature");
-	MarkNativeAsOptional("STAMM_UnloadFeature");
-	MarkNativeAsOptional("STAMM_WriteToLog");
-	MarkNativeAsOptional("STAMM_AutoUpdate");
-	MarkNativeAsOptional("STAMM_GetTag");
-}
+	public __pl_stamm_SetNTVOptional()
+	{
+		MarkNativeAsOptional("STAMM_AddFeature");
+		MarkNativeAsOptional("STAMM_AddFeatureText");
+		MarkNativeAsOptional("STAMM_AddBlockDescription");
+		MarkNativeAsOptional("STAMM_IsMyFeature");
+		MarkNativeAsOptional("STAMM_GetLevel");
+		MarkNativeAsOptional("STAMM_IsShop");
+		MarkNativeAsOptional("STAMM_GetBlockCount");
+		MarkNativeAsOptional("STAMM_GetBasename");
+		MarkNativeAsOptional("STAMM_GetClientPoints");
+		MarkNativeAsOptional("STAMM_GetClientLevel");
+		MarkNativeAsOptional("STAMM_GetLevelName");
+		MarkNativeAsOptional("STAMM_IsLevelPrivate");
+		MarkNativeAsOptional("STAMM_GetLevelNumber");
+		MarkNativeAsOptional("STAMM_GetLevelPoints");
+		MarkNativeAsOptional("STAMM_GetLevelCount");
+		MarkNativeAsOptional("STAMM_GetType");
+		MarkNativeAsOptional("STAMM_GetGame");
+		MarkNativeAsOptional("STAMM_GetClientBlock");
+		MarkNativeAsOptional("STAMM_AddClientPoints");
+		MarkNativeAsOptional("STAMM_DelClientPoints");
+		MarkNativeAsOptional("STAMM_SetClientPoints");
+		MarkNativeAsOptional("STAMM_HaveClientFeature");
+		MarkNativeAsOptional("STAMM_IsClientVip");
+		MarkNativeAsOptional("STAMM_IsClientValid");
+		MarkNativeAsOptional("STAMM_IsClientAdmin");
+		MarkNativeAsOptional("STAMM_IsLoaded");
+		MarkNativeAsOptional("STAMM_WantClientFeature");
+		MarkNativeAsOptional("STAMM_StartHappyHour");
+		MarkNativeAsOptional("STAMM_EndHappyHour");
+		MarkNativeAsOptional("STAMM_LoadFeature");
+		MarkNativeAsOptional("STAMM_UnloadFeature");
+		MarkNativeAsOptional("STAMM_WriteToLog");
+		MarkNativeAsOptional("STAMM_AutoUpdate");
+		MarkNativeAsOptional("STAMM_GetTag");
+	}
 #endif
