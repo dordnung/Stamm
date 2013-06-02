@@ -3,6 +3,6 @@
 	"GetFireWeapon"
 	{
 		"en"		"Ignite players with your weapon for 2 seconds"
-		"de"		"Brenne Spieler mit deiner Waffe für 2 Sekunden an"
+		"de"		"Brenne Spieler mit deiner Waffe fÃ¼r 2 Sekunden an"
 	}
 }

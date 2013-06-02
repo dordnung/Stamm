@@ -50,33 +50,33 @@
 	{
 		"#format"   "{1:s}"
 		"en"		"Type {green}{1}{lightgreen}, to see all advantages {green}of Stamm"
-		"de"		"Schreibe {green}{1}{lightgreen}, um alle Vorzüge {green}von Stamm {lightgreen}zu sehen"
+		"de"		"Schreibe {green}{1}{lightgreen}, um alle VorzÃ¼ge {green}von Stamm {lightgreen}zu sehen"
 	}
 	"DeletedPoints"
 	{
 		"#format"   "{1:s}"
 		"en" 		"Stamm Points {green}of {1} {lightgreen}deleted!"
-		"de" 		"Stamm Punkte {green}von {1} {lightgreen}wurden gelöscht!"
+		"de" 		"Stamm Punkte {green}von {1} {lightgreen}wurden gelÃ¶scht!"
 	}
 	"YourDeletedPoints"
 	{
 		"en" 		"Your Stamm Points {green}were reseted!!"
-		"de" 		"Deine Stamm Punkte {green}wurden zurückgesetzt!"
+		"de" 		"Deine Stamm Punkte {green}wurden zurÃ¼ckgesetzt!"
 	}
 	"AllLevels"
 	{
 		"en"		"Level Overview"
-		"de"		"Level Übersicht"
+		"de"		"Level Ãœbersicht"
 	}
 	"ChoosePlayer"
 	{
 		"en" 		"Choose a Player"
-		"de" 		"Wähle einen Spieler"
+		"de" 		"WÃ¤hle einen Spieler"
 	}
 	"ChooseFeature"
 	{
 		"en" 		"Choose a Feature"
-		"de" 		"Wähle ein Feature"
+		"de" 		"WÃ¤hle ein Feature"
 	}
 	"NoRanks"
 	{
@@ -183,22 +183,22 @@
 	"Close"
 	{
 		"en"		"Close"
-		"de"		"Schließen"
+		"de"		"SchlieÃŸen"
 	}
 	"Reset"
 	{
 		"en"		"Reset"
-		"de"		"Zurücksetzen"
+		"de"		"ZurÃ¼cksetzen"
 	}
 	"Back"
 	{
 		"en"		"Back"
-		"de"		"Zurück"
+		"de"		"ZurÃ¼ck"
 	}
 	"HaveFeatures"
 	{
 		"en"		"The following features are available:"
-		"de"		"Folgende Features sind verfügbar:"
+		"de"		"Folgende Features sind verfÃ¼gbar:"
 	}
 	"ChangeFeatures"
 	{
@@ -220,12 +220,12 @@
 	"AdminMenu"
 	{
 		"en"		"Admin Menu"
-		"de"		"Admin Menü"
+		"de"		"Admin MenÃ¼"
 	}
 	"PointsOfPlayer"
 	{
 		"en"		"Add Stamm Points to a player"
-		"de"		"Stamm Punkte einem Spieler hinzufügen"
+		"de"		"Stamm Punkte einem Spieler hinzufÃ¼gen"
 	}
 	"StammCMD"
 	{
@@ -240,7 +240,7 @@
 	"ResetPlayer"
 	{
 		"en"		"Reset Stamm Points of a player"
-		"de"		"Spieler Stamm Punkte zurücksetzen"
+		"de"		"Spieler Stamm Punkte zurÃ¼cksetzen"
 	}
 	"HappyHour"
 	{

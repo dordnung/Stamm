@@ -8,7 +8,7 @@
 	"GetHook"
 	{
 		"en"		"Command +hook to shoot a hook"
-		"de"		"Befehl +hook um einen Haken zu schieÃŸen"
+		"de"		"Befehl +hook um einen Haken zu schießen"
 	}
 	"GetRope"
 	{
