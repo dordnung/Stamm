@@ -1,0 +1,24 @@
+"Phrases"
+{
+	"GetTeamAntiFlash"
+	{
+		"en"		"(and their Team by his flashbang) "
+		"de"		"(und ihr Team mit seiner Flashgranate) "
+	}
+	"AntiTeamFlash"
+	{
+		"en"		"Team Anti Flash"
+		"de"		"Team Anti Flash"
+	}
+	"AntiFlash"
+	{
+		"en"		"Anti Flash"
+		"de"		"Anti Flash"
+	}
+	"GetAntiFlash"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"VIP's {1}get {2}"
+		"de"		"VIP's {1}bekommen {2}"
+	}
+}

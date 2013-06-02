@@ -1,0 +1,26 @@
+"Phrases"
+{
+	"GetVIPMessage"
+	{	
+		"#format"	"{1:s}"
+		"en"		"Write VIP Messages{1}"
+		"de"		"Schreibe VIP Nachrichten{1}"
+	}
+	"GetVIPChat"
+	{	
+		"#format"	"{1:s}"
+		"en"		"Get a own VIP Chat{1}"
+		"de"		"Bekomme einen eigenen VIP Chat{1}"
+	}
+	"FeatureDisabled"
+	{
+		"en"		"You disabled {green}this Feature!"
+		"de"		"Du hast {green}dieses Feature {lightgreen}deaktiviert!"
+	}
+	"Activate"
+	{
+		"#format"	"{1:s}"
+		"en"		" (activate with {1})"
+		"de"  		" (Mit {1} aktivieren)"
+	}
+}

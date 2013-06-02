@@ -1,0 +1,18 @@
+"Phrases"
+{
+	"GetWeapons"
+	{
+		"en"		"Get Weapons per chat (!sweapons)"
+		"de"		"Bekomme Waffen per Chat (!sweapons)"
+	}
+	"MaximumReached"
+	{
+		"en"		"Maximum reached!"
+		"de"		"Maximum erreicht!"
+	}
+	"WeaponFailed"
+	{
+		"en"		"{green}Weapon invalid {lightgreen}or {green}not allowed!"
+		"de"		"{green}Waffe ungÃƒÂ¼ltig {lightgreen}oder {green}nicht erlaubt!"
+	}
+}

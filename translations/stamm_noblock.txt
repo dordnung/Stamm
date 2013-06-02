@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"GetNoBlock"
+	{
+		"en"		"No one can walk through you"
+		"de"		"Niemand kann durch dich durchlaufen"
+	}
+}
