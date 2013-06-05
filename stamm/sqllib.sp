@@ -446,41 +446,6 @@ public Action:sqllib_GetVipTop(client, args)
 // Get the rank of the client
 public Action:sqllib_GetVipRank(client, args)
 {
-	// No VIP ?
-	if (g_iPlayerLevel[client] <= 0)
-	{
-		if (!g_bStripTag)
-		{
-			// No VIP
-			if (!g_bMoreColors)
-			{
-				CPrintToChat(client, "%s %t", g_sStammTag, "NoVIP");
-			}
-			else
-			{
-				MCPrintToChat(client, "%s %t", g_sStammTag, "NoVIP");
-			}
-		}
-		else
-		{
-			// No Level
-			if (!g_bMoreColors)
-			{
-				CPrintToChat(client, "%s %t", g_sStammTag, "NoRank");
-			}
-			else
-			{
-				MCPrintToChat(client, "%s %t", g_sStammTag, "NoRank");
-			}
-		}
-
-
-		return Plugin_Handled;
-	}
-	
-
-
-
 	if (sqllib_db != INVALID_HANDLE)
 	{
 		decl String:query[128];
@@ -560,29 +525,14 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			// Found something?
 			if (!index)
 			{
-				if (!g_bStripTag)
+				// There are no players
+				if (!g_bMoreColors)
 				{
-					// There are no vips
-					if (!g_bMoreColors)
-					{
-						CPrintToChat(client, "%s %t", g_sStammTag, "NoVips");
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", g_sStammTag, "NoVips");
-					}
+					CPrintToChat(client, "%s %t", g_sStammTag, "NoRanks");
 				}
 				else
 				{
-					// There are no players
-					if (!g_bMoreColors)
-					{
-						CPrintToChat(client, "%s %t", g_sStammTag, "NoRanks");
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", g_sStammTag, "NoRanks");
-					}
+					MCPrintToChat(client, "%s %t", g_sStammTag, "NoRanks");
 				}
 				
 				return;

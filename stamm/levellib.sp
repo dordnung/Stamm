@@ -43,7 +43,9 @@ public levellib_LoadLevels()
 	// Didn't find the stamm level file -> Stop plugin, we can't do anything here
 	if (!FileExists("cfg/stamm/StammLevels.txt"))
 	{
-		SetFailState("Attention: Couldn't load cfg/stamm/StammLevels.txt. File doesn't exist!");
+		LogToFile(g_sLogFile, "Attention: Couldn't load cfg/stamm/StammLevels.txt. File doesn't exist!");
+
+		return;
 	}
 
 

@@ -943,7 +943,6 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 
 
 
-
 						// We Found a feature -> go to next level
 						if (foundFeature)
 						{

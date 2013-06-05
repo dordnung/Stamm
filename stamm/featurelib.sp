@@ -44,8 +44,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	// sure we want to go on
 	new bool:goON = true;
 
-	// level value -1 at start
-	new value = -1;
+	new bool:found = false;
 
 
 
@@ -114,7 +113,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 	g_FeatureList[g_iFeatures][FEATURE_ENABLE] = true;
 	g_FeatureList[g_iFeatures][FEATURE_CHANGE] = allowChange;
 	g_FeatureList[g_iFeatures][FEATURE_STANDARD] = standard;
-	
+	g_FeatureList[g_iFeatures][FEATURE_BLOCKS] = 0;
 
 
 
@@ -131,6 +130,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 			// Mark features as zero level
 			goON = false;
 			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
+			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0;
 		}
 	}
 
@@ -154,11 +154,12 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		if (!KvGotoFirstSubKey(level_settings, false))
 		{
 			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
+			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0;
 		}
 		else
 		{
 			// Start to parse it
-			new start=0;
+			new start = g_FeatureList[g_iFeatures][FEATURE_BLOCKS];
 
 			// Loop for keyvalues
 			do
@@ -181,7 +182,10 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 				// When it's a int, just load it
 				if (StringToInt(Svalue2) > 0)
 				{
-					value = StringToInt(Svalue2);
+					g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = StringToInt(Svalue2);
+					g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = 0;
+
+					found = true;
 				}
 				else
 				{
@@ -190,8 +194,11 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					{
 						if (StrEqual(Svalue2, g_sLevelName[i], false) || StrEqual(Svalue2, g_sLevelKey[i], false))
 						{
-							// Update value
-							value = i+1; 
+							found = true; 
+
+
+							g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i+1;
+							g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0;
 
 							// Break
 							break;
@@ -203,7 +210,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 				// Found an invalid value?
-				if (value <= 0 || value > g_iLevels+g_iPLevels)
+				if (!found)
 				{
 					// Mark as disabled
 					g_FeatureList[g_iFeatures][FEATURE_ENABLE] = false;
@@ -213,7 +220,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					
 
 					// Log the error
-					LogToFile(g_sLogFile, "[ STAMM ] Invalid Level %i for Feature: %s", value, g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+					LogToFile(g_sLogFile, "[ STAMM ] Invalid Level for Feature: %s", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
 
 
 					// Stop here
@@ -222,23 +229,18 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 
-				// Save the level
-				g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = value;
-
-
-
 
 				// Description not empty?
 				if (!StrEqual(description, ""))
 				{
 					// Create description array
-					if (g_FeatureList[g_iFeatures][FEATURE_DESCS][value] == INVALID_HANDLE)
+					if (g_FeatureList[g_iFeatures][FEATURE_DESCS][start] == INVALID_HANDLE)
 					{
-						g_FeatureList[g_iFeatures][FEATURE_DESCS][value] = CreateArray(128);
+						g_FeatureList[g_iFeatures][FEATURE_DESCS][start] = CreateArray(128);
 					}
 
 
-					PushArrayString(g_FeatureList[g_iFeatures][FEATURE_DESCS][value], description);
+					PushArrayString(g_FeatureList[g_iFeatures][FEATURE_DESCS][start], description);
 				}
 
 
@@ -249,6 +251,10 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 			} 
 			// Next Block
 			while (KvGotoNextKey(level_settings, false));
+
+
+			// Update count
+			g_FeatureList[g_iFeatures][FEATURE_BLOCKS] = start;
 		}
 		
 

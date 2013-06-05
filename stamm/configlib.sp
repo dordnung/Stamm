@@ -183,7 +183,7 @@ public configlib_LoadConfig()
 	// Found any level?
 	if (g_iLevels <= 0 && g_iPLevels <= 0) 
 	{
-		SetFailState("[ STAMM ] Error!! Found no Stamm levels!!");
+		LogToFile(g_sLogFile, "[ STAMM ] Attention! Found no Stamm levels!!");
 	}
 }
 

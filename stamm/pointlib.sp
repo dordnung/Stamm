@@ -519,7 +519,18 @@ public pointlib_ShowPlayerPoints(client, bool:only)
 			}
 			else
 			{ 
-				if (!g_bStripTag)
+				if (!g_iLevels)
+				{
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "VIPClientZero", points);
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "VIPClientZero", points);
+					}
+				}
+				else if (!g_bStripTag)
 				{
 					if (!g_bMoreColors)
 					{
@@ -572,7 +583,18 @@ public pointlib_ShowPlayerPoints(client, bool:only)
 			}
 			else
 			{ 
-				if (!g_bStripTag)
+				if (!g_iLevels)
+				{
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "VIPAllZero", name, points);
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "VIPAllZero", name, points);
+					}
+				}
+				else if (!g_bStripTag)
 				{
 					if (!g_bMoreColors)
 					{

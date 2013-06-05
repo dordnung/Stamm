@@ -324,7 +324,7 @@ public Action:clientlib_deleteOlds(Handle:timer, any:data)
 // Check VIP state
 public clientlib_CheckVip(client)
 {
-	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client))
+	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client) && (g_iLevels + g_iPLevels > 0))
 	{
 		decl String:steamid[64];
 		new clientpoints = g_iPlayerPoints[client];
@@ -403,30 +403,14 @@ public clientlib_CheckVip(client)
 
 
 
-
-			if (!g_bStripTag)
+			// Rejoin
+			if (!g_bMoreColors)
 			{
-				// VIP
-				if (!g_bMoreColors)
-				{
-					CPrintToChat(client, "%s %t", g_sStammTag, "JoinVIP");
-				}
-				else
-				{
-					MCPrintToChat(client, "%s %t", g_sStammTag, "JoinVIP");
-				}
+				CPrintToChat(client, "%s %t", g_sStammTag, "JoinVIP");
 			}
 			else
 			{
-				// Level
-				if (!g_bMoreColors)
-				{
-					CPrintToChat(client, "%s %t", g_sStammTag, "JoinLevel");
-				}
-				else
-				{
-					MCPrintToChat(client, "%s %t", g_sStammTag, "JoinLevel");
-				}
+				MCPrintToChat(client, "%s %t", g_sStammTag, "JoinVIP");
 			}
 			
 
