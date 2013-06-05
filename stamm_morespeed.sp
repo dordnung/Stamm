@@ -132,7 +132,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Client changed feature state
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{

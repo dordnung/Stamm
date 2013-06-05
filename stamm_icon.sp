@@ -104,7 +104,7 @@ public OnPluginStart()
 
 
 // Client changed feature state
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client))
 	{

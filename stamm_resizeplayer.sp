@@ -173,7 +173,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Client changed a feature
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client))
 	{

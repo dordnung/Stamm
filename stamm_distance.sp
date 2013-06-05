@@ -226,7 +226,7 @@ public OnClientDisconnect(client)
 
 
 // Client changed feature
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (!mode)
 	{
