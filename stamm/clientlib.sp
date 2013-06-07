@@ -263,7 +263,7 @@ public clientlib_IsSpecialVIP(client)
 public clientlib_CheckFlagAdmin(client)
 {
 	// Flag checking
-	if ((GetUserFlagBits(client) & ReadFlagString(g_sGiveFlagAdmin) || GetUserFlagBits(client) & ADMFLAG_ROOT))
+	if (GetUserFlagBits(client) & ReadFlagString(g_sGiveFlagAdmin))
 	{
 		clientlib_GiveFastVIP(client);
 	}
