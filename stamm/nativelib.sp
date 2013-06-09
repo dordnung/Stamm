@@ -736,7 +736,7 @@ public nativelib_IsLevelPrivate(Handle:plugin, numParams)
 	
 
 	// greater than normal levels?
-	if (type > g_iLevels+g_PLevels)
+	if (type > g_iLevels+g_iPLevels)
 	{
 		ThrowNativeError(1, "Level %i is invalid! Found only %i Levels", type, g_iLevels+g_iPLevels);
 	}
