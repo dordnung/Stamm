@@ -197,6 +197,8 @@ public Handle:sqllib_createDB()
 // Insert new Player
 public sqllib_InsertPlayer(client)
 {
+	g_bClientReady[client] = false;
+
 	if (sqllib_db != INVALID_HANDLE)
 	{
 		decl String:query[4024];
@@ -229,7 +231,7 @@ public sqllib_InsertPlayer(client)
 
 
 		// Get it
-		SQL_TQuery(sqllib_db, sqllib_InsertHandler, query, client);
+		SQL_TQuery(sqllib_db, sqllib_InsertHandler, query, GetClientUserId(client));
 	}
 }
 
@@ -279,8 +281,10 @@ public sqllib_AddColumn(String:name[], bool:standard)
 
 
 // Clint insert handler
-public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any:client)
+public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any:userid)
 {
+	new client = GetClientOfUserId(userid);
+	
 	if (hndl != INVALID_HANDLE)
 	{
 		decl String:versionSteamid[12];
@@ -298,7 +302,6 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			g_iPointsNumber[client] = 0;
 			g_iHappyNumber[client] = 0;
 			g_iHappyFactor[client] = 0;
-			g_bClientReady[client] = false;
 
 
 
@@ -431,7 +434,7 @@ public Action:sqllib_GetVipTop(client, args)
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
 
-		SQL_TQuery(sqllib_db, sqllib_GetVIPTopQuery, query, client);
+		SQL_TQuery(sqllib_db, sqllib_GetVIPTopQuery, query, GetClientUserId(client));
 	}
 	
 	return Plugin_Handled;
@@ -460,7 +463,7 @@ public Action:sqllib_GetVipRank(client, args)
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
 
-		SQL_TQuery(sqllib_db, sqllib_GetVIPRankQuery, query, client);
+		SQL_TQuery(sqllib_db, sqllib_GetVIPRankQuery, query, GetClientUserId(client));
 	}
 	
 
@@ -476,8 +479,10 @@ public Action:sqllib_GetVipRank(client, args)
 
 
 // Vip Top query handle
-public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], any:client)
+public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], any:userid)
 {
+	new client = GetClientOfUserId(userid);
+
 	if (hndl != INVALID_HANDLE)
 	{
 		if (clientlib_isValidClient(client))
@@ -566,8 +571,10 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 
 
 // VIP rank handler
-public sqllib_GetVIPRankQuery(Handle:owner, Handle:hndl, const String:error[], any:client)
+public sqllib_GetVIPRankQuery(Handle:owner, Handle:hndl, const String:error[], any:userid)
 {
+	new client = GetClientOfUserId(userid);
+
 	// Found somehing valid?
 	if (hndl != INVALID_HANDLE)
 	{

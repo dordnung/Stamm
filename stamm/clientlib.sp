@@ -150,7 +150,7 @@ public clientlib_ClientReady(client)
 		// Show points	
 		if (g_bJoinShow)
 		{ 
-			CreateTimer(5.0, pointlib_ShowPoints2, client);
+			CreateTimer(5.0, pointlib_ShowPoints2, GetClientUserId(client));
 		}
 
 

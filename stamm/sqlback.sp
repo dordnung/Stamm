@@ -163,7 +163,7 @@ public sqlback_syncSteamid(client, const String:version[])
 		}
 
 
-		SQL_TQuery(sqllib_db, sqlback_syncSteamid1, query, client);
+		SQL_TQuery(sqllib_db, sqlback_syncSteamid1, query, GetClientUserId(client));
 	}
 }
 
@@ -172,8 +172,10 @@ public sqlback_syncSteamid(client, const String:version[])
 
 
 // SQL handler
-public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any:client)
+public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any:userid)
 {
+	new client = GetClientOfUserId(userid);
+	
 	// Found a entry?
 	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl) && clientlib_isValidClient_PRE(client))
 	{

@@ -362,8 +362,10 @@ public Action:pointlib_DelPlayerPoints(args)
 
 
 // Points handler
-public Action:pointlib_ShowPoints2(Handle:timer, any:client)
+public Action:pointlib_ShowPoints2(Handle:timer, any:userid)
 {
+	new client = GetClientOfUserId(userid);
+
 	// Show points
 	pointlib_ShowPlayerPoints(client, false);
 	
