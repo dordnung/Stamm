@@ -25,7 +25,7 @@ native bool:STAMM_AddBlockDescription(block, const String:description[], any:...
  *
  * @param block			Block to search for.
  * @return 				The level to get that block. -1 if block is for buying.
- * @error 				Block or feature is invalid.
+ * @error 				Block or feature is invalid or it's a shop feature.
  */
 native STAMM_GetLevel(block=1);
 
@@ -35,7 +35,7 @@ native STAMM_GetLevel(block=1);
  *
  * @param block			Block to search for.
  * @return 				Points to buy that block. -1 if level needed.
- * @error 				Block or feature is invalid.
+ * @error 				Block or feature is invalid or it's a level feature.
  */
 native STAMM_GetPoints(block=1);
 

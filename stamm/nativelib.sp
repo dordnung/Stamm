@@ -374,11 +374,17 @@ public nativelib_GetLevel(Handle:plugin, numParams)
 			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
+		// Check if shop
+		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
+		{
+			ThrowNativeError(2, "Block %i has no level, it's a shop Feature!", block);
+		}
+
 		return g_FeatureList[feature][FEATURE_LEVEL][block-1];
 	}
 	else
 	{
-		ThrowNativeError(2, "Your Feature is invalid");
+		ThrowNativeError(3, "Your Feature is invalid");
 	}
 
 
@@ -407,11 +413,17 @@ public nativelib_GetPoints(Handle:plugin, numParams)
 			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
+		// Check if no shop
+		if (g_FeatureList[feature][FEATURE_LEVEL][block-1] > 0)
+		{
+			ThrowNativeError(2, "Block %i has no points, it's a level Feature!", block);
+		}
+
 		return g_FeatureList[feature][FEATURE_POINTS][block-1];
 	}
 	else
 	{
-		ThrowNativeError(2, "Your Feature is invalid");
+		ThrowNativeError(3, "Your Feature is invalid");
 	}
 
 
@@ -577,7 +589,7 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 			for (new j=MAXLEVELS-1; j >= 0; j--)
 			{
 				// Block exists?
-				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0)
+				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 && g_FeatureList[feature][FEATURE_POINTS][j] == 0)
 				{
 					// Client have Block?
 					if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])

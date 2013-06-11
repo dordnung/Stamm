@@ -127,10 +127,16 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		// If this doesnt exist, stop here, but don't abort, because maybe it needs no level config
 		if (!FileExists(levelPath))
 		{
-			// Mark features as zero level
+			// Mark feature as zero level
 			goON = false;
 			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
 			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0;
+
+			// Debug
+			if (g_bDebug) 
+			{
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Found no Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
+			}
 		}
 	}
 
@@ -155,6 +161,12 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		{
 			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
 			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0;
+
+			// Debug
+			if (g_bDebug) 
+			{
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Found invalid Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
+			}
 		}
 		else
 		{
@@ -179,7 +191,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 
-				// When it's a int, just load it
+				// When it's a int, we have a shop feature
 				if (StringToInt(Svalue2) > 0)
 				{
 					g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = StringToInt(Svalue2);
