@@ -101,7 +101,7 @@ public sqllib_LoadDB()
 	}
 	else 
 	{
-		decl String:query[620];
+		decl String:query[768];
 		
 
 		// Get Driver

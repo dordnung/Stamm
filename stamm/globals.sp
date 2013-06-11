@@ -89,6 +89,7 @@ new g_iServerID;
 new g_iVipType;
 new g_iTimePoint;
 new g_iShowPoints;
+new g_iCommands;
 new g_iDelete;
 new g_iLevels;
 new g_iPLevels;
@@ -134,6 +135,8 @@ new String:g_sStammTag[64];
 new String:g_sAdminFlag[26];
 new String:g_sGiveFlagAdmin[26];
 new String:g_sDatabaseVersion[12];
+new String:g_sCommandName[MAXFEATURES][64];
+new String:g_sCommand[MAXFEATURES][64];
 
 
 // Level and Feature string globals

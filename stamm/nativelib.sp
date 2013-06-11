@@ -88,6 +88,7 @@ public nativelib_Start()
 	CreateNative("STAMM_UnloadFeature", nativelib_UnloadFeature);
 	CreateNative("STAMM_WriteToLog", nativelib_WriteToStammLog);
 	CreateNative("STAMM_GetTag", nativelib_GetStammTag);
+	CreateNative("STAMM_AddCommand", nativelib_AddCommand);
 
 
 	// And create all the global forwards
@@ -1405,4 +1406,28 @@ public nativelib_GetStammTag(Handle:plugin, numParams)
 {
 	// Save tag
 	SetNativeString(1, g_sStammTag, GetNativeCell(2), false);
+}
+
+
+
+
+
+// Adds a new command
+public nativelib_AddCommand(Handle:plugin, numParams)
+{
+	if (g_iCommands == MAXFEATURES)
+	{
+		ThrowNativeError(1, "Max commands of %i reached!", MAXFEATURES);
+	}
+
+
+	// Get Command
+	GetNativeString(1, g_sCommand[g_iCommands], sizeof(g_sCommand[]));
+
+	// Get name
+	FormatNativeString(0, 2, 3, sizeof(g_sCommandName[]), _, g_sCommandName[g_iCommands]);
+
+
+	// Update command count
+	g_iCommands++;
 }

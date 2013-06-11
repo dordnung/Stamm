@@ -139,6 +139,19 @@ native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
 native STAMM_GetTag(String:tag[], maxlength);
 
 
+/**
+ * Adds a new command to the command list
+ *
+ * @param command		The command to add.
+ * @param name			Name of the command.
+ * @param ...         	Name Format arguments.
+ * @error				Max Commands reached.
+ *
+ * @noreturn
+ */
+native STAMM_AddCommand(const String:command[], const String:name[], any:...);
+
+
 
 
 

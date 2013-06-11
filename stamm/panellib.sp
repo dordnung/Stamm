@@ -32,7 +32,6 @@
 // Panels
 new Handle:panellib_levels;
 new Handle:panellib_credits;
-new Handle:panellib_cmdlist;
 new Handle:panellib_adminpanel;
 
 
@@ -79,7 +78,6 @@ public panellib_Start()
 	// Create new Panels
 	panellib_credits = CreatePanel();
 	panellib_levels = CreateMenu(panellib_PassPanelHandler);
-	panellib_cmdlist = CreatePanel();
 	panellib_adminpanel = CreatePanel();
 
 
@@ -146,31 +144,21 @@ public panellib_Start()
 
 
 
-	// Create Command overview
-	Format(infoString, sizeof(infoString), "%T", "StammCMD", LANG_SERVER);
-	SetPanelTitle(panellib_cmdlist, infoString);
-	
-	DrawPanelText(panellib_cmdlist, "-------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T %s", "StammPoints", LANG_SERVER, g_sTextToWriteF);
-	DrawPanelItem(panellib_cmdlist, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T %s", "StammTop", LANG_SERVER, g_sVipListF);
-	DrawPanelItem(panellib_cmdlist, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T %s", "StammRank", LANG_SERVER, g_sVipRankF);
-	DrawPanelItem(panellib_cmdlist, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T %s", "StammChange", LANG_SERVER, g_sChangeF);
-	DrawPanelItem(panellib_cmdlist, infoString);
-	
-	DrawPanelText(panellib_cmdlist, "-------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T", "Back", LANG_SERVER);
-	DrawPanelItem(panellib_cmdlist, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "Close", LANG_SERVER);
-	DrawPanelItem(panellib_cmdlist, infoString);
+	// Add first four commands
+	g_iCommands = 4;
+
+	Format(g_sCommandName[0], sizeof(g_sCommandName[]), "%T", "StammPoints", LANG_SERVER);
+	Format(g_sCommand[0], sizeof(g_sCommand[]), g_sTextToWriteF);
+
+	Format(g_sCommandName[1], sizeof(g_sCommandName[]), "%T", "StammTop", LANG_SERVER);
+	Format(g_sCommand[1], sizeof(g_sCommand[]), g_sVipListF);
+
+	Format(g_sCommandName[2], sizeof(g_sCommandName[]), "%T", "StammRank", LANG_SERVER);
+	Format(g_sCommand[2], sizeof(g_sCommand[]), g_sVipRankF);
+
+	Format(g_sCommandName[3], sizeof(g_sCommandName[]), "%T", "StammChange", LANG_SERVER);
+	Format(g_sCommand[3], sizeof(g_sCommand[]), g_sChangeF);
+
 	
 
 
@@ -833,34 +821,30 @@ public panellib_CmdlistHandler(Handle:menu, MenuAction:action, param1, param2)
 	{
 		if (clientlib_isValidClient(param1))
 		{
-			// Explicit show command
-			// Get selected Command
-			if (param2 == 1) 
-			{
-				FakeClientCommandEx(param1, "say %s", g_sTextToWriteF);
-			}
+			decl String:command[64];
 
-			if (param2 == 2) 
-			{
-				FakeClientCommandEx(param1, "say %s", g_sVipListF);
-			}
+			// Get Command
+			GetMenuItem(menu, param2, command, sizeof(command));
 
-			if (param2 == 3) 
-			{
-				FakeClientCommandEx(param1, "say %s", g_sVipRankF);
-			}
 
-			if (param2 == 4)
-			{
-				FakeClientCommandEx(param1, "say %s", g_sChangeF);
-			}
-
-			if (param2 == 5)
-			{
-				// Go back
-				SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
-			}
+			FakeClientCommandEx(param1, "say \"%s\"", command);
 		}
+	}
+
+	else if (action == MenuAction_Cancel)
+	{
+		// Go back
+		if (param2 == MenuCancel_ExitBack && clientlib_isValidClient(param1))
+		{
+			SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
+		}
+	}
+
+
+	// Close
+	if (action == MenuAction_End) 
+	{
+		CloseHandle(menu);
 	}
 }
 
@@ -883,24 +867,40 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 				SendPanelToClient(panellib_credits, param1, panellib_PanelHandler, 20);
 			}
 
-			if (param2 == 3)
+			else if (param2 == 3)
 			{ 
 				// Open level overview
 				DisplayMenu(panellib_levels, param1, 20);
 			}
 
-			if (param2 == 2) 
+			else if (param2 == 2) 
 			{
 				// Open command list menu
-				SendPanelToClient(panellib_cmdlist, param1, panellib_CmdlistHandler, 20);
+				new Handle:cmdlist = CreateMenu(panellib_CmdlistHandler);
+
+
+				decl String:infoString[128];
+
+
+				SetMenuTitle(cmdlist, "%T", "StammCMD", param1);
+				SetMenuExitBackButton(cmdlist, true);
+
+
+				// Add all commands
+				for (new i=0; i < g_iCommands; i++)
+				{
+					// Add command			
+					Format(infoString, sizeof(infoString), "%s %s", g_sCommandName[i], g_sCommand[i]);
+
+					AddMenuItem(cmdlist, g_sCommand[i], infoString);
+				}
+
+				// Send
+				DisplayMenu(cmdlist, param1, 20);
 			}
 
-
-
-
-
 			// Open feature list
-			if (param2 == 1)
+			else if (param2 == 1)
 			{
 				// Found feature?
 				new bool:foundFeature = false;
