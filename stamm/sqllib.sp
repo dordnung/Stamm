@@ -472,11 +472,17 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 			if (!SQL_FetchRow(hndl))
 			{
 				// Set all features to false
-				for (new i=0; i < MAXLEVELS; i++)
+				for (new i=0; i < MAXFEATURES; i++)
 				{
+					// Array invalid
+					if (g_hBoughtBlock[client][i] == INVALID_HANDLE)
+					{
+						g_hBoughtBlock[client][i] = CreateArray(1, MAXLEVELS);
+					}
+
 					for (new j=0; j < MAXLEVELS; j++)
 					{
-						g_bBoughtBlock[client][i][j] = false;
+						SetArrayCell(g_hBoughtBlock[client][i], j, 0);
 					}
 				}
 
@@ -488,7 +494,7 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 			{
 				new index = -1;
 				new indexBlock = -1;
-
+				decl String:blockn[32];
 
 				// Parse all database data
 				do
@@ -518,7 +524,9 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 						for (new j=0; j < g_FeatureList[index][FEATURE_BLOCKS]; j++)
 						{
 							// Check if name equals
-							if (StrEqual(g_sFeatureBlocks[index][j], block, false))
+							GetArrayString(g_hFeatureBlocks[index], j, blockn, sizeof(blockn));
+
+							if (StrEqual(blockn, block, false))
 							{
 								indexBlock = j;
 
@@ -530,7 +538,13 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 						// Found it
 						if (indexBlock != -1)
 						{
-							g_bBoughtBlock[client][index][indexBlock] = true;
+							// Array invalid
+							if (g_hBoughtBlock[client][index] == INVALID_HANDLE)
+							{
+								g_hBoughtBlock[client][index] = CreateArray(1, MAXLEVELS);
+							}
+
+							SetArrayCell(g_hBoughtBlock[client][index], indexBlock, 1);
 						}
 					}
 

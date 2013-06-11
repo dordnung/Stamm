@@ -425,7 +425,7 @@ public panellib_CreateUserPanels(client, mode)
 				// Maybe he bought a block
 				for (new j=0; j < g_FeatureList[i][FEATURE_BLOCKS]; j++)
 				{
-					if (g_bBoughtBlock[client][i][j])
+					if (GetArrayCell(g_hBoughtBlock[client][i], j) == 1)
 					{
 						enabled = true;
 

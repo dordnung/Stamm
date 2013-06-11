@@ -499,7 +499,10 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 public nativelib_GetBlockOfName(Handle:plugin, numParams)
 {
 	decl String:name[64];
+	decl String:block[32];
+
 	new feature = featurelib_getFeatureByHandle(plugin);
+
 
 	GetNativeString(1, name, sizeof(name));
 
@@ -512,7 +515,9 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 		for (new j=0; j < g_FeatureList[feature][FEATURE_BLOCKS]; j++)
 		{
 			// Check if name equals
-			if (StrEqual(g_sFeatureBlocks[feature][j], name, false))
+			GetArrayString(g_hFeatureBlocks[feature], j, block, sizeof(block));
+
+			if (StrEqual(block, name, false))
 			{
 				return j+1;
 			}
@@ -593,7 +598,7 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 || g_FeatureList[feature][FEATURE_POINTS][j] > 0)
 				{
 					// Client have Block?
-					if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] || g_bBoughtBlock[client][feature][j]) && g_FeatureList[feature][WANT_FEATURE][client])
+					if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] || GetArrayCell(g_hBoughtBlock[client][feature], j) == 1) && g_FeatureList[feature][WANT_FEATURE][client])
 					{
 						// found highest
 						return j+1;
@@ -1188,7 +1193,7 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 
 
 			// Player level high enough and want feature?
-			if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1] || g_bBoughtBlock[client][feature][block-1]) && g_FeatureList[feature][WANT_FEATURE][client])
+			if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1] || GetArrayCell(g_hBoughtBlock[client][feature], block-1) == 1) && g_FeatureList[feature][WANT_FEATURE][client])
 			{
 				return true;
 			}

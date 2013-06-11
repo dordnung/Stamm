@@ -186,8 +186,13 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 				// Save Block
-				Format(g_sFeatureBlocks[g_iFeatures][start], sizeof(g_sFeatureBlocks[][]), Svalue);
+				if (g_hFeatureBlocks[g_iFeatures] == INVALID_HANDLE)
+				{
+					g_hFeatureBlocks[g_iFeatures] = CreateArray(32, MAXLEVELS);
+				}
 
+
+				SetArrayString(g_hFeatureBlocks[g_iFeatures], start, Svalue);
 
 
 

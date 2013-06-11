@@ -143,15 +143,12 @@ new String:g_sCommand[MAXFEATURES][64];
 new String:g_sLevelName[MAXLEVELS][32];
 new String:g_sLevelKey[MAXLEVELS][32];
 new String:g_sLevelFlag[MAXLEVELS][26];
-new String:g_sFeatureBlocks[MAXFEATURES][MAXLEVELS][32];
-
 
 
 
 
 
 // Global bools
-new bool:g_bBoughtBlock[MAXPLAYERS + 1][MAXFEATURES][MAXLEVELS];
 new bool:g_bClientReady[MAXPLAYERS + 1];
 new bool:g_bPluginStarted;
 new bool:g_bIsLate;
@@ -169,6 +166,8 @@ new bool:g_bMoreColors;
 
 
 // Global handles
+new Handle:g_hBoughtBlock[MAXPLAYERS + 1][MAXFEATURES];
+new Handle:g_hFeatureBlocks[MAXFEATURES];
 new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;
 
@@ -179,60 +178,60 @@ new Handle:g_hHudSync;
 
 
 // Define here the SQL querys
-new String:g_sCreateBackupQuery[] = "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))";
-new String:g_sCreateTableQuery[] = "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))";
-new String:g_sCreateBackupQueryMySQL[] = "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'";
-new String:g_sCreateTableQueryMySQL[] = "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'";
+#define g_sCreateBackupQuery "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))"
+#define g_sCreateTableQuery "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))"
+#define g_sCreateBackupQueryMySQL "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
+#define g_sCreateTableQueryMySQL "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
 
-new String:g_sCreateFeatureQuery[] = "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))";
-new String:g_sCreatHappyQuery[] = "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)";
-
-
-new String:g_sDeleteOldQuery[] = "DELETE FROM `%s` WHERE `last_visit` < %i";
-new String:g_sDeletePlayerQuery[] = "DELETE FROM `%s` WHERE `steamid`='%s'";
-new String:g_sDeletePlayerShopQuery[] = "DELETE FROM `%s_shop` WHERE `steamid`='%s' AND `feature`='%s' AND `block`='%s'";
-new String:g_sDeleteHappyQuery[] = "DELETE FROM `%s_happy`";
+#define g_sCreateFeatureQuery "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))"
+#define g_sCreatHappyQuery "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)"
 
 
-new String:g_sUpdatePlayerQuery[] = "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'";
-new String:g_sUpdateSetPointsLevelZeroQuery[] = "UPDATE `%s` SET `level`=0,`points`=0 WHERE `steamid`='%s'";
-new String:g_sUpdateSetPointsZeroQuery[] = "UPDATE `%s` SET `points`=0 ";
-new String:g_sUpdateSetPointsQuery[] = "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'";
-new String:g_sUpdateAddPointsQuery[] = "UPDATE `%s` SET `points`=`points`+(%i) ";
-new String:g_sUpdateAddPointsSteamidQuery[] = "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'";
-new String:g_sUpdatePlayer2Query[] = "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'";
+#define g_sDeleteOldQuery "DELETE FROM `%s` WHERE `last_visit` < %i"
+#define g_sDeletePlayerQuery "DELETE FROM `%s` WHERE `steamid`='%s'"
+#define g_sDeletePlayerShopQuery "DELETE FROM `%s_shop` WHERE `steamid`='%s' AND `feature`='%s' AND `block`='%s'"
+#define g_sDeleteHappyQuery "DELETE FROM `%s_happy`"
 
 
-new String:g_sInsertHappyQuery[] = "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)";
-new String:g_sInsertMiddleQuery[] = "%s FROM `%s` WHERE steamid = '%s'";
-new String:g_sInsertPlayerQuery[] = "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)";
-new String:g_sInsertPlayerShopQuery[] = "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES ('%s', '%s', '%s')";
-new String:g_sInsertPlayerSaveQuery[] = "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES ('%s', %i, %i, '%s', %s, %i);";
-new String:g_sInsertPlayerSave2Query[] = "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES";
-new String:g_sInsertPlayerSave2DataQuery[] = "('%s', %i, %i, '%s', %s, %i);";
-new String:g_sInsertPlayerSave2Data2Query[] = "('%s', %i, %i, '%s', %s, %i),";
-new String:g_sInsertPlayerSave2QueryShop[] = "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES";
-new String:g_sInsertPlayerSave2DataQueryShop[] = "('%s', '%s', '%s');";
-new String:g_sInsertPlayerSave2Data2QueryShop[] = "('%s', '%s', '%s'),";
-new String:g_sInsertBackupQuery[] = "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`";
+#define g_sUpdatePlayerQuery "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'"
+#define g_sUpdateSetPointsLevelZeroQuery "UPDATE `%s` SET `level`=0,`points`=0 WHERE `steamid`='%s'"
+#define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 "
+#define g_sUpdateSetPointsQuery "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'"
+#define g_sUpdateAddPointsQuery "UPDATE `%s` SET `points`=`points`+(%i) "
+#define g_sUpdateAddPointsSteamidQuery "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'"
+#define g_sUpdatePlayer2Query "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'"
 
 
-new String:g_sSelectVersionQuery[] = "SELECT REPLACE(`version`, '.', '') FROM `%s` ORDER BY `version` DESC LIMIT 1";
-new String:g_sSelectHappyQuery[] = "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1";
-new String:g_sSelectPointsQuery[] = "SELECT `points` FROM `%s` WHERE `steamid`='%s'";
-new String:g_sSelectAllPointsQuery[] = "SELECT `VIP` FROM `%s` LIMIT 1";
-new String:g_sSelectTop10Query[] = "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10";
-new String:g_sSelectRankQuery[] = "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i";
-new String:g_sSelectPlayerQuery[] = "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`";
-new String:g_sSelectPlayerShopAllQuery[] = "SELECT `steamid`, `feature`, `block` FROM `%s_shop`";
-new String:g_sSelectPlayerStartQuery[] = "SELECT `points`, `level`, `version`";
-new String:g_sSelectPlayerShopQuery[] = "SELECT `feature`, `block` FROM `%s_shop` WHERE steamid = '%s'";
+#define g_sInsertHappyQuery "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)"
+#define g_sInsertMiddleQuery "%s FROM `%s` WHERE steamid = '%s'"
+#define g_sInsertPlayerQuery "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)"
+#define g_sInsertPlayerShopQuery "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES ('%s', '%s', '%s')"
+#define g_sInsertPlayerSaveQuery "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES ('%s', %i, %i, '%s', %s, %i)"
+#define g_sInsertPlayerSave2Query "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES"
+#define g_sInsertPlayerSave2DataQuery "('%s', %i, %i, '%s', %s, %i);"
+#define g_sInsertPlayerSave2Data2Query "('%s', %i, %i, '%s', %s, %i),"
+#define g_sInsertPlayerSave2QueryShop "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES"
+#define g_sInsertPlayerSave2DataQueryShop "('%s', '%s', '%s');"
+#define g_sInsertPlayerSave2Data2QueryShop "('%s', '%s', '%s'),"
+#define g_sInsertBackupQuery "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`"
 
 
-new String:g_sAlterAdminQuery[] = "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0";
-new String:g_sAlterLastVisitQuery[] = "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i";
-new String:g_sAlterVersionQuery[] = "ALTER TABLE `%s` ADD `version` FLOAT NOT NULL DEFAULT 0.0";
-new String:g_sAlterPayedQuery[] = "ALTER TABLE `%s` DROP `payed`";
-new String:g_sAlterRenameQuery[] = "ALTER TABLE `%s` RENAME TO `%s_old`";
-new String:g_sAlterRename2Query[] = "ALTER TABLE `%s_backup` RENAME TO `%s`";
-new String:g_sAlterFeatureQuery[] = "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT %i";
+#define g_sSelectVersionQuery "SELECT REPLACE(`version`, '.', '') FROM `%s` ORDER BY `version` DESC LIMIT 1"
+#define g_sSelectHappyQuery "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1"
+#define g_sSelectPointsQuery "SELECT `points` FROM `%s` WHERE `steamid`='%s'"
+#define g_sSelectAllPointsQuery "SELECT `VIP` FROM `%s` LIMIT 1"
+#define g_sSelectTop10Query "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10"
+#define g_sSelectRankQuery "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i"
+#define g_sSelectPlayerQuery "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`"
+#define g_sSelectPlayerShopAllQuery "SELECT `steamid`, `feature`, `block` FROM `%s_shop`"
+#define g_sSelectPlayerStartQuery "SELECT `points`, `level`, `version`"
+#define g_sSelectPlayerShopQuery "SELECT `feature`, `block` FROM `%s_shop` WHERE steamid = '%s'"
+
+
+#define g_sAlterAdminQuery "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0"
+#define g_sAlterLastVisitQuery "ALTER TABLE `%s` ADD `last_visit` INT UNSIGNED NOT NULL DEFAULT %i"
+#define g_sAlterVersionQuery "ALTER TABLE `%s` ADD `version` FLOAT NOT NULL DEFAULT 0.0"
+#define g_sAlterPayedQuery "ALTER TABLE `%s` DROP `payed`"
+#define g_sAlterRenameQuery "ALTER TABLE `%s` RENAME TO `%s_old`"
+#define g_sAlterRename2Query "ALTER TABLE `%s_backup` RENAME TO `%s`"
+#define g_sAlterFeatureQuery "ALTER TABLE `%s` ADD `%s` TINYINT NOT NULL DEFAULT %i"

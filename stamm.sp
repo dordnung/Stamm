@@ -437,7 +437,7 @@ public stammStarted()
 
 
 	// Print hint
-	PrintToServer("Stamm started succesfully with %i Features and %i Levels", g_iFeatures, g_iLevels+g_iPLevels);
+	PrintToServer("######### [ STAMM ] Stamm started succesfully with %i Features and %i Levels ###########", g_iFeatures, g_iLevels+g_iPLevels);
 
 
 
