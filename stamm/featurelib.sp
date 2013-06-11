@@ -76,7 +76,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 			// if plugin already started load the feature
-			if (g_sPluginStarted)
+			if (g_bPluginStarted)
 			{
 				CreateTimer(0.5, featurelib_loadFeatures, i);
 			}
@@ -204,6 +204,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 					// Else search for the value of the level name with this loop
 					for (new i=0; i < g_iLevels+g_iPLevels; i++)
 					{
+						// Name or key equals
 						if (StrEqual(Svalue2, g_sLevelName[i], false) || StrEqual(Svalue2, g_sLevelKey[i], false))
 						{
 							found = true; 
@@ -282,7 +283,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 	// Load feature if plugin already started
-	if (g_sPluginStarted)
+	if (g_bPluginStarted)
 	{
 		CreateTimer(0.5, featurelib_loadFeatures, g_iFeatures-1);
 	}
@@ -319,7 +320,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 	else
 	{
 		// Finally stamm is loaded
-		g_sPluginStarted = true;
+		g_bPluginStarted = true;
 		
 
 		// Loop through all feature and load them

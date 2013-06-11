@@ -431,8 +431,23 @@ public panellib_CreateUserPanels(client, mode)
 			// Loop through all features
 			for (new i=0; i < g_iFeatures; i++)
 			{
+				new bool:enabled;
+
+
+				// Maybe he bought a block
+				for (new j=0; j < g_FeatureList[i][FEATURE_BLOCKS]; j++)
+				{
+					if (g_bBoughtBlock[client][i][j])
+					{
+						enabled = true;
+
+						break;
+					}
+				}
+
+
 				// Only enabled features and changeable features
-				if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_CHANGE] && g_iPlayerLevel[client] >= g_FeatureList[i][FEATURE_LEVEL][0])
+				if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_CHANGE] && (g_iPlayerLevel[client] >= g_FeatureList[i][FEATURE_LEVEL][0] || enabled))
 				{
 					// found something
 					found = true;

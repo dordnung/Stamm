@@ -507,8 +507,8 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 	// Feature found?
 	if (feature != -1)
 	{
-		// Go through all levels
-		for (new j=0; j < MAXLEVELS; j++)
+		// Go through all blocks
+		for (new j=0; j < g_FeatureList[feature][FEATURE_BLOCKS]; j++)
 		{
 			// Check if name equals
 			if (StrEqual(g_sFeatureBlocks[feature][j], name, false))
@@ -585,14 +585,14 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 		// Found feature?
 		if (feature != -1)
 		{
-			// Go through all blocks and 
+			// Go through all blocks
 			for (new j=MAXLEVELS-1; j >= 0; j--)
 			{
 				// Block exists?
-				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 && g_FeatureList[feature][FEATURE_POINTS][j] == 0)
+				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 || g_FeatureList[feature][FEATURE_POINTS][j] > 0)
 				{
 					// Client have Block?
-					if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
+					if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] || g_bBoughtBlock[client][feature][j]) && g_FeatureList[feature][WANT_FEATURE][client])
 					{
 						// found highest
 						return j+1;
@@ -1187,7 +1187,7 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 
 
 			// Player level high enough and want feature?
-			if (g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1] && g_FeatureList[feature][WANT_FEATURE][client])
+			if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1] || g_bBoughtBlock[client][feature][block-1]) && g_FeatureList[feature][WANT_FEATURE][client])
 			{
 				return true;
 			}
@@ -1297,7 +1297,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 public nativelib_IsLoaded(Handle:plugin, numParams)
 {
 	// yeah, just return the value
-	return g_sPluginStarted;
+	return g_bPluginStarted;
 }
 
 

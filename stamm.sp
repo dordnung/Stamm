@@ -197,7 +197,7 @@ public OnPluginStart()
 
 
 	// No, it's not started, yet
-	g_sPluginStarted = false;
+	g_bPluginStarted = false;
 }
 
 
@@ -304,7 +304,7 @@ public OnConfigsExecuted()
 
 
 	// No mapchange? Real load
-	if (!g_sPluginStarted)
+	if (!g_bPluginStarted)
 	{	
 		// Start rest of stamm componants
 		// They need the config

@@ -29,7 +29,7 @@
 
 new Handle:sqllib_db;
 new sqllib_convert = -1;
-
+new sqllib_convert_cur = 2;
 
 
 
@@ -138,6 +138,26 @@ public sqllib_LoadDB()
 			
 			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Table. Error: %s", sqlError);
 		}
+
+
+
+
+		// Create feature table
+		Format(query, sizeof(query), g_sCreateFeatureQuery, g_sTableName);
+		
+		if (g_bDebug) 
+		{
+			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
+		}
+
+		// Fast query
+		if (!SQL_FastQuery(sqllib_db, query))
+		{
+			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
+			
+			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Feature Table. Error: %s", sqlError);
+		}
+
 
 
 
@@ -262,7 +282,6 @@ public sqllib_AddColumn(String:name[], bool:standard)
 
 
 
-
 		if (g_bDebug) 
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
@@ -291,7 +310,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 		decl String:name[MAX_NAME_LENGTH + 1];
 		decl String:name2[2 * MAX_NAME_LENGTH + 2];
 		decl String:steamid[64];
-		decl String:query[512];
+		decl String:query[1024];
 		
 
 
@@ -344,9 +363,6 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 
 
-				// Client is ready
-				clientlib_ClientReady(client);
-
 				// Sync the steamid with version 0.00
 				sqlback_syncSteamid(client, "0.00");
 			}
@@ -396,19 +412,142 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// Get the version of this client
 				SQL_FetchString(hndl, 2, versionSteamid, sizeof(versionSteamid));
 
-				clientlib_ClientReady(client);
-
-
 
 				// Sync old STEAM_1:
 				sqlback_syncSteamid(client, versionSteamid);
 			}
+
+
+
+			// Get Feature of the player
+			Format(query, sizeof(query), g_sSelectPlayerShopQuery, g_sTableName, steamid);
+			
+			if (g_bDebug) 
+			{
+				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
+			}
+
+
+			// Get it
+			SQL_TQuery(sqllib_db, sqllib_InsertHandler2, query, GetClientUserId(client));
 		}
 	}
 	else
 	{
 		// Couldn't check
 		LogToFile(g_sLogFile, "[ STAMM ] Error checking Player %N:   %s", client, error);
+	}
+}
+
+
+
+
+
+
+
+
+// Clint insert handler 2
+public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], any:userid)
+{
+	new client = GetClientOfUserId(userid);
+	
+
+	if (hndl != INVALID_HANDLE)
+	{
+		decl String:feature[64];
+		decl String:block[64];
+		decl String:steamid[64];
+		
+
+
+		// Only valid clients
+		if (clientlib_isValidClient_PRE(client))
+		{
+			// Get steamid
+			clientlib_getSteamid(client, steamid, sizeof(steamid));
+
+
+
+			// Found no entry?
+			if (!SQL_FetchRow(hndl))
+			{
+				// Set all features to false
+				for (new i=0; i < MAXLEVELS; i++)
+				{
+					for (new j=0; j < MAXLEVELS; j++)
+					{
+						g_bBoughtBlock[client][i][j] = false;
+					}
+				}
+
+
+				// Client is ready
+				clientlib_ClientReady(client);
+			}
+			else
+			{
+				new index = -1;
+				new indexBlock = -1;
+
+
+				// Parse all database data
+				do
+				{
+					// Get features and blocks of client
+					SQL_FetchString(hndl, 0, feature, sizeof(feature));
+					SQL_FetchString(hndl, 1, block, sizeof(block));
+
+
+					// Find the feature
+					for (new i=0; i < g_iFeatures; i++)
+					{
+						// Basename equals?
+						if (StrEqual(g_FeatureList[i][FEATURE_BASE], feature, false))
+						{
+							index = i;
+
+							break;
+						}
+					}
+
+
+					// Found it
+					if (index != -1)
+					{
+						// Find the block
+						for (new j=0; j < g_FeatureList[index][FEATURE_BLOCKS]; j++)
+						{
+							// Check if name equals
+							if (StrEqual(g_sFeatureBlocks[index][j], block, false))
+							{
+								indexBlock = j;
+
+								break;
+							}
+						}
+
+
+						// Found it
+						if (indexBlock != -1)
+						{
+							g_bBoughtBlock[client][index][indexBlock] = true;
+						}
+					}
+
+				} 
+				while (SQL_FetchRow(hndl));
+
+
+
+				// Client is ready
+				clientlib_ClientReady(client);
+			}
+		}
+	}
+	else
+	{
+		// Couldn't check
+		LogToFile(g_sLogFile, "[ STAMM ] Error checking Player Shop %N:   %s", client, error);
 	}
 }
 
@@ -654,13 +793,16 @@ public Action:sqllib_convertDB(args)
 
 
 	// Not converting right now?
-	if (sqllib_convert > -1)
+	if (sqllib_convert_cur != 2)
 	{
 		ReplyToCommand(0, "You are already converting the database. Please Wait.");
 
 		return Plugin_Handled;
 	}
 
+
+	// Reset sqllib_convert_cur
+	sqllib_convert_cur = 0;
 
 
 	GetCmdArg(1, mysqlString, sizeof(mysqlString));
@@ -681,11 +823,21 @@ public Action:sqllib_convertDB(args)
 	sqllib_convert = StringToInt(mysqlString);
 
 	
+
 	// Select data from database
 	Format(query, sizeof(query), g_sSelectPlayerQuery, g_sTableName);
 
 	// Execute
 	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile, query);
+
+
+
+
+	// Select data from database
+	Format(query, sizeof(query), g_sSelectPlayerShopAllQuery, g_sTableName);
+
+	// Execute
+	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile2, query);
 
 
 
@@ -727,6 +879,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 			if (sqllib_convert == 0)
 			{
 				WriteFileLine(file, "BEGIN TRANSACTION;");
+
 
 				// Write create statement
 				WriteFileLine(file, g_sCreateTableQuery, g_sTableName, GetTime());
@@ -771,12 +924,14 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 					// Escape Sqlite
 					EscapeStringSQLite(name, name2, sizeof(name2), true);
 
+
 					WriteFileLine(file, g_sInsertPlayerSaveQuery, g_sTableName, steamid, level, points, name2, versionS, last);
 				}
 				else
 				{
 					// Escape Mysql
 					EscapeStringMySQL(name, name2, sizeof(name2), true);
+
 
 					// For mysql we insert up to 1000 users with one call
 					if (counter == 0)
@@ -832,5 +987,133 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 	}
 
 	// Reset state
-	sqllib_convert = -1;
+	sqllib_convert_cur++;
+}
+
+
+
+
+// Convert Handler
+public sqllib_SQLConvertDatabaseToFile2(Handle:owner, Handle:hndl, const String:error[], any:data)
+{
+	// Found someting?
+	if (hndl != INVALID_HANDLE && SQL_FetchRow(hndl))
+	{
+		new String:filename[64];
+		new counter = 0;
+
+
+
+		// Format filename
+		Format(filename, sizeof(filename), "%s_shop.sql", g_sTableName);
+
+		new Handle:file = OpenFile(filename, "wb");
+
+
+
+
+		// Could open file?
+		if (file != INVALID_HANDLE)
+		{
+			// For sqlite we need a start
+			if (sqllib_convert == 0)
+			{
+				WriteFileLine(file, "BEGIN TRANSACTION;");
+			}
+
+
+			// Shop table
+			WriteFileLine(file, g_sCreateFeatureQuery, g_sTableName);
+
+
+
+			// Parse all database data
+			do
+			{
+				decl String:steamid[64];
+				decl String:feature[128];
+				decl String:feature2[256];
+				decl String:block[128];
+				decl String:block2[256];
+
+
+				// Fetch steamid and name
+				SQL_FetchString(hndl, 0, steamid, sizeof(steamid));
+				SQL_FetchString(hndl, 1, feature, sizeof(feature));
+				SQL_FetchString(hndl, 2, block, sizeof(block));
+
+				
+
+				// For sqlite just add a insert into line
+				if (sqllib_convert == 0)
+				{
+					// Escape Sqlite
+					EscapeStringSQLite(feature, feature2, sizeof(feature2), true);
+					EscapeStringSQLite(block, block2, sizeof(block2), true);
+
+					WriteFileLine(file, g_sInsertPlayerShopQuery, g_sTableName, feature2, block2);
+				}
+				else
+				{
+					// Escape Mysql
+					EscapeStringMySQL(feature, feature2, sizeof(feature2), true);
+					EscapeStringMySQL(block, block2, sizeof(block2), true);
+
+
+					// For mysql we insert up to 1000 users with one call
+					if (counter == 0)
+					{
+						// new line
+						WriteFileLine(file, g_sInsertPlayerSave2QueryShop, g_sTableName);
+					}
+
+
+					// Check if 1000 reached
+					if (++counter == 1000 || !SQL_MoreRows(hndl))
+					{
+						WriteFileLine(file, g_sInsertPlayerSave2DataQueryShop, feature2, block2);
+
+						counter = 0;
+					}
+					else
+					{
+						WriteFileLine(file, g_sInsertPlayerSave2Data2QueryShop, feature2, block2);
+					}
+				}
+
+			} 
+			while (SQL_FetchRow(hndl));
+
+
+
+
+			// And we need a end for sqlite
+			if (sqllib_convert == 0)
+			{
+				WriteFileLine(file, "COMMIT;");
+			}
+
+
+
+
+			// Close file
+			CloseHandle(file);
+
+
+			// Notice finish
+			PrintToServer("Converted Shop Database to file %s successfully", filename);
+		}
+		else
+		{
+			// Couldn't create file
+			PrintToServer("Couldn't convert database to file. Couldn't create file %s", filename);
+		}
+	}
+	else
+	{
+		PrintToServer("Couldn't convert database to file. Error: ", error);
+	}
+
+	// Reset state
+	sqllib_convert_cur++;
 }
