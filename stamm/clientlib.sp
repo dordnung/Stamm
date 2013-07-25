@@ -97,7 +97,7 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 			new Float:endPos;
 			
 
-
+			// Set position of text.
 			if (TF2_GetPlayerClass(client) != TFClass_Engineer)
 			{
 				startPos = 0.01;
@@ -110,7 +110,7 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 			}
 
 
-
+			// Show the hud text
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
 			ShowSyncHudText(client, g_hHudSync, "[STAMM] %T: %i", "Points", client, g_iPlayerPoints[client]);
 		}
@@ -188,6 +188,14 @@ public OnClientDisconnect(client)
 public clientlib_IsSteamIDConnected(String:steamid[])
 {
 	decl String:cSteamid[64];
+	decl String:search[64];
+
+
+	// Copy to buffer
+	strcopy(search, sizeof(search), steamid);
+
+	// Replace STEAM_1: with STEAM_0:
+	ReplaceString(search, sizeof(search), "STEAM_1:", "STEAM_0:");
 
 
 	// Client Loop
@@ -200,7 +208,7 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 
 
 
-			if (StrEqual(steamid, cSteamid, false))
+			if (StrEqual(search, cSteamid, false))
 			{
 				// return client
 				return client;

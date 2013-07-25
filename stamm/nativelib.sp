@@ -117,17 +117,6 @@ public nativelib_Start()
 // Local forwards, let feature notice that it's loaded
 public nativelib_startLoaded(Handle:plugin, String:basename[])
 {
-	// Do we run Simillimum?
-	if (IsSimillimumAvailable())
-	{
-		if (GetHandleStatus(plugin) != HandleError_None)
-		{
-			g_FeatureList[plugin][FEATURE_ENABLE] = false;
-			return;
-		}
-	}
-
-
 	// Get function id
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnFeatureLoaded");
 	
@@ -259,17 +248,6 @@ public nativelib_ClientSave(client)
 // Notice to feature, that a player changed the status of him
 public nativelib_ClientChanged(client, Handle:plugin, bool:status, bool:shop)
 {
-	// Do we run Simillimum?
-	if (IsSimillimumAvailable())
-	{
-		if (GetHandleStatus(plugin) != HandleError_None)
-		{
-			g_FeatureList[plugin][FEATURE_ENABLE] = false;
-			return;
-		}
-	}
-
-
 	// Search for the function 
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
 	
@@ -598,7 +576,14 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 || g_FeatureList[feature][FEATURE_POINTS][j] > 0)
 				{
 					// Client have Block?
-					if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] || GetArrayCell(g_hBoughtBlock[client][feature], j) == 1) && g_FeatureList[feature][WANT_FEATURE][client])
+					if (g_FeatureList[feature][FEATURE_LEVEL][j] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
+					{
+						// found highest
+						return j+1;
+					}
+
+					// Client have Block?
+					if (g_FeatureList[feature][FEATURE_POINTS][j] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], j) == 1 && g_FeatureList[feature][WANT_FEATURE][client])
 					{
 						// found highest
 						return j+1;
@@ -1191,9 +1176,19 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 				ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 			}
 
+			if (!g_FeatureList[feature][WANT_FEATURE][client])
+			{
+				return false;
+			}
+
 
 			// Player level high enough and want feature?
-			if ((g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1] || GetArrayCell(g_hBoughtBlock[client][feature], block-1) == 1) && g_FeatureList[feature][WANT_FEATURE][client])
+			if (g_FeatureList[g_iFeatures][FEATURE_POINTS][block-1] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], block-1) == 1)
+			{
+				return true;
+			}
+
+			if (g_FeatureList[feature][FEATURE_LEVEL][block-1] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1])
 			{
 				return true;
 			}

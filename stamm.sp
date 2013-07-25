@@ -27,7 +27,7 @@
 
 
 // Include Sourcemod API's
-#include <simillimum>
+#include <sourcemod>
 #include <sdktools>
 #include <colors>
 #include <morecolors_stamm>
@@ -38,6 +38,7 @@
 // Tf2
 #undef REQUIRE_EXTENSIONS
 #include <tf2_stocks>
+#define REQUIRE_EXTENSIONS
 
 // Stamm Includes
 #include "stamm/globals.sp"
@@ -107,7 +108,6 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 // Finally it's loaded
 public OnPluginStart()
 {
-
 	// Check the folders we need
 	CheckStammFolders();
 
@@ -212,7 +212,7 @@ public OnPluginEnd()
 	{
 		if (g_FeatureList[i][FEATURE_ENABLE])
 		{
-			// Unload all Features
+			// Unload Feature
 			featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
 		}
 	}
@@ -276,8 +276,8 @@ public CheckStammFolders()
 	// Check for old folder
 	if (DirExists(oldFolder2) || DirExists(oldFolder))
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\". Then delete it!", oldFolder2);
-		PrintToServer("[ STAMM ] ATTENTION: Found Folder %s. Please move the folder levels inside to \"cfg/stamm\". Then delete it!", oldFolder2);
+		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder levels inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
+		PrintToServer("[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder levels inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
 	}
 }
 
@@ -461,21 +461,6 @@ public stammStarted()
 // Check if features are valid
 public Action:checkFeatures(Handle:timer, any:data)
 {
-	// Do we run Simillimum?
-	if (IsSimillimumAvailable())
-	{
-		for (new i=0; i < g_iFeatures; i++)
-		{
-			if (GetHandleStatus(g_FeatureList[i][FEATURE_HANDLE]) != HandleError_None)
-			{
-				g_FeatureList[i][FEATURE_ENABLE] = false;
-			}
-		}
-
-		return Plugin_Continue;
-	}
-
-
 	new current = 0;
 	new Handle:runningPlugins[128] = INVALID_HANDLE;
 
@@ -486,7 +471,7 @@ public Action:checkFeatures(Handle:timer, any:data)
 
 
 	// Loop
-	while (MorePlugins(hIter) && current < 128)
+	while (MorePlugins(hIter) && current < sizeof(runningPlugins))
 	{
 		new Handle:hPlugin = ReadPlugin(hIter);
 
@@ -505,7 +490,7 @@ public Action:checkFeatures(Handle:timer, any:data)
 	{
 		new bool:found = false;
 
-		for (new j=0; j < 128; j++)
+		for (new j=0; j < sizeof(runningPlugins); j++)
 		{
 			if (runningPlugins[j] != INVALID_HANDLE && g_FeatureList[i][FEATURE_HANDLE] == runningPlugins[j])
 			{
