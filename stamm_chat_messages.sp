@@ -1,176 +1,73 @@
-/**
- * -----------------------------------------------------
- * File        stamm_chat_messages.sp
- * Authors     David <popoklopsi> Ordnung
- * License     GPLv3
- * Web         http://popoklopsi.de
- * -----------------------------------------------------
- * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>
- */
-
-
-// Icnludes
 #include <sourcemod>
 #include <colors>
-#include <morecolors_stamm>
-
 #undef REQUIRE_PLUGIN
 #include <stamm>
-#include <updater>
 
 #pragma semicolon 1
 
+new v_level;
 
-
-
-new welcome;
-new leave;
-
-
+new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Chat Messages",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.1",
 	description = "Give VIP's VIP Chat and Message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
+public OnPluginStart()
+{
+	new Handle:myPlugin = GetMyHandle();
+	
+	GetPluginFilename(myPlugin, basename, sizeof(basename));
+	ReplaceString(basename, sizeof(basename), ".smx", "");
+	ReplaceString(basename, sizeof(basename), "stamm/", "");
+	ReplaceString(basename, sizeof(basename), "stamm\\", "");
+}
 
-
-// ADd Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
-	{
-		SetFailState("Can't Load Feature, Stamm is not installed!");
-	}
-
-
-	// Replace Invalid Colors
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-		
-
-	STAMM_LoadTranslation();	
-	STAMM_AddFeature("VIP Chat Messages");
+	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
 }
 
-
-
-// Feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public OnStammReady()
 {
-	decl String:description[64];
-	decl String:urlString[256];
+	LoadTranslations("stamm-features.phrases");
+	
+	new String:description[64];
 
+	Format(description, sizeof(description), "%T", "GetChatMessages", LANG_SERVER);
+	
+	v_level = AddStammFeature(basename, "VIP Chat Messages", description);
+	
+	Format(description, sizeof(description), "%T", "YouGetChatMessages", LANG_SERVER);
+	AddStammFeatureInfo(basename, v_level, description);
 
-
-
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
-	// Auto updater
-	if (LibraryExists("updater") && STAMM_AutoUpdate())
-	{
-		Updater_AddPlugin(urlString);
-	}
-
-
-	// Get Blocks
-	welcome = STAMM_GetBlockOfName("welcome");
-	leave = STAMM_GetBlockOfName("leave");
-
-
-	// Check valid?
-	if (welcome != -1)
-	{
-		Format(description, sizeof(description), "%T", "GetWelcomeMessages", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(welcome), description);
-	}
-
-	if (leave != -1)
-	{
-		Format(description, sizeof(description), "%T", "GetLeaveMessages", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(leave), description);
-	}
 }
 
-
-
-// Client Ready
-public STAMM_OnClientReady(client)
+public OnStammClientReady(client)
 {
-	decl String:name[MAX_NAME_LENGTH + 1];
-	decl String:tag[64];
-
-
+	new String:name[MAX_NAME_LENGTH + 1];
+	
 	GetClientName(client, name, sizeof(name));
-	STAMM_GetTag(tag, sizeof(tag));
-
-
-	// Gets a welcome message?
-	if (welcome != -1 && STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, welcome))
-	{
-		if (STAMM_GetGame() == GameCSGO)
-		{
-			CPrintToChatAll("%s %t", "WelcomeMessage", tag, name);
-		}
-		else
-		{
-			MCPrintToChatAll("%s %t", "WelcomeMessage", tag, name);
-		}
-	}
+	
+	if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename)) CPrintToChatAll("{olive}[ {green}Stamm {olive}] %T", "WelcomeMessage", LANG_SERVER, name);
 }
 
-
-// Client Disonnect
 public OnClientDisconnect(client)
 {
-	if (STAMM_IsClientValid(client) && leave != -1)
+	if (IsStammClientValid(client))
 	{
-		decl String:name[MAX_NAME_LENGTH + 1];
-		decl String:tag[64];
-
-
+		new String:name[MAX_NAME_LENGTH + 1];
+		
 		GetClientName(client, name, sizeof(name));
-		STAMM_GetTag(tag, sizeof(tag));
-
-
-		// Gets a leave message?
-		if (STAMM_HaveClientFeature(client, leave))
+		
+		if (IsClientVip(client, v_level))
 		{
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChatAll("%s %t", tag, "LeaveMessage", name);
-			}
-			else
-			{
-				MCPrintToChatAll("%s %t", tag, "LeaveMessage", name);
-			}
+			if (ClientWantStammFeature(client, basename)) CPrintToChatAll("{olive}[ {green}Stamm {olive}] %T", "LeaveMessage", LANG_SERVER, name);
 		}
 	}
 }

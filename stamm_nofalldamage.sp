@@ -1,125 +1,77 @@
-/**
- * -----------------------------------------------------
- * File        stamm_nofalldamage.sp
- * Authors     David <popoklopsi> Ordnung
- * License     GPLv3
- * Web         http://popoklopsi.de
- * -----------------------------------------------------
- * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>
- */
-
-
-
-// Includes
+#pragma semicolon 1
 #include <sourcemod>
-#include <sdkhooks>
 
 #undef REQUIRE_PLUGIN 
+#include <sdkhooks>
 #include <stamm>
-#include <updater>
 
-#pragma semicolon 1
+new v_level;
+
+new String:basename[64];
 
 #define DMG_FALL   (1 << 5)
-
-
 
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Fall Damage",
-	author = "Popoklopsi",
-	version = "1.1.1",
+	author = "Franc1sco steam: franug",
+	version = "1.0",
 	description = "Give VIP's No Fall Damage",
-	url = "https://forums.alliedmods.net/showthread.php?t=142073"
+	url = "www.servers-cfg.foroactivo.com"
 };
 
-
-
-
-// Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
-{
-	decl String:urlString[256];
-
-
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
-	if (LibraryExists("updater") && STAMM_AutoUpdate())
-	{
-		Updater_AddPlugin(urlString);
-	}
-}
-
-
-
-// Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
+	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!LibraryExists("sdkhooks")) SetFailState("Can't Load Feature, SDKHooks is not installed!");
 	
-
-	if (!LibraryExists("stamm")) 
-	{
-		SetFailState("Can't Load Feature, Stamm is not installed!");
-	}
-
-	if (!LibraryExists("sdkhooks")) 
-	{
-		SetFailState("Can't Load Feature, SDKHooks is not installed!");
-	}
-
-
-	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoFallDamage", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Fall Damage", description);
+	if (GetStammGame() != GameCSS) SetFailState("Can't Load Feature, not Supported for your game!");
 }
 
+public OnPluginStart()
+{
+	new Handle:myPlugin = GetMyHandle();
+	
+	GetPluginFilename(myPlugin, basename, sizeof(basename));
+	ReplaceString(basename, sizeof(basename), ".smx", "");
+	ReplaceString(basename, sizeof(basename), "stamm/", "");
+	ReplaceString(basename, sizeof(basename), "stamm\\", "");
+}
 
+public OnStammReady()
+{
+	LoadTranslations("stamm-features.phrases");
+	
+	new String:description[64];
 
+	Format(description, sizeof(description), "%T", "GetNoFallDamage", LANG_SERVER);
+	
+	v_level = AddStammFeature(basename, "VIP No Fall Damage", description);
+	
+	Format(description, sizeof(description), "%T", "YouGetNoFallDamage", LANG_SERVER);
+	AddStammFeatureInfo(basename, v_level, description);
+}
 
-// Client is ready hook him
-public STAMM_OnClientReady(client)
+public OnClientPutInServer(client)
 {
 	SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
 }
 
-
-
-// Client toke damage
 public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype)
 {
-	if (STAMM_IsClientValid(client))
+	if (IsStammClientValid(client))
 	{
-		if (STAMM_HaveClientFeature(client))
+		if (ClientWantStammFeature(client, basename))
 		{
-			// Just was fall damage??
-			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
+			if (IsClientVip(client, v_level) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 			{
 				if (damagetype & DMG_FALL)
 				{
-					// Do no damage
 					return Plugin_Handled;
 				}
 			}
 		}
 	}
-	
 	return Plugin_Continue;
 }

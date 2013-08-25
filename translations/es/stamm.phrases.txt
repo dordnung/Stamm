@@ -1,0 +1,255 @@
+"Phrases"
+{
+	"aborted"
+	{
+		"es"		"abortado"
+	}
+	"Round"
+	{
+		"es"		"ronda"
+	}
+	"Kill"
+	{
+		"es"		"muerte"
+	}
+	"Minute"
+	{
+		"es"		"minuto(s)"
+	}
+	"Points"
+	{
+		"es"		"puntos"
+	}
+	"PointInfo"
+	{
+		"es"		"Usted consigue 1 punto:"
+	}
+	"InfoTyp"
+	{
+		"es"		"esta activado, {green}escribe {1} {olive}para ver tus {green}puntos actuales"
+	}
+	"InfoTypInfo"
+	{
+		"es"		"Escribe {green}{1}{olive}, para ver toda la info {green}sobre Stamm"
+	}
+	"DeletedPoints"
+	{
+		"es" 		"stammpoints {green}de {1} {olive}borrados!"
+	}
+	"YourDeletedPoints"
+	{
+		"es" 		"Tus stammpoints {green}han sido reiniciados!!"
+	}
+	"AllLevels"
+	{
+		"es"		"Nivel general"
+	}
+	"ChoosePlayer"
+	{
+		"es" 		"Elige un jugador"
+	}
+	"ChooseFeature"
+	{
+		"es" 		"Elija una caracteristica"
+	}
+	"DeletedDB"
+	{
+		"es" 		"La database {green}ha sido reiniciada"
+	}
+	"NoVIP"
+	{
+		"es" 		"Tu {green}no eres VIP!"
+	}
+	"NoVips"
+	{
+		"es" 		"No hay Vips{olive}, aun!"
+	}
+	"Rank"
+	{
+		"es" 		"Tu estas en {green}{1}. Lugar{olive} con {green}{2} puntos"
+	}
+	"NoVIPClient"
+	{
+		"es"		"Tu tienes {green}{1} puntos{olive}, todavia necesitas{green} {2} puntos {olive}para ser VIP {3}"
+	}
+	"VIPClient"
+	{
+		"es"		"Tu tienes {green}{1} puntos{olive}, tu eres un VIP {2}"
+	}
+	"NoVIPAll"
+	{
+		"es"		"{green}{1} {olive}tiene {green}{2} puntos{olive}, todavia necesita{green} {3} puntos {olive}para ser VIP {4}"
+	}
+	"VIPAll"
+	{
+		"es"		"{green}{1} {olive}tiene {green}{2} puntos{olive}, el es VIP {3}"
+	}
+	"LevelNowVIP"
+	{
+		"es"		"{1} ahora es{green} VIP {2}"
+	}
+	"JoinVIP"
+	{
+		"es"		"{green}Haz retry {olive}para tener {green}todas las caracteristicas de VIP"
+	}
+	"StammPoints"
+	{
+		"es"		"Tus puntos Stamm:"
+	}
+	"StammTop"
+	{
+		"es"		"Top VIP:"
+	}
+	"StammRank"
+	{
+		"es"		"Tu rank Stamm:"
+	}
+	"StammChange"
+	{
+		"es"		"Cambiar tus caracteristicas:"
+	}
+	"DelStammList"
+	{
+		"es"		"Reiniciar la database Stamm?"
+	}
+	"Close"
+	{
+		"es"		"Cerrar"
+	}
+	"Reset"
+	{
+		"es"		"Reiniciar"
+	}
+	"Back"
+	{
+		"es"		"Volver"
+	}
+	"HaveFeatures"
+	{
+		"es"		"Los VIPs tienen las siguientes caracteristicas:"
+	}
+	"HaveMe"
+	{
+		"es"		"Usted tiene las siguientes caracteristicas:"
+	}
+	"ChangeFeatures"
+	{
+		"es"		"Activar/Desactivar Caracteristicas actuales:"
+	}
+	"FeatureOn"
+	{
+		"es"		"Desactivar {1}"
+	}
+	"FeatureOff"
+	{
+		"es"		"Activar {1}"
+	}
+	"AdminMenu"
+	{
+		"es"		"Menu de Admin"
+	}
+	"PointsOfPlayer"
+	{
+		"es"		"Fijar puntos en un jugador"
+	}
+	"StammCMD"
+	{
+		"es"		"Commandos de Stamm (traducido por Franug)"
+	}
+	"StammFeatures"
+	{
+		"es"		"Caracteristicas de Stamm"
+	}
+	"YourFeatures"
+	{
+		"es"		"Sus Caracteristicas"
+	}
+	"ResetPlayer"
+	{
+		"es"		"Reiniciar puntos del jugador"
+	}
+	"ResetDatabase"
+	{
+		"es"		"Reiniciar database"
+	}
+	"HappyHour"
+	{
+		"es"		"Activar Hora Feliz"
+	}
+	"HappyHourEnd"
+	{
+		"es"		"Desactivar Hora Feliz"
+	}
+	"RankTime2"
+	{
+		"es"		"{1} horas y {2} minutos"
+	}
+	"WritePoints"
+	{
+		"es"		"Ahora escribe{green} el numero de puntos {olive}en tu chat"
+	}
+	"WritePointsInfo"
+	{
+		"es"		"Mensaje {green}con un espacio {olive}= {green}abortado"
+	}
+	"SetPoints"
+	{
+		"es"		"Puntos de {green}{1} {olive}fijados a {green}{2}"
+	}
+	"SetPoints2"
+	{
+		"es"		"{green}Tus puntos {olive}han sido fijados a {green}{1}"
+	}
+	"WriteHappyFactor"
+	{
+		"es"		"{green}Ahora escribe {olive}en el chat: {green}el factor de multiplicacion"
+	}
+	"WriteHappyFactorInfo"
+	{
+		"es"		"Si es menor {green}que 2 {olive}= {green}abortado"
+	}
+	"WriteHappyTime"
+	{
+		"es"		"{green}Ahora escribe {olive}en el chat: {green}la duracion (en minutos)"
+	}
+	"WriteHappyTimeInfo"
+	{
+		"es"		"Si es menor {green}que 2 {olive}= {green}abortado"
+	}
+	"HappyRunning"
+	{
+		"es"		"La Hora Feliz {green}esta ahora activada"
+	}
+	"HappyNotRunning"
+	{
+		"es"		"Hora Feliz {green}no esta activada"
+	}
+	"HappyActive"
+	{
+		"es"		"Actualmente {green}Hora Feliz {olive}esta activada con {green}el factor de multiplicacion {1}"
+	}
+	"HappyEnded"
+	{
+		"es"		"Fin de la Hora Feliz!"
+	}
+	"LoadFeature"
+	{
+		"es"		"Activar Caracteristica"
+	}
+	"UnloadFeature"
+	{
+		"es"		"Desactivar Caracteristica"
+	}
+	"LoadedFeature"
+	{
+		"es"		"Cargada {green}Caracteristica {1}"
+	}
+	"UnloadedFeature"
+	{
+		"es"		"Descargada {green}Caracteristica {1}"
+	}
+	"NoFeatureFound"
+	{
+		"es"		"{green}No se han encontrado {olive}Caracteristicas"
+	}
+}

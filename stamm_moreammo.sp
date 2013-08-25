@@ -1,41 +1,9 @@
-/**
- * -----------------------------------------------------
- * File        stamm_moreammo.sp
- * Authors     David <popoklopsi> Ordnung
- * License     GPLv3
- * Web         http://popoklopsi.de
- * -----------------------------------------------------
- * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>
- */
-
-
-// Includes
 #include <sourcemod>
 #include <sdktools>
-#include <autoexecconfig>
-
 #undef REQUIRE_PLUGIN
 #include <stamm>
-#include <updater>
 
 #pragma semicolon 1
-
-
-
 
 new ammo;
 
@@ -44,187 +12,97 @@ new Handle:thetimer;
 
 new bool:WeaponEdit[MAXPLAYERS + 1][2024];
 
-
-
+new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreAmmo",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.1",
 	description = "Give VIP's more ammo",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
-
-
-// Add feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
-	{
-		SetFailState("Can't Load Feature, Stamm is not installed!");
-	}
+	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+}
 
-	if (STAMM_GetGame() == GameTF2)
+public OnPluginStart()
+{
+	new Handle:myPlugin = GetMyHandle();
+	
+	GetPluginFilename(myPlugin, basename, sizeof(basename));
+	ReplaceString(basename, sizeof(basename), ".smx", "");
+	ReplaceString(basename, sizeof(basename), "stamm/", "");
+	ReplaceString(basename, sizeof(basename), "stamm\\", "");
+	
+	HookEvent("player_death", PlayerDeath);
+	
+	if (GetStammGame() == GameTF2)
 	{
 		HookEvent("teamplay_round_start", RoundStart);
 		HookEvent("arena_round_start", RoundStart);
 	}
 	
-
-	if (STAMM_GetGame() == GameDOD)
-	{
-		HookEvent("dod_round_start", RoundStart);
-	}
-
-	else
-	{
-		HookEvent("round_start", RoundStart);
-	}
-
-	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP MoreAmmo", "");
-}
-
-
-
-
-// Create config and hook round start
-public OnPluginStart()
-{
-	HookEvent("player_death", PlayerDeath);
-
-	// Config
-	AutoExecConfig_SetFile("moreammo", "stamm/features");
-	
-	c_ammo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
+	c_ammo = CreateConVar("ammo_amount", "20", "Ammo increase in percent each level!");
 	
 	AutoExecConfig(true, "moreammo", "stamm/features");
-	AutoExecConfig_CleanFile();
 }
 
-
-
-
-// Feature loaded, add desc. and auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
-{
-	decl String:haveDescription[64];
-	decl String:urlString[256];
-
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
-	if (LibraryExists("updater") && STAMM_AutoUpdate())
-	{
-		Updater_AddPlugin(urlString);
-	}
-
-
-	// Add dscriptions for block
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetMoreAmmo", LANG_SERVER, ammo * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
-	}
-}
-
-
-
-// Reset on mapstart
 public OnMapStart()
 {
-	if (thetimer != INVALID_HANDLE) 
-	{
-		KillTimer(thetimer);
-	}
-
-	// Create check timer
+	if (thetimer != INVALID_HANDLE) KillTimer(thetimer);
+	
 	thetimer = CreateTimer(1.0, CheckWeapons, _, TIMER_REPEAT);
 }
 
-
-
-// Load config
 public OnConfigsExecuted()
 {
 	ammo = GetConVarInt(c_ammo);
 }
 
-
-
-// Reset on death
 public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	for (new x=0; x < 2024; x++) 
-	{
-		WeaponEdit[client][x] = false;
-	}
+	for (new x=0; x < 2024; x++) WeaponEdit[client][x] = false;
 }
-
-
 
 public RoundStart(Handle:event, String:name[], bool:dontBroadcast)
 {
-	// Reset on round start
 	for (new x=0; x < 2024; x++)
 	{
-		for (new i=0; i <= MaxClients; i++) 
-		{
-			WeaponEdit[i][x] = false;
-		}
+		for (new i=0; i <= MaxClients; i++) WeaponEdit[i][x] = false;
 	}
 }
 
-
-
-// Check weapons
 public Action:CheckWeapons(Handle:timer, any:data)
 {
-	// Client loop
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		new client = i;
 		
-		// Client valid?
-		if (STAMM_IsClientValid(client) && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
+		if (IsStammClientValid(client) && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
 		{
-			// Get highest client block
-			new clientBlock = STAMM_GetClientBlock(client);
-
-
-			// Client have block?
-			if (clientBlock > 0)
+			if (IsClientVip(client, 1) && ClientWantStammFeature(client, basename))
 			{
-				// Weapon loop
 				for (new x=0; x < 2; x++)
 				{
-					// Player carry weapon?
 					new weapon = GetPlayerWeaponSlot(client, x);
 
 					if (weapon != -1 && !WeaponEdit[client][weapon])
 					{
-						// Get ammo index
 						new ammotype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
 
-						// Found ammo?
 						if (ammotype != -1)
 						{
-							// Get ammo count
 							new cAmmo = GetEntProp(client, Prop_Send, "m_iAmmo", _, ammotype);
 							
-							// Found ammo count
 							if (cAmmo > 0)
 							{
-								// Calculate new Ammo
-								new newAmmo;
+								new newAmmo = RoundToZero(cAmmo + ((float(cAmmo)/100.0) * (GetClientStammLevel(client) * ammo)));
 								
-								newAmmo = RoundToZero(cAmmo + ((float(cAmmo)/100.0) * (clientBlock * ammo)));
-								
-								// Set ammo
 								SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, ammotype);
 								
 								WeaponEdit[client][weapon] = true;
@@ -237,4 +115,21 @@ public Action:CheckWeapons(Handle:timer, any:data)
 	}
 	
 	return Plugin_Continue;
+}
+
+public OnStammReady()
+{
+	LoadTranslations("stamm-features.phrases");
+	
+	new String:description[256];
+	
+	Format(description, sizeof(description), "%T", "GetMoreAmmo", LANG_SERVER, ammo);
+	
+	AddStammFeature(basename, "VIP MoreAmmo", description);
+
+	for (new i=1; i <= GetStammLevelCount(); i++)
+	{
+		Format(description, sizeof(description), "%T", "YouGetMoreAmmo", LANG_SERVER, ammo * i);
+		AddStammFeatureInfo(basename, i, description);
+	}
 }

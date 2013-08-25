@@ -1,149 +1,83 @@
-/**
- * -----------------------------------------------------
- * File        stamm_killhp.sp
- * Authors     David <popoklopsi> Ordnung
- * License     GPLv3
- * Web         http://popoklopsi.de
- * -----------------------------------------------------
- * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>
- */
-
-
-// Includes
 #include <sourcemod>
-#include <autoexecconfig>
-
 #undef REQUIRE_PLUGIN
 #include <stamm>
-#include <updater>
-
-
 
 #pragma semicolon 1
 
-
-
 new hp;
 new mhp;
+new v_level;
 
 new Handle:c_hp;
 new Handle:m_hp;
 
-
+new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature KillHP",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.1",
 	description = "Give VIP's HP every kill",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
-
-
-
-// Add Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
-	{
-		SetFailState("Can't Load Feature, Stamm is not installed!");
-	}
-
-	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP KillHP", "");
+	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
 }
 
-
-
-// Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
-{
-	decl String:description[64];
-	decl String:urlString[256];
-
-
-
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
-	if (LibraryExists("updater") && STAMM_AutoUpdate())
-	{
-		Updater_AddPlugin(urlString);
-	}
-
-
-
-	// Add Description
-	Format(description, sizeof(description), "%T", "GetKillHP", LANG_SERVER, hp);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
-}
-
-
-
-// Create config
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("killhp", "stamm/features");
-
+	new Handle:myPlugin = GetMyHandle();
+	
+	GetPluginFilename(myPlugin, basename, sizeof(basename));
+	ReplaceString(basename, sizeof(basename), ".smx", "");
+	ReplaceString(basename, sizeof(basename), "stamm/", "");
+	ReplaceString(basename, sizeof(basename), "stamm\\", "");
+	
 	HookEvent("player_death", PlayerDeath);
 	
-	c_hp = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
-	m_hp = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
+	c_hp = CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
+	m_hp = CreateConVar("killhp_max", "100", "Max HP of a player");
 	
 	AutoExecConfig(true, "killhp", "stamm/features");
-	AutoExecConfig_CleanFile();
 }
 
-
-
-// Load config
 public OnConfigsExecuted()
 {
 	hp = GetConVarInt(c_hp);
 	mhp = GetConVarInt(m_hp);
 }
 
-
-
-// Player died
 public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
 	
-	
-	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
+	if (IsStammClientValid(client) && IsStammClientValid(attacker))
 	{
-		// Give HP to Killer
-		if (STAMM_HaveClientFeature(attacker))
+		if (IsClientVip(attacker, v_level) && ClientWantStammFeature(attacker, basename))
 		{
 			new newHP = GetClientHealth(attacker) + hp;
 			
-			// Not more than Max HP
-			if (newHP >= mhp) 
-			{
-				newHP = mhp;
-			}
-
-			// Set health
+			if (newHP >= mhp) newHP = mhp;
+			
 			SetEntityHealth(attacker, newHP);
 		}
 	}
+}
+
+public OnStammReady()
+{
+	LoadTranslations("stamm-features.phrases");
+	
+	new String:description[256];
+	
+	Format(description, sizeof(description), "%T", "GetKillHP", LANG_SERVER, hp);
+	
+	v_level = AddStammFeature(basename, "VIP KillHP", description);
+	
+	Format(description, sizeof(description), "%T", "YouGetKillHP", LANG_SERVER, hp);
+	AddStammFeatureInfo(basename, v_level, description);
 }

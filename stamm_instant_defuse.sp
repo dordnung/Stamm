@@ -1,127 +1,69 @@
-/**
- * -----------------------------------------------------
- * File        stamm_instant_defuse.sp
- * Authors     David <popoklopsi> Ordnung
- * License     GPLv3
- * Web         http://popoklopsi.de
- * -----------------------------------------------------
- * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>
- */
-
-
-// Includes
 #include <sourcemod>
 #include <sdktools>
-
 #undef REQUIRE_PLUGIN
 #include <stamm>
-#include <updater>
 
 #pragma semicolon 1
 
+new v_level;
 
+new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Instant Defuse",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.1",
 	description = "VIP's can defuse the bomb instantly",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
-
-
-// Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
-{
-	decl String:urlString[256];
-
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
-	if (LibraryExists("updater") && STAMM_AutoUpdate())
-	{
-		Updater_AddPlugin(urlString);
-	}
-}
-
-
-
-
-// Add Feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-
-	if (!LibraryExists("stamm")) 
-	{
-		SetFailState("Can't Load Feature, Stamm is not installed!");
-	}
+	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
 	
-	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
-	{
-		SetFailState("Can't Load Feature, not Supported for your game!");
-	}
-		
-
-	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetInstantDefuse", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Instant Defuse", description);
+	if (GetStammGame() == GameTF2) SetFailState("Can't Load Feature, not Supported for your game!");
 }
 
-
-
-
-// Hook defuse begin
 public OnPluginStart()
 {
+	new Handle:myPlugin = GetMyHandle();
+	
+	GetPluginFilename(myPlugin, basename, sizeof(basename));
+	ReplaceString(basename, sizeof(basename), ".smx", "");
+	ReplaceString(basename, sizeof(basename), "stamm/", "");
+	ReplaceString(basename, sizeof(basename), "stamm\\", "");
+	
 	HookEvent("bomb_begindefuse", Event_Defuse);
 }
 
+public OnStammReady()
+{
+	LoadTranslations("stamm-features.phrases");
+	
+	new String:description[64];
+	
+	Format(description, sizeof(description), "%T", "GetInstantDefuse", LANG_SERVER);
+	
+	v_level = AddStammFeature(basename, "VIP Instant Defuse", description);
+	
+	Format(description, sizeof(description), "%T", "YouGetInstantDefuse", LANG_SERVER);
+	AddStammFeatureInfo(basename, v_level, description);
+}
 
-
-
-// Handle defusing
 public Event_Defuse(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (STAMM_IsClientValid(client))
+	if (IsStammClientValid(client))
 	{
-		// Set to defuse
-		if (STAMM_HaveClientFeature(client)) 
-		{
-			CreateTimer(0.5, setCountdown, client);
-		}
+		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename)) CreateTimer(0.5, setCountdown, client);
 	}
 }
 
-
-
-// No set countdown to zero
 public Action:setCountdown(Handle:timer, any:client)
 {
 	new bombent = FindEntityByClassname(-1, "planted_c4");
 	
-	if (bombent) 
-	{
-		SetEntPropFloat(bombent, Prop_Send, "m_flDefuseCountDown", 0.1);
-	}
+	if (bombent) SetEntPropFloat(bombent, Prop_Send, "m_flDefuseCountDown", 0.1);
 }

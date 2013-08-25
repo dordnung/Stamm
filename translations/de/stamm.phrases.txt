@@ -1,0 +1,255 @@
+"Phrases"
+{
+	"aborted"
+	{
+		"de"		"Abgebrochen"
+	}
+	"Round"
+	{
+		"de"		"Runde"
+	}
+	"Kill"
+	{
+		"de"		"Kill"
+	}
+	"Minute"
+	{
+		"de"		"Minute(n)"
+	}
+	"Points"
+	{
+		"de"		"Punkte"
+	}
+	"PointInfo"
+	{
+		"de"		"Du bekommst 1 Punkt mit:"
+	}
+	"InfoTyp"
+	{
+		"de"		"ist aktiviert, {green}schreibe {1} {olive}um deine {green}aktuellen Punkte {olive}zu sehen"
+	}
+	"InfoTypInfo"
+	{
+		"de"		"Schreibe {green}{1}{olive}, um alle Infos {green}über Stamm {olive}zu sehen"
+	}
+	"DeletedPoints"
+	{
+		"de" 		"Stammpunkte {green}von {1} {olive}wurden gelöscht!"
+	}
+	"YourDeletedPoints"
+	{
+		"de" 		"Deine Stammpunkte {green}wurden zurückgesetzt!!"
+	}
+	"AllLevels"
+	{
+		"de"		"Level Übersicht"
+	}
+	"ChoosePlayer"
+	{
+		"de" 		"Wähle einen Spieler"
+	}
+	"ChooseFeature"
+	{
+		"de" 		"Wähle ein Feature"
+	}
+	"DeletedDB"
+	{
+		"de" 		"Die Datenbank {green}wurde zurückgesetzt"
+	}
+	"NoVIP"
+	{
+		"de" 		"Du bist {green}kein VIP!"
+	}
+	"NoVips"
+	{
+		"de" 		"{green}Keine VIP's{olive}, bis jetzt!"
+	}
+	"Rank"
+	{
+		"de" 		"Du bist auf dem {green}{1}. Platz{olive} mit {green}{2} Punkten"
+	}
+	"NoVIPClient"
+	{
+		"de"		"Du hast {green}{1} Punkte{olive}, du brauchst noch{green} {2} Punkte {olive}um {3} VIP zu werden"
+	}
+	"VIPClient"
+	{
+		"de"		"Du hast {green}{1} Punkte{olive}, du bist {2} VIP"
+	}
+	"NoVIPAll"
+	{
+		"de"		"{green}{1} {olive}hat {green}{2} Punkte{olive}, er braucht noch{green} {3} Punkte {olive}um {4} VIP zu werden"
+	}
+	"VIPAll"
+	{
+		"de"		"{green}{1} {olive}hat {green}{2} Punkte{olive}, er ist {3} VIP"
+	}
+	"LevelNowVIP"
+	{
+		"de"		"{green}{1} {olive}ist jetzt {green}{2} VIP"
+	}
+	"JoinVIP"
+	{
+		"de"		"{green}Rejoine {olive}um {green}alle VIP features {olive}zu bekommen"
+	}
+	"StammPoints"
+	{
+		"de"		"Deine Stammpunkte:"
+	}
+	"StammTop"
+	{
+		"de"		"VIP Top:"
+	}
+	"StammRank"
+	{
+		"de"		"Dein Stamm Rank:"
+	}
+	"StammChange"
+	{
+		"de"		"Ändere deine Features:"
+	}
+	"DelStammList"
+	{
+		"de"		"Stamm Datenbank zurücksetzen?"
+	}
+	"Close"
+	{
+		"de"		"Schließen"
+	}
+	"Reset"
+	{
+		"de"		"Zurücksetzen"
+	}
+	"Back"
+	{
+		"de"		"Zurück"
+	}
+	"HaveFeatures"
+	{
+		"de"		"VIP's haben folgende Features:"
+	}
+	"HaveMe"
+	{
+		"de"		"Du hast folgende Features:"
+	}
+	"ChangeFeatures"
+	{
+		"de"		"Aktiviere/Deaktivere laufende Features:"
+	}
+	"FeatureOn"
+	{
+		"de"		"Deaktiviere {1}"
+	}
+	"FeatureOff"
+	{
+		"de"		"Aktiviere {1}"
+	}
+	"AdminMenu"
+	{
+		"de"		"Admin Menü"
+	}
+	"PointsOfPlayer"
+	{
+		"de"		"Punkte eines Spielers setzen"
+	}
+	"StammCMD"
+	{
+		"de"		"Stamm Befehle"
+	}
+	"StammFeatures"
+	{
+		"de"		"Stamm Features"
+	}
+	"YourFeatures"
+	{
+		"de"		"Deine Features"
+	}
+	"ResetPlayer"
+	{
+		"de"		"Spieler Punkte zurücksetzen"
+	}
+	"ResetDatabase"
+	{
+		"de"		"Datenbank zurücksetzen"
+	}
+	"HappyHour"
+	{
+		"de"		"Happy Hour aktivieren"
+	}
+	"HappyHourEnd"
+	{
+		"de"		"Happy Hour deaktivieren"
+	}
+	"RankTime2"
+	{
+		"de"		"{1} Stunden und {2} Minuten"
+	}
+	"WritePoints"
+	{
+		"de"		"Schreibe nun{green} die Anzahl der Punkte {olive}in deinen Chat"
+	}
+	"WritePointsInfo"
+	{
+		"de"		"Nachricht {green}mit einem Leerzeichen {olive}= {green}Abbrechen"
+	}
+	"SetPoints"
+	{
+		"de"		"Punkte von {green}{1} {olive}wurden gesetzt auf: {green}{2}"
+	}
+	"SetPoints2"
+	{
+		"de"		"{green}Deine Punkte {olive}wurden gesetzt auf: {green}{1}"
+	}
+	"WriteHappyFactor"
+	{
+		"de"		"{green}Schreibe nun {olive}in den Chat: {green}den Multiplikationsfaktor"
+	}
+	"WriteHappyFactorInfo"
+	{
+		"de"		"Wenn kleiner {green}als 2 {olive}= {green}Abbrechen"
+	}
+	"WriteHappyTime"
+	{
+		"de"		"{green}Schreibe {olive}in den Chat: {green}die Dauer(in Minuten)"
+	}
+	"WriteHappyTimeInfo"
+	{
+		"de"		"Wenn kleiner {green}als 2 {olive}= {green}Abbrechen"
+	}
+	"HappyRunning"
+	{
+		"de"		"Happy Hour {green}ist schon aktiviert"
+	}
+	"HappyNotRunning"
+	{
+		"de"		"Happy Hour {green}ist nicht aktiviert"
+	}
+	"HappyActive"
+	{
+		"de"		"Zurzeit ist {green}Happy Hour {olive}mit dem {green}Multiplikationsfaktor {1} {olive}aktiv"
+	}
+	"HappyEnded"
+	{
+		"de"		"Happy Hour Ende!"
+	}
+	"LoadFeature"
+	{
+		"de"		"Feature aktivieren"
+	}
+	"UnloadFeature"
+	{
+		"de"		"Feature deaktivieren"
+	}
+	"LoadedFeature"
+	{
+		"de"		"{green}Feature {1} {olive}geladen"
+	}
+	"UnloadedFeature"
+	{
+		"de"		"{green}Feature {1} {olive}gestoppt"
+	}
+	"NoFeatureFound"
+	{
+		"de"		"{green}Kein Feature {olive}wurde gefunden"
+	}
+}
