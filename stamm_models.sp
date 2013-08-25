@@ -69,7 +69,6 @@ new bool:Loaded;
 
 
 
-
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Vip Models",
@@ -119,11 +118,11 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	new Handle:model_settings;
 
 
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
 	// Auto updater
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
+		Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+
 		Updater_AddPlugin(urlString);
 	}
 
@@ -227,10 +226,24 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 
-
 	CloseHandle(model_settings);
 	
 	STAMM_AddFeatureText(lowest, description);
+
+}
+
+
+
+public OnMapStart()
+{
+	// Precache the models again
+	for (new i = 0; i < modelCount; i++)
+	{
+		if (!StrEqual(models[i][MODELPATH], "") && !StrEqual(models[i][MODELPATH], "0"))
+		{
+			PrecacheModel(models[i][MODELPATH], true);
+		}
+	}
 }
 
 
@@ -393,7 +406,7 @@ public Action:CmdModel(client, args)
 
 	if (STAMM_IsClientValid(client))
 	{
-		if (model_change && PlayerHasModel[client])
+		if (model_change && same_models && PlayerHasModel[client])
 		{
 			STAMM_GetTag(tag, sizeof(tag));
 
@@ -431,7 +444,7 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 			GetMenuItem(menu, param2, ModelChoose, sizeof(ModelChoose));
 			
 
-			// don'T want standard model
+			// don't want standard model
 			if (!StrEqual(ModelChoose, "standard"))
 			{
 				// set the new model
@@ -442,9 +455,7 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 				
 				Format(PlayerModel[param1], sizeof(PlayerModel[]), ModelChoose);
 			}
-
-
-			if (StrEqual(ModelChoose, "standard")) 
+			else
 			{
 				// Reset model
 				// But mark he don't want a model
