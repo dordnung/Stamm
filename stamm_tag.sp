@@ -45,7 +45,7 @@ new String:tag[PLATFORM_MAX_PATH + 1];
 
 
 
-// Details
+// Details of plugin
 public Plugin:myinfo =
 {
 	name = "Stamm Feature VIP Tag",
