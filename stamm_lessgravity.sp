@@ -33,11 +33,8 @@
 
 #pragma semicolon 1
 
-
-
 new grav;
 new Handle:c_grav;
-
 
 
 // Details
@@ -62,7 +59,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Less Gravity");
+	STAMM_AddFeature("VIP Less Gravity", "");
 }
 
 
@@ -83,7 +80,6 @@ public OnPluginStart()
 
 
 
-
 // And load it
 public OnConfigsExecuted()
 {
@@ -99,15 +95,12 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	decl String:haveDescription[64];
 	decl String:urlString[256];
 
-
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
 	}
-
 
 	// Add dsecription for each feature
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
@@ -133,13 +126,12 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Also change it, if he cahnged the state
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
 		new Float:newGrav;
 		new clientBlock;
-
 
 		// Client want it
 		if (mode)

@@ -60,16 +60,14 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
-
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
 	}
 }
-
 
 
 // Hooke needed events
@@ -84,12 +82,10 @@ public OnPluginStart()
 }
 
 
-
 // Add feature for TF2
 public OnAllPluginsLoaded()
 {
 	decl String:haveDescription[64];
-
 
 	if (!LibraryExists("stamm")) 
 	{
@@ -100,7 +96,6 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
-	
 	
 	STAMM_LoadTranslation();
 

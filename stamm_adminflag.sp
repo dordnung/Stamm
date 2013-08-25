@@ -41,10 +41,9 @@ public Plugin:myinfo =
 	name = "Stamm Feature Admin Flags",
 	author = "Popoklopsi",
 	version = "1.3.2",
-	description = "Give VIP's Admin Flags",
+	description = "Give VIP's admin flags",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
-
 
 
 
@@ -58,7 +57,7 @@ public OnAllPluginsLoaded()
 
 	STAMM_LoadTranslation();
 
-	STAMM_AddFeature("VIP Admin Flags");
+	STAMM_AddFeature("VIP Admin Flags", "");
 }
 
 
@@ -68,11 +67,9 @@ public OnAllPluginsLoaded()
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:description[64];
-	decl String:theflags[64];
+	new String:theflags[64];
+
 	decl String:urlString[256];
-
-
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -91,7 +88,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		
 		getLevelFlag(theflags, sizeof(theflags), i);
 		
-
 		// Valid flags?
 		if (!StrEqual(theflags, ""))
 		{
@@ -111,11 +107,10 @@ public STAMM_OnClientReady(client)
 		decl String:theflags[64];
 		new bytes;
 
-
 		// Get Flags for client level
 		Format(theflags, sizeof(theflags), "");
+		
 		getLevelFlag(theflags, sizeof(theflags), STAMM_GetClientLevel(client));
-
 
 		if (!StrEqual(theflags, "")) 
 		{
@@ -139,7 +134,6 @@ public getLevelFlag(String:theflags[], size, level)
 {
 	new Handle:flagvalue = CreateKeyValues("AdminFlags");
 
-
 	// Do we have a file?
 	if (!FileExists("cfg/stamm/features/adminflags.txt"))
 	{
@@ -160,7 +154,6 @@ public getLevelFlag(String:theflags[], size, level)
 			decl String:section[64];
 			
 			KvGetSectionName(flagvalue, section, sizeof(section));
-
 
 			// Only Flags for specific level
 			if (STAMM_GetLevelNumber(section) == level)

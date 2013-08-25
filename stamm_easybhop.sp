@@ -33,7 +33,6 @@
 
 
 
-
 public Plugin:myinfo =
 {
 	name = "EasyBhop",
@@ -44,13 +43,10 @@ public Plugin:myinfo =
 };
 
 
-
 // Add to auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
-
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -59,7 +55,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
-
 
 
 // Add the feature

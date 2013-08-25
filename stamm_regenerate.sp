@@ -80,15 +80,12 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	decl String:haveDescription[64];
 	decl String:urlString[256];
 
-
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
 	}
-
 
 	// Set Description for each block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)

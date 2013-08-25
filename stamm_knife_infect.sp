@@ -26,7 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <colors>
-#include <morecolors_stamm>
 #include <sdktools>
 #include <autoexecconfig>
 
@@ -64,12 +63,10 @@ public Plugin:myinfo =
 
 
 
-
 // Auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -148,7 +145,6 @@ public OnConfigsExecuted()
 	mode_infect = GetConVarInt(mode_c);
 	lhp = GetConVarInt(lhp_c);
 	
-
 	if (mode_infect != 1 || dur) 
 	{
 		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
@@ -186,7 +182,6 @@ public Action:SecondTimer(Handle:timer, any:data)
 					}
 				}
 				
-
 				// Player lose health on infect
 				if (mode_infect != 1)
 				{
@@ -199,7 +194,6 @@ public Action:SecondTimer(Handle:timer, any:data)
 						ForcePlayerSuicide(i);
 					}
 					
-
 					SetEntityHealth(i, newhp);
 				}
 			}
@@ -208,7 +202,6 @@ public Action:SecondTimer(Handle:timer, any:data)
 	
 	return Plugin_Continue;
 }
-
 
 
 
@@ -233,18 +226,13 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 // A Player gets hurted
 public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 {
-	decl String:weapon[64];
-	decl String:p_name[128];
-	decl String:tag[64];
+	new String:weapon[64];
+	new String:p_name[128];
 	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
 	
-
-
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
-	STAMM_GetTag(tag, sizeof(tag));
-
 
 	// Clients are valid
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
@@ -278,26 +266,12 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 				if (dur)
 				{
 					timers[client] = dur;
-
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChat(client, "%s %t", tag, "YouGotTimeInfected", p_name, dur);
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", tag, "YouGotTimeInfected", p_name, dur);
-					}
+					
+					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotTimeInfected", LANG_SERVER, p_name, dur);
 				}
 				else 
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChat(client, "%s %t", tag, "YouGotRoundInfected", p_name);
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", tag, "YouGotRoundInfected", p_name);
-					}
+					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotRoundInfected", LANG_SERVER, p_name);
 				}
 			}
 		}

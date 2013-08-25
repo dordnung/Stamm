@@ -59,7 +59,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -100,7 +99,6 @@ public OnPluginStart()
 	AutoExecConfig(true, "show_damage", "stamm/features");
 	AutoExecConfig_CleanFile();
 	
-
 	HookEvent("player_hurt", eventPlayerHurt);
 }
 
@@ -121,7 +119,6 @@ public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadc
 {
 	new client = GetClientOfUserId(GetEventInt(event, "attacker"));
 
-
 	// Is client valid and want feature?
 	if (STAMM_IsClientValid(client))
 	{
@@ -130,7 +127,6 @@ public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadc
 			// Get damage done, the games have different event types oO
 			new damage;
 			
-
 			if (STAMM_GetGame() == GameTF2) 
 			{
 				damage = GetEventInt(event, "damageamount");
@@ -145,7 +141,6 @@ public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadc
 			{
 				damage = GetEventInt(event, "dmg_health");
 			}
-
 
 			// Switch the area to show to and show it
 			switch(damage_area)

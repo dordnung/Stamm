@@ -33,15 +33,11 @@
 
 #pragma semicolon 1
 
-
-
 new Handle:c_cash;
 new Handle:c_max;
 
 new cash;
 new maxm;
-
-
 
 public Plugin:myinfo =
 {
@@ -67,10 +63,9 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 
-
 	STAMM_LoadTranslation();
 		
-	STAMM_AddFeature("VIP Cash");
+	STAMM_AddFeature("VIP Cash", "");
 }
 
 
@@ -80,8 +75,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:description[64];
 	decl String:urlString[256];
-
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -127,8 +120,6 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 {
 	new userid = GetEventInt(event, "userid");
 	new client = GetClientOfUserId(userid);
-	
-
 	
 	if (STAMM_IsClientValid(client))
 	{

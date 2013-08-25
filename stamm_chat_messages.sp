@@ -26,7 +26,6 @@
 // Icnludes
 #include <sourcemod>
 #include <colors>
-#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -61,8 +60,6 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-
-	// Replace Invalid Colors
 	if (!CColorAllowed(Color_Lightgreen))
 	{
 		if (CColorAllowed(Color_Lime))
@@ -76,8 +73,9 @@ public OnAllPluginsLoaded()
 	}
 		
 
-	STAMM_LoadTranslation();	
-	STAMM_AddFeature("VIP Chat Messages");
+	STAMM_LoadTranslation();
+		
+	STAMM_AddFeature("VIP Chat Messages", "");
 }
 
 
@@ -87,9 +85,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:description[64];
 	decl String:urlString[256];
-
-
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -125,24 +120,14 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public STAMM_OnClientReady(client)
 {
 	decl String:name[MAX_NAME_LENGTH + 1];
-	decl String:tag[64];
-
-
+	
 	GetClientName(client, name, sizeof(name));
-	STAMM_GetTag(tag, sizeof(tag));
-
+	
 
 	// Gets a welcome message?
 	if (welcome != -1 && STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, welcome))
 	{
-		if (STAMM_GetGame() == GameCSGO)
-		{
-			CPrintToChatAll("%s %t", "WelcomeMessage", tag, name);
-		}
-		else
-		{
-			MCPrintToChatAll("%s %t", "WelcomeMessage", tag, name);
-		}
+		CPrintToChatAll("{lightgreen}[ {green}Stamm {lightgreen}] %T", "WelcomeMessage", LANG_SERVER, name);
 	}
 }
 
@@ -153,24 +138,14 @@ public OnClientDisconnect(client)
 	if (STAMM_IsClientValid(client) && leave != -1)
 	{
 		decl String:name[MAX_NAME_LENGTH + 1];
-		decl String:tag[64];
-
-
+		
 		GetClientName(client, name, sizeof(name));
-		STAMM_GetTag(tag, sizeof(tag));
 
 
 		// Gets a leave message?
 		if (STAMM_HaveClientFeature(client, leave))
 		{
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChatAll("%s %t", tag, "LeaveMessage", name);
-			}
-			else
-			{
-				MCPrintToChatAll("%s %t", tag, "LeaveMessage", name);
-			}
+			CPrintToChatAll("{lightgreen}[ {green}Stamm {lightgreen}] %T", "LeaveMessage", LANG_SERVER, name);
 		}
 	}
 }

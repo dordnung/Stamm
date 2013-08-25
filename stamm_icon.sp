@@ -66,18 +66,15 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 
 
-
 // Add feature
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
-
 
 	STAMM_LoadTranslation();
 		
@@ -94,7 +91,6 @@ public OnPluginStart()
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_death", eventPlayerDeath);
 	
-
 	for (new i=0; i <= MaxClients; i++) 
 	{
 		stammview[i] = 0;
@@ -104,7 +100,7 @@ public OnPluginStart()
 
 
 // Client changed feature state
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
 	if (STAMM_IsClientValid(client))
 	{
@@ -120,6 +116,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 					
 					GetEdictClassname(stammview[client], class, sizeof(class));
 					
+
 
 					if (StrEqual(class, "prop_dynamic")) 
 					{

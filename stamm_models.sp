@@ -27,7 +27,6 @@
 #include <sourcemod>
 #include <sdktools>
 #include <colors>
-#include <morecolors_stamm>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
@@ -57,7 +56,9 @@ new admin_model;
 new lowest;
 
 new String:PlayerModel[MAXPLAYERS + 1][PLATFORM_MAX_PATH + 1];
+
 new String:models[64][4][PLATFORM_MAX_PATH + 1];
+
 new String:model_change_cmd[32];
 
 new Handle:c_model_change_cmd;
@@ -69,6 +70,7 @@ new bool:Loaded;
 
 
 
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Vip Models",
@@ -77,7 +79,6 @@ public Plugin:myinfo =
 	description = "Give VIP's VIP Models",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
-
 
 
 
@@ -102,9 +103,9 @@ public OnAllPluginsLoaded()
 		}
 	}
 		
-
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Models");
+
+	STAMM_AddFeature("VIP Models", "");
 }
 
 
@@ -115,17 +116,13 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	decl String:description[64];
 	decl String:urlString[256];
 
-	new Handle:model_settings;
-
+	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	// Auto updater
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
-		Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
-
 		Updater_AddPlugin(urlString);
 	}
-
 
 	// Load Translation files
 	if (model_change && same_models)
@@ -146,7 +143,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 	// To Keyvalues
-	model_settings = CreateKeyValues("ModelSettings");
+	new Handle:model_settings = CreateKeyValues("ModelSettings");
 
 	lowest = STAMM_GetLevelCount();
 
@@ -226,24 +223,10 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 
+
 	CloseHandle(model_settings);
 	
 	STAMM_AddFeatureText(lowest, description);
-
-}
-
-
-
-public OnMapStart()
-{
-	// Precache the models again
-	for (new i = 0; i < modelCount; i++)
-	{
-		if (!StrEqual(models[i][MODELPATH], "") && !StrEqual(models[i][MODELPATH], "0"))
-		{
-			PrecacheModel(models[i][MODELPATH], true);
-		}
-	}
 }
 
 
@@ -280,7 +263,6 @@ public OnConfigsExecuted()
 	admin_model = GetConVarInt(c_admin_model);
 	
 	GetConVarString(c_model_change_cmd, model_change_cmd, sizeof(model_change_cmd));
-
 
 	if (!Loaded)
 	{
@@ -346,7 +328,7 @@ public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadc
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	// Reset model
+	// Reset moedl
 	if (STAMM_IsClientValid(client))
 	{
 		PlayerHasModel[client] = 0;
@@ -368,7 +350,6 @@ public ModelDownloads()
 		return;
 	}
 
-
 	// If yes, open it
 	new Handle:downloadfile = OpenFile("cfg/stamm/features/ModelDownloads.txt", "rb");
 	
@@ -386,7 +367,6 @@ public ModelDownloads()
 			ReplaceString(filecontent, sizeof(filecontent), "\t", "");
 			ReplaceString(filecontent, sizeof(filecontent), "\r", "");
 			
-
 			if (!StrEqual(filecontent, "")) 
 			{
 				AddFileToDownloadsTable(filecontent);
@@ -401,34 +381,21 @@ public ModelDownloads()
 // Player want a new model
 public Action:CmdModel(client, args)
 {
-	decl String:tag[64];
-
-
 	if (STAMM_IsClientValid(client))
 	{
-		if (model_change && same_models && PlayerHasModel[client])
+		if (model_change && PlayerHasModel[client])
 		{
-			STAMM_GetTag(tag, sizeof(tag));
-
-			// Reset his mark for a model
+			// Resetz his mark for a model
 			PlayerHasModel[client] = 0;
+			
 			Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 			
-
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChat(client, "%s %t", tag, "NewModel", client);
-			}
-			else
-			{
-				MCPrintToChat(client, "%s %t", tag, "NewModel", client);
-			}
+			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "NewModel", client);
 		}
 	}
 	
 	return Plugin_Handled;
 }
-
 
 
 
@@ -443,8 +410,7 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 			
 			GetMenuItem(menu, param2, ModelChoose, sizeof(ModelChoose));
 			
-
-			// don't want standard model
+			// don'T want standard model
 			if (!StrEqual(ModelChoose, "standard"))
 			{
 				// set the new model
@@ -455,7 +421,8 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 				
 				Format(PlayerModel[param1], sizeof(PlayerModel[]), ModelChoose);
 			}
-			else
+
+			if (StrEqual(ModelChoose, "standard")) 
 			{
 				// Reset model
 				// But mark he don't want a model
@@ -513,7 +480,6 @@ public PrepareSameModels(client)
 			}
 		}
 		
-
 		// Also add standard choose
 		AddMenuItem(ModelMenu, "standard", StandardModel);
 		
@@ -550,7 +516,6 @@ public PrepareRandomModels(client)
 			found++;
 		}
 	}
-
 
 	// Found available ones?
 	if (found > 0)

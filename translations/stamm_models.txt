@@ -14,7 +14,7 @@
 	"ChooseModel"
 	{
 		"en"		"Choose a VIP model"
-		"de"		"Wähle ein VIP Model"
+		"de"		"WÃƒÂ¤hle ein VIP Model"
 	}
 	"StandardModel"
 	{
@@ -24,12 +24,12 @@
 	"NewModel"
 	{
 		"en" 		"{green}Next round {lightgreen}you can choose {green}a new Model!"
-		"de" 		"{green}Nächste Runde {lightgreen}kannst du {green}ein neues Model auswählen!"
+		"de" 		"{green}NÃƒÂ¤chste Runde {lightgreen}kannst du {green}ein neues Model auswÃƒÂ¤hlen!"
 	}
 	"ModelChangeCmd"
 	{
 		"#format"   "{1:s}"
 		"en" 		"Choose new Model: {1}"
-		"de" 		"Model neu wählen: {1}"
+		"de" 		"Model neu wÃƒÂ¤hlen: {1}"
 	}
 }

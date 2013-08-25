@@ -58,7 +58,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
 
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -66,7 +65,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
-
 
 
 
@@ -90,7 +88,6 @@ public OnAllPluginsLoaded()
 
 
 
-
 // Create Config
 public OnPluginStart()
 {
@@ -101,7 +98,6 @@ public OnPluginStart()
 	AutoExecConfig(true, "joinsound", "stamm/features");
 	AutoExecConfig_CleanFile();
 }
-
 
 
 
@@ -127,7 +123,6 @@ public OnConfigsExecuted()
 
 
 
-
 // Client ready, start sound
 public STAMM_OnClientReady(client)
 {
@@ -146,8 +141,6 @@ public OnMapStart()
 	
 	CreateTimer(60.0, MapTimer_Change);
 }
-
-
 
 public Action:MapTimer_Change(Handle:timer)
 {

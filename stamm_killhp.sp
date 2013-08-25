@@ -56,7 +56,6 @@ public Plugin:myinfo =
 
 
 
-
 // Add Feature
 public OnAllPluginsLoaded()
 {
@@ -77,8 +76,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:description[64];
 	decl String:urlString[256];
-
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -127,7 +124,6 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
 	
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{

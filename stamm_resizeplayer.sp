@@ -35,12 +35,10 @@
 
 
 
-
 new resize;
 new Handle:c_resize;
 
 new Float:clientSize[MAXPLAYERS + 1];
-
 
 
 // Plugin ifno
@@ -71,10 +69,9 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature. not Supported for your game!");
 	}
 
-
 	// Load translation and add feaure
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Resize Player");
+	STAMM_AddFeature("VIP Resize Player", "");
 }
 
 
@@ -110,8 +107,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:haveDescription[64];
 	decl String:urlString[256];
-
-
 
 	// Add to updater
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -173,7 +168,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Client changed a feature
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode)
 {
 	if (STAMM_IsClientValid(client))
 	{
@@ -183,7 +178,6 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 
 		// Setz size
 		SetEntPropFloat(client, Prop_Send, "m_flModelScale", clientSize[client]);
-
 
 		if (STAMM_GetGame() == GameTF2)
 		{

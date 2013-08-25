@@ -42,7 +42,6 @@ new hear;
 new bool:useNew = false;
 
 
-
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Holy Granade",
@@ -73,7 +72,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
-
 
 	if (!LibraryExists("stamm")) 
 	{
@@ -134,7 +132,6 @@ public OnConfigsExecuted()
 		AddFileToDownloadsTable("sound/stamm/throw.mp3");
 		AddFileToDownloadsTable("sound/stamm/explode.mp3");
 	}
-	
 
 	AddFileToDownloadsTable("materials/models/stamm/holy_grenade.vtf");
 	AddFileToDownloadsTable("models/stamm/holy_grenade.mdl");

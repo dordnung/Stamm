@@ -43,7 +43,6 @@ new Handle:c_hp;
 
 
 
-
 // Plugin Info
 public Plugin:myinfo =
 {
@@ -53,7 +52,6 @@ public Plugin:myinfo =
 	description = "Give VIP's more HP on spawn",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
-
 
 
 
@@ -77,7 +75,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:haveDescription[64];
 	decl String:urlString[256];
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -104,7 +101,6 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
-
 	AutoExecConfig_SetFile("spawnhp", "stamm/features");
 	
 	c_hp = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more per block");
@@ -113,7 +109,6 @@ public OnPluginStart()
 
 	AutoExecConfig_CleanFile();
 }
-
 
 
 

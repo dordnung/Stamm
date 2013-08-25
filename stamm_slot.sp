@@ -49,7 +49,6 @@ new String:vip_kick_message2[128];
 
 
 
-
 // Information
 public Plugin:myinfo =
 {
@@ -62,12 +61,10 @@ public Plugin:myinfo =
 
 
 
-
 // Add to auto updater
 public STAMM_OnFeatureLoaded(String:basename[])
 {
 	decl String:urlString[256];
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -79,18 +76,15 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 
 
-
 // Add Feature
 public OnAllPluginsLoaded()
 {
 	decl String:description[64];
 
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
-
 
 	STAMM_LoadTranslation();
 		
@@ -98,7 +92,6 @@ public OnAllPluginsLoaded()
 	
 	STAMM_AddFeature("VIP Slot", description);
 }
-
 
 
 
@@ -157,7 +150,6 @@ public VipSlotCheck(client)
 			KickClient(client, vip_kick_message);
 		}
 	}
-	
 	
 	// Check for let a slot free
 	current_players = GetClientCount(false);
