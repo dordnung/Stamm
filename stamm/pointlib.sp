@@ -72,6 +72,19 @@ public Action:pointlib_PlayerTime(Handle:timer)
 			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && g_iMinPlayer <= clientlib_GetPlayerCount())
 			{
 				pointlib_GivePlayerPoints(i, g_iPoints, true);
+
+				if (g_bShowTextOnPoints)
+				{
+					// Notify player
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(i, "%s %t", g_sStammTag, "NewPointsTime", g_iPoints, g_iTimePoint);
+					}
+					else
+					{
+						MCPrintToChat(i, "%s %t", g_sStammTag, "NewPointsTime", g_iPoints, g_iTimePoint);
+					}
+				}
 			}
 		}
 	}

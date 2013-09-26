@@ -163,6 +163,7 @@ new bool:g_bStripTag;
 new bool:g_bUseMenu;
 new bool:g_bHappyHourON;
 new bool:g_bMoreColors;
+new bool:g_bShowTextOnPoints;
 
 
 

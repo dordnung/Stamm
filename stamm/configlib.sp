@@ -57,7 +57,7 @@ new Handle:configlib_VipRank;
 new Handle:configlib_WantUpdate;
 new Handle:configlib_StripTag;
 new Handle:configlib_UseMenu;
-
+new Handle:configlib_ShowTextOnPoints;
 
 
 
@@ -101,7 +101,7 @@ public configlib_CreateConfig()
 	configlib_WantUpdate = AutoExecConfig_CreateConVar("stamm_autoupdate", "1", "1 = Auto Update Stamm and it's features (Needs the Auto Updater), 0 = Off");
 	configlib_StripTag = AutoExecConfig_CreateConVar("stamm_striptag", "0", "1 = Use level instead of VIP, 0 = Use term VIP");
 	configlib_UseMenu = AutoExecConfig_CreateConVar("stamm_usemenu", "1", "1 = Player sees a menu when typing stamm command, 0 = Just a chat message");
-
+	configlib_ShowTextOnPoints = AutoExecConfig_CreateConVar("stamm_text_on_points", "1", "1 = Players see a notify when they get points through kill/round/time, 0 = Disable");
 
 
 
@@ -170,7 +170,7 @@ public configlib_LoadConfig()
 	g_bHudText = GetConVarBool(configlib_HudText);
 	g_bStripTag = GetConVarBool(configlib_StripTag);
 	g_bUseMenu = GetConVarBool(configlib_UseMenu);
-
+	g_bShowTextOnPoints = GetConVarBool(configlib_ShowTextOnPoints);
 
 
 

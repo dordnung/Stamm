@@ -86,6 +86,19 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 				{
 					// Give global points
 					pointlib_GivePlayerPoints(client, g_iPoints, true);
+
+					if (g_bShowTextOnPoints)
+					{
+						// Notify player
+						if (!g_bMoreColors)
+						{
+							CPrintToChat(client, "%s %t", g_sStammTag, "NewPointsRound", g_iPoints);
+						}
+						else
+						{
+							MCPrintToChat(client, "%s %t", g_sStammTag, "NewPointsRound", g_iPoints);
+						}
+					}
 				}
 			}
 		}
@@ -134,6 +147,19 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 				{
 					// Give global Points
 					pointlib_GivePlayerPoints(client, g_iPoints, true);
+
+					if (g_bShowTextOnPoints)
+					{
+						// Notify player
+						if (!g_bMoreColors)
+						{
+							CPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
+						}
+						else
+						{
+							MCPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
+						}
+					}
 				}
 			}
 		}

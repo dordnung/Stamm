@@ -40,6 +40,24 @@
 		"en"		"You get 1 Stamm Point with:"
 		"de"		"Du bekommst 1 Stamm Punkt mit:"
 	}
+	"NewPointsKill"
+	{
+		"#format"   "{1:i}"
+		"en"		"You got {green}{1} Stamm Point/s for {lightgreen}killing a player"
+		"de"		"Du hast {green}{1} Stamm Punkt/e für {lightgreen}das Töten eines Spielers erhalten"
+	}
+	"NewPointsRound"
+	{
+		"#format"   "{1:i}"
+		"en"		"You got {green}{1} Stamm Point/s for {lightgreen}a new round"
+		"de"		"Du hast {green}{1} Stamm Punkt/e für {lightgreen}eine neue Runde erhalten"
+	}
+	"NewPointsTime"
+	{
+		"#format"   "{1:i},{2:i}"
+		"en"		"You got {green}{1} Stamm Point/s for {lightgreen}playing {2} minute/s"
+		"de"		"Du hast {green}{1} Stamm Punkt/e für {lightgreen}das Spielen von {2} Minute/n erhalten"
+	}
 	"InfoTyp"
 	{
 		"#format"   "{1:s}"
