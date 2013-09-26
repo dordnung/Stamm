@@ -85,7 +85,7 @@ public configlib_CreateConfig()
 	configlib_AdminFlag = AutoExecConfig_CreateConVar("stamm_adminflag", "bt", "Flag a player needs to access the stamm admin menu (see addons/sourcemod/configs/admin_levels.cfg for all flags)");
 	configlib_InfoTime = AutoExecConfig_CreateConVar("stamm_infotime", "300", "Info Message Interval in seconds (300 = 5 minutes), 0 = Off");
 	configlib_JoinShow = AutoExecConfig_CreateConVar("stamm_join_show", "1", "1 = When a Player join, he see his points, 0 = OFF");
-	configlib_LvlUpSound = AutoExecConfig_CreateConVar("stamm_lvl_up_sound", "music/stamm/lvlup.mp3", "Path to the level up sound, beginning after sound/, 0 = Off");
+	configlib_LvlUpSound = AutoExecConfig_CreateConVar("stamm_lvl_up_sound", "stamm/lvlup.mp3", "Path to the level up sound, beginning after sound/, 0 = Off");
 	configlib_MinPlayer = AutoExecConfig_CreateConVar("stamm_min_player", "0", "Number of Players, which have to be on the Server, to count points");
 	configlib_SeeText = AutoExecConfig_CreateConVar("stamm_see_text", "1", "1 = All see the players points, 0 = only the player, who write it in the chat");
 	configlib_ServerID = AutoExecConfig_CreateConVar("stamm_serverid", "1", "If you have more than one Server, type here your Server number in, e.g. 1. Server = 1");

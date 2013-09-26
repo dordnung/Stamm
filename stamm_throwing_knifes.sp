@@ -130,7 +130,7 @@ public OnConfigsExecuted()
 
 
 // Client changed feature
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT, bool:isShop */)
 {
 	if (!mode) 
 	{

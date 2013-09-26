@@ -231,7 +231,7 @@ public Action:SetupTrail(Handle:timer, any:client)
 
 
 // Client doesnt want it anymore
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT, bool:isShop */)
 {
 	if (!mode) 
 	{
