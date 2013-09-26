@@ -141,7 +141,7 @@ public sqllib_LoadDB()
 
 
 
-
+		/* TODO: IMPLEMENT
 		// Create feature table
 		Format(query, sizeof(query), g_sCreateFeatureQuery, g_sTableName);
 		
@@ -156,7 +156,7 @@ public sqllib_LoadDB()
 			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
 			
 			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Feature Table. Error: %s", sqlError);
-		}
+		}*/
 
 
 
@@ -418,7 +418,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			}
 
 
-
+			/* TODO: IMPLEMENT
 			// Get Feature of the player
 			Format(query, sizeof(query), g_sSelectPlayerShopQuery, g_sTableName, steamid);
 			
@@ -429,7 +429,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 
 			// Get it
-			SQL_TQuery(sqllib_db, sqllib_InsertHandler2, query, GetClientUserId(client));
+			SQL_TQuery(sqllib_db, sqllib_InsertHandler2, query, GetClientUserId(client));*/
 		}
 	}
 	else
@@ -445,7 +445,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 
 
-
+/* TODO: IMPLEMENT
 // Clint insert handler 2
 public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], any:userid)
 {
@@ -564,7 +564,7 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 		LogToFile(g_sLogFile, "[ STAMM ] Error checking Player Shop %N:   %s", client, error);
 	}
 }
-
+*/
 
 
 
@@ -846,12 +846,12 @@ public Action:sqllib_convertDB(args)
 
 
 
-
+	/* TODO: IMPLEMENT
 	// Select data from database
 	Format(query, sizeof(query), g_sSelectPlayerShopAllQuery, g_sTableName);
 
 	// Execute
-	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile2, query);
+	SQL_TQuery(sqllib_db, sqllib_SQLConvertDatabaseToFile2, query);*/
 
 
 
@@ -1006,7 +1006,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 
 
 
-
+/* TODO: IMPLEMENT
 // Convert Handler
 public sqllib_SQLConvertDatabaseToFile2(Handle:owner, Handle:hndl, const String:error[], any:data)
 {
@@ -1130,4 +1130,4 @@ public sqllib_SQLConvertDatabaseToFile2(Handle:owner, Handle:hndl, const String:
 
 	// Reset state
 	sqllib_convert_cur++;
-}
+}*/

@@ -43,7 +43,8 @@
 enum FeatureEnum
 {
 	FEATURE_LEVEL[MAXLEVELS],
-	FEATURE_POINTS[MAXLEVELS],
+	/* TODO: IMPLEMENT
+	FEATURE_POINTS[MAXLEVELS],*/
 	FEATURE_BLOCKS,
 	bool:FEATURE_CHANGE,
 	bool:FEATURE_STANDARD,
@@ -166,7 +167,7 @@ new bool:g_bMoreColors;
 
 
 // Global handles
-new Handle:g_hBoughtBlock[MAXPLAYERS + 1][MAXFEATURES];
+/* TODO: IMPLEMENTnew Handle:g_hBoughtBlock[MAXPLAYERS + 1][MAXFEATURES];*/
 new Handle:g_hFeatureBlocks[MAXFEATURES];
 new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;
@@ -183,7 +184,7 @@ new Handle:g_hHudSync;
 #define g_sCreateBackupQueryMySQL "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
 #define g_sCreateTableQueryMySQL "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
 
-#define g_sCreateFeatureQuery "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))"
+/* TODO: IMPLEMENT#define g_sCreateFeatureQuery "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))" */
 #define g_sCreatHappyQuery "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)"
 
 
@@ -205,12 +206,12 @@ new Handle:g_hHudSync;
 #define g_sInsertHappyQuery "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)"
 #define g_sInsertMiddleQuery "%s FROM `%s` WHERE steamid = '%s'"
 #define g_sInsertPlayerQuery "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)"
-#define g_sInsertPlayerShopQuery "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES ('%s', '%s', '%s')"
+/* TODO: IMPLEMENT #define g_sInsertPlayerShopQuery "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES ('%s', '%s', '%s')" */
 #define g_sInsertPlayerSaveQuery "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES ('%s', %i, %i, '%s', %s, %i)"
 #define g_sInsertPlayerSave2Query "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES"
 #define g_sInsertPlayerSave2DataQuery "('%s', %i, %i, '%s', %s, %i);"
 #define g_sInsertPlayerSave2Data2Query "('%s', %i, %i, '%s', %s, %i),"
-#define g_sInsertPlayerSave2QueryShop "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES"
+/* TODO: IMPLEMENT #define g_sInsertPlayerSave2QueryShop "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES" */
 #define g_sInsertPlayerSave2DataQueryShop "('%s', '%s', '%s');"
 #define g_sInsertPlayerSave2Data2QueryShop "('%s', '%s', '%s'),"
 #define g_sInsertBackupQuery "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`"
@@ -223,9 +224,9 @@ new Handle:g_hHudSync;
 #define g_sSelectTop10Query "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10"
 #define g_sSelectRankQuery "SELECT COUNT(*) FROM `%s` WHERE `points` >= %i"
 #define g_sSelectPlayerQuery "SELECT `steamid`, `level`, `points`, `name`, `version`, `last_visit` FROM `%s`"
-#define g_sSelectPlayerShopAllQuery "SELECT `steamid`, `feature`, `block` FROM `%s_shop`"
+/* TODO: IMPLEMENT #define g_sSelectPlayerShopAllQuery "SELECT `steamid`, `feature`, `block` FROM `%s_shop`" */
 #define g_sSelectPlayerStartQuery "SELECT `points`, `level`, `version`"
-#define g_sSelectPlayerShopQuery "SELECT `feature`, `block` FROM `%s_shop` WHERE steamid = '%s'"
+/* TODO: IMPLEMENT #define g_sSelectPlayerShopQuery "SELECT `feature`, `block` FROM `%s_shop` WHERE steamid = '%s'" */
 
 
 #define g_sAlterAdminQuery "ALTER TABLE `%s` ADD `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0"

@@ -130,7 +130,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 			// Mark feature as zero level
 			goON = false;
 			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
-			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0;
+
+			/* TODO: IMPLEMENT
+			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
 
 			// Debug
 			if (g_bDebug) 
@@ -160,7 +162,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 		if (!KvGotoFirstSubKey(level_settings, false))
 		{
 			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
-			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0;
+
+			/* TODO: IMPLEMENT
+			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
 
 			// Debug
 			if (g_bDebug) 
@@ -196,6 +200,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 
+				/* TODO: IMPLEMENT
 				// When it's a int, we have a shop feature
 				if (StringToInt(Svalue2) > 0)
 				{
@@ -204,7 +209,7 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 					found = true;
 				}
-				else
+				else*/
 				{
 					// Else search for the value of the level name with this loop
 					for (new i=0; i < g_iLevels+g_iPLevels; i++)
@@ -216,7 +221,9 @@ public featurelib_addFeature(Handle:plugin, String:name[], String:description[],
 
 
 							g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i+1;
-							g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0;
+
+							/* TODO: IMPLEMENT
+							g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0; */
 
 							// Break
 							break;

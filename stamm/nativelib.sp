@@ -56,8 +56,9 @@ public nativelib_Start()
 	CreateNative("STAMM_GetBasename", nativelib_GetFeatureBasename);
 	CreateNative("STAMM_IsMyFeature", nativelib_IsMyFeature);
 	CreateNative("STAMM_GetLevel", nativelib_GetLevel);
+	/* TODO: IMPLEMENT
 	CreateNative("STAMM_GetPoints", nativelib_GetPoints);
-	CreateNative("STAMM_IsShop", nativelib_IsShop);
+	CreateNative("STAMM_IsShop", nativelib_IsShop); */
 	CreateNative("STAMM_GetClientPoints", nativelib_GetClientStammPoints);
 	CreateNative("STAMM_GetClientLevel", nativelib_GetClientStammLevel);
 	CreateNative("STAMM_GetClientBlock", nativelib_GetClientStammBlock);
@@ -246,7 +247,7 @@ public nativelib_ClientSave(client)
 
 
 // Notice to feature, that a player changed the status of him
-public nativelib_ClientChanged(client, Handle:plugin, bool:status, bool:shop)
+public nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLEMENT ,bool:shop */)
 {
 	// Search for the function 
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
@@ -261,7 +262,7 @@ public nativelib_ClientChanged(client, Handle:plugin, bool:status, bool:shop)
 		// Push with client and new status
 		Call_PushCell(client);
 		Call_PushCell(status);
-		Call_PushCell(shop);
+		/* TODO: IMPLEMENT Call_PushCell(shop); */
 		
 		Call_Finish();
 	}
@@ -353,11 +354,12 @@ public nativelib_GetLevel(Handle:plugin, numParams)
 			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
+		/* TODO: IMPLEMENT
 		// Check if shop
 		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
 		{
 			ThrowNativeError(2, "Block %i has no level, it's a shop Feature!", block);
-		}
+		} */
 
 		return g_FeatureList[feature][FEATURE_LEVEL][block-1];
 	}
@@ -375,7 +377,7 @@ public nativelib_GetLevel(Handle:plugin, numParams)
 
 
 
-
+/* TODO: IMPLEMENT
 // Get the points of a block
 public nativelib_GetPoints(Handle:plugin, numParams)
 {
@@ -409,13 +411,13 @@ public nativelib_GetPoints(Handle:plugin, numParams)
 
 	// Shouldn't come here :D
 	return 0;
-}
+}*/
 
 
 
 
 
-
+/* TODO: IMPLEMENT
 // Check if block is for buying
 public nativelib_IsShop(Handle:plugin, numParams)
 {
@@ -442,7 +444,7 @@ public nativelib_IsShop(Handle:plugin, numParams)
 
 	// Shouldn't come here :D
 	return false;
-}
+}*/
 
 
 
@@ -573,7 +575,7 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 			for (new j=MAXLEVELS-1; j >= 0; j--)
 			{
 				// Block exists?
-				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 || g_FeatureList[feature][FEATURE_POINTS][j] > 0)
+				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 /* TODO: IMPLEMENT|| g_FeatureList[feature][FEATURE_POINTS][j] > 0*/)
 				{
 					// Client have Block?
 					if (g_FeatureList[feature][FEATURE_LEVEL][j] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
@@ -581,13 +583,13 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 						// found highest
 						return j+1;
 					}
-
+					/* TODO: IMPLEMENT
 					// Client have Block?
 					if (g_FeatureList[feature][FEATURE_POINTS][j] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], j) == 1 && g_FeatureList[feature][WANT_FEATURE][client])
 					{
 						// found highest
 						return j+1;
-					}
+					}*/
 				}
 			}
 		}
@@ -1181,12 +1183,12 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 				return false;
 			}
 
-
+			/* TODO: IMPLEMENT
 			// Player level high enough and want feature?
 			if (g_FeatureList[g_iFeatures][FEATURE_POINTS][block-1] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], block-1) == 1)
 			{
 				return true;
-			}
+			}*/
 
 			if (g_FeatureList[feature][FEATURE_LEVEL][block-1] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1])
 			{

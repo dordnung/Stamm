@@ -207,7 +207,6 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 			clientlib_getSteamid(client, cSteamid, sizeof(cSteamid));
 
 
-
 			if (StrEqual(search, cSteamid, false))
 			{
 				// return client

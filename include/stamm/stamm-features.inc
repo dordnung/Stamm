@@ -19,10 +19,9 @@
 
 
 /**
- * Executes when your feature is loaded by Stamm
+ * Executes when your feature is loaded by Stamm.
  *
  * @param basename 		Basename of your feature.
- * @error 				Feature is invalid.
  */
 forward STAMM_OnFeatureLoaded(const String:basename[]);
 
@@ -33,7 +32,7 @@ forward STAMM_OnFeatureLoaded(const String:basename[]);
 
 
 /**
- * Registers a new Stamm Feature
+ * Registers a new Stamm Feature.
  *
  * @param name			Short Name of the Plugin.
  * @param description	Feature description.
@@ -48,7 +47,7 @@ native STAMM_AddFeature(String:name[], const String:description[] = "", bool:all
 /**
  * DEPRECATED! USE STAMM_AddBlockDescription INSTEAD!
  *
- * Adds information about what a player get on a specific level with this feature
+ * Adds information about what a player get on a specific level with this feature.
  *
  * @param level			The level, 0=No VIP, x=Level.
  * @param description	What a player get on this level.
@@ -70,7 +69,7 @@ native bool:STAMM_IsMyFeature(const String:basename[]);
 
 
 /**
- * Returns the basename for your plugin
+ * Returns the basename for your plugin.
  *
  * @param basename		String to store basename in.
  * @param maxlength		Maxlength of the basename.
@@ -81,7 +80,7 @@ native STAMM_GetBasename(String:basename[], maxlength);
 
 
 /**
- * Loads a Stamm Feature
+ * Loads a Stamm Feature.
  *
  * @param plugin		Handle of the plugin.
  * @return				-1 = already loaded, 0 = no such Feature, 1 = success.
@@ -90,7 +89,7 @@ native STAMM_LoadFeature(Handle:plugin);
 
 
 /**
- * Unloads a Stamm Feature
+ * Unloads a Stamm Feature.
  *
  * @param plugin		Handle of the plugin.
  * @return				-1 = already unloaded, 0 = no such Feature, 1 = success.
@@ -99,7 +98,7 @@ native STAMM_UnloadFeature(Handle:plugin);
 
 
 /**
- * Loads the translation file of your feature in stamm/languages
+ * Loads the translation file of your feature in languages/stamm.
  *
  * @noreturn
  */

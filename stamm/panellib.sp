@@ -422,6 +422,7 @@ public panellib_CreateUserPanels(client, mode)
 				new bool:enabled;
 
 
+				/* TODO: IMPLEMENT
 				// Maybe he bought a block
 				for (new j=0; j < g_FeatureList[i][FEATURE_BLOCKS]; j++)
 				{
@@ -431,7 +432,7 @@ public panellib_CreateUserPanels(client, mode)
 
 						break;
 					}
-				}
+				}*/
 
 
 				// Only enabled features and changeable features
@@ -548,7 +549,7 @@ public panellib_ChangePanelHandler(Handle:menu, MenuAction:action, param1, param
 			if (g_FeatureList[index][FEATURE_ENABLE])
 			{
 				// Notice to API
-				nativelib_ClientChanged(param1, g_FeatureList[index][FEATURE_HANDLE], g_FeatureList[index][WANT_FEATURE][param1], false);
+				nativelib_ClientChanged(param1, g_FeatureList[index][FEATURE_HANDLE], g_FeatureList[index][WANT_FEATURE][param1] /* TODO: IMPLEMENT ,false */);
 			}
 
 

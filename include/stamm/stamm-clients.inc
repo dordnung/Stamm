@@ -9,52 +9,52 @@
 
 
 /**
- * Executes when a player becomes VIP
+ * Executes when a player becomes VIP.
  *
- * @param client		Client.
+ * @param client		Client ID of the new VIP.
  */
 forward STAMM_OnClientBecomeVip(client);
 
 
 /**
- * Executes when a player is fully initialized by Stamm after connecting
+ * Executes when a player is fully initialized by Stamm after connecting.
  *
- * @param client		Client.
+ * @param client		Client ID of the new player.
  */
 forward STAMM_OnClientReady(client);
 
 
 /**
- * Executes when a player is saved
+ * Executes when a player is saved to the database.
  *
- * @param client		Client.
+ * @param client		Client ID of the saved player.
  */
 forward STAMM_OnSaveClient(client);
 
 
 /**
- * Executes when a player switched your feature on/off or bought/sold it
+ * Executes when a player switched your feature on/off TODO: bought/sold it.
  *
- * @param client		Client.
- * @param turnedOn		true = Switched on (bought), false = Switched off (sold).
- * @param isShop		true = Was called from shop, false = Was called from menu
+ * @param client		Client ID of the client.
+ * @param turnedOn		true = Switched the feature on (TODO: bought), false = Switched the feature off (TODO: sold).
+ * TODO: @param isShop	true = Was called from shop, false = Was called from menu
  */
-forward STAMM_OnClientChangedFeature(client, bool:turnedOn, bool:isShop);
+forward STAMM_OnClientChangedFeature(client, bool:turnedOn /* TODO: ,bool:isShop*/);
 
 
 /**
- * Executes when a player gets Stamm points
+ * Executes after a player got some Stamm points.
  *
- * @param client		Client.
- * @param points		The number of points, the player get.
+ * @param client		Client ID of the client.
+ * @param points		The number of points, the player got.
  */
 forward STAMM_OnClientGetPoints(client, points);
 
 
 /**
- * Executes before a player get Stamm points
+ * Executes before a player get Stamm points.
  *
- * @param client		Client.
+ * @param client		Client ID of the client.
  * @param points		The number of points the player get.
  * @return  			Plugin_Continue, Plugin_Changed to give points, anything else to prevent it.
  */
@@ -68,7 +68,7 @@ forward Action:STAMM_OnClientGetPoints_PRE(client, &points);
 
 
 /**
- * Adds points to a player
+ * Give points to a player.
  *
  * @param client		Client.
  * @param points		Number of points to add.
@@ -79,7 +79,7 @@ native bool:STAMM_AddClientPoints(client, points);
 
 
 /**
- * Deletes points from a player
+ * Deletes points from a player.
  *
  * @param client		Client.
  * @param points		Number of points to delete.
@@ -90,7 +90,7 @@ native bool:STAMM_DelClientPoints(client, points);
 
 
 /**
- * Sets points of a player
+ * Sets points of a player.
  *
  * @param client		Client.
  * @param points		Number of points to set.
@@ -101,17 +101,17 @@ native bool:STAMM_SetClientPoints(client, points);
 
 
 /**
- * Returns the level of a client
+ * Returns the stamm vip level of a client
  *
  * @param client		Client.
- * @return				0=no VIP, x=Level
+ * @return				0=no VIP, x=Level.
  * @error 				Client is invalid.
  */
 native STAMM_GetClientLevel(client);
 
 
 /**
- * Returns the points of a player
+ * Returns the points a player have.
  *
  * @param client		Client.
  * @return				Points of player.
@@ -125,7 +125,7 @@ native STAMM_GetClientPoints(client);
  *
  * @param client		Client.
  * @param type			x = Level.
- * @param min			true = Minimum rang, false = Exact Rang.
+ * @param min			true = Exact Rang or higher, false = Exact Rang.
  * @return				true if Client is VIP, otherwise false.
  * @error 				Client is invalid.
  */
@@ -133,7 +133,7 @@ native bool:STAMM_IsClientVip(client, type, bool:min=true);
 
 
 /**
- * Returns true when the clients level is high enough for your feature or he bought it and wants it.
+ * Returns true when the clients level is high enough for your feature TODO: He bought it and wants it.
  *
  * @param client		Client.
  * @return				true if client have feature, otherwise false.
@@ -143,7 +143,7 @@ native bool:STAMM_HaveClientFeature(client, block=1);
 
 
 /**
- * Returns true when the specific player is completely loaded by Stamm, otherwise false
+ * Returns true when the specific player is completely loaded by Stamm, otherwise false.
  *
  * @param client		Client.
  * @return				true if fully loaded, otherwise false.
@@ -152,7 +152,7 @@ native bool:STAMM_IsClientValid(client);
 
 
 /**
- * Returns true when the specific player is a Stamm admin, otherwise false
+ * Returns true when the specific player is a Stamm admin, otherwise false.
  *
  * @param client		Client.
  * @return				true if admin, otherwise false.
@@ -161,7 +161,7 @@ native bool:STAMM_IsClientAdmin(client);
 
 
 /**
- * Returns true when the specific player enabled this feature, false otherwise
+ * Returns true when the specific player enabled this feature, false otherwise.
  *
  * @param client		Client.
  * @return				true if the player enabled it, otherwise false.
