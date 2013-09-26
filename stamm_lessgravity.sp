@@ -45,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LessGravity",
 	author = "Popoklopsi",
-	version = "1.2.3",
+	version = "1.3.0",
 	description = "Give VIP's less gravity",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

@@ -50,7 +50,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Colored Smokes",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.0",
 	description = "Give VIP's colored smokes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

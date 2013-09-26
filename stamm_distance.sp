@@ -52,7 +52,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Distance",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.0",
 	description = "VIP's see the distance and direction to the nearest player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

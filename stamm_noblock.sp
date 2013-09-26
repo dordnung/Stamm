@@ -39,7 +39,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature NoBlock",
 	author = "Popoklopsi",
-	version = "1.1.1",
+	version = "1.2.0",
 	description = "Non VIP's cant' walk through VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

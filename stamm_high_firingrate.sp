@@ -47,7 +47,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Higher Firing Rate",
 	author = "Popoklopsi",
-	version = "1.0.2",
+	version = "1.1.0",
 	description = "Give VIP's higher firing Rate",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

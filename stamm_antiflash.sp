@@ -50,7 +50,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Anti Flash",
 	author = "Popoklopsi",
-	version = "1.3.3",
+	version = "1.4.0",
 	description = "Give VIP's anti flash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

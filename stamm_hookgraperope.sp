@@ -45,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Hook Grape Rope",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.0",
 	description = "Allows VIP's to grap, hook or rope",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

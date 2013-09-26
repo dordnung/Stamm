@@ -46,7 +46,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Joinsound",
 	author = "Popoklopsi",
-	version = "1.3.2",
+	version = "1.4.0",
 	description = "Give VIP's a Joinsound",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

@@ -48,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature ResizePlayer",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.0",
 	description = "Resizes VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

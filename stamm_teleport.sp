@@ -54,7 +54,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Teleport",
 	author = "Popoklopsi",
-	version = "1.1.1",
+	version = "1.2.0",
 	description = "VIP's can create Teleport Points",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

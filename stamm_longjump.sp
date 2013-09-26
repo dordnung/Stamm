@@ -46,7 +46,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LongJump",
 	author = "Popoklopsi",
-	version = "1.0.2",
+	version = "1.1.0",
 	description = "VIP's have Long Jump",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

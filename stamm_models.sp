@@ -72,7 +72,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Vip Models",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.0",
 	description = "Give VIP's VIP Models",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

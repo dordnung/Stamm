@@ -44,7 +44,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Icon",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.0",
 	description = "Adds an Stamm Icon on top of a player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

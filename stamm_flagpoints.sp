@@ -47,7 +47,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature FlagPoints",
 	author = "Popoklopsi",
-	version = "1.0.3",
+	version = "1.1.0",
 	description = "Give only points to players with a specific flag",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

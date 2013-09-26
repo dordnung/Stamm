@@ -40,7 +40,7 @@ public Plugin:myinfo =
 	name = "FastLadder",
 	author = "Bara",
 	description = "Prohibit non VIP's the fast go up on ladders",
-	version = "1.0.1",
+	version = "1.1.0",
 	url = "www.bara.in"
 };
 

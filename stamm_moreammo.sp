@@ -51,7 +51,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreAmmo",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.0",
 	description = "Give VIP's more ammo",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };

@@ -47,7 +47,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Throwing Knife",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.4.0",
 	description = "Give VIP's every Round x Throwing Knifes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
