@@ -68,9 +68,8 @@ public OnAllPluginsLoaded()
 
 
 // auto updater and load description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
 
 
@@ -92,20 +91,17 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 	if (grap != -1)
 	{
-		Format(description, sizeof(description), "%T", "GetGrap", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(grap), description);
+		STAMM_AddBlockDescription(grap, "%T", "GetGrap", LANG_SERVER);
 	}
 
 	if (hook != -1)
 	{
-		Format(description, sizeof(description), "%T", "GetHook", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(hook), description);
+		STAMM_AddBlockDescription(hook, "%T", "GetHook", LANG_SERVER);
 	}
 
 	if (rope != -1)
 	{
-		Format(description, sizeof(description), "%T", "GetRope", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(rope), description);
+		STAMM_AddBlockDescription(rope, "%T", "GetRope", LANG_SERVER);
 	}
 }
 

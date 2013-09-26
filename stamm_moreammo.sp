@@ -108,9 +108,8 @@ public OnPluginStart()
 
 
 // Feature loaded, add desc. and auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -124,9 +123,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Add dscriptions for block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetMoreAmmo", LANG_SERVER, ammo * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetMoreAmmo", LANG_SERVER, ammo * i);
 	}
 }
 

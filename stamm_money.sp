@@ -76,11 +76,9 @@ public OnAllPluginsLoaded()
 
 
 // Add feature text
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -90,9 +88,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 
-	Format(description, sizeof(description), "%T", "GetCash", LANG_SERVER, cash);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
+
+	STAMM_AddBlockDescription(1, "%T", "GetCash", LANG_SERVER, cash);
 }
 
 

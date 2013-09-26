@@ -52,7 +52,7 @@ public Plugin:myinfo =
 
 
 // Auto Updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 

@@ -76,11 +76,9 @@ public OnPluginStart()
 
 
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
-	decl String:description[64];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -96,8 +94,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	{
 		blockDirection = blockDistance = blockName = 1;
 
-		Format(description, sizeof(description), "%T", "GetAll", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(), description);
+		STAMM_AddBlockDescription(1, "%T", "GetAll", LANG_SERVER);
 	}
 
 	else
@@ -111,20 +108,17 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		// Check valid?
 		if (blockDirection != -1)
 		{
-			Format(description, sizeof(description), "%T", "GetDirection", LANG_SERVER);
-			STAMM_AddFeatureText(STAMM_GetLevel(blockDirection), description);
+			STAMM_AddBlockDescription(blockDirection, "%T", "GetDirection", LANG_SERVER);
 		}
 
 		if (blockDistance != -1)
 		{
-			Format(description, sizeof(description), "%T", "GetDistance", LANG_SERVER);
-			STAMM_AddFeatureText(STAMM_GetLevel(blockDistance), description);
+			STAMM_AddBlockDescription(blockDistance, "%T", "GetDistance", LANG_SERVER);
 		}
 
 		if (blockName != -1)
 		{
-			Format(description, sizeof(description), "%T", "GetName", LANG_SERVER);
-			STAMM_AddFeatureText(STAMM_GetLevel(blockName), description);
+			STAMM_AddBlockDescription(blockName, "%T", "GetName", LANG_SERVER);
 		}
 	}
 

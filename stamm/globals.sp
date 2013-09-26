@@ -119,8 +119,8 @@ new String:g_sAdminMenu[32];
 new String:g_sLogFile[PLATFORM_MAX_PATH + 1];
 new String:g_sDebugFile[PLATFORM_MAX_PATH + 1];
 new String:g_sLvlUpSound[PLATFORM_MAX_PATH + 1];
-new String:g_sPluginVersion[10] = "2.18";
-new String:g_sPluginVersionUpdate[10] = "2.1.8";
+new String:g_sPluginVersion[10] = "2.2";
+new String:g_sPluginVersionUpdate[10] = "2.2.0";
 new String:g_sTableName[64];
 new String:g_sTextToWrite[32];
 new String:g_sTextToWriteF[32];
@@ -167,7 +167,7 @@ new bool:g_bMoreColors;
 
 
 // Global handles
-/* TODO: IMPLEMENTnew Handle:g_hBoughtBlock[MAXPLAYERS + 1][MAXFEATURES];*/
+/* TODO: IMPLEMENT new Handle:g_hBoughtBlock[MAXPLAYERS + 1][MAXFEATURES];*/
 new Handle:g_hFeatureBlocks[MAXFEATURES];
 new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;
@@ -184,7 +184,7 @@ new Handle:g_hHudSync;
 #define g_sCreateBackupQueryMySQL "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
 #define g_sCreateTableQueryMySQL "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
 
-/* TODO: IMPLEMENT#define g_sCreateFeatureQuery "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))" */
+/* TODO: IMPLEMENT #define g_sCreateFeatureQuery "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))" */
 #define g_sCreatHappyQuery "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)"
 
 

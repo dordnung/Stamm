@@ -65,7 +65,7 @@ public OnAllPluginsLoaded()
 
 
 // Feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:description[64];
 	decl String:theflags[64];

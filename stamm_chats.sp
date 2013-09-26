@@ -95,9 +95,8 @@ public OnAllPluginsLoaded()
 
 
 // Add to auto updater and make descriptions
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:activate[64];
 	decl String:urlString[256];
 
@@ -112,18 +111,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 
 
-	// Format descriptions
-	if (NeedTag)
-	{
-		Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "*");
-		Format(description, sizeof(description), "%T", "GetVIPMessage", LANG_SERVER, activate);
-	}
-	else
-	{
-		Format(description, sizeof(description), "%T", "GetVIPMessage", LANG_SERVER, "");
-	}
-
-
 	// Get block of messages
 	messages = STAMM_GetBlockOfName("messages");
 	chat = STAMM_GetBlockOfName("chat");
@@ -133,16 +120,24 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Found a valid block?
 	if (messages != -1)
 	{
-		STAMM_AddFeatureText(STAMM_GetLevel(messages), description);
+		if (NeedTag)
+		{
+			Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "*");
+
+			STAMM_AddBlockDescription(messages, "%T", "GetVIPMessage", LANG_SERVER, activate);
+		}
+		else
+		{
+			STAMM_AddBlockDescription(messages, "%T", "GetVIPMessage", LANG_SERVER, "");
+		}
 	}	
 
 	// Found valid block?
 	if (chat != -1)
 	{
 		Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "#");
-		Format(description, sizeof(description), "%T", "GetVIPChat", LANG_SERVER, activate);
 
-		STAMM_AddFeatureText(STAMM_GetLevel(chat), description);
+		STAMM_AddBlockDescription(chat, "%T", "GetVIPChat", LANG_SERVER, activate);
 	}
 }
 

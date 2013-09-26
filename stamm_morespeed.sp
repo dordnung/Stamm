@@ -84,11 +84,9 @@ public OnPluginStart()
 
 
 // Auto updater and description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -103,9 +101,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Set description for each block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetMoreSpeed", LANG_SERVER, pspeed * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetMoreSpeed", LANG_SERVER, pspeed * i);
 	}
 }
 
@@ -132,7 +128,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Client changed feature state
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT, bool:isShop */)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{

@@ -83,11 +83,9 @@ public OnAllPluginsLoaded()
 
 
 // Feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
-
 
 
 
@@ -108,14 +106,12 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Check valid?
 	if (welcome != -1)
 	{
-		Format(description, sizeof(description), "%T", "GetWelcomeMessages", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(welcome), description);
+		STAMM_AddBlockDescription(welcome, "%T", "GetWelcomeMessages", LANG_SERVER);
 	}
 
 	if (leave != -1)
 	{
-		Format(description, sizeof(description), "%T", "GetLeaveMessages", LANG_SERVER);
-		STAMM_AddFeatureText(STAMM_GetLevel(leave), description);
+		STAMM_AddBlockDescription(leave, "%T", "GetLeaveMessages", LANG_SERVER);
 	}
 }
 

@@ -105,9 +105,8 @@ public OnConfigsExecuted()
 
 
 // Add to auto updater and set description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
 
 
@@ -123,9 +122,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Description for each block	
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetHigherFiringRate", LANG_SERVER, firerate * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetHigherFiringRate", LANG_SERVER, firerate * i);
 	}
 }
 

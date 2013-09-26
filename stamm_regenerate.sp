@@ -75,11 +75,9 @@ public OnAllPluginsLoaded()
 
 
 // Add to updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -93,9 +91,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Set Description for each block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetRegenerate", LANG_SERVER, hp * i, timeInterval);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetRegenerate", LANG_SERVER, hp * i, timeInterval);
 	}
 }
 

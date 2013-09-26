@@ -85,11 +85,9 @@ public OnAllPluginsLoaded()
 
 
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -100,9 +98,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 
 
-	Format(description, sizeof(description), "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
+	STAMM_AddBlockDescription(1, "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
 }
 
 

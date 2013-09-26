@@ -50,7 +50,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Anti Flash",
 	author = "Popoklopsi",
-	version = "1.3.2",
+	version = "1.3.3",
 	description = "Give VIP's anti flash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -85,9 +85,8 @@ public OnAllPluginsLoaded()
 
 
 // Feaure loaded, set textes
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:team[64];
 	decl String:team2[64];
 	decl String:urlString[256];
@@ -127,9 +126,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 
-	Format(description, sizeof(description), "%T", "GetAntiFlash", LANG_SERVER, team, team2);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
+	STAMM_AddBlockDescription(1, "%T", "GetAntiFlash", LANG_SERVER, team, team2);
 }
 
 

@@ -73,9 +73,8 @@ public OnAllPluginsLoaded()
 
 
 // Add to udater and add descriptions
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
 
 
@@ -90,9 +89,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Add for each block a description
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetSpawnHP", LANG_SERVER, hp * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetSpawnHP", LANG_SERVER, hp * i);
 	}
 }
 

@@ -106,11 +106,9 @@ public OnConfigsExecuted()
 
 
 // Feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
-
 
 
 	// Add to updater
@@ -125,9 +123,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Write level descriptions
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetResize", LANG_SERVER, resize * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetResize", LANG_SERVER, resize * i);
 	}
 }
 
@@ -173,7 +169,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Client changed a feature
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT, bool:isShop */)
 {
 	if (STAMM_IsClientValid(client))
 	{

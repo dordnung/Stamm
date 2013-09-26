@@ -55,7 +55,7 @@ public Plugin:myinfo =
 
 
 // Add to updater on feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 

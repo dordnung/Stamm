@@ -94,11 +94,9 @@ public OnConfigsExecuted()
 
 
 // Add to auto update and set description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -112,9 +110,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// Add dsecription for each feature
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetLessGravity", LANG_SERVER, grav * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		STAMM_AddBlockDescription(i, "%T", "GetLessGravity", LANG_SERVER, grav * i);
 	}
 }
 
@@ -133,7 +129,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Also change it, if he cahnged the state
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT , bool:isShop */)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{

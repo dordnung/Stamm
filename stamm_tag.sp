@@ -96,9 +96,8 @@ public OnPluginStart()
 
 
 // Add auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
 
 
@@ -112,9 +111,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 
-	Format(description, sizeof(description), "%T", "GetTag", LANG_SERVER, tag);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
+	STAMM_AddBlockDescription(1, "%T", "GetTag", LANG_SERVER, tag);
 }
 
 

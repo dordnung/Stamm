@@ -54,7 +54,6 @@ new modelCount;
 new model_change;
 new same_models;
 new admin_model;
-new lowest;
 
 new String:PlayerModel[MAXPLAYERS + 1][PLATFORM_MAX_PATH + 1];
 new String:models[64][4][PLATFORM_MAX_PATH + 1];
@@ -110,9 +109,8 @@ public OnAllPluginsLoaded()
 
 
 // Feature loaded, parse models
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
 
 	new Handle:model_settings;
@@ -127,16 +125,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 
 
-	// Load Translation files
-	if (model_change && same_models)
-	{
-		Format(description, sizeof(description), "%T", "GetModelChange", LANG_SERVER, model_change_cmd);
-	}
-	else 
-	{
-		Format(description, sizeof(description), "%T", "GetModel", LANG_SERVER);
-	}
-
 
 
 	// Load Models configs
@@ -148,7 +136,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	// To Keyvalues
 	model_settings = CreateKeyValues("ModelSettings");
 
-	lowest = STAMM_GetLevelCount();
 
 	FileToKeyValues(model_settings, "cfg/stamm/features/ModelSettings.txt");
 
@@ -186,13 +173,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 
 				Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", STAMM_GetLevel());
-
-
-				// First Level with models
-				if (STAMM_GetLevel() < lowest)
-				{
-					lowest = STAMM_GetLevel();
-				}
 			}
 
 			else
@@ -212,11 +192,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 					STAMM_WriteToLog(false, "ATTENTION: Found incorrect level for model %s. One assumed!!", models[modelCount][MODELNAME]);
 					Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "1");
 				}
-
-				if (StringToInt(models[modelCount][MODELLEVEL]) < lowest)
-				{
-					lowest = StringToInt(models[modelCount][MODELLEVEL]);
-				}
 			}
 
 			// One model more
@@ -227,9 +202,17 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	
 
 	CloseHandle(model_settings);
-	
-	STAMM_AddFeatureText(lowest, description);
 
+	// Load Translation files
+	if (model_change && same_models)
+	{
+		STAMM_AddBlockDescription(1, "%T", "GetModelChange", LANG_SERVER, model_change_cmd);
+	}
+	else 
+	{
+
+		STAMM_AddBlockDescription(1, "%T", "GetModel", LANG_SERVER);
+	}
 }
 
 
