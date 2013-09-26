@@ -67,7 +67,8 @@ public configlib_CreateConfig()
 {
 	// Set file
 	AutoExecConfig_SetFile("stamm_config", "stamm");
-	
+	AutoExecConfig_SetCreateFile(true);
+
 	// Global versions cvar
 	configlib_StammVersion = AutoExecConfig_CreateConVar("stamm_ver", g_sPluginVersion, "Stamm Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
@@ -106,10 +107,8 @@ public configlib_CreateConfig()
 
 
 	// Autoexec
-	AutoExecConfig(true, "stamm_config", "stamm");
-	
 	AutoExecConfig_CleanFile();
-
+	AutoExecConfig_ExecuteFile();
 
 	// Hook Changes
 	SetConVarString(configlib_StammVersion, g_sPluginVersion);
