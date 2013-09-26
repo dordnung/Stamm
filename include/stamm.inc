@@ -1,5 +1,5 @@
 #if defined _stamm_included
-  #endinput
+	#endinput
 #endif
 #define _stamm_included
 
