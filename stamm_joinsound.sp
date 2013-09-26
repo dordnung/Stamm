@@ -112,7 +112,7 @@ public OnConfigsExecuted()
 	
 	GetConVarString(j_path, path, sizeof(path));
 	
-	if (STAMM_GetGame() == GameCSGO)
+	if (STAMM_GetGame() != GameCSGO)
 	{
 		PrecacheSound(path, true);
 	}
