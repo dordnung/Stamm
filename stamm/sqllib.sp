@@ -430,6 +430,9 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 			// Get it
 			SQL_TQuery(sqllib_db, sqllib_InsertHandler2, query, GetClientUserId(client));*/
+
+			/* TODO: REMOVE THIS */
+			clientlib_ClientReady(client);
 		}
 	}
 	else
@@ -446,7 +449,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 
 
 /* TODO: IMPLEMENT
-// Clint insert handler 2
+// Client insert handler 2
 public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], any:userid)
 {
 	new client = GetClientOfUserId(userid);

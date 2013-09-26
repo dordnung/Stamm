@@ -387,11 +387,11 @@ public Action:pointlib_ShowPoints(client, arg)
 	}
 	else
 	{
-		Handle:menu = panellib_createInfoPanel(client);
+		new Handle:menu = panellib_createInfoPanel(client);
 
 		if (menu != INVALID_HANDLE)
 		{
-			SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
+			SendPanelToClient(menu, client, panellib_InfoHandler, 40);
 		}
 	}
 	
