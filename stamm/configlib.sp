@@ -69,10 +69,10 @@ public configlib_CreateConfig()
 	AutoExecConfig_SetFile("stamm_config", "stamm");
 	AutoExecConfig_SetCreateFile(true);
 
+
+
 	// Global versions cvar
 	configlib_StammVersion = AutoExecConfig_CreateConVar("stamm_ver", g_sPluginVersion, "Stamm Version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
-
-
 
 
 	// Add all the natives
@@ -124,6 +124,7 @@ public configlib_CreateConfig()
 	HookConVarChange(configlib_StripTag, OnCvarChanged);
 	HookConVarChange(configlib_UseMenu, OnCvarChanged);
 	HookConVarChange(configlib_WantUpdate, OnCvarChanged);
+	HookConVarChange(configlib_ShowTextOnPoints, OnCvarChanged);
 }
 
 
@@ -256,6 +257,11 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 	else if (cvar == configlib_UseMenu)
 	{
 		g_bUseMenu = GetConVarBool(configlib_UseMenu);
+	}
+
+	else if (cvar == configlib_ShowTextOnPoints)
+	{
+		g_bShowTextOnPoints = GetConVarBool(configlib_ShowTextOnPoints);
 	}
 }
 
