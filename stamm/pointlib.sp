@@ -387,7 +387,12 @@ public Action:pointlib_ShowPoints(client, arg)
 	}
 	else
 	{
-		SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
+		Handle:menu = panellib_createInfoPanel(client);
+
+		if (menu != INVALID_HANDLE)
+		{
+			SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
+		}
 	}
 	
 	return Plugin_Handled;
