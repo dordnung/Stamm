@@ -67,10 +67,8 @@ public OnAllPluginsLoaded()
 // Feature loaded
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:theflags[64];
 	decl String:urlString[256];
-
 
 
 
@@ -95,8 +93,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		// Valid flags?
 		if (!StrEqual(theflags, ""))
 		{
-			Format(description, sizeof(description), "%T", "GetAdminFlags", LANG_SERVER, theflags);
-			STAMM_AddFeatureText(i, description);
+			STAMM_AddBlockDescription(1, "%T", "GetAdminFlags", LANG_SERVER, theflags);
 		}
 	}
 }
@@ -143,7 +140,7 @@ public getLevelFlag(String:theflags[], size, level)
 	// Do we have a file?
 	if (!FileExists("cfg/stamm/features/adminflags.txt"))
 	{
-		STAMM_WriteToLog(false, "Didn't find cfg/stamm/features/adminflags.txt!");
+		STAMM_WriteToLog(false, "Couldn't find cfg/stamm/features/adminflags.txt!");
 
 		return;
 	}
