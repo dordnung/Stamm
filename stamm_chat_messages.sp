@@ -133,11 +133,11 @@ public STAMM_OnClientReady(client)
 	{
 		if (STAMM_GetGame() == GameCSGO)
 		{
-			CPrintToChatAll("%s %t", "WelcomeMessage", tag, name);
+			CPrintToChatAll("%s %t", tag, "WelcomeMessage", name);
 		}
 		else
 		{
-			MCPrintToChatAll("%s %t", "WelcomeMessage", tag, name);
+			MCPrintToChatAll("%s %t", tag, "WelcomeMessage", name);
 		}
 	}
 }
