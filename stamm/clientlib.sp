@@ -33,7 +33,7 @@ new Handle:clientlib_olddelete;
 
 
 // Is Client valid, without ready state
-public bool:clientlib_isValidClient_PRE(client)
+bool:clientlib_isValidClient_PRE(client)
 {
 	if (client > 0 && client <= MaxClients)
 	{
@@ -59,7 +59,7 @@ public bool:clientlib_isValidClient_PRE(client)
 
 
 // Is valid client
-public bool:clientlib_isValidClient(client)
+bool:clientlib_isValidClient(client)
 {
 	// With ready state
 	return (clientlib_isValidClient_PRE(client) && g_bClientReady[client]);
@@ -128,7 +128,7 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 
 
 // Check a client as ready
-public clientlib_ClientReady(client)
+clientlib_ClientReady(client)
 {
 	if (clientlib_isValidClient_PRE(client))
 	{
@@ -185,7 +185,7 @@ public OnClientDisconnect(client)
 
 
 // Checks if a steamid is connected
-public clientlib_IsSteamIDConnected(String:steamid[])
+clientlib_IsSteamIDConnected(String:steamid[])
 {
 	decl String:cSteamid[64];
 	decl String:search[64];
@@ -225,7 +225,7 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 
 
 // Check if a client is a stamm admin
-public bool:clientlib_IsAdmin(client)
+bool:clientlib_IsAdmin(client)
 {
 	if (clientlib_isValidClient_PRE(client))
 	{
@@ -243,7 +243,7 @@ public bool:clientlib_IsAdmin(client)
 
 
 // Check if a client is a special VIP
-public clientlib_IsSpecialVIP(client)
+clientlib_IsSpecialVIP(client)
 {
 	if (clientlib_isValidClient(client))
 	{
@@ -267,7 +267,7 @@ public clientlib_IsSpecialVIP(client)
 
 
 // Give Player fast VIP
-public clientlib_CheckFlagAdmin(client)
+clientlib_CheckFlagAdmin(client)
 {
 	// Flag checking
 	if (GetUserFlagBits(client) & ReadFlagString(g_sGiveFlagAdmin))
@@ -282,7 +282,7 @@ public clientlib_CheckFlagAdmin(client)
 
 
 // Set level to highest level
-public clientlib_GiveFastVIP(client)
+clientlib_GiveFastVIP(client)
 {
 	if (g_iPlayerLevel[client] < g_iLevels)
 	{
@@ -329,7 +329,7 @@ public Action:clientlib_deleteOlds(Handle:timer, any:data)
 
 
 // Check VIP state
-public clientlib_CheckVip(client)
+clientlib_CheckVip(client)
 {
 	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client) && (g_iLevels + g_iPLevels > 0))
 	{
@@ -422,14 +422,11 @@ public clientlib_CheckVip(client)
 			
 
 
-
 			// Play lvl up sound if wanted
 			if (!StrEqual(g_sLvlUpSound, "0") && isUP)
 			{
 				EmitSoundToAll(g_sLvlUpSound);
 			}
-
-
 
 
 
@@ -449,7 +446,6 @@ public clientlib_CheckVip(client)
 			// Notice to API
 			nativelib_PublicPlayerBecomeVip(client);
 		}
-		
 		else if (levelstufe == 0 && levelstufe != g_iPlayerLevel[client])
 		{
 			// New level is no level, poor player ):
@@ -457,8 +453,6 @@ public clientlib_CheckVip(client)
 							
 			// set to zero
 			g_iPlayerLevel[client] = 0;
-
-
 
 
 			// Update to database
@@ -482,18 +476,14 @@ public clientlib_CheckVip(client)
 
 
 // Saves player points and feature states
-public clientlib_SavePlayer(client, number)
+clientlib_SavePlayer(client, number)
 {
 	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client))
 	{
 		decl String:query[4024];
 		decl String:steamid[64];
-		
-
 
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
-		
-
 
 
 		// Zero points only?
@@ -508,18 +498,13 @@ public clientlib_SavePlayer(client, number)
 		}
 
 
-
-
 		// Add all features to the call
 		for (new i=0; i < g_iFeatures; i++)
 		{
 			Format(query, sizeof(query), "%s, `%s`=%i", query, g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][WANT_FEATURE][client]);
 		}
 
-
 		Format(query, sizeof(query), "%s WHERE `steamid`='%s'", query, steamid);
-		
-
 
 
 		// Execute
@@ -529,7 +514,6 @@ public clientlib_SavePlayer(client, number)
 		{ 
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
-
 
 
 		// Notice to API
@@ -543,7 +527,7 @@ public clientlib_SavePlayer(client, number)
 
 
 // Get the steamid
-public clientlib_getSteamid(client, String:steamid[], size)
+clientlib_getSteamid(client, String:steamid[], size)
 {
 	GetClientAuthString(client, steamid, size);
 	
@@ -782,7 +766,7 @@ public Action:clientlib_CmdSay(client, args)
 
 
 // Check players
-public clientlib_CheckPlayers()
+clientlib_CheckPlayers()
 {
 	new players = clientlib_GetPlayerCount();
 	new factor = (MaxClients - players) + 1;
@@ -806,7 +790,7 @@ public clientlib_CheckPlayers()
 
 
 // get current clients on server
-public clientlib_GetPlayerCount()
+clientlib_GetPlayerCount()
 {
 	new players = 0;
 

@@ -32,30 +32,24 @@
 
 
 
-
 // Start Eventlib
-public eventlib_Start()
+eventlib_Start()
 {
-
 	// Event Round start for TF2
 	if (g_iGameID == GAME_TF2)
 	{
 		HookEvent("teamplay_round_start", eventlib_RoundStart);
-		HookEvent("arena_round_start", eventlib_RoundStart);
 	}
-
 	else if (g_iGameID == GAME_DOD)
 	{
 		// Event Round start for DOD
 		HookEvent("dod_round_start", eventlib_RoundStart);
 	}
-
 	else
 	{
 		// Event Round start for CSS and CSGO
 		HookEvent("round_start", eventlib_RoundStart);
 	}
-
 
 
 	// Player Death
@@ -66,12 +60,9 @@ public eventlib_Start()
 
 
 
-
-
 // Round started
 public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
-
 	// Get points with rounds and enough players on server?
 	if ((g_iVipType == 2 || g_iVipType == 4 || g_iVipType == 6 || g_iVipType == 7) && clientlib_GetPlayerCount() >= g_iMinPlayer)
 	{
@@ -103,7 +94,6 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 			}
 		}
 	}
-	
 
 
 	// Announce Happy hour
@@ -124,12 +114,9 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 
 
 
-
-
 // A Player died
 public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {
-
 	// Get client and attacker of event
 	new userid = GetClientOfUserId(GetEventInt(event, "userid"));
 	new client = GetClientOfUserId(GetEventInt(event, "attacker"));

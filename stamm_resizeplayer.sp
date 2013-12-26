@@ -164,13 +164,13 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	STAMM_OnClientChangedFeature(client, true);
+	STAMM_OnClientChangedFeature(client, true, false);
 }
 
 
 
 // Client changed a feature
-public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT, bool:isShop */)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client))
 	{

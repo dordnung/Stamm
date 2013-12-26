@@ -33,7 +33,7 @@ new Handle:otherlib_inftimer;
 
 
 // Download files and precache
-public otherlib_PrepareFiles()
+otherlib_PrepareFiles()
 {
 	// Want a lvl up sound?
 	if (!StrEqual(g_sLvlUpSound, "0")) 
@@ -59,7 +59,7 @@ public otherlib_PrepareFiles()
 
 
 // Add lvl up spound to downloads table
-public otherlib_DownloadLevel()
+otherlib_DownloadLevel()
 {
 	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
 	
@@ -76,7 +76,7 @@ public otherlib_DownloadLevel()
 
 
 // Get the agme
-public otherlib_saveGame()
+otherlib_saveGame()
 {
 	new String:GameName[12];
 	g_iGameID = GAME_UNSUPPORTED;
@@ -250,7 +250,7 @@ public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 
 
 // Client want to start new Happy Hour
-public otherlib_MakeHappyHour(client)
+otherlib_MakeHappyHour(client)
 {
 	// Mark that client want to set
 	g_iHappyNumber[client] = 1;
@@ -277,7 +277,7 @@ public otherlib_MakeHappyHour(client)
 
 
 // End happy hour
-public otherlib_EndHappyHour()
+otherlib_EndHappyHour()
 {
 	if (g_bHappyHourON)
 	{
@@ -341,7 +341,7 @@ public otherlib_EndHappyHour()
 
 
 // Start happy hour
-public otherlib_StartHappyHour(time, factor)
+otherlib_StartHappyHour(time, factor)
 {
 	decl String:query[128];
 
@@ -478,7 +478,7 @@ public Action:otherlib_StopHappy(args)
 
 
 // Checks a timer, end it when it's running and reset it
-public otherlib_checkTimer(Handle:timer)
+otherlib_checkTimer(Handle:timer)
 {
 	// End it
 	if (timer != INVALID_HANDLE)

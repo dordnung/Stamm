@@ -63,12 +63,11 @@ new Handle:configlib_ShowTextOnPoints;
 
 
 // Create the config
-public configlib_CreateConfig()
+configlib_CreateConfig()
 {
 	// Set file
 	AutoExecConfig_SetFile("stamm_config", "stamm");
 	AutoExecConfig_SetCreateFile(true);
-
 
 
 	// Global versions cvar
@@ -105,11 +104,11 @@ public configlib_CreateConfig()
 	configlib_ShowTextOnPoints = AutoExecConfig_CreateConVar("stamm_text_on_points", "1", "1 = Players see a notify when they get points through kill/round/time, 0 = Disable");
 
 
-
 	// Autoexec
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 
+	
 	// Hook Changes
 	SetConVarString(configlib_StammVersion, g_sPluginVersion);
 	HookConVarChange(configlib_StammVersion, OnCvarChanged);
@@ -130,10 +129,8 @@ public configlib_CreateConfig()
 
 
 
-
-
-// Load the config
-public configlib_LoadConfig()
+// Loads the config
+configlib_LoadConfig()
 {
 	// Read all values from the cvars
 	g_fInfoTime = GetConVarFloat(configlib_InfoTime);
@@ -160,7 +157,6 @@ public configlib_LoadConfig()
 	configlib_FixGiveFlagAdmin();
 
 
-
 	// Bools
 	g_bAutoUpdate = GetConVarBool(configlib_WantUpdate);
 	g_bDebug = GetConVarBool(configlib_StammDebug);
@@ -173,11 +169,8 @@ public configlib_LoadConfig()
 	g_bShowTextOnPoints = GetConVarBool(configlib_ShowTextOnPoints);
 
 
-
 	// Format the tablename
 	Format(g_sTableName, sizeof(g_sTableName), "%s_%i", g_sTableName, g_iServerID);
-
-	
 
 
 	// Found any level?
@@ -186,7 +179,6 @@ public configlib_LoadConfig()
 		LogToFile(g_sLogFile, "[ STAMM ] Attention! Found no Stamm levels!!");
 	}
 }
-
 
 
 
@@ -270,7 +262,7 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 
 
 // Backwards Compatiblity
-public configlib_FixGiveFlagAdmin()
+configlib_FixGiveFlagAdmin()
 {
 	// Before we had numbers, now we have flags
 	// Replace numbers with flags

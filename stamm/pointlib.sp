@@ -35,7 +35,7 @@ new Handle:pointlib_showpointer;
 
 
 // Init. pointslib
-public pointlib_Start()
+pointlib_Start()
 {
 	Format(g_sTextToWriteF, sizeof(g_sTextToWriteF), g_sTextToWrite);
 	
@@ -417,7 +417,7 @@ public Action:pointlib_ShowPoints(client, arg)
 
 
 // Give points to player
-public pointlib_GivePlayerPoints(client, number, bool:check)
+pointlib_GivePlayerPoints(client, number, bool:check)
 {
 	// Negativ number? and on delete less than zero?
 	if (number < 0 && g_iPlayerPoints[client] + number < 0)
@@ -472,7 +472,7 @@ public pointlib_GivePlayerPoints(client, number, bool:check)
 
 
 // Show points
-public pointlib_ShowPlayerPoints(client, bool:only)
+pointlib_ShowPlayerPoints(client, bool:only)
 {
 	if (clientlib_isValidClient(client))
 	{

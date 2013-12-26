@@ -33,7 +33,7 @@
 
 
 // Add a new Feature
-public featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:allowChange, bool:standard)
+featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:allowChange, bool:standard)
 {
 	// Detail strings
 	decl String:basename[64];
@@ -391,7 +391,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 
 
 // Return short basename
-public featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
+featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 {
 	new retriev;
 	
@@ -433,7 +433,7 @@ public featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 
 
 // Unload a Feature
-public featurelib_UnloadFeature(Handle:plugin)
+featurelib_UnloadFeature(Handle:plugin)
 {
 	// Get intern index of the plugin
 	new index = featurelib_getFeatureByHandle(plugin);
@@ -467,7 +467,7 @@ public featurelib_UnloadFeature(Handle:plugin)
 
 
 // Load a Feautre
-public featurelib_loadFeature(Handle:plugin)
+featurelib_loadFeature(Handle:plugin)
 {
 	// Intern index
 	new index = featurelib_getFeatureByHandle(plugin);
@@ -499,7 +499,7 @@ public featurelib_loadFeature(Handle:plugin)
 
 
 // Reloads a feature
-public featurelib_ReloadFeature(Handle:plugin)
+featurelib_ReloadFeature(Handle:plugin)
 {
 	// Just unload and reload^^
 	featurelib_UnloadFeature(plugin);
@@ -719,7 +719,7 @@ public Action:featurelib_List(args)
 
 
 // returns the index by given Handle
-public featurelib_getFeatureByHandle(Handle:plugin)
+featurelib_getFeatureByHandle(Handle:plugin)
 {
 	// Go through all features
 	for (new i=0; i < g_iFeatures; i++)

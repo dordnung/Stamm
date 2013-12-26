@@ -123,14 +123,14 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	STAMM_OnClientChangedFeature(client, true);
+	STAMM_OnClientChangedFeature(client, true, false);
 }
 
 
 
 
-// Also change it, if he cahnged the state
-public STAMM_OnClientChangedFeature(client, bool:mode /* TODO: IMPLEMENT , bool:isShop */)
+// Also change it, if he changed the state
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{

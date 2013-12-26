@@ -45,7 +45,7 @@ new Handle:nativelib_happy_end;
 
 
 // Init. Nativelib
-public nativelib_Start()
+nativelib_Start()
 {
 
 	// compatiblity to old sourcemod versions
@@ -116,7 +116,7 @@ public nativelib_Start()
 
 
 // Local forwards, let feature notice that it's loaded
-public nativelib_startLoaded(Handle:plugin, String:basename[])
+nativelib_startLoaded(Handle:plugin, String:basename[])
 {
 	// Get function id
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnFeatureLoaded");
@@ -143,7 +143,7 @@ public nativelib_startLoaded(Handle:plugin, String:basename[])
 
 
 // forward to change points a player get
-public Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
+Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 {
 	new Action:result;
 
@@ -170,7 +170,7 @@ public Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 
 
 // Notice to all plugins, that a player got points
-public nativelib_PublicPlayerGetPoints(client, number)
+nativelib_PublicPlayerGetPoints(client, number)
 {
 	Call_StartForward(nativelib_stamm_get);
 	
@@ -187,7 +187,7 @@ public nativelib_PublicPlayerGetPoints(client, number)
 
 
 // Notice to all plugins, that a player got VIP
-public nativelib_PublicPlayerBecomeVip(client)
+nativelib_PublicPlayerBecomeVip(client)
 {
 	Call_StartForward(nativelib_player_stamm);
 	
@@ -202,7 +202,7 @@ public nativelib_PublicPlayerBecomeVip(client)
 
 
 // Notice to all plugins, that Stamm is ready
-public nativelib_StammReady()
+nativelib_StammReady()
 {
 	Call_StartForward(nativelib_stamm_ready);
 	
@@ -215,7 +215,7 @@ public nativelib_StammReady()
 
 
 // Notice to all plugins, that a player is ready
-public nativelib_ClientReady(client)
+nativelib_ClientReady(client)
 {
 	Call_StartForward(nativelib_client_ready);
 	
@@ -230,7 +230,7 @@ public nativelib_ClientReady(client)
 
 
 // Notice to all plugins, that a player got save
-public nativelib_ClientSave(client)
+nativelib_ClientSave(client)
 {
 	Call_StartForward(nativelib_client_save);
 	
@@ -247,7 +247,7 @@ public nativelib_ClientSave(client)
 
 
 // Notice to feature, that a player changed the status of him
-public nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLEMENT ,bool:shop */)
+nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLEMENT ,bool:shop */)
 {
 	// Search for the function 
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
@@ -274,7 +274,7 @@ public nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLE
 
 
 // Notice to all plugins, that happy hour started
-public nativelib_HappyStart(time, factor)
+nativelib_HappyStart(time, factor)
 {
 	Call_StartForward(nativelib_happy_start);
 	
@@ -290,7 +290,7 @@ public nativelib_HappyStart(time, factor)
 
 
 // Notice to all plugins, that happy hour ended
-public nativelib_HappyEnd()
+nativelib_HappyEnd()
 {
 	Call_StartForward(nativelib_happy_end);
 	

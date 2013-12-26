@@ -30,15 +30,13 @@
 
 
 // Get current databe version
-public sqlback_getDatabaseVersion()
+sqlback_getDatabaseVersion()
 {
 	if (sqllib_db != INVALID_HANDLE)
 	{
 		decl String:query[128];
+
 		
-
-
-
 		// Get highest version
 		Format(query, sizeof(query), g_sSelectVersionQuery, g_sTableName);
 		
@@ -48,10 +46,7 @@ public sqlback_getDatabaseVersion()
 		}
 
 		SQL_TQuery(sqllib_db, sqlback_getVersion, query);
-
-
-
-
+		
 
 		// Get running happy hour
 		Format(query, sizeof(query), g_sSelectHappyQuery, g_sTableName, GetTime());
@@ -71,7 +66,7 @@ public sqlback_getDatabaseVersion()
 
 
 // check version
-public bool:sqlback_isVersionNewer(String:version[])
+bool:sqlback_isVersionNewer(String:version[])
 {
 	new String:version2[strlen(version) + 1];
 
@@ -101,7 +96,6 @@ public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:d
 	}
 
 
-
 	// Check if we need to modify
 	sqlback_ModifyTableBackwards();
 }
@@ -122,7 +116,6 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 		new time = GetTime();
 
 
-
 		// is end in future?
 		if (end > time)
 		{
@@ -136,7 +129,7 @@ public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:dat
 
 
 // Sync steamid game indepentend
-public sqlback_syncSteamid(client, const String:version[])
+sqlback_syncSteamid(client, const String:version[])
 {
 	// Only for versions < 2.1
 	if (sqllib_db != INVALID_HANDLE && StringToInt(version[0]) <= 2 && StringToInt(version[2]) < 1 && StringToInt(version[3]) <= 9)
@@ -192,9 +185,6 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 		pointlib_GivePlayerPoints(client, SQL_FetchInt(hndl, 0), false);
 
 
-
-
-
 		// Delete STEAM_1: entry
 		Format(query, sizeof(query), g_sDeletePlayerQuery, g_sTableName, steamid);
 		
@@ -213,10 +203,9 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 
 
 // Check for needed modify
-public sqlback_ModifyTableBackwards()
+sqlback_ModifyTableBackwards()
 {
 	decl String:query[256];
-
 
 
 	// Version <= 2.15

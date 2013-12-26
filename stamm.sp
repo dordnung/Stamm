@@ -226,7 +226,7 @@ public OnPluginPauseChange(bool:pause)
 {
 	if (pause)
 	{
-		// On Pause End Plugin
+		// On Pause unload all features
 		OnPluginEnd();
 	}
 	else
@@ -246,14 +246,13 @@ public OnPluginPauseChange(bool:pause)
 
 
 // Check the folders we need
-public CheckStammFolders()
+CheckStammFolders()
 {
 	// Strings
 	decl String:oldFolder[PLATFORM_MAX_PATH + 1];
 	decl String:oldFolder2[PLATFORM_MAX_PATH + 1];
 	decl String:smFolder[PLATFORM_MAX_PATH + 1];
 	decl String:CurrentDate[20];
-	
 
 
 	// Current time
@@ -265,19 +264,15 @@ public CheckStammFolders()
 	BuildPath(Path_SM, oldFolder, sizeof(oldFolder), "Stamm");
 
 
-
-
 	Format(g_sLogFile, sizeof(g_sLogFile), "%s/stamm_errors_(%s).log", smFolder, CurrentDate);
 	Format(g_sDebugFile, sizeof(g_sDebugFile), "%s/stamm_debugs_(%s).log", smFolder, CurrentDate);
 
 
-
-
-	// Check for old folder
+	// Check for old folders
 	if (DirExists(oldFolder2) || DirExists(oldFolder))
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder levels inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
-		PrintToServer("[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder levels inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
+		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder 'levels' inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
+		PrintToServer("[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder 'levels' inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
 	}
 }
 
@@ -299,7 +294,6 @@ public OnConfigsExecuted()
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
-	
 
 
 
@@ -319,21 +313,19 @@ public OnConfigsExecuted()
 		sqlback_getDatabaseVersion();
 
 
-
 		// Delete old Timers
 		otherlib_checkTimer(pointlib_timetimer);
 		otherlib_checkTimer(pointlib_showpointer);
 		otherlib_checkTimer(otherlib_inftimer);
 		otherlib_checkTimer(clientlib_olddelete);
-		
 
 
 		// get Time points? start timer
-		if (g_iVipType == 3 || g_iVipType == 5 || g_iVipType == 6 ||  g_iVipType == 7)
+		if (g_iVipType == 3 || g_iVipType == 5 || g_iVipType == 6 || g_iVipType == 7)
 		{
 			pointlib_timetimer = CreateTimer((60.0*g_iTimePoint), pointlib_PlayerTime, _, TIMER_REPEAT);
 		}
-			
+
 
 		// Show points some times
 		if (g_iShowPoints) 
@@ -375,9 +367,8 @@ public OnConfigsExecuted()
 
 
 // Finally ready to start off
-public stammStarted()
-{	
-
+stammStarted()
+{
 	// no late load -> load all features added
 	if (!g_bIsLate)
 	{
@@ -391,17 +382,12 @@ public stammStarted()
 
 		new FileType:typs;
 
-
-
 		// Path to the stamm plugins
 		BuildPath(Path_SM, pathdir, sizeof(pathdir), "plugins/stamm");
 
 
-
 		// Open the dir
 		new Handle:dir = OpenDirectory(pathdir);
-
-
 
 		// Valid dir?
 		if (dir != INVALID_HANDLE)
@@ -434,12 +420,8 @@ public stammStarted()
 	}
 
 
-
-
 	// Print hint
 	PrintToServer("######### [ STAMM ] Stamm started succesfully with %i Features and %i Levels ###########", g_iFeatures, g_iLevels+g_iPLevels);
-
-
 
 
 	// If debug, notice stamm started
@@ -468,8 +450,6 @@ public Action:checkFeatures(Handle:timer, any:data)
 	// Plugin Iterator
 	new Handle:hIter = GetPluginIterator();
 
-
-
 	// Loop
 	while (MorePlugins(hIter) && current < sizeof(runningPlugins))
 	{
@@ -482,7 +462,6 @@ public Action:checkFeatures(Handle:timer, any:data)
 			current++;
 		}
 	}
-
 
 
 	// Search for feature handle

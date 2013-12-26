@@ -40,7 +40,7 @@ new Handle:panellib_adminpanel;
 
 
 // Init. Panellib 
-public panellib_Start()
+panellib_Start()
 {
 	decl String:infoString[256];
 		
@@ -189,7 +189,7 @@ public panellib_Start()
 
 
 
-public Handle:panellib_createInfoPanel(client)
+Handle:panellib_createInfoPanel(client)
 {
 	if (clientlib_isValidClient(client))
 	{
@@ -393,7 +393,7 @@ public Action:panellib_ChangePanel(client, args)
 
 
 // Intern function to create and send Panels
-public panellib_CreateUserPanels(client, mode)
+panellib_CreateUserPanels(client, mode)
 {
 	// Change panel, always up to date
 	if (mode == 1)

@@ -31,7 +31,7 @@
 
 
 // Load all levels
-public levellib_LoadLevels()
+levellib_LoadLevels()
 {
 	// Create the keyvalue
 	new Handle:all_levels = CreateKeyValues("StammLevels");
@@ -173,7 +173,7 @@ public levellib_LoadLevels()
 
 
 // Sort levels ASC
-public levellib_sortLevels()
+levellib_sortLevels()
 {
 	for (new i=0; i < g_iLevels; i++)
 	{
@@ -200,7 +200,7 @@ public levellib_sortLevels()
 
 
 // Find the level of clients points
-public levellib_PointsToID(client, points)
+levellib_PointsToID(client, points)
 {
 	// First check if he's a special vip
 	new spec = clientlib_IsSpecialVIP(client);

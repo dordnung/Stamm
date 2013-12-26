@@ -35,7 +35,7 @@ new sqllib_convert_cur = 2;
 
 
 // Init. sqllib
-public sqllib_Start()
+sqllib_Start()
 {
 	Format(g_sVipListF, sizeof(g_sVipListF), g_sVipList);
 	Format(g_sVipRankF, sizeof(g_sVipRankF), g_sVipRank);
@@ -64,7 +64,7 @@ public sqllib_Start()
 
 
 // Load the database
-public sqllib_LoadDB()
+sqllib_LoadDB()
 {
 	decl String:sqlError[255];
 	decl String:ident[32];
@@ -196,7 +196,7 @@ public sqllib_LoadDB()
 
 
 // Create database config
-public Handle:sqllib_createDB()
+Handle:sqllib_createDB()
 {
 	new Handle:dbHandle = CreateKeyValues("Databases");
 	
@@ -215,7 +215,7 @@ public Handle:sqllib_createDB()
 
 
 // Insert new Player
-public sqllib_InsertPlayer(client)
+sqllib_InsertPlayer(client)
 {
 	g_bClientReady[client] = false;
 
@@ -262,7 +262,7 @@ public sqllib_InsertPlayer(client)
 
 
 // Add new column for a feature
-public sqllib_AddColumn(String:name[], bool:standard)
+sqllib_AddColumn(String:name[], bool:standard)
 {
 	if (sqllib_db != INVALID_HANDLE)
 	{
