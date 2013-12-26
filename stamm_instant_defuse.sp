@@ -65,9 +65,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -80,10 +77,7 @@ public OnAllPluginsLoaded()
 		
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetInstantDefuse", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Instant Defuse", description);
+	STAMM_AddFastFeature("VIP Instant Defuse", "%T", "GetInstantDefuse", LANG_SERVER);
 }
 
 

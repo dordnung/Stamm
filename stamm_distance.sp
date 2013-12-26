@@ -131,14 +131,12 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-	
 	STAMM_AddFeature("VIP Distance");
 }
 

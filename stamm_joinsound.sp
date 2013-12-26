@@ -73,8 +73,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -82,10 +80,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetJoinsound", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Joinsound", description);
+	STAMM_AddFastFeature("VIP Joinsound", "%T", "GetJoinsound", LANG_SERVER);
 }
 
 

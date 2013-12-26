@@ -84,8 +84,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
 	// Colors :)
 	if (!CColorAllowed(Color_Lightgreen))
 	{
@@ -112,10 +110,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetKnifeInfect", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP KnifeInfect", description);
+	STAMM_AddFastFeature("VIP KnifeInfect", "%T", "GetKnifeInfect", LANG_SERVER);
 }
 
 

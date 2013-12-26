@@ -11,20 +11,20 @@
 /**
  * Adds information about what a player get on a specific block with this feature.
  *
- * @param level         The block.
+ * @param block         The block.
  * @param description   Description for this block.
  * @param ...           Format arguments.
- * @return              true = success, false = error.
+ * @return              Returns true on success, otherwise false.
  * @error               Block or feature is invalid.
  */
 native bool:STAMM_AddBlockDescription(block, const String:description[], any:...);
 
 
 /**
- * Returns the level a block needs (TODO: No Buying).
+ * Returns the stamm level a block needs (TODO: No Buying).
  *
  * @param block         Block to search for.
- * @return              The level to get that block. TODO: -1 if block is for buying.
+ * @return              The level needed to get that block. TODO: -1 if block is for buying.
  * @error               Block or feature is invalid TODO: it's a shop feature.
  */
 native STAMM_GetLevel(block=1);
@@ -53,9 +53,9 @@ native bool:STAMM_IsShop(block=1); */
 
 
 /**
- * Returns the number of a block by name.
+ * Returns the block number by a name.
  *
- * @param name          The name.
+ * @param name          The name of the bock.
  * @return              The block number.
  * @error               Feature is invalid.
  */
@@ -65,7 +65,7 @@ native STAMM_GetBlockOfName(const String:name[]);
 /**
  * Returns the number of blocks found in LevelSettings.
  *
- * @return              Number of blocks.
+ * @return              Number of blocks found.
  * @error               Feature is invalid.
  */
 native STAMM_GetBlockCount();

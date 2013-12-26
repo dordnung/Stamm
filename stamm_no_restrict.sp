@@ -71,7 +71,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
 	decl String:path[PLATFORM_MAX_PATH + 1];
 	new Handle:kv;
 
@@ -91,16 +90,10 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
-		
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoRestrict", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Restrict", description);
-
-
+	STAMM_AddFastFeature("VIP No Restrict", "%T", "GetNoRestrict", LANG_SERVER);
 
 
 	if (STAMM_GetGame() == GameCSGO)

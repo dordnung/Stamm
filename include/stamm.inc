@@ -4,7 +4,7 @@
 #define _stamm_included
 
 
-/* Include all includes we need for stamm */
+/* Include all stuff we need for stamm */
 #include <stamm/stamm-core>
 #include <stamm/stamm-blocks>
 #include <stamm/stamm-clients>

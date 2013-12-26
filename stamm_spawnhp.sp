@@ -66,8 +66,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP SpawnHP", "");
+	STAMM_AddFeature("VIP SpawnHP");
 }
 
 

@@ -93,8 +93,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -102,10 +100,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-
-	Format(haveDescription, sizeof(haveDescription), "%T", "GetLongJump", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP LongJump", haveDescription);
+	STAMM_AddFastFeature("VIP LongJump", "%T", "GetLongJump", LANG_SERVER);
 }
 
 

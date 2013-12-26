@@ -70,8 +70,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -79,10 +77,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-
-	Format(haveDescription, sizeof(haveDescription), "%T", "GetFireWeapon", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP FireWeapon", haveDescription);
+	STAMM_AddFastFeature("VIP FireWeapon", "%T", "GetFireWeapon", LANG_SERVER);
 }
 
 

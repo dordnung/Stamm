@@ -8,7 +8,7 @@
 
 
 /**
- * Return of function STAMM_GetGame()
+ * A list of possible games stamm can running on.
  */
 enum StammGame
 {
@@ -21,7 +21,7 @@ enum StammGame
 
 
 /**
- * Return of function STAMM_GetType()
+ * A list with possible types, how a player get stamm points.
  */
 enum StammType
 {
@@ -41,6 +41,7 @@ enum StammType
 
 /**
  * Executes when Stamm is fully loaded.
+ * Here you can be sure to access all Stamm stuff successfully.
  */
 forward STAMM_OnReady();
 
@@ -48,15 +49,14 @@ forward STAMM_OnReady();
 /**
  * Executes when Happy Hour starts.
  *
- * @param time          Runtime in seconds.
- * @param factor        Multiplication Factor.
+ * @param time          Runtime of the happy hour in seconds.
+ * @param factor        Multiplication Factor for Stamm points.
  */
 forward STAMM_OnHappyHourStart(time, factor);
 
 
 /**
  * Executes when Happy Hour ends.
- *
  */
 forward STAMM_OnHappyHourEnd();
 
@@ -66,7 +66,7 @@ forward STAMM_OnHappyHourEnd();
 
 
 /**
- * Returns how to get points.
+ * Returns how a player can get Stamm points.
  *
  * @return              KILLS, ROUNDS, TIME, KILLS_ROUNDS, KILLS_TIME, ROUNDS_TIME, KILLS_ROUNDS_TIME
  */
@@ -101,9 +101,9 @@ native bool:STAMM_IsLoaded();
 /**
  * Starts Happy Hour.
  *
- * @param time          Time in minutes (must be greate than 1).
- * @param factor        Multiplication Factor.
- * @return              false = Happy Hour already on, true = success.
+ * @param time          Runtime in minutes (must be greater than 1).
+ * @param factor        Multiplication Factor of Stamm points.
+ * @return              Return false when happy hour already running, otherwise true.
  * @error               Time or factor invalid.
  */
 native bool:STAMM_StartHappyHour(time, factor);
@@ -112,7 +112,7 @@ native bool:STAMM_StartHappyHour(time, factor);
 /**
  * Ends Happy Hour.
  *
- * @return              false = Happy Hour already off, true = success.
+ * @return              Return false when happy hour already off, otherwise true.
  */
 native bool:STAMM_EndHappyHour();
 
@@ -120,7 +120,7 @@ native bool:STAMM_EndHappyHour();
 /**
  * Logs a Message to the Stamm Log File.
  *
- * @param debug         Write to debug, or normal log file.
+ * @param debug         If true write to debug log file, otherwise to normal log file.
  * @param fmt           Format string.
  * @param ...           Format arguments.
  *
@@ -134,7 +134,7 @@ native STAMM_WriteToLog(bool:debug, const String:fmt[], any:...);
  * You can use this to print messages with the specific tag.
  *
  * @param tag           String to save tag in.
- * @param maxlength     Maxlength of string.
+ * @param maxlength     Maxlength of the string.
  *
  * @noreturn
  */
@@ -144,9 +144,9 @@ native STAMM_GetTag(String:tag[], maxlength);
 /**
  * Adds a new command to the command list in the stamm menu.
  *
- * @param command       The command to add.
- * @param name          Name of the command.
- * @param ...           Name Format arguments.
+ * @param command       The true command to add.
+ * @param name          The name of the command.
+ * @param ...           The name Format arguments.
  * @error               Max Commands reached.
  *
  * @noreturn

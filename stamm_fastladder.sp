@@ -65,8 +65,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature for CSS and CSGO
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -77,13 +75,8 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 
-
-
 	STAMM_LoadTranslation();
-
-	Format(description, sizeof(description), "%T", "GetFastLadder", LANG_SERVER);
-
-	STAMM_AddFeature("VIP FastLadder", description, false);
+	STAMM_AddFastFeature("VIP FastLadder", "%T", "GetFastLadder", LANG_SERVER);
 }
 
 

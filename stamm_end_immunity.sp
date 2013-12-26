@@ -88,9 +88,6 @@ public OnPluginStart()
 // Add feature for TF2
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -103,10 +100,7 @@ public OnAllPluginsLoaded()
 	
 	
 	STAMM_LoadTranslation();
-
-	Format(haveDescription, sizeof(haveDescription), "%T", "GetImmunity", LANG_SERVER);
-
-	STAMM_AddFeature("VIP End of Round Immunity", haveDescription);
+	STAMM_AddFastFeature("VIP End of Round Immunity", "%T", "GetImmunity", LANG_SERVER);
 }
 
 

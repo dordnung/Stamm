@@ -37,9 +37,9 @@ forward STAMM_OnSaveClient(client);
  *
  * @param client        Client ID of the client.
  * @param turnedOn      true = Switched the feature on (TODO: bought), false = Switched the feature off (TODO: sold).
- * TODO: @param isShop  true = Was called from shop, false = Was called from menu
+ * TODO: @param isShop  true = Was called from shop, false = Was called from menu (Currently this is always false)
  */
-forward STAMM_OnClientChangedFeature(client, bool:turnedOn /* TODO: ,bool:isShop*/);
+forward STAMM_OnClientChangedFeature(client, bool:turnedOn, bool:isShop);
 
 
 /**
@@ -55,7 +55,7 @@ forward STAMM_OnClientGetPoints(client, points);
  * Executes before a player get Stamm points.
  *
  * @param client        Client ID of the client.
- * @param points        The number of points the player get.
+ * @param points        The number of points the player get (changeable).
  * @return              Plugin_Continue, Plugin_Changed to give points, anything else to prevent it.
  */
 forward Action:STAMM_OnClientGetPoints_PRE(client, &points);
@@ -72,7 +72,7 @@ forward Action:STAMM_OnClientGetPoints_PRE(client, &points);
  *
  * @param client        Client.
  * @param points        Number of points to add.
- * @return              true = Success, false = fail.
+ * @return              Return true on success, otherwise false.
  * @error               Client is invalid.
  */
 native bool:STAMM_AddClientPoints(client, points);
@@ -83,7 +83,7 @@ native bool:STAMM_AddClientPoints(client, points);
  *
  * @param client        Client.
  * @param points        Number of points to delete.
- * @return              true = Success, false = Fail.
+ * @return              Return true on success, otherwise false.
  * @error               Client is invalid.
  */
 native bool:STAMM_DelClientPoints(client, points);
@@ -94,7 +94,7 @@ native bool:STAMM_DelClientPoints(client, points);
  *
  * @param client        Client.
  * @param points        Number of points to set.
- * @return              true = Success, false = Fail.
+ * @return              Return true on success, otherwise false.
  * @error               Client is invalid.
  */
 native bool:STAMM_SetClientPoints(client, points);
@@ -133,9 +133,10 @@ native bool:STAMM_IsClientVip(client, type, bool:min=true);
 
 
 /**
- * Returns true when the clients level is high enough for your feature TODO: He bought it and wants it.
+ * Returns true when the clients level is high enough for your a specific block. TODO: He bought it and wants it.
  *
  * @param client        Client.
+ * @param block         Block to check access for.
  * @return              true if client have feature, otherwise false.
  * @error               Client, feature or block is invalid.
  */
@@ -161,7 +162,7 @@ native bool:STAMM_IsClientAdmin(client);
 
 
 /**
- * Returns true when the specific player enabled this feature, false otherwise.
+ * Returns true when the specific player enabled this feature in his menu, false otherwise.
  *
  * @param client        Client.
  * @return              true if the player enabled it, otherwise false.

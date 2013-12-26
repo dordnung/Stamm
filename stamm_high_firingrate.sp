@@ -77,7 +77,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Higher Firing Rate", "");
+	STAMM_AddFeature("VIP Higher Firing Rate");
 }
 
 

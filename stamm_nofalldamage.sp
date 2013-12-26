@@ -70,9 +70,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-	
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -85,10 +82,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoFallDamage", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Fall Damage", description);
+	STAMM_AddFastFeature("VIP No Fall Damage", "%T", "GetNoFallDamage", LANG_SERVER);
 }
 
 

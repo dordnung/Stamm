@@ -84,7 +84,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP MoreAmmo", "");
+	STAMM_AddFeature("VIP MoreAmmo");
 }
 
 

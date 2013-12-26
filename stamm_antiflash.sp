@@ -78,7 +78,6 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
 	STAMM_AddFeature("VIP Anti Flash");
 }
 

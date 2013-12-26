@@ -262,7 +262,7 @@ public nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLE
 		// Push with client and new status
 		Call_PushCell(client);
 		Call_PushCell(status);
-		/* TODO: IMPLEMENT Call_PushCell(shop); */
+		Call_PushCell(false);
 		
 		Call_Finish();
 	}

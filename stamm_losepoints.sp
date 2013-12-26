@@ -62,8 +62,6 @@ public Plugin:myinfo =
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -71,10 +69,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-
-	Format(haveDescription, sizeof(haveDescription), "%T", "NoLosePoints", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP LosePoints", haveDescription, false);
+	STAMM_AddFastFeature("VIP LosePoints", "%T", "NoLosePoints", LANG_SERVER);
 }
 
 

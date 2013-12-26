@@ -62,7 +62,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP MoreSpeed", "");
+	STAMM_AddFeature("VIP MoreSpeed");
 }
 
 

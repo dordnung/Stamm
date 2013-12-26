@@ -67,8 +67,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP HP Regenerate", "");
+	STAMM_AddFeature("VIP HP Regenerate");
 }
 
 

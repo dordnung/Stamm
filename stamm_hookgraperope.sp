@@ -61,8 +61,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP HookGrapeRope", "");
+	STAMM_AddFeature("VIP HookGrapeRope");
 }
 
 

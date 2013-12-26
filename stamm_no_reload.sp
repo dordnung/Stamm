@@ -71,9 +71,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -87,11 +84,7 @@ public OnAllPluginsLoaded()
 
 	// Load Trans.
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoReload", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Reload", description);
-
+	STAMM_AddFastFeature("VIP No Reload", "%T", "GetNoReload", LANG_SERVER);
 
 
 	// Weapon fire for non TF2 games

@@ -83,9 +83,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -93,10 +90,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetSlot", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Slot", description);
+	STAMM_AddFastFeature("VIP Slot", "%T", "GetSlot", LANG_SERVER);
 }
 
 

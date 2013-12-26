@@ -66,8 +66,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP KillHP", "");
+	STAMM_AddFeature("VIP KillHP");
 }
 
 

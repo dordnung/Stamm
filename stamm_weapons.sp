@@ -76,7 +76,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add the feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
 	decl String:path[PLATFORM_MAX_PATH + 1];
 
 
@@ -92,10 +91,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetWeapons", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Weapons", description);
+	STAMM_AddFastFeature("VIP Weapons", "%T", "GetWeapons", LANG_SERVER);
 
 
 	if (STAMM_GetGame() == GameCSGO)

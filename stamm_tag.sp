@@ -73,7 +73,6 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-
 	STAMM_AddFeature("VIP Tag", "", true, false);
 }
 

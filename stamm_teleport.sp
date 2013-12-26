@@ -83,8 +83,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add the feature to stamm
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
 	if (!LibraryExists("stamm")) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -92,10 +90,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetTeleport", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Teleport", description);
+	STAMM_AddFastFeature("VIP Teleport", "%T", "GetTeleport", LANG_SERVER);
 }
 
 
