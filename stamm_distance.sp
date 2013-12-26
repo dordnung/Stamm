@@ -64,12 +64,12 @@ public Plugin:myinfo =
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("distance", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	unit_c = AutoExecConfig_CreateConVar("distance_unit", "1", "1 = Use feet as unit, 0 = Use meters as unit");
 	
-	AutoExecConfig(true, "distance", "stamm/features");
 	AutoExecConfig_CleanFile();
-
+	AutoExecConfig_ExecuteFile();
 
 	HookEvent("player_spawn", eventPlayerSpawn);
 }

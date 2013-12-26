@@ -99,12 +99,13 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("colored_smokes", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	mode_smoke_c = AutoExecConfig_CreateConVar("smoke_mode", "0", "The Mode: 0=Team Colors, 1=Random, 2=Party, 3=Custom");
 	colors_c = AutoExecConfig_CreateConVar("smoke_color", "255 255 255", "When mode = 3: RGB colors of the smoke");
 	
-	AutoExecConfig(true, "colored_smokes", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 	HookEvent("smokegrenade_detonate", eventHeDetonate);
 }

@@ -97,12 +97,13 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("cash", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	c_cash = AutoExecConfig_CreateConVar("money_amount", "2000", "x = Cash, what a VIP gets, when he spawns");
 	c_max = AutoExecConfig_CreateConVar("money_max", "1", "1 = Give not more than the max. Money, 0 = Off");
 	
-	AutoExecConfig(true, "cash", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 	HookEvent("player_spawn", eventPlayerSpawn);
 }

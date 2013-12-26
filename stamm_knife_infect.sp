@@ -124,13 +124,14 @@ public OnPluginStart()
 	HookEvent("player_spawn", PlayerDeath);
 
 	AutoExecConfig_SetFile("knife_infect", "stamm/features");
-	
+	AutoExecConfig_SetCreateFile(true);
+
 	dur_c = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
 	mode_c = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
 	lhp_c = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
 	
-	AutoExecConfig(true, "knife_infect", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

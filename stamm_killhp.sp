@@ -94,14 +94,16 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("killhp", "stamm/features");
-
-	HookEvent("player_death", PlayerDeath);
+	AutoExecConfig_SetCreateFile(true);
 	
 	c_hp = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
 	m_hp = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
 	
-	AutoExecConfig(true, "killhp", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
+	
+
+	HookEvent("player_death", PlayerDeath);
 }
 
 

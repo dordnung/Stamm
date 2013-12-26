@@ -236,14 +236,16 @@ public OnMapStart()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("vip_models", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	c_model_change = AutoExecConfig_CreateConVar("model_change", "1", "0 = Players can only change models, when changing team, 1 = Players can always change it");
 	c_admin_model = AutoExecConfig_CreateConVar("model_admin_model", "1", "Should Admins also get a VIP Skin 1 = Yes, 0 = No");
 	c_model_change_cmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
 	c_same_models = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
 
-	AutoExecConfig(true, "vip_models", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
+	
 	
 	HookEvent("player_team", eventPlayerTeam);
 	HookEvent("player_spawn", eventPlayerSpawn);

@@ -102,12 +102,12 @@ public OnPluginStart()
 
 
 	AutoExecConfig_SetFile("spawnhp", "stamm/features");
-	
+	AutoExecConfig_SetCreateFile(true);
+
 	c_hp = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more per block");
 	
-	AutoExecConfig(true, "spawnhp", "stamm/features");
-
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

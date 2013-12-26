@@ -82,12 +82,14 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("tag", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	s_tag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
 	s_admin = AutoExecConfig_CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
 	
-	AutoExecConfig(true, "tag", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
+	
 	
 	HookEvent("player_spawn", eventPlayerSpawn);
 }

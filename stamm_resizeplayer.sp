@@ -87,11 +87,12 @@ public OnPluginStart()
 
 	// Create Config
 	AutoExecConfig_SetFile("resizeplayer", "stamm/features");
-	
+	AutoExecConfig_SetCreateFile(true);
+
 	c_resize = AutoExecConfig_CreateConVar("resize_amount", "10", "Resize amount in(+)/de(-)crease in percent each block!");
 	
-	AutoExecConfig(true, "resizeplayer", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

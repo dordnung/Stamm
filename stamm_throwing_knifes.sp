@@ -106,13 +106,12 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("throwing_knifes", "stamm/features");
-
+	AutoExecConfig_SetCreateFile(true);
 
 	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
 	
-	
-	AutoExecConfig(true, "throwing_knifes", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 
 	HookEvent("player_spawn", eventPlayerSpawn);

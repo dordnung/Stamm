@@ -148,13 +148,14 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("chats", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	c_MessageTag = AutoExecConfig_CreateConVar("chats_messagetag", "VIP Message", "Tag when a player writes something as a VIP");
 	c_OwnChatTag = AutoExecConfig_CreateConVar("chats_ownchattag", "VIP Chat", "Tag when a player writes something in the VIP Chat");
 	c_NeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate it, 0 = Off");
 	
-	AutoExecConfig(true, "chats", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 	RegConsoleCmd("say", CmdSay);
 }

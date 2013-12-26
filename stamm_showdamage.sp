@@ -89,11 +89,12 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("show_damage", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	damage_area_c = AutoExecConfig_CreateConVar("damage_area", "1", "Textarea where to show message, 1=Center Text, 2=Hint Text, 3=Chat");
 	
-	AutoExecConfig(true, "show_damage", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 
 	HookEvent("player_hurt", eventPlayerHurt);

@@ -75,11 +75,12 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("flagpoints", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag string a player needs to collect points");
 	
-	AutoExecConfig(true, "flagpoints", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

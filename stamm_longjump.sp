@@ -57,11 +57,12 @@ public Plugin:myinfo =
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("longjump", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	c_strong = AutoExecConfig_CreateConVar("longjump_strong", "3", "The longjump factor");
 
-	AutoExecConfig(true, "longjump", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

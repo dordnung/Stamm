@@ -134,12 +134,13 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("anti_flash", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	antiteamflash_c = AutoExecConfig_CreateConVar("vip_antiteamflash", "1", "1=Team will not be flashed by VIP's flashbang!, 0=Off");
 	antiflash_c = AutoExecConfig_CreateConVar("vip_antiflash", "1", "1=VIP can't be flashed by anyone, 0=he can't be flashed by team");
 	
-	AutoExecConfig(true, "anti_flash", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

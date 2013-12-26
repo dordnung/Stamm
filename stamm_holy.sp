@@ -93,11 +93,12 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("holy_grenade", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	hear_all = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
 	
-	AutoExecConfig(true, "holy_grenade", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 	HookEvent("weapon_fire", eventWeaponFire);
 	HookEvent("hegrenade_detonate", eventHeDetonate);

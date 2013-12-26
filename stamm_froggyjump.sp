@@ -81,11 +81,12 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("froggyjump", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
 	c_strong = AutoExecConfig_CreateConVar("froggyjump_strong", "200", "The push up strong");
 
-	AutoExecConfig(true, "froggyjump", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 

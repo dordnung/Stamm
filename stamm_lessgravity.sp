@@ -74,11 +74,12 @@ public OnPluginStart()
 	HookEvent("player_spawn", PlayerSpawn);
 
 	AutoExecConfig_SetFile("lessgravity", "stamm/features");
-	
+	AutoExecConfig_SetCreateFile(true);
+
 	c_grav = AutoExecConfig_CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each block!");
 	
-	AutoExecConfig(true, "lessgravity", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
