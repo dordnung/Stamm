@@ -152,7 +152,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 			if (!StrEqual(models[modelCount][MODELPATH], "") && !StrEqual(models[modelCount][MODELPATH], "0"))
 			{
-				PrecacheModel(models[modelCount][MODELPATH], true);
+				PrecacheModel(models[modelCount][MODELPATH]);
 			}
 
 			KvGetString(model_settings, "name", models[modelCount][MODELNAME], sizeof(models[][]));
@@ -224,7 +224,7 @@ public OnMapStart()
 	{
 		if (!StrEqual(models[i][MODELPATH], "") && !StrEqual(models[i][MODELPATH], "0"))
 		{
-			PrecacheModel(models[i][MODELPATH], true);
+			PrecacheModel(models[i][MODELPATH]);
 		}
 	}
 }
