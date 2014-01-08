@@ -212,9 +212,9 @@ new Handle:g_hHudSync;
 #define g_sInsertPlayerSave2Query "INSERT INTO `%s` (`steamid`, `level`, `points`, `name`, `version`, `last_visit`) VALUES"
 #define g_sInsertPlayerSave2DataQuery "('%s', %i, %i, '%s', %s, %i);"
 #define g_sInsertPlayerSave2Data2Query "('%s', %i, %i, '%s', %s, %i),"
-/* TODO: IMPLEMENT #define g_sInsertPlayerSave2QueryShop "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES" */
+/* TODO: IMPLEMENT #define g_sInsertPlayerSave2QueryShop "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES"
 #define g_sInsertPlayerSave2DataQueryShop "('%s', '%s', '%s');"
-#define g_sInsertPlayerSave2Data2QueryShop "('%s', '%s', '%s'),"
+#define g_sInsertPlayerSave2Data2QueryShop "('%s', '%s', '%s')," */
 #define g_sInsertBackupQuery "INSERT INTO `%s_backup` (`steamid`, `name`, `level`, `points`) SELECT `steamid`, `name`, `level`, `kills`+`rounds`+`time` FROM `%s`"
 
 

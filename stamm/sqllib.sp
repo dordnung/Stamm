@@ -111,11 +111,11 @@ sqllib_LoadDB()
 		// Create new table 
 		if (driver != INVALID_HANDLE && StrEqual(ident, "mysql"))
 		{
-			Format(query, sizeof(query), g_sCreateTableQuery, g_sTableName, GetTime());
+			Format(query, sizeof(query), g_sCreateTableQueryMySQL, g_sTableName, GetTime());
 		}
 		else
 		{
-			Format(query, sizeof(query), g_sCreateTableQueryMySQL, g_sTableName, GetTime());
+			Format(query, sizeof(query), g_sCreateTableQuery, g_sTableName, GetTime());
 		}
 
 

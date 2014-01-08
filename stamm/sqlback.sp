@@ -313,11 +313,11 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 		// Create new table as backup
 		if (driver != INVALID_HANDLE && StrEqual(ident, "mysql"))
 		{
-			Format(query, sizeof(query), g_sCreateBackupQuery, g_sTableName, GetTime());
+			Format(query, sizeof(query), g_sCreateBackupQueryMySQL, g_sTableName, GetTime());
 		}
 		else
 		{
-			Format(query, sizeof(query), g_sCreateBackupQueryMySQL, g_sTableName, GetTime());
+			Format(query, sizeof(query), g_sCreateBackupQuery, g_sTableName, GetTime());
 		}
 		
 
