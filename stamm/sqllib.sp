@@ -160,7 +160,6 @@ sqllib_LoadDB()
 
 
 
-
 		// Create happy hour table
 		Format(query, sizeof(query), g_sCreatHappyQuery, g_sTableName);
 		
@@ -610,7 +609,6 @@ public Action:sqllib_GetVipRank(client, args)
 		decl String:query[128];
 		
 
-
 		// Get the count of players with points higher than that of the client
 		Format(query, sizeof(query), g_sSelectRankQuery, g_sTableName, g_iPlayerPoints[client]);
 		
@@ -639,6 +637,7 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 {
 	new client = GetClientOfUserId(userid);
 
+
 	if (hndl != INVALID_HANDLE)
 	{
 		if (clientlib_isValidClient(client))
@@ -651,15 +650,12 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			
 
 
-
-
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
 
 			Format(top_text, sizeof(top_text), "%T", "StammTop", client);
 			SetPanelTitle(Top10Menu, top_text);
 
 			DrawPanelText(Top10Menu, "------------------------------------");
-
 
 
 
@@ -990,7 +986,7 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 			CloseHandle(file);
 
 			// Notice finish
-			PrintToServer("Converted Database to file %s successfully", filename);
+			PrintToServer("Converted Database to file %s in your gamedir, successfully", filename);
 		}
 		else
 		{

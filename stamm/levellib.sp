@@ -34,10 +34,8 @@
 levellib_LoadLevels()
 {
 	// Create the keyvalue
-	new Handle:all_levels = CreateKeyValues("StammLevels");
 	decl String:flagTest[64];
-
-
+	new bool:duplicate;
 
 
 	// Didn't find the stamm level file -> Stop plugin, we can't do anything here
@@ -50,11 +48,12 @@ levellib_LoadLevels()
 
 
 
+	new Handle:all_levels = CreateKeyValues("StammLevels");
+
+
 
 	// Load the file to keyvalue
 	FileToKeyValues(all_levels, "cfg/stamm/StammLevels.txt");
-	
-
 
 
 	// First go through all non private levels
@@ -62,9 +61,10 @@ levellib_LoadLevels()
 	{
 		do
 		{
+			duplicate = false;
+
 			// Check if it's a non private level
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
-
 
 
 			// Check now, and check if we under the maxlevels line
@@ -72,7 +72,6 @@ levellib_LoadLevels()
 			{
 				// Get point count
 				new points = KvGetNum(all_levels, "points");
-				
 
 
 				// Check for duplicate
@@ -84,10 +83,15 @@ levellib_LoadLevels()
 						// But first say it 
 						LogToFile(g_sLogFile, "[ STAMM ] Stamm Level with %i Points duplicated!!", points);
 
-						continue;
+						duplicate = true;
 					}
 				}
 				
+
+				if (duplicate)
+				{
+					continue;
+				}
 
 
 				// Save this level
@@ -150,14 +154,11 @@ levellib_LoadLevels()
 
 
 
-
 				// Notice that it loaded the level
 				if (g_bDebug) 
 				{
 					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added priavte Level %s", g_sLevelName[g_iLevels+g_iPLevels]);
 				}
-
-
 
 
 				// Update privat counter
@@ -171,7 +172,6 @@ levellib_LoadLevels()
 
 
 
-
 // Sort levels ASC
 levellib_sortLevels()
 {
@@ -180,20 +180,19 @@ levellib_sortLevels()
 		for (new j=0; j < g_iLevels-1; j++)
 		{
 			// Check if next item is less than current item
-			if (g_iLevelPoints[j+1] < g_iLevelPoints[j])
+			if (g_iLevelPoints[j + 1] < g_iLevelPoints[j])
 			{
 				// helper value
 				new save = g_iLevelPoints[j];
 				
 
 				// Change them
-				g_iLevelPoints[j] = g_iLevelPoints[j+1];
-				g_iLevelPoints[j+1] = save;
+				g_iLevelPoints[j] = g_iLevelPoints[j + 1];
+				g_iLevelPoints[j + 1] = save;
 			}
 		}
 	}
 }
-
 
 
 
@@ -210,7 +209,7 @@ levellib_PointsToID(client, points)
 	// if so, just give it's level back
 	if (spec != -1)
 	{
-		return g_iLevels+spec+1;
+		return g_iLevels + spec + 1;
 	}
 
 
@@ -223,43 +222,38 @@ levellib_PointsToID(client, points)
 		{
 			// helper var
 			new l_points = g_iLevelPoints[i];
-			
-
 
 
 			// Are we at the end?
-			if (i == g_iLevels-1)
+			if (i == g_iLevels - 1)
 			{
 				// Does the player is higher than the point level
 				if (points >= l_points) 
 				{
 					// Return index
-					return i+1;
+					return i + 1;
 				}
 			}
 			else
 			{
 				// helper var for next point level
-				new n_points = g_iLevelPoints[i+1];
-				
+				new n_points = g_iLevelPoints[i + 1];
 
 
 				// Check if players points between current and next point level
 				if (l_points <= points && points < n_points) 
 				{
 					// return index
-					return i+1;
+					return i + 1;
 				}
 			}
 		}
-		
 
 
 		// No VIP
 		return 0;
 	}
 	
-
 
 	// Something went terrible wrong
 	return -1;

@@ -328,7 +328,7 @@ public OnConfigsExecuted()
 
 
 		// Show points some times
-		if (g_iShowPoints) 
+		if (g_iShowPoints > 0) 
 		{
 			pointlib_showpointer = CreateTimer(float(g_iShowPoints), pointlib_PointShower, _, TIMER_REPEAT);
 		}

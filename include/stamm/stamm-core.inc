@@ -147,7 +147,7 @@ native STAMM_GetTag(String:tag[], maxlength);
  * Adds a new command to the command list in the stamm menu.
  * Use this to inform the player of a command you registered for your feature.
  *
- * @param command       The true command to add.
+ * @param command       The real command to add.
  * @param name          The name of the command.
  * @param ...           The name Format arguments.
  *

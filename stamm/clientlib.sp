@@ -112,7 +112,7 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 
 			// Show the hud text
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
-			ShowSyncHudText(client, g_hHudSync, "[STAMM] %T: %i", "Points", client, g_iPlayerPoints[client]);
+			ShowSyncHudText(client, g_hHudSync, "[STAMM] %t: %i", "Points", g_iPlayerPoints[client]);
 		}
 	}
 
@@ -140,7 +140,6 @@ clientlib_ClientReady(client)
 		
 
 
-
 		// check admin flag
 		if (!StrEqual(g_sGiveFlagAdmin, "0") && !StrEqual(g_sGiveFlagAdmin, ""))
 		{ 
@@ -152,7 +151,6 @@ clientlib_ClientReady(client)
 		{ 
 			CreateTimer(5.0, pointlib_ShowPoints2, GetClientUserId(client));
 		}
-
 
 
 
@@ -287,7 +285,7 @@ clientlib_GiveFastVIP(client)
 	if (g_iPlayerLevel[client] < g_iLevels)
 	{
 		// Set points to highest level
-		pointlib_GivePlayerPoints(client, g_iLevelPoints[g_iLevels-1], false);
+		pointlib_GivePlayerPoints(client, g_iLevelPoints[g_iLevels - 1], false);
 	}
 }
 
@@ -446,11 +444,12 @@ clientlib_CheckVip(client)
 			// Notice to API
 			nativelib_PublicPlayerBecomeVip(client);
 		}
+
 		else if (levelstufe == 0 && levelstufe != g_iPlayerLevel[client])
 		{
 			// New level is no level, poor player ):
 			decl String:queryback[256];
-							
+
 			// set to zero
 			g_iPlayerLevel[client] = 0;
 
@@ -565,7 +564,6 @@ public Action:clientlib_CmdSay(client, args)
 			new timetoset = StringToInt(text);
 			
 
-
 			// valid time?
 			if (timetoset > 1)
 			{  
@@ -605,10 +603,10 @@ public Action:clientlib_CmdSay(client, args)
 			}
 			
 
-
 			// type to factor
 			g_iHappyFactor[client] = 1;
-				
+
+
 			return Plugin_Handled;	
 		}
 
@@ -617,7 +615,6 @@ public Action:clientlib_CmdSay(client, args)
 			// Get factor
 			new factortoset = StringToInt(text);
 			
-
 
 			// Valid factor and happy hour not started?
 			if (factortoset > 1 && !g_bHappyHourON) 
@@ -768,17 +765,15 @@ public Action:clientlib_CmdSay(client, args)
 // Check players
 clientlib_CheckPlayers()
 {
-	new players = clientlib_GetPlayerCount();
-	new factor = (MaxClients - players) + 1;
-
-
-
 	// update global points	
 	if (g_bExtraPoints)
 	{
 		// Only if happy hour not started
 		if (!g_bHappyHourON)
 		{ 
+			new players = clientlib_GetPlayerCount();
+			new factor = (MaxClients - players) + 1;
+			
 			g_iPoints = factor;
 		}
 	}

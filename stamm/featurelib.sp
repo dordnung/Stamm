@@ -49,7 +49,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 
 
 
-
 	// Get the short basename and the real basename
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
 	GetPluginFilename(plugin, g_FeatureList[g_iFeatures][FEATURE_BASEREAL], sizeof(basename));
@@ -71,7 +70,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 			g_FeatureList[i][FEATURE_HANDLE] = plugin;
 			g_FeatureList[i][FEATURE_CHANGE] = allowChange;
 			g_FeatureList[i][FEATURE_STANDARD] = standard;
-
 
 
 
@@ -157,7 +155,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 
 
 
-
 		// File is invalid, mark level as zero
 		if (!KvGotoFirstSubKey(level_settings, false))
 		{
@@ -220,7 +217,7 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 							found = true; 
 
 
-							g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i+1;
+							g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i + 1;
 
 							/* TODO: IMPLEMENT
 							g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0; */
@@ -230,7 +227,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 						}
 					}
 				}
-
 
 
 
@@ -251,7 +247,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 					// Stop here
 					return;
 				}
-
 
 
 
@@ -297,7 +292,7 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 	// Load feature if plugin already started
 	if (g_bPluginStarted)
 	{
-		CreateTimer(0.5, featurelib_loadFeatures, g_iFeatures-1);
+		CreateTimer(0.5, featurelib_loadFeatures, g_iFeatures - 1);
 	}
 }
 
@@ -309,7 +304,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 // Load a feature or all features
 public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 {
-
 	// Only load one feature
 	if (featureIndex != -1)
 	{
@@ -318,7 +312,6 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
 		}
-
 
 
 
@@ -369,7 +362,6 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 			{
 				// Mark client as invalid
 				g_bClientReady[i] = false;
-				
 
 
 				// Check valid PRE
@@ -393,7 +385,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 // Return short basename
 featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 {
-	new retriev;
+	new retrieve;
 	
 
 	// Explore the real basename
@@ -415,16 +407,16 @@ featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 	retriev = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	
 	// Found nothig? Maybe Windows server?
-	if (retriev <= 1)
+	if (retrieve <= 1)
 	{
 		// Explore it again (Windows Style)
-		retriev = ExplodeString(basename, "\\", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
+		retrieve = ExplodeString(basename, "\\", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	}
 
 
 
 	// Save the short path (filename hehe^^)
-	Format(name, size, explodedBasename[retriev-1]);
+	Format(name, size, explodedBasename[retrieve - 1]);
 }
 
 

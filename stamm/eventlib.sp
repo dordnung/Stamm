@@ -121,31 +121,30 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 	new userid = GetClientOfUserId(GetEventInt(event, "userid"));
 	new client = GetClientOfUserId(GetEventInt(event, "attacker"));
 
-	// Are both valid?
-	if (clientlib_isValidClient(userid))
-	{
-		if (clientlib_isValidClient(client))
-		{
-			// Get points with kills?
-			if (g_iVipType == 1 || g_iVipType == 4 || g_iVipType == 5 || g_iVipType == 7)
-			{
-				// Valid Team? Enough Players? No suicide?
-				if (clientlib_GetPlayerCount() >= g_iMinPlayer && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
-				{
-					// Give global Points
-					pointlib_GivePlayerPoints(client, g_iPoints, true);
 
-					if (g_bShowTextOnPoints)
+	// Are both valid?
+	if (clientlib_isValidClient(userid) && clientlib_isValidClient(client))
+	{
+		// Get points with kills?
+		if (g_iVipType == 1 || g_iVipType == 4 || g_iVipType == 5 || g_iVipType == 7)
+		{
+			// Valid Team? Enough Players? No suicide?
+			if (clientlib_GetPlayerCount() >= g_iMinPlayer && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && userid != client && GetClientTeam(userid) != GetClientTeam(client))
+			{
+				// Give global Points
+				pointlib_GivePlayerPoints(client, g_iPoints, true);
+
+
+				if (g_bShowTextOnPoints)
+				{
+					// Notify player
+					if (!g_bMoreColors)
 					{
-						// Notify player
-						if (!g_bMoreColors)
-						{
-							CPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
-						}
-						else
-						{
-							MCPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
-						}
+						CPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
 					}
 				}
 			}

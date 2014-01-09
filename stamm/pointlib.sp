@@ -42,7 +42,7 @@ pointlib_Start()
 
 	// Register commands for add, del and set points
 	RegServerCmd("stamm_add_points", pointlib_AddPlayerPoints, "Add Points of a Player: stamm_add_points <userid|steamid> <points>");
-	RegServerCmd("stamm_del_points", pointlib_DelPlayerPoints, "Del Points of a Player: stamm_del_points <userid|steamid> <points>");
+	RegServerCmd("stamm_del_points", pointlib_DelPlayerPoints, "Delete Points of a Player: stamm_del_points <userid|steamid> <points>");
 	RegServerCmd("stamm_set_points", pointlib_SetPlayerPoints, "Set Points of a Player: stamm_set_points <userid|steamid> <points>");
 
 
@@ -88,7 +88,6 @@ public Action:pointlib_PlayerTime(Handle:timer)
 			}
 		}
 	}
-
 
 	return Plugin_Continue;
 }
@@ -176,9 +175,7 @@ public Action:pointlib_AddPlayerPoints(args)
 				decl String:query[128];
 
 
-
 				Format(query, sizeof(query), g_sUpdateAddPointsSteamidQuery, g_sTableName, number, useridString);
-
 
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
@@ -213,16 +210,13 @@ public Action:pointlib_SetPlayerPoints(args)
 	{
 		decl String:useridString[64];
 		decl String:numberString[25];
-		
 
 
 		GetCmdArg(1, useridString, sizeof(useridString));
 		GetCmdArg(2, numberString, sizeof(numberString));
 
 
-
 		new number = StringToInt(numberString);
-
 
 
 		// Steamid handle
@@ -331,9 +325,7 @@ public Action:pointlib_DelPlayerPoints(args)
 			ReplaceString(useridString, sizeof(useridString), "STEAM_1:", "STEAM_0:", false);
 
 
-
 			new client = clientlib_IsSteamIDConnected(useridString);
-
 
 
 			if (client > 0)
@@ -382,6 +374,7 @@ public Action:pointlib_ShowPoints2(Handle:timer, any:userid)
 	// Show points
 	pointlib_ShowPlayerPoints(client, false);
 	
+
 	return Plugin_Handled;
 }
 
@@ -419,15 +412,6 @@ public Action:pointlib_ShowPoints(client, arg)
 // Give points to player
 pointlib_GivePlayerPoints(client, number, bool:check)
 {
-	// Negativ number? and on delete less than zero?
-	if (number < 0 && g_iPlayerPoints[client] + number < 0)
-	{
-		// Delete zo zero
-		number = -g_iPlayerPoints[client];
-	}
-
-
-
 	// Check if a feature stop getting points
 	if (check)
 	{
@@ -444,17 +428,15 @@ pointlib_GivePlayerPoints(client, number, bool:check)
 
 
 
-	// Handle less than zero
+	// Negativ number? and after delete less than zero?
 	if (number < 0 && g_iPlayerPoints[client] + number < 0)
 	{
-		g_iPlayerPoints[client] = 0;
-	}
-	else
-	{
-		// Finally add points
-		g_iPlayerPoints[client] = g_iPlayerPoints[client] + number;
+		number = -g_iPlayerPoints[client];
 	}
 
+
+	// Finally add points
+	g_iPlayerPoints[client] = g_iPlayerPoints[client] + number;
 
 
 	// Check vip and save him
@@ -478,8 +460,7 @@ pointlib_ShowPlayerPoints(client, bool:only)
 	{
 		decl String:name[MAX_NAME_LENGTH+1];
 		decl String:vip[32];
-
-
+		
 
 		GetClientName(client, name, sizeof(name));
 		
@@ -498,13 +479,11 @@ pointlib_ShowPlayerPoints(client, bool:only)
 
 
 
-		
 		// If not highest level, calculate rest points
 		if (index != g_iLevels && index < g_iLevels) 
 		{
 			restpoints = g_iLevelPoints[index] - g_iPlayerPoints[client];
 		}
-
 
 
 

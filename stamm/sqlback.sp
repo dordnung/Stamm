@@ -169,6 +169,7 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 {
 	new client = GetClientOfUserId(userid);
 	
+
 	// Found a entry?
 	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl) && clientlib_isValidClient_PRE(client))
 	{
@@ -377,8 +378,6 @@ public sqlback_SQLModify3(Handle:owner, Handle:hndl, const String:error[], any:d
 	if (hndl != INVALID_HANDLE)
 	{
 		decl String:query[128];
-		
-
 
 
 		// Rename old database to old
@@ -410,7 +409,6 @@ public sqlback_SQLModify4(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[128];
 		
-
 
 
 		// Make new database to main

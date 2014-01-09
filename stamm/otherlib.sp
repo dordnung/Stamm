@@ -39,7 +39,7 @@ otherlib_PrepareFiles()
 	if (!StrEqual(g_sLvlUpSound, "0")) 
 	{
 		// Download and precache it
-		otherlib_DownloadLevel();	
+		otherlib_DownloadLevel();
 
 
 		// CSGO Fix
@@ -49,7 +49,7 @@ otherlib_PrepareFiles()
 		}
 		else
 		{
-			PrecacheSound(g_sLvlUpSound, true);
+			PrecacheSound(g_sLvlUpSound);
 		}
 	}
 }
@@ -128,12 +128,10 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 		GetCmdArg(1, arg, sizeof(arg));
 
 
-
 		// Is first argument plugins?
 		if (StrEqual(arg, "plugins", false))
 		{
 			GetCmdArg(2, arg, sizeof(arg));
-
 
 
 			// Second musst be load, unload or reload
@@ -151,8 +149,6 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 			{
 				mode = 3;
 			}
-
-
 
 
 			// Found a valid mode?
@@ -256,8 +252,6 @@ otherlib_MakeHappyHour(client)
 	g_iHappyNumber[client] = 1;
 	
 
-
-
 	// Notice next step
 	if (!g_bMoreColors)
 	{
@@ -282,8 +276,6 @@ otherlib_EndHappyHour()
 	if (g_bHappyHourON)
 	{
 		decl String:query[128];
-
-
 
 
 		// Delete out of database
@@ -321,7 +313,6 @@ otherlib_EndHappyHour()
 		{
 			MCPrintToChatAll("%s %t", g_sStammTag, "HappyEnded");
 		}
-	
 
 
 
@@ -344,7 +335,6 @@ otherlib_EndHappyHour()
 otherlib_StartHappyHour(time, factor)
 {
 	decl String:query[128];
-
 
 
 
@@ -425,7 +415,6 @@ public Action:otherlib_StartHappy(args)
 	{
 		decl String:timeString[25];
 		decl String:factorString[25];
-		
 
 
 		// Get time and factor
@@ -463,15 +452,12 @@ public Action:otherlib_StartHappy(args)
 
 
 
-
-
 // Stops happy hour
 public Action:otherlib_StopHappy(args)
 {
 	// Just give it to another method
 	otherlib_EndHappyHour();
 }
-
 
 
 
