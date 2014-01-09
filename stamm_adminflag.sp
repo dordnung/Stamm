@@ -139,7 +139,7 @@ public getLevelFlag(String:theflags[], size, level)
 	// Do we have a file?
 	if (!FileExists("cfg/stamm/features/adminflags.txt") && blocks <= 0)
 	{
-		STAMM_WriteToLog(false, "Couldn't find any block and also 'cfg/stamm/features/adminflags.txt' doesn't exists!");
+		STAMM_WriteToLog(false, "Couldn't find any block and also 'cfg/stamm/features/adminflags.txt' doesn't exist!");
 
 		return;
 	}
