@@ -66,6 +66,7 @@ nativelib_Start()
 	CreateNative("STAMM_GetLevelName", nativelib_GetStammLevelName);
 	CreateNative("STAMM_GetLevelNumber", nativelib_GetStammLevelNumber);
 	CreateNative("STAMM_GetBlockCount", nativelib_GetBlockCount);
+	CreateNative("STAMM_GetBlockName", nativelib_GetBlockName);
 	CreateNative("STAMM_GetBlockOfName", nativelib_GetBlockOfName);
 	CreateNative("STAMM_GetType", nativelib_GetStammType);
 	CreateNative("STAMM_GetGame", nativelib_GetStammGame);
@@ -468,6 +469,46 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 
 	// Shouldn't come here :D
 	return 0;
+}
+
+
+
+
+
+
+// Get the block name of a block index
+public nativelib_GetBlockName(Handle:plugin, numParams)
+{
+	decl String:name[32];
+
+	new feature = featurelib_getFeatureByHandle(plugin);
+	new block = GetNativeCell(1);
+
+
+	// Feature found?
+	if (feature != -1)
+	{
+		// Check valid block
+		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
+		{
+			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+		}
+
+		/* TODO: IMPLEMENT
+		// Check if shop
+		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
+		{
+			ThrowNativeError(2, "Block %i has no level, it's a shop Feature!", block);
+		} */
+
+		// Get block Name
+		GetArrayString(g_hFeatureBlocks[feature], block-1, name, sizeof(name));
+		SetNativeString(2, name, GetNativeCell(3), false);
+	}
+	else
+	{
+		ThrowNativeError(1, "Your Feature is invalid");
+	}
 }
 
 

@@ -183,6 +183,8 @@ public SharedPlugin:__pl_stamm =
 		/* TODO: MarkNativeAsOptional("STAMM_GetPoints"); */
 		/* TODO: MarkNativeAsOptional("STAMM_IsShop"); */
 		MarkNativeAsOptional("STAMM_GetBlockCount");
+		MarkNativeAsOptional("STAMM_GetBlockName");
+		MarkNativeAsOptional("STAMM_GetBlockOfName");
 		MarkNativeAsOptional("STAMM_GetBasename");
 		MarkNativeAsOptional("STAMM_GetClientPoints");
 		MarkNativeAsOptional("STAMM_GetClientLevel");

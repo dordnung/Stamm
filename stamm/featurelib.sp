@@ -560,7 +560,7 @@ public Action:featurelib_Load(args)
 	}
 	else
 	{
-		// So it's right ->
+		// So it's correct ->
 		ReplyToCommand(0, "Usage: stamm_feature_load <basename>");
 	}
 
@@ -618,7 +618,7 @@ public Action:featurelib_UnLoad(args)
 	}
 	else
 	{
-		// So it's right ->
+		// So it's correct ->
 		ReplyToCommand(0, "Usage: stamm_feature_unload <basename>");
 	}
 
@@ -676,7 +676,6 @@ public Action:featurelib_ReLoad(args)
 	}
 	else
 	{
-		// Wrong again, so it's right!! ->
 		ReplyToCommand(0, "Usage: stamm_feature_reload <basename>");
 	}
 

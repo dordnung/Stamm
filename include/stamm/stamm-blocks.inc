@@ -63,6 +63,18 @@ native STAMM_GetBlockOfName(const String:name[]);
 
 
 /**
+ * Returns the name of a block
+ *
+ * @param block         Block to get name for.
+ * @param name          String to store name in.
+ * @param maxlength     Maxlength of the name.
+ * @noreturn
+ * @error               Block or feature is invalid.
+ */
+native STAMM_GetBlockName(block=1, String:name[], maxlength);
+
+
+/**
  * Returns the number of blocks found in LevelSettings.
  *
  * @return              Number of blocks found.
