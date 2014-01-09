@@ -133,42 +133,60 @@ public STAMM_OnClientReady(client)
 // Read out the flags
 public getLevelFlag(String:theflags[], size, level)
 {
-	new Handle:flagvalue = CreateKeyValues("AdminFlags");
+	new blocks = STAMM_GetBlockCount();
 
 
 	// Do we have a file?
-	if (!FileExists("cfg/stamm/features/adminflags.txt"))
+	if (!FileExists("cfg/stamm/features/adminflags.txt") && blocks <= 0)
 	{
-		STAMM_WriteToLog(false, "Couldn't find cfg/stamm/features/adminflags.txt!");
+		STAMM_WriteToLog(false, "Couldn't find any block and also 'cfg/stamm/features/adminflags.txt' doesn't exists!");
 
 		return;
 	}
-	
-	FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
-	
 
 
-	// Key Value loop
-	if (KvGotoFirstSubKey(flagvalue, false))
+	if (blocks > 0)
 	{
-		do
+		for (new i=0; i < blocks; i++)
 		{
-			decl String:section[64];
-			
-			KvGetSectionName(flagvalue, section, sizeof(section));
-
-
-			// Only Flags for specific level
-			if (STAMM_GetLevelNumber(section) == level)
+			if (STAMM_GetLevel(i) == level)
 			{
-				KvGoBack(flagvalue);
-				KvGetString(flagvalue, section, theflags, size);
+				STAMM_GetBlockName(i, theflags, size);
 
 				break;
 			}
 		}
-		while (KvGotoNextKey(flagvalue, false));
 	}
-	
-	CloseHandle(flagvalue);
+	else
+	{
+		new Handle:flagvalue = CreateKeyValues("AdminFlags");
+		
+		FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
+		
+
+
+		// Key Value loop
+		if (KvGotoFirstSubKey(flagvalue, false))
+		{
+			do
+			{
+				decl String:section[64];
+				
+				KvGetSectionName(flagvalue, section, sizeof(section));
+
+
+				// Only Flags for specific level
+				if (STAMM_GetLevelNumber(section) == level)
+				{
+					KvGoBack(flagvalue);
+					KvGetString(flagvalue, section, theflags, size);
+
+					break;
+				}
+			}
+			while (KvGotoNextKey(flagvalue, false));
+		}
+		
+		CloseHandle(flagvalue);
+	}
 }
