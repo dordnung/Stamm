@@ -21,7 +21,7 @@ enum StammGame
 
 
 /**
- * A list with possible types, how a player get stamm points.
+ * A list with possible types, how a player can get stamm points.
  */
 enum StammType
 {
@@ -92,6 +92,7 @@ native bool:STAMM_AutoUpdate();
 
 /**
  * Returns true when Stamm is fully loaded.
+ * Use this if you are unsure whether you can use stamm stuff.
  *
  * @return              true if fully loaded, otherwise false.
  */
@@ -102,7 +103,8 @@ native bool:STAMM_IsLoaded();
  * Starts Happy Hour.
  *
  * @param time          Runtime in minutes (must be greater than 1).
- * @param factor        Multiplication Factor of Stamm points.
+ * @param factor        Multiplication Factor for Stamm points.
+ *
  * @return              Return false when happy hour already running, otherwise true.
  * @error               Time or factor invalid.
  */
@@ -143,10 +145,12 @@ native STAMM_GetTag(String:tag[], maxlength);
 
 /**
  * Adds a new command to the command list in the stamm menu.
+ * Use this to inform the player of a command you registered for your feature.
  *
  * @param command       The true command to add.
  * @param name          The name of the command.
  * @param ...           The name Format arguments.
+ *
  * @error               Max Commands reached.
  *
  * @noreturn
