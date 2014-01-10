@@ -75,7 +75,7 @@ public OnAllPluginsLoaded()
 	new Handle:kv;
 
 
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}

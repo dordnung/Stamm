@@ -83,7 +83,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add the feature to stamm
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}

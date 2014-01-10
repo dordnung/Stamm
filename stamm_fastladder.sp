@@ -65,7 +65,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature for CSS and CSGO
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}

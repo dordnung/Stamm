@@ -79,7 +79,7 @@ public OnAllPluginsLoaded()
 	decl String:path[PLATFORM_MAX_PATH + 1];
 
 
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
