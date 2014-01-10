@@ -87,13 +87,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		Format(theflags, sizeof(theflags), "");
 		
 		getLevelFlag(theflags, sizeof(theflags), i);
-		
-
-		// Valid flags?
-		if (!StrEqual(theflags, ""))
-		{
-			STAMM_AddBlockDescription(1, "%T", "GetAdminFlags", LANG_SERVER, theflags);
-		}
 	}
 }
 
@@ -121,8 +114,7 @@ public STAMM_OnClientReady(client)
 			// Set flags
 			if (bytes)
 			{
-				new oldbytes = GetUserFlagBits(client);
-				SetUserFlagBits(client, bytes | oldbytes);
+				SetUserFlagBits(client, bytes | GetUserFlagBits(client));
 			}
 		}
 	}
@@ -147,11 +139,12 @@ public getLevelFlag(String:theflags[], size, level)
 
 	if (blocks > 0)
 	{
-		for (new i=0; i < blocks; i++)
+		for (new i=1; i <= blocks; i++)
 		{
 			if (STAMM_GetLevel(i) == level)
 			{
 				STAMM_GetBlockName(i, theflags, size);
+				STAMM_AddBlockDescription(i, "%T", "GetAdminFlags", LANG_SERVER, theflags);
 
 				break;
 			}
