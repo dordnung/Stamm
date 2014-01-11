@@ -33,12 +33,13 @@
 
 #pragma semicolon 1
 
+#define HORIZONTAL 33
+#define VERTICAL 33
 
 
-new bool:bPressed[MAXPLAYERS+1] = false;
 
-new Handle:c_strong;
-new strong;
+new Handle:g_hStrong;
+
 
 
 
@@ -53,25 +54,23 @@ public Plugin:myinfo =
 
 
 
+
 // Create config
 public OnPluginStart()
 {
+	HookEvent("player_jump", OnPlayerJump);
+
+
 	AutoExecConfig_SetFile("longjump", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_strong = AutoExecConfig_CreateConVar("longjump_strong", "3", "The longjump factor");
+	g_hStrong = AutoExecConfig_CreateConVar("longjump_strong", "3", "The longjump factor");
 
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
 
-
-// Load config
-public OnConfigsExecuted()
-{
-	strong = GetConVarInt(c_strong);
-}
 
 
 
@@ -91,6 +90,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 
+
 // Add feature
 public OnAllPluginsLoaded()
 {
@@ -107,53 +107,34 @@ public OnAllPluginsLoaded()
 
 
 
-// Check for jumping
-public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon)
+public OnPlayerJump(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if (!STAMM_IsClientValid(client))
-	{
-		return Plugin_Continue;
-	}
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if (!STAMM_HaveClientFeature(client) || !IsPlayerAlive(client))
+	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 	{
-		return Plugin_Continue;
-	}
+		new team = GetClientTeam(client);
+		new strong = GetConVarInt(g_hStrong);
 
 
-	// Resetz on Ground
-	if (GetEntityFlags(client) & FL_ONGROUND)
-	{
-		bPressed[client] = false;
-	}
-	
-	else
-	{
-		// Player jumped
-		if (buttons & IN_JUMP)
+		if (team > 1 && team < 4)
 		{
-			// For first time
-			if(!bPressed[client])
-			{
-				new Float:velocity[3];
-				new Float:velocity0;
-				new Float:velocity1;
-				
-				// Calculate long jump
-				velocity0 = GetEntPropFloat(client, Prop_Send, "m_vecVelocity[0]");
-				velocity1 = GetEntPropFloat(client, Prop_Send, "m_vecVelocity[1]");
-				
-				velocity[0] = (float(strong) * velocity0) * (1.0 / 4.1);
-				velocity[1] = (float(strong) * velocity1) * (1.0 / 4.1);
-				velocity[2] = 0.0;
-				
-				// Give longjump
-				SetEntPropVector(client, Prop_Send, "m_vecBaseVelocity", velocity);
-			}
+			new Float:fViewVector[3];
 
-			bPressed[client] = true;
+			new Float:fAngle0 = GetEntPropFloat(client, Prop_Send, "m_angEyeAngles[0]");
+			new Float:fAngle1 = GetEntPropFloat(client, Prop_Send, "m_angEyeAngles[1]");
+
+
+			fViewVector[0] = Cosine(DegToRad(fAngle1));
+			fViewVector[1] = Sine(DegToRad(fAngle1));
+			fViewVector[2] = -1 * Sine(DegToRad(fAngle0));
+
+			fViewVector[0] = float(HORIZONTAL) * float(strong) * fViewVector[0];
+			fViewVector[1] = float(HORIZONTAL) * float(strong) * fViewVector[1];
+			fViewVector[2] = float(VERTICAL) * float(strong);
+
+
+			SetEntPropVector(client, Prop_Send, "m_vecBaseVelocity", fViewVector);
 		}
 	}
-
-	return Plugin_Continue;
 }
