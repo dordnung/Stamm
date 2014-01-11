@@ -36,12 +36,8 @@
 
 
 
-
-new Handle:colors_c;
-new Handle:mode_smoke_c;
-
-new mode_smoke;
-new String:colors[64];
+new Handle:g_hColors;
+new Handle:g_hModeSmoke;
 
 
 
@@ -101,25 +97,16 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("colored_smokes", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	mode_smoke_c = AutoExecConfig_CreateConVar("smoke_mode", "0", "The Mode: 0=Team Colors, 1=Random, 2=Party, 3=Custom");
-	colors_c = AutoExecConfig_CreateConVar("smoke_color", "255 255 255", "When mode = 3: RGB colors of the smoke");
+	g_hModeSmoke = AutoExecConfig_CreateConVar("smoke_mode", "0", "The Mode: 0=Team Colors, 1=Random, 2=Party, 3=Custom");
+	g_hColors = AutoExecConfig_CreateConVar("smoke_color", "255 255 255", "When mode = 3: RGB colors of the smoke");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 	
+
 	HookEvent("smokegrenade_detonate", eventHeDetonate);
 }
 
-
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	mode_smoke = GetConVarInt(mode_smoke_c);
-	
-	GetConVarString(colors_c, colors, sizeof(colors));
-}
 
 
 
@@ -127,8 +114,14 @@ public OnConfigsExecuted()
 // Smoke grenade Detonate
 public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	decl String:colors[64];
+
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+
+
+	GetConVarString(g_hColors, colors, sizeof(colors));
 	
+
 	if (STAMM_IsClientValid(client))
 	{
 		if (STAMM_HaveClientFeature(client))
@@ -140,15 +133,17 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			origin[0] = GetEventFloat(event, "x");
 			origin[1] = GetEventFloat(event, "y");
 			origin[2] = GetEventFloat(event, "z");
-			
+
+
 			// Create a light ;D
 			new ent_light = CreateEntityByName("light_dynamic");
-			
+
+
 			// Could we create it?
 			if (ent_light != -1)
 			{
 				// Switch Mode
-				switch (mode_smoke)
+				switch (GetConVarInt(g_hModeSmoke))
 				{
 					case 0:
 					{
