@@ -2,8 +2,8 @@
 {
 	"GetTeleport"
 	{
-		"en"		"Create teleport points with !sadd"
-		"de"		"Erstelle Teleport Punkte mit !sadd"
+		"en"		"Create teleport points"
+		"de"		"Erstelle Teleport Punkte"
 	}
 	"TeleportAdded"
 	{

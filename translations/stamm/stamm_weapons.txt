@@ -2,8 +2,8 @@
 {
 	"GetWeapons"
 	{
-		"en"		"Get Weapons per chat (!sweapons)"
-		"de"		"Bekomme Waffen per Chat (!sweapons)"
+		"en"		"Get Weapons per chat"
+		"de"		"Bekomme Waffen per Chat"
 	}
 	"MaximumReached"
 	{

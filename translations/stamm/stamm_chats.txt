@@ -8,9 +8,8 @@
 	}
 	"GetVIPChat"
 	{	
-		"#format"	"{1:s}"
-		"en"		"Get a own VIP Chat{1}"
-		"de"		"Bekomme einen eigenen VIP Chat{1}"
+		"en"		"Get a own VIP Chat (start message with #})"
+		"de"		"Bekomme einen eigenen VIP Chat (Starte Nachricht mit #)"
 	}
 	"FeatureDisabled"
 	{
@@ -20,7 +19,7 @@
 	"Activate"
 	{
 		"#format"	"{1:s}"
-		"en"		" (activate with {1})"
-		"de"  		" (Mit {1} aktivieren)"
+		"en"		" (start message with {1})"
+		"de"  		" (Starte Nachricht mit {1})"
 	}
 }
