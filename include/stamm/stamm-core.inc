@@ -158,6 +158,26 @@ native STAMM_GetTag(String:tag[], maxlength);
 native STAMM_AddCommand(const String:command[], const String:name[], any:...);
 
 
+/**
+ * Loads a Stamm Feature.
+ *
+ * @param plugin        Handle of the plugin.
+ *
+ * @return              -1 = already loaded, 0 = no such Feature, 1 = success.
+ */
+native STAMM_LoadFeature(Handle:plugin);
+
+
+/**
+ * Unloads a Stamm Feature.
+ *
+ * @param plugin        Handle of the plugin.
+ *
+ * @return              -1 = already unloaded, 0 = no such Feature, 1 = success.
+ */
+native STAMM_UnloadFeature(Handle:plugin);
+
+
 
 /**
  * Checks whether stamm is available on the server.

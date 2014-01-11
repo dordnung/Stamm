@@ -135,26 +135,6 @@ native bool:STAMM_IsMyFeature(const String:basename[]);
 native STAMM_GetBasename(String:basename[], maxlength);
 
 
-/**
- * Loads a Stamm Feature.
- *
- * @param plugin        Handle of the plugin.
- *
- * @return              -1 = already loaded, 0 = no such Feature, 1 = success.
- */
-native STAMM_LoadFeature(Handle:plugin);
-
-
-/**
- * Unloads a Stamm Feature.
- *
- * @param plugin        Handle of the plugin.
- *
- * @return              -1 = already unloaded, 0 = no such Feature, 1 = success.
- */
-native STAMM_UnloadFeature(Handle:plugin);
-
-
 
 /**
  * Loads the translation file of your feature in languages/stamm.
