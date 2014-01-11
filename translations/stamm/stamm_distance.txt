@@ -2,8 +2,8 @@
 {
 	"GetAll"
 	{
-		"en"		"See the distance and direction to the nearest player"
-		"de"		"Sehe die Distanz und Richtung zum nähesten Spieler"
+		"en"		"See the name, distance and direction to the nearest player"
+		"de"		"Sehe die Distanz und Richtung und den Namen zum nähesten Spieler"
 	}
 	
 	"GetDirection"
