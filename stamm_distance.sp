@@ -35,16 +35,11 @@
 
 
 
-new blockDirection;
-new blockDistance;
-new blockName;
+new g_iBlockDirection;
+new g_iBlockDistance;
+new g_iBlockName;
 
-new unit;
-new bool:vipPlayers[MAXPLAYERS + 1][3];
-new Handle:unit_c;
-
-new String:unitString[12];
-new String:unitStringOne[12];
+new bool:g_bVipPlayers[MAXPLAYERS + 1][3];
 
 
 
@@ -66,13 +61,15 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("distance", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	unit_c = AutoExecConfig_CreateConVar("distance_unit", "1", "1 = Use feet as unit, 0 = Use meters as unit");
+	g_hUnit = AutoExecConfig_CreateConVar("distance_unit", "1", "1 = Use feet as unit, 0 = Use meters as unit");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 
+
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
+
 
 
 // Auto updater
@@ -89,10 +86,11 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	}
 
 
+
 	// Found old config 
 	if (STAMM_GetBlockCount() < 3)
 	{
-		blockDirection = blockDistance = blockName = 1;
+		g_iBlockDirection = g_iBlockDistance = g_iBlockName = 1;
 
 		STAMM_AddBlockDescription(1, "%T", "GetAll", LANG_SERVER);
 	}
@@ -100,31 +98,33 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	else
 	{
 		// Get Blocks
-		blockDirection = STAMM_GetBlockOfName("direction");
-		blockDistance = STAMM_GetBlockOfName("distance");
-		blockName = STAMM_GetBlockOfName("name");
+		g_iBlockDirection = STAMM_GetBlockOfName("direction");
+		g_iBlockDistance = STAMM_GetBlockOfName("distance");
+		g_iBlockName = STAMM_GetBlockOfName("name");
 
 
 		// Check valid?
-		if (blockDirection != -1)
+		if (g_iBlockDirection != -1)
 		{
-			STAMM_AddBlockDescription(blockDirection, "%T", "GetDirection", LANG_SERVER);
+			STAMM_AddBlockDescription(g_iBlockDirection, "%T", "GetDirection", LANG_SERVER);
 		}
 
-		if (blockDistance != -1)
+		if (g_iBlockDistance != -1)
 		{
-			STAMM_AddBlockDescription(blockDistance, "%T", "GetDistance", LANG_SERVER);
+			STAMM_AddBlockDescription(g_iBlockDistance, "%T", "GetDistance", LANG_SERVER);
 		}
 
-		if (blockName != -1)
+		if (g_iBlockName != -1)
 		{
-			STAMM_AddBlockDescription(blockName, "%T", "GetName", LANG_SERVER);
+			STAMM_AddBlockDescription(g_iBlockName, "%T", "GetName", LANG_SERVER);
 		}
 	}
+
 
 	// check for nearest player
 	CreateTimer(0.2, checkPlayers, _, TIMER_REPEAT);
 }
+
 
 
 
@@ -150,14 +150,104 @@ public OnConfigsExecuted()
 	{
 		SetConVarInt(FindConVar("sv_hudhint_sound"), 0);
 	}
+}
 
 
-	// Get unit to take
-	unit = GetConVarInt(unit_c);
 
 
-	// Get unit text
-	if (unit == 1)
+// A player spawned
+public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+
+
+	// Reset
+	g_bVipPlayers[client][0] = false;
+	g_bVipPlayers[client][1] = false;
+	g_bVipPlayers[client][2] = false;
+
+
+	// Is client VIP?
+	if (STAMM_IsClientValid(client))
+	{
+		if (g_iBlockDirection != -1 && STAMM_HaveClientFeature(client, g_iBlockDirection))
+		{
+			g_bVipPlayers[client][2] = true;
+		}
+
+		if (g_iBlockDistance != -1 && STAMM_HaveClientFeature(client, g_iBlockDistance))
+		{
+			g_bVipPlayers[client][1] = true;
+		}
+
+		if (g_iBlockName != -1 && STAMM_HaveClientFeature(client, g_iBlockName))
+		{
+			g_bVipPlayers[client][0] = true;
+		}
+	}
+}
+
+
+
+
+// Client disconnected
+public OnClientDisconnect(client)
+{
+	g_bVipPlayers[client][0] = false;
+	g_bVipPlayers[client][1] = false;
+	g_bVipPlayers[client][2] = false;
+}
+
+
+
+
+// Client changed feature
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
+{
+	if (!mode)
+	{
+		g_bVipPlayers[client][0] = false;
+		g_bVipPlayers[client][1] = false;
+		g_bVipPlayers[client][2] = false;
+	}
+	else
+	{
+		if (g_iBlockDirection != -1 && STAMM_HaveClientFeature(client, g_iBlockDirection))
+		{
+			g_bVipPlayers[client][2] = true;
+		}
+
+		if (g_iBlockDistance != -1 && STAMM_HaveClientFeature(client, g_iBlockDistance))
+		{
+			g_bVipPlayers[client][1] = true;
+		}
+
+		if (g_iBlockName != -1 && STAMM_HaveClientFeature(client, g_iBlockName))
+		{
+			g_bVipPlayers[client][0] = true;
+		}
+	}
+}
+
+
+
+
+// Check for nearest player
+public Action:checkPlayers(Handle:timer, any:data)
+{
+	decl String:unitString[12];
+	decl String:unitStringOne[12];
+
+	new Float:clientOrigin[3];
+	new Float:searchOrigin[3];
+	new Float:near;
+	new Float:distance;
+
+	new nearest;
+
+
+
+	if (GetConVarInt(g_hUnit) == 1)
 	{
 		Format(unitString, sizeof(unitString), "feet");
 		Format(unitStringOne, sizeof(unitStringOne), "feet");
@@ -168,107 +258,21 @@ public OnConfigsExecuted()
 		Format(unitString, sizeof(unitString), "meters");
 		Format(unitStringOne, sizeof(unitStringOne), "meter");
 	}
-}
 
 
-
-// A player spawned
-public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
-{
-	new userid = GetEventInt(event, "userid");
-	new client = GetClientOfUserId(userid);
-
-
-	// Reset
-	vipPlayers[client][0] = false;
-	vipPlayers[client][1] = false;
-	vipPlayers[client][2] = false;
-
-
-	// Is client VIP?
-	if (STAMM_IsClientValid(client))
-	{
-		if (blockDirection != -1 && STAMM_HaveClientFeature(client, blockDirection))
-		{
-			vipPlayers[client][2] = true;
-		}
-
-		if (blockDistance != -1 && STAMM_HaveClientFeature(client, blockDistance))
-		{
-			vipPlayers[client][1] = true;
-		}
-
-		if (blockName != -1 && STAMM_HaveClientFeature(client, blockName))
-		{
-			vipPlayers[client][0] = true;
-		}
-	}
-}
-
-
-
-// Client disconnected
-public OnClientDisconnect(client)
-{
-	vipPlayers[client][0] = false;
-	vipPlayers[client][1] = false;
-	vipPlayers[client][2] = false;
-}
-
-
-
-// Client changed feature
-public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
-{
-	if (!mode)
-	{
-		vipPlayers[client][0] = false;
-		vipPlayers[client][1] = false;
-		vipPlayers[client][2] = false;
-	}
-	else
-	{
-		if (blockDirection != -1 && STAMM_HaveClientFeature(client, blockDirection))
-		{
-			vipPlayers[client][2] = true;
-		}
-
-		if (blockDistance != -1 && STAMM_HaveClientFeature(client, blockDistance))
-		{
-			vipPlayers[client][1] = true;
-		}
-
-		if (blockName != -1 && STAMM_HaveClientFeature(client, blockName))
-		{
-			vipPlayers[client][0] = true;
-		}
-	}
-}
-
-
-
-// Check for nearest player
-public Action:checkPlayers(Handle:timer, any:data)
-{
-	new Float:clientOrigin[3];
-	new Float:searchOrigin[3];
-	new Float:near;
-	new Float:distance;
-
-	new nearest;
 
 	// Client loop
 	for (new client = 1; client <= MaxClients; client++)
 	{
 		// Valid client?
-		if ((vipPlayers[client][0] || vipPlayers[client][1] || vipPlayers[client][2]) && IsPlayerAlive(client))
+		if ((g_bVipPlayers[client][0] || g_bVipPlayers[client][1] || g_bVipPlayers[client][2]) && IsPlayerAlive(client))
 		{
 			// Is VIP and want it?
 			if (!STAMM_IsClientValid(client) || !STAMM_WantClientFeature(client))
 			{
-				vipPlayers[client][0] = false;
-				vipPlayers[client][1] = false;
-				vipPlayers[client][2] = false;
+				g_bVipPlayers[client][0] = false;
+				g_bVipPlayers[client][1] = false;
+				g_bVipPlayers[client][2] = false;
 			}
 
 			else
@@ -317,7 +321,7 @@ public Action:checkPlayers(Handle:timer, any:data)
 
 
 					// Client get Direction?
-					if (vipPlayers[client][2])
+					if (g_bVipPlayers[client][2])
 					{
 						// Get the origin of the nearest player
 						GetClientAbsOrigin(nearest, searchOrigin);
@@ -397,7 +401,7 @@ public Action:checkPlayers(Handle:timer, any:data)
 
 
 						// Add to text
-						if (vipPlayers[client][1] || vipPlayers[client][0])
+						if (g_bVipPlayers[client][1] || g_bVipPlayers[client][0])
 						{
 							Format(textToPrint, sizeof(textToPrint), "%s\n", directionString);
 						}
@@ -410,20 +414,20 @@ public Action:checkPlayers(Handle:timer, any:data)
 
 
 					// Client get Distance?
-					if (vipPlayers[client][1])
+					if (g_bVipPlayers[client][1])
 					{
 						// Distance to meters
 						dist = near * 0.01905;
 
 						// Distance to feet
-						if (unit == 1)
+						if (GetConVarInt(g_hUnit) == 1)
 						{
 							dist = dist * 3.2808399;
 						}
 
 
 						// Add to text
-						if (vipPlayers[client][0])
+						if (g_bVipPlayers[client][0])
 						{
 							Format(textToPrint, sizeof(textToPrint), "%s(%i %s)\n", textToPrint, RoundFloat(dist), (RoundFloat(dist) == 1 ? unitStringOne : unitString));
 						}
@@ -435,7 +439,7 @@ public Action:checkPlayers(Handle:timer, any:data)
 
 
 					// Add name
-					if (vipPlayers[client][0])
+					if (g_bVipPlayers[client][0])
 					{
 						Format(textToPrint, sizeof(textToPrint), "%s%N", textToPrint, nearest);
 					}
