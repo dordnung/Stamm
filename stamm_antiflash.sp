@@ -37,12 +37,8 @@
 
 
 
-new Handle:antiteamflash_c;
-new Handle:antiflash_c;
-
-new antiteamflash;
-new antiflash;
-
+new Handle:g_hAntiTeamFlash;
+new Handle:g_hAntiFlash;
 
 
 
@@ -54,6 +50,8 @@ public Plugin:myinfo =
 	description = "Give VIP's anti flash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
+
 
 
 
@@ -83,13 +81,11 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Feaure loaded, set textes
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:team[64];
-	decl String:team2[64];
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -101,32 +97,17 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 
-	// Anti team flash translations
-	if (antiteamflash) 
-	{
-		Format(team, sizeof(team), "%T", "GetTeamAntiFlash", LANG_SERVER);
-	}
-	else 
-	{
-		Format(team, sizeof(team), "");
-	}
-
-
 	// Antiflash translations
-	if (antiflash) 
+	if (GetConVarBool(g_hAntiFlash)) 
 	{
-		Format(team2, sizeof(team2), "%T", "AntiFlash", LANG_SERVER);
+		STAMM_AddBlockDescription(1, "%T", "GetAntiFlash", LANG_SERVER);
 	}
-
 	else 
 	{
-
-		Format(team2, sizeof(team2), "%T", "AntiTeamFlash", LANG_SERVER);
+		STAMM_AddBlockDescription(1, "%T", "GetTeamFlash", LANG_SERVER);
 	}
-	
-
-	STAMM_AddBlockDescription(1, "%T", "GetAntiFlash", LANG_SERVER, team, team2);
 }
+
 
 
 
@@ -136,20 +117,16 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("anti_flash", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	antiteamflash_c = AutoExecConfig_CreateConVar("vip_antiteamflash", "1", "1=Team will not be flashed by VIP's flashbang!, 0=Off");
-	antiflash_c = AutoExecConfig_CreateConVar("vip_antiflash", "1", "1=VIP can't be flashed by anyone, 0=he can't be flashed by team");
+
+	g_hAntiTeamFlash = AutoExecConfig_CreateConVar("vip_antiteamflash", "1", "1=Team will not be flashed by VIP's flashbang!, 0=Off");
+	g_hAntiFlash = AutoExecConfig_CreateConVar("vip_antiflash", "1", "1=VIP can't be flashed by anyone, 0=he can't be flashed by team");
 	
+
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
 
-// Load the config
-public OnConfigsExecuted()
-{
-	antiteamflash = GetConVarInt(antiteamflash_c);
-	antiflash = GetConVarInt(antiflash_c);
-}
 
 
 // A player gets flashed
@@ -163,14 +140,14 @@ public Action:OnGetPercentageOfFlashForPlayer(client, entity, Float:pos[3], &Flo
 	// Anti team flash	
 	if (STAMM_IsClientValid(owner) && STAMM_IsClientValid(client))
 	{
-		if (team == team2 && owner != client && antiteamflash && STAMM_HaveClientFeature(owner)) 
+		if (team == team2 && owner != client && GetConVarBool(g_hAntiTeamFlash) && STAMM_HaveClientFeature(owner)) 
 		{
 			return Plugin_Handled;
 		}
 	}
 
 	// Anti flash
-	if (STAMM_HaveClientFeature(client) && ((antiflash) || (team == team2)))
+	if (STAMM_HaveClientFeature(client) && ((GetConVarBool(g_hAntiFlash)) || (team == team2)))
 	{
 		return Plugin_Handled;
 	}
