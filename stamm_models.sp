@@ -59,10 +59,10 @@ new String:PlayerModel[MAXPLAYERS + 1][PLATFORM_MAX_PATH + 1];
 new String:models[64][4][PLATFORM_MAX_PATH + 1];
 new String:model_change_cmd[32];
 
-new Handle:c_model_change_cmd;
-new Handle:c_model_change;
-new Handle:c_same_models;
-new Handle:c_admin_model;
+new Handle:g_hModelChangeCmd;
+new Handle:g_hModelChange;
+new Handle:g_hSameModels;
+new Handle:g_hAdminModel;
 
 new bool:Loaded;
 
@@ -108,6 +108,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Feature loaded, parse models
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
@@ -123,7 +124,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 		Updater_AddPlugin(urlString);
 	}
-
 
 
 
@@ -178,7 +178,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 			else
 			{
 				// Get the level
-				new levelNumber = STAMM_GetBlockLevelNumber(models[modelCount][MODELLEVEL]);
+				new levelNumber = STAMM_GetLevelNumber(models[modelCount][MODELLEVEL]);
 
 				// Given as int
 				if (levelNumber != 0)
@@ -203,6 +203,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 	CloseHandle(model_settings);
 
+
 	// Load Translation files
 	if (model_change && same_models)
 	{
@@ -214,6 +215,8 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		STAMM_AddBlockDescription(1, "%T", "GetModel", LANG_SERVER);
 	}
 }
+
+
 
 
 
@@ -232,16 +235,17 @@ public OnMapStart()
 
 
 
+
 // Create the config
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("vip_models", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_model_change = AutoExecConfig_CreateConVar("model_change", "1", "0 = Players can only change models, when changing team, 1 = Players can always change it");
-	c_admin_model = AutoExecConfig_CreateConVar("model_admin_model", "1", "Should Admins also get a VIP Skin 1 = Yes, 0 = No");
-	c_model_change_cmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
-	c_same_models = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
+	g_hModelChange = AutoExecConfig_CreateConVar("model_change", "1", "0 = Players can only change models, when changing team, 1 = Players can always change it");
+	g_hAdminModel = AutoExecConfig_CreateConVar("model_admin_model", "1", "Should Admins also get a VIP Skin 1 = Yes, 0 = No");
+	g_hModelChangeCmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
+	g_hSameModels = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
 
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -257,14 +261,16 @@ public OnPluginStart()
 
 
 
+
+
 // And load the configs
 public OnConfigsExecuted()
 {
-	model_change = GetConVarInt(c_model_change);
-	same_models = GetConVarInt(c_same_models);
-	admin_model = GetConVarInt(c_admin_model);
+	model_change = GetConVarInt(g_hModelChange);
+	same_models = GetConVarInt(g_hSameModels);
+	admin_model = GetConVarInt(g_hAdminModel);
 	
-	GetConVarString(c_model_change_cmd, model_change_cmd, sizeof(model_change_cmd));
+	GetConVarString(g_hModelChangeCmd, model_change_cmd, sizeof(model_change_cmd));
 
 
 	if (!Loaded)
@@ -281,6 +287,7 @@ public OnConfigsExecuted()
 		Format(model_change_cmd, sizeof(model_change_cmd), "!%s", model_change_cmd);
 	}
 }
+
 
 
 
@@ -326,6 +333,8 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+
+
 // Player changed team
 public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadcast)
 {
@@ -339,6 +348,8 @@ public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadc
 		Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 	}
 }
+
+
 
 
 
@@ -383,6 +394,9 @@ public ModelDownloads()
 }
 
 
+
+
+
 // Player want a new model
 public Action:CmdModel(client, args)
 {
@@ -413,6 +427,7 @@ public Action:CmdModel(client, args)
 	
 	return Plugin_Handled;
 }
+
 
 
 
@@ -460,6 +475,7 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 
 
 
+
 // Perpare the models
 public PrepareSameModels(client)
 {
@@ -486,7 +502,7 @@ public PrepareSameModels(client)
 		for (new item = 0; item < modelCount; item++)
 		{
 			// Right team and right level?
-			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_IsClientVip(client, StringToInt(models[item][MODELLEVEL])))
+			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_GetClientLevel(client) >= StringToInt(models[item][MODELLEVEL]))
 			{
 				if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
 				{
@@ -517,6 +533,8 @@ public PrepareSameModels(client)
 
 
 
+
+
 // Prepare random models
 public PrepareRandomModels(client)
 {
@@ -528,7 +546,7 @@ public PrepareRandomModels(client)
 	// Collect available models of the client
 	for (new item = 0; item < modelCount; item++)
 	{
-		if (StringToInt(models[item][MODELTEAM]) == GetClientTeam(client) && STAMM_IsClientVip(client, StringToInt(models[item][MODELLEVEL])))
+		if (StringToInt(models[item][MODELTEAM]) == GetClientTeam(client) && STAMM_GetClientLevel(client) >= StringToInt(models[item][MODELLEVEL]))
 		{
 			modelsFound[found] = item;
 

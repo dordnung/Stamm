@@ -35,8 +35,8 @@
 
 
 
-new grav;
-new Handle:c_grav;
+new Handle:g_hGrav;
+
 
 
 
@@ -73,22 +73,14 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	AutoExecConfig_SetFile("lessgravity", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_grav = AutoExecConfig_CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each block!");
+	g_hGrav = AutoExecConfig_CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each block!");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
-}
-
-
-
-
-// And load it
-public OnConfigsExecuted()
-{
-	grav = GetConVarInt(c_grav);
 }
 
 
@@ -98,6 +90,7 @@ public OnConfigsExecuted()
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+	new grav = GetConVarInt(g_hGrav);
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -137,7 +130,6 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 		new Float:newGrav;
 		new clientBlock;
 
-
 		// Client want it
 		if (mode)
 		{
@@ -148,7 +140,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 			if (clientBlock > 0)
 			{
 				// Calculate new gravity
-				newGrav = 1.0 - float(grav)/100.0 * clientBlock;
+				newGrav = 1.0 - float(GetConVarInt(g_hGrav)) / 100.0 * clientBlock;
 
 				if (newGrav < 0.1) 
 				{

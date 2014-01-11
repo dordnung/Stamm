@@ -38,8 +38,7 @@
 
 
 
-new hp;
-new Handle:c_hp;
+new Handle:g_hHP;
 
 
 
@@ -71,6 +70,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Add to udater and add descriptions
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
@@ -88,7 +88,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	// Add for each block a description
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		STAMM_AddBlockDescription(i, "%T", "GetSpawnHP", LANG_SERVER, hp * i);
+		STAMM_AddBlockDescription(i, "%T", "GetSpawnHP", LANG_SERVER, GetConVarInt(g_hHP) * i);
 	}
 }
 
@@ -104,20 +104,13 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("spawnhp", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_hp = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more per block");
+	g_hHP = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more per block");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
 
-
-
-// Load Config
-public OnConfigsExecuted()
-{
-	hp = GetConVarInt(c_hp);
-}
 
 
 
@@ -150,7 +143,7 @@ public Action:changeHealth(Handle:timer, any:client)
 	if (clientBlock > 0)
 	{
 		// Set new HP
-		new newHP = GetClientHealth(client) + hp * clientBlock;
+		new newHP = GetClientHealth(client) + GetConVarInt(g_hHP) * clientBlock;
 		
 		// also increate max HP
 		SetEntProp(client, Prop_Data, "m_iMaxHealth", newHP);

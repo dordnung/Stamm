@@ -36,10 +36,9 @@
 
 
 
-new resize;
-new Handle:c_resize;
+new Handle:g_hResize;
+new Float:g_hClientSize[MAXPLAYERS + 1];
 
-new Float:clientSize[MAXPLAYERS + 1];
 
 
 
@@ -79,30 +78,25 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Feature started
 public OnPluginStart()
 {
 	// Hook event player spawn
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	// Create Config
 	AutoExecConfig_SetFile("resizeplayer", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_resize = AutoExecConfig_CreateConVar("resize_amount", "10", "Resize amount in(+)/de(-)crease in percent each block!");
+	g_hResize = AutoExecConfig_CreateConVar("resize_amount", "10", "Resize amount in(+)/de(-)crease in percent each block!");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
 
-
-
-// Get Config cvar
-public OnConfigsExecuted()
-{
-	resize = GetConVarInt(c_resize);
-}
 
 
 
@@ -124,7 +118,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	// Write level descriptions
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		STAMM_AddBlockDescription(i, "%T", "GetResize", LANG_SERVER, resize * i);
+		STAMM_AddBlockDescription(i, "%T", "GetResize", LANG_SERVER, GetConVarInt(g_hResize) * i);
 	}
 }
 
@@ -135,7 +129,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public STAMM_OnClientReady(client)
 {
 	// Default size is 1.0
-	clientSize[client] = 1.0;
+	g_hClientSize[client] = 1.0;
 
 	// For each block
 	for (new i=STAMM_GetBlockCount(); i > 0; i--)
@@ -144,11 +138,11 @@ public STAMM_OnClientReady(client)
 		if (STAMM_HaveClientFeature(client, i))
 		{
 			// set new size
-			clientSize[client] = 1.0 + float(resize)/100.0 * i;
+			g_hClientSize[client] = 1.0 + float(GetConVarInt(g_hResize))/100.0 * i;
 
-			if (clientSize[client] < 0.1) 
+			if (g_hClientSize[client] < 0.1) 
 			{
-				clientSize[client] = 0.1;
+				g_hClientSize[client] = 0.1;
 			}
 
 			// Break here
@@ -179,13 +173,13 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 
 
 		// Setz size
-		SetEntPropFloat(client, Prop_Send, "m_flModelScale", clientSize[client]);
+		SetEntPropFloat(client, Prop_Send, "m_flModelScale", g_hClientSize[client]);
 
 
 		if (STAMM_GetGame() == GameTF2)
 		{
 			// On TF2 setz head size
-			SetEntPropFloat(client, Prop_Send, "m_flHeadScale", clientSize[client]);
+			SetEntPropFloat(client, Prop_Send, "m_flHeadScale", g_hClientSize[client]);
 		}
 	}
 }
@@ -199,10 +193,10 @@ public OnGameFrame()
 	{
 		for (new i = 1; i <= MaxClients; i++)
 		{
-			if (STAMM_IsClientValid(i) && clientSize[i] != 1.0)
+			if (STAMM_IsClientValid(i) && g_hClientSize[i] != 1.0)
 			{
 				// Set head size
-				SetEntPropFloat(i, Prop_Send, "m_flHeadScale", clientSize[i]);
+				SetEntPropFloat(i, Prop_Send, "m_flHeadScale", g_hClientSize[i]);
 			}
 		}
 	}

@@ -33,16 +33,16 @@
 
 
 // Colors for the diffent grenades
-#define HEColor 	{225,0,0,225}
-#define FlashColor 	{255,255,0,225}
-#define SmokeColor	{0,225,0,225}
-#define DecoyColor	{139,090,043,225}
-#define MoloColor	{255,069,0,225}
+#define HEColor {225,0,0,225}
+#define FlashColor {255,255,0,225}
+#define SmokeColor {0,225,0,225}
+#define DecoyColor {139,090,043,225}
+#define MoloColor {255,069,0,225}
 
 #pragma semicolon 1
 
 
-new BeamSprite;
+new g_iBeamSprite;
 
 
 
@@ -62,7 +62,6 @@ public Plugin:myinfo =
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
-
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -107,7 +106,7 @@ public OnPluginStart()
 // Precache trail
 public OnMapStart()
 {
-	BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
+	g_iBeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
 }
 
 
@@ -208,7 +207,7 @@ public AddTrail(client, ent, tcolor[4])
 		if (IsValidEntity(ent) && owner == client)
 		{
 			// Create trail
-			TE_SetupBeamFollow(ent, BeamSprite,	0, 5.0, 3.0, 3.0, 1, tcolor);
+			TE_SetupBeamFollow(ent, g_iBeamSprite,	0, 5.0, 3.0, 3.0, 1, tcolor);
 			TE_SendToAll();
 		}
 	}

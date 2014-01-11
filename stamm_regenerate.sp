@@ -36,12 +36,10 @@
 
 
 
-new hp;
-new timeInterval;
+new Handle:g_hHP;
+new Handle:g_hTime;
+new Handle:g_hClientTimers[MAXPLAYERS + 1];
 
-new Handle:c_hp;
-new Handle:c_time;
-new Handle:ClientTimers[MAXPLAYERS + 1];
 
 
 
@@ -73,6 +71,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Add to updater
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
@@ -90,7 +89,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	// Set Description for each block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		STAMM_AddBlockDescription(i, "%T", "GetRegenerate", LANG_SERVER, hp * i, timeInterval);
+		STAMM_AddBlockDescription(i, "%T", "GetRegenerate", LANG_SERVER, GetConVarInt(g_hHP) * i, GetConVarInt(g_hTime));
 	}
 }
 
@@ -102,24 +101,17 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	AutoExecConfig_SetFile("regenerate", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_hp = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every x seconds per block");
-	c_time = AutoExecConfig_CreateConVar("regenerate_time", "1", "Time interval to regenerate (in Seconds)");
+	g_hHP = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every x seconds per block");
+	g_hTime = AutoExecConfig_CreateConVar("regenerate_time", "1", "Time interval to regenerate (in Seconds)");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
-
-
-// Read config
-public OnConfigsExecuted()
-{
-	hp = GetConVarInt(c_hp);
-	timeInterval = GetConVarInt(c_time);
-}
 
 
 
@@ -134,13 +126,13 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Reset timer if available
-			if (ClientTimers[client] != INVALID_HANDLE) 
+			if (g_hClientTimers[client] != INVALID_HANDLE) 
 			{
-				KillTimer(ClientTimers[client]);
+				KillTimer(g_hClientTimers[client]);
 			}
 
 			// Start timer to add health
-			ClientTimers[client] = CreateTimer(float(timeInterval), GiveHealth, client, TIMER_REPEAT);
+			g_hClientTimers[client] = CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, GetClientUserId(client), TIMER_REPEAT);
 		}
 	}
 }
@@ -148,8 +140,11 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Regenerate Timer
-public Action:GiveHealth(Handle:timer, any:client)
+public Action:GiveHealth(Handle:timer, any:userid)
 {
+	new client = GetClientOfUserId(userid);
+
+
 	// Is client valid?
 	if (STAMM_IsClientValid(client))
 	{
@@ -164,7 +159,7 @@ public Action:GiveHealth(Handle:timer, any:client)
 			new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
 
 			new oldHP = GetClientHealth(client);
-			new newHP = oldHP + hp * clientBlock;
+			new newHP = oldHP + GetConVarInt(g_hHP) * clientBlock;
 			
 			// Only if not higher than max Health
 			if (newHP > maxHealth)
@@ -185,5 +180,8 @@ public Action:GiveHealth(Handle:timer, any:client)
 		}
 	}
 	
-	return Plugin_Handled;
+
+	g_hClientTimers[client] = INVALID_HANDLE;
+	
+	return Plugin_Stop;
 }

@@ -36,11 +36,8 @@
 
 
 
-new Handle:s_tag;
-new Handle:s_admin;
-new admin_tag;
-
-new String:tag[PLATFORM_MAX_PATH + 1];
+new Handle:g_hTag;
+new Handle:g_hAdmin;
 
 
 
@@ -78,14 +75,15 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Create the config
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("tag", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	s_tag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
-	s_admin = AutoExecConfig_CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
+	g_hTag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
+	g_hAdmin = AutoExecConfig_CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -96,11 +94,12 @@ public OnPluginStart()
 
 
 
+
 // Add auto updater
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
-
+	decl String:tag[PLATFORM_MAX_PATH + 1];
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -117,20 +116,13 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 
-// Load config
-public OnConfigsExecuted()
-{
-	GetConVarString(s_tag, tag, sizeof(tag));
-	admin_tag = GetConVarInt(s_admin);
-}
-
-
 
 // Client is ready, check name
 public STAMM_OnClientReady(client)
 {
 	NameCheck(client);
 }
+
 
 
 
@@ -149,33 +141,37 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+
 // Check the name here
 public NameCheck(client)
 {
-	new String:name[MAX_NAME_LENGTH+1];
-	
+	decl String:name[MAX_NAME_LENGTH+1];
+	decl String:tag[PLATFORM_MAX_PATH + 1];
+
+
 	// Get client Tag
 	CS_GetClientClanTag(client, name, sizeof(name));
+	GetConVarString(g_hTag, tag, sizeof(tag));
+
 	
 	// Is VIP tag in name?
 	if (StrContains(name, tag) != -1)
 	{
 		// But Player isn't a VIP oO?
-		if (!STAMM_IsClientVip(client, STAMM_GetBlockLevel()))
+		if (STAMM_GetClientLevel(client) < STAMM_GetBlockLevel(1))
 		{
 			// Strip the tage out
 			ReplaceString(name, sizeof(name), tag, "");
 			CS_SetClientClanTag(client, name);
 		}
 	}
-	
 	else
 	{
 		// Tag is not in name
 		if (STAMM_HaveClientFeature(client)) 
 		{
 			// Add the tag if the player wants it
-			if (admin_tag || (!admin_tag && !STAMM_IsClientAdmin(client))) 
+			if (GetConVarInt(g_hAdmin) || (!GetConVarInt(g_hAdmin) && !STAMM_IsClientAdmin(client))) 
 			{
 				CS_SetClientClanTag(client, tag);
 			}

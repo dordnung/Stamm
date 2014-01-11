@@ -39,16 +39,12 @@
 
 
 
-new dur;
-new mode_infect;
-new lhp;
-new timers[MAXPLAYERS+1];
+new Handle:g_hDur;
+new Handle:g_hMode;
+new Handle:g_hlHP;
 
-new Handle:dur_c;
-new Handle:mode_c;
-new Handle:lhp_c;
-
-new bool:Infected[MAXPLAYERS+1];
+new g_iTimers[MAXPLAYERS+1];
+new bool:g_bInfected[MAXPLAYERS+1];
 
 
 
@@ -123,12 +119,13 @@ public OnPluginStart()
 	HookEvent("player_hurt", PlayerHurt);
 	HookEvent("player_spawn", PlayerDeath);
 
+
 	AutoExecConfig_SetFile("knife_infect", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	dur_c = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
-	mode_c = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
-	lhp_c = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
+	g_hDur = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
+	g_hMode = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
+	g_hlHP = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -137,41 +134,42 @@ public OnPluginStart()
 
 
 
-// Load Config
-public OnConfigsExecuted()
-{
-	dur = GetConVarInt(dur_c);
-	mode_infect = GetConVarInt(mode_c);
-	lhp = GetConVarInt(lhp_c);
-	
 
-	if (mode_infect != 1 || dur) 
+public OnMapStart()
+{
+	if (GetConVarInt(g_hMode) != 1 || GetConVarInt(g_hDur)) 
 	{
-		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
+
 
 
 
 // Timer to check for infected Players
 public Action:SecondTimer(Handle:timer, any:data)
 {
+	new mode_infect = GetConVarInt(g_hMode);
+	new dur = GetConVarInt(g_hDur);
+	new lhp = GetConVarInt(g_hlHP);
+
+
 	for (new i=1; i <= MaxClients; i++)
 	{
 		if (STAMM_IsClientValid(i))
 		{
 			// Client is infected
-			if (Infected[i])
+			if (g_bInfected[i])
 			{
 				// Only for a specific duration
 				if (dur)
 				{
-					timers[i]--;
+					g_iTimers[i]--;
 					
 					// Time is over
-					if (timers[i] <= 0)
+					if (g_iTimers[i] <= 0)
 					{
-						Infected[i] = false;
+						g_bInfected[i] = false;
 						
 						if (mode_infect) 
 						{
@@ -213,16 +211,18 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (STAMM_IsClientValid(client) && Infected[client])
-	{
-		Infected[client] = false;
 
-		if (mode_infect) 
+	if (STAMM_IsClientValid(client) && g_bInfected[client])
+	{
+		g_bInfected[client] = false;
+
+		if (GetConVarInt(g_hMode)) 
 		{
 			ClientCommand(client, "r_screenoverlay \"\"");
 		}
 	}
 }
+
 
 
 
@@ -232,10 +232,11 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 	decl String:weapon[64];
 	decl String:p_name[128];
 	decl String:tag[64];
-	
+
+
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
+	new dur = GetConVarInt(g_hDur);
 
 
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
@@ -246,17 +247,17 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
 		// Weapon was knife
-		if (StrEqual(weapon, "knife") && !Infected[client])
+		if (StrEqual(weapon, "knife") && !g_bInfected[client])
 		{
 			// Attack was from a VIP
 			if (STAMM_HaveClientFeature(attacker))
 			{
-				Infected[client] = true;
+				g_bInfected[client] = true;
 				
 				GetClientName(attacker, p_name, sizeof(p_name));
 				
 				// Infecte the player
-				if (mode_infect)
+				if (GetConVarInt(g_hMode))
 				{
 					// With a Overlay
 					if (STAMM_GetGame() == GameCSS) 
@@ -273,7 +274,7 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 				// For specific time
 				if (dur)
 				{
-					timers[client] = dur;
+					g_iTimers[client] = dur;
 
 					if (STAMM_GetGame() == GameCSGO)
 					{

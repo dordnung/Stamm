@@ -37,11 +37,12 @@
 
 
 
-new maximum;
-new Usages[MAXPLAYERS + 1];
+new g_iMaximum;
+new g_iUsages[MAXPLAYERS + 1];
 
-new Handle:kv;
-new Handle:weaponlist;
+new Handle:g_hKV;
+new Handle:g_hWeaponList;
+
 
 
 
@@ -53,6 +54,7 @@ public Plugin:myinfo =
 	description = "Give VIP's weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -69,7 +71,11 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+
+
+	STAMM_AddCommand("!sweapons", "VIP Weapons", "%T", "GetWeapons", LANG_SERVER);
 }
+
 
 
 
@@ -117,19 +123,19 @@ public OnAllPluginsLoaded()
 
 
 	// Read the config
-	kv = CreateKeyValues("WeaponSettings");
-	FileToKeyValues(kv, path);
+	g_hKV = CreateKeyValues("WeaponSettings");
+	FileToKeyValues(g_hKV, path);
 	
 	// Maxium gives
-	maximum = KvGetNum(kv, "maximum");
+	g_iMaximum = KvGetNum(g_hKV, "maximum");
 	
 	// Create Menu
-	weaponlist = CreateMenu(weaponlist_handler);
-	SetMenuTitle(weaponlist, "!sgive <weapon_name>");
+	g_hWeaponList = CreateMenu(weaponlist_handler);
+	SetMenuTitle(g_hWeaponList, "!sgive <weapon_name>");
 	
 
 	// Parse config
-	if (KvGotoFirstSubKey(kv, false))
+	if (KvGotoFirstSubKey(g_hKV, false))
 	{
 		decl String:buffer[120];
 		decl String:buffer2[120];
@@ -137,7 +143,7 @@ public OnAllPluginsLoaded()
 		do
 		{
 			// Get Weaponname
-			KvGetSectionName(kv, buffer, sizeof(buffer));
+			KvGetSectionName(g_hKV, buffer, sizeof(buffer));
 
 			strcopy(buffer2, sizeof(buffer2), buffer);
 
@@ -145,23 +151,24 @@ public OnAllPluginsLoaded()
 			ReplaceString(buffer, sizeof(buffer), "weapon_", "");
 
 			// And go back
-			KvGoBack(kv);
+			KvGoBack(g_hKV);
 			
 			//  Get status of weapon
-			if (!StrEqual(buffer2, "maximum") && KvGetNum(kv, buffer2) == 1) 
+			if (!StrEqual(buffer2, "maximum") && KvGetNum(g_hKV, buffer2) == 1) 
 			{
-				AddMenuItem(weaponlist, buffer, buffer);
+				AddMenuItem(g_hWeaponList, buffer, buffer);
 			}
 
 
-			KvJumpToKey(kv, buffer2);
+			KvJumpToKey(g_hKV, buffer2);
 		} 
-		while (KvGotoNextKey(kv, false));
+		while (KvGotoNextKey(g_hKV, false));
 
 		// Go Back
-		KvRewind(kv);
+		KvRewind(g_hKV);
 	}
 }
+
 
 
 
@@ -193,6 +200,7 @@ public OnPluginStart()
 
 
 
+
 // Menu handler 
 public weaponlist_handler(Handle:menu, MenuAction:action, param1, param2)
 {
@@ -212,21 +220,24 @@ public weaponlist_handler(Handle:menu, MenuAction:action, param1, param2)
 
 
 
+
 // Resetz uses
 public RoundStart(Handle:event, String:name[], bool:dontBroadcast)
 {
 	for (new x=0; x <= MaxClients; x++)
 	{ 
-		Usages[x] = 0;
+		g_iUsages[x] = 0;
 	}
 }
+
+
 
 
 
 // Also reset usages
 public STAMM_OnClientReady(client)
 {
-	Usages[client] = 0;
+	g_iUsages[client] = 0;
 }
 
 
@@ -237,7 +248,7 @@ public Action:InfoCallback(client, args)
 {
 	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 	{
-		DisplayMenu(weaponlist, client, 30);
+		DisplayMenu(g_hWeaponList, client, 30);
 	}
 
 	return Plugin_Handled;
@@ -259,7 +270,7 @@ public Action:GiveCallback(client, args)
 			if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client))
 			{
 				// max. usages not reached
-				if (Usages[client] < maximum)
+				if (g_iUsages[client] < g_iMaximum)
 				{
 					decl String:WeaponName[64];
 					
@@ -272,12 +283,12 @@ public Action:GiveCallback(client, args)
 
 
 					// Enabled?
-					if (KvGetNum(kv, WeaponName))
+					if (KvGetNum(g_hKV, WeaponName))
 					{
 						// Give Item
 						GivePlayerItem(client, WeaponName);
 						
-						Usages[client]++;
+						g_iUsages[client]++;
 					}
 
 

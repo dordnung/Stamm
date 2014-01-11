@@ -36,8 +36,8 @@
 
 
 
-new pspeed;
-new Handle:c_speed;
+new Handle:g_hSpeed;
+
 
 
 
@@ -67,15 +67,17 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Create config
 public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	AutoExecConfig_SetFile("morespeed", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_speed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
+	g_hSpeed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -92,28 +94,20 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
+
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
 	}
 
 
-
 	// Set description for each block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		STAMM_AddBlockDescription(i, "%T", "GetMoreSpeed", LANG_SERVER, pspeed * i);
+		STAMM_AddBlockDescription(i, "%T", "GetMoreSpeed", LANG_SERVER, GetConVarInt(g_hSpeed) * i);
 	}
 }
 
-
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	pspeed = GetConVarInt(c_speed);
-}
 
 
 
@@ -125,6 +119,8 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 	
 	STAMM_OnClientChangedFeature(client, true, false);
 }
+
+
 
 
 
@@ -146,7 +142,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 				// Set new speed of player
 				new Float:newSpeed;
 				
-				newSpeed = 1.0 + float(pspeed)/100.0 * clientBlock;
+				newSpeed = 1.0 + float(GetConVarInt(g_hSpeed)) / 100.0 * clientBlock;
 				
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
 			}

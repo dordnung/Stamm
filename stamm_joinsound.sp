@@ -36,9 +36,8 @@
 
 
 
-new Handle:j_path;
-new bool:MapTimer = true;
-new String:path[PLATFORM_MAX_PATH + 1];
+new Handle:g_hPath;
+new bool:g_bMapTimer = true;
 
 
 
@@ -92,7 +91,7 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("joinsound", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	j_path = AutoExecConfig_CreateConVar("joinsound_path", "music/stamm/vip_sound.mp3", "Path to joinsound, after sound/");
+	g_hPath = AutoExecConfig_CreateConVar("joinsound_path", "music/stamm/vip_sound.mp3", "Path to joinsound, after sound/");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -104,10 +103,12 @@ public OnPluginStart()
 // Load config and precache sound
 public OnConfigsExecuted()
 {
-	new String:downloadfile[PLATFORM_MAX_PATH + 1];
+	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
+	GetConVarString(g_hPath, path, sizeof(path));
 	
-	GetConVarString(j_path, path, sizeof(path));
-	
+
 	if (STAMM_GetGame() != GameCSGO)
 	{
 		PrecacheSound(path, true);
@@ -117,7 +118,9 @@ public OnConfigsExecuted()
 		AddToStringTable(FindStringTable("soundprecache"), path);
 	}
 
+
 	Format(downloadfile, sizeof(downloadfile), "sound/%s", path);
+
 	AddFileToDownloadsTable(downloadfile);
 }
 
@@ -127,7 +130,7 @@ public OnConfigsExecuted()
 // Client ready, start sound
 public STAMM_OnClientReady(client)
 {
-	if (STAMM_HaveClientFeature(client) && MapTimer) 
+	if (STAMM_HaveClientFeature(client) && g_bMapTimer) 
 	{
 		CreateTimer(4.0, StartSound);
 	}
@@ -138,7 +141,7 @@ public STAMM_OnClientReady(client)
 // Mapchange protect
 public OnMapStart()
 {
-	MapTimer = false;
+	g_bMapTimer = false;
 	
 	CreateTimer(60.0, MapTimer_Change);
 }
@@ -147,7 +150,7 @@ public OnMapStart()
 
 public Action:MapTimer_Change(Handle:timer)
 {
-	MapTimer = true;
+	g_bMapTimer = true;
 }
 
 
@@ -155,5 +158,9 @@ public Action:MapTimer_Change(Handle:timer)
 // Emit the sound
 public Action:StartSound(Handle:timer)
 {
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
+	GetConVarString(g_hPath, path, sizeof(path));
+	
 	EmitSoundToAll(path);
 }

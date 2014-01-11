@@ -37,12 +37,11 @@
 
 
 
-new ammo;
 
-new Handle:c_ammo;
-new Handle:thetimer;
+new Handle:g_hAmmo;
+new Handle:g_hTheTimer;
 
-new bool:WeaponEdit[MAXPLAYERS + 1][2024];
+new bool:g_bWeaponEdit[MAXPLAYERS + 1][2024];
 
 
 
@@ -55,6 +54,7 @@ public Plugin:myinfo =
 	description = "Give VIP's more ammo",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -90,20 +90,23 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Create config and hook round start
 public OnPluginStart()
 {
 	HookEvent("player_death", PlayerDeath);
 
+
 	// Config
 	AutoExecConfig_SetFile("moreammo", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_ammo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
+	g_hAmmo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
+
 
 
 
@@ -124,31 +127,25 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	// Add dscriptions for block
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		STAMM_AddBlockDescription(i, "%T", "GetMoreAmmo", LANG_SERVER, ammo * i);
+		STAMM_AddBlockDescription(i, "%T", "GetMoreAmmo", LANG_SERVER, GetConVarInt(g_hAmmo) * i);
 	}
 }
+
 
 
 
 // Reset on mapstart
 public OnMapStart()
 {
-	if (thetimer != INVALID_HANDLE) 
+	if (g_hTheTimer != INVALID_HANDLE) 
 	{
-		KillTimer(thetimer);
+		KillTimer(g_hTheTimer);
 	}
 
 	// Create check timer
-	thetimer = CreateTimer(1.0, CheckWeapons, _, TIMER_REPEAT);
+	g_hTheTimer = CreateTimer(1.0, CheckWeapons, _, TIMER_REPEAT);
 }
 
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	ammo = GetConVarInt(c_ammo);
-}
 
 
 
@@ -159,9 +156,10 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 	
 	for (new x=0; x < 2024; x++) 
 	{
-		WeaponEdit[client][x] = false;
+		g_bWeaponEdit[client][x] = false;
 	}
 }
+
 
 
 
@@ -172,16 +170,19 @@ public RoundStart(Handle:event, String:name[], bool:dontBroadcast)
 	{
 		for (new i=0; i <= MaxClients; i++) 
 		{
-			WeaponEdit[i][x] = false;
+			g_bWeaponEdit[i][x] = false;
 		}
 	}
 }
 
 
 
+
 // Check weapons
 public Action:CheckWeapons(Handle:timer, any:data)
 {
+	new ammo = GetConVarInt(g_hAmmo);
+
 	// Client loop
 	for (new i = 1; i <= MaxClients; i++)
 	{
@@ -203,7 +204,7 @@ public Action:CheckWeapons(Handle:timer, any:data)
 					// Player carry weapon?
 					new weapon = GetPlayerWeaponSlot(client, x);
 
-					if (weapon != -1 && !WeaponEdit[client][weapon])
+					if (weapon != -1 && !g_bWeaponEdit[client][weapon])
 					{
 						// Get ammo index
 						new ammotype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
@@ -225,7 +226,7 @@ public Action:CheckWeapons(Handle:timer, any:data)
 								// Set ammo
 								SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, ammotype);
 								
-								WeaponEdit[client][weapon] = true;
+								g_bWeaponEdit[client][weapon] = true;
 							}
 						}
 					}

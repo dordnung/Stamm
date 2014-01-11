@@ -36,9 +36,7 @@
 
 
 
-
-new firerate;
-new Handle:c_firerate;
+new Handle:g_hFireRate;
 
 
 
@@ -89,19 +87,13 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("higher_firingrate", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_firerate = AutoExecConfig_CreateConVar("firing_rate", "10", "Firing rate increase in percent each block!");
+	g_hFireRate = AutoExecConfig_CreateConVar("firing_rate", "10", "Firing rate increase in percent each block!");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
 
-
-// Load config
-public OnConfigsExecuted()
-{
-	firerate = GetConVarInt(c_firerate);
-}
 
 
 
@@ -123,7 +115,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	// Description for each block	
 	for (new i=1; i <= STAMM_GetBlockCount(); i++)
 	{
-		STAMM_AddBlockDescription(i, "%T", "GetHigherFiringRate", LANG_SERVER, firerate * i);
+		STAMM_AddBlockDescription(i, "%T", "GetHigherFiringRate", LANG_SERVER, GetConVarInt(g_hFireRate) * i);
 	}
 }
 
@@ -134,6 +126,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
 	new bool:change = false;
+	
 	
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
@@ -149,7 +142,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 			
 			TF2Items_SetItemIndex(hItem, -1);
 
-			new Float:newFire = 1.0 - float(firerate)/100.0 * clientBlock;
+			new Float:newFire = 1.0 - float(GetConVarInt(g_hFireRate))/100.0 * clientBlock;
 
 
 			if (newFire < 0.1)

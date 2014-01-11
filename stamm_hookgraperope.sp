@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------
- * File        stamm_hookgraperope.sp
+ * File        stamm_g_iHookg_iGrapeg_iRope.sp
  * Authors     David <popoklopsi> Ordnung
  * License     GPLv3
  * Web         http://popoklopsi.de
@@ -35,9 +35,10 @@
 
 
 
-new grap;
-new hook;
-new rope;
+new g_iGrap;
+new g_iHook;
+new g_iRope;
+
 
 
 
@@ -49,6 +50,7 @@ public Plugin:myinfo =
 	description = "Allows VIP's to grap, hook or rope",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -66,12 +68,11 @@ public OnAllPluginsLoaded()
 
 
 
+
 // auto updater and load description
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
-
-
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -82,25 +83,30 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 	// Load Descriptions for each block
-	grap = STAMM_GetBlockOfName("grap");
-	hook = STAMM_GetBlockOfName("hook");
-	rope = STAMM_GetBlockOfName("rope");
+	g_iGrap = STAMM_GetBlockOfName("grap");
+	g_iHook = STAMM_GetBlockOfName("hook");
+	g_iRope = STAMM_GetBlockOfName("rope");
 
 
 
-	if (grap != -1)
+	if (g_iGrap != -1)
 	{
-		STAMM_AddBlockDescription(grap, "%T", "GetGrap", LANG_SERVER);
+		STAMM_AddBlockDescription(g_iGrap, "%T", "GetGrap", LANG_SERVER);
 	}
 
-	if (hook != -1)
+	if (g_iHook != -1)
 	{
-		STAMM_AddBlockDescription(hook, "%T", "GetHook", LANG_SERVER);
+		STAMM_AddBlockDescription(g_iHook, "%T", "GetHook", LANG_SERVER);
 	}
 
-	if (rope != -1)
+	if (g_iRope != -1)
 	{
-		STAMM_AddBlockDescription(rope, "%T", "GetRope", LANG_SERVER);
+		STAMM_AddBlockDescription(g_iRope, "%T", "GetRope", LANG_SERVER);
+	}
+
+	if (g_iGrap == -1 && g_iHook == -1 && g_iRope == -1)
+	{
+		SetFailState("Found neither block grap nor block hoo nor block rope!");
 	}
 }
 
@@ -112,7 +118,7 @@ public STAMM_OnClientReady(client)
 {
 	if (STAMM_IsClientValid(client))
 	{
-		if (hook != -1 && STAMM_HaveClientFeature(client, hook))
+		if (g_iHook != -1 && STAMM_HaveClientFeature(client, g_iHook))
 		{
 			HGR_ClientAccess(client, 0, 0);
 		}
@@ -123,7 +129,7 @@ public STAMM_OnClientReady(client)
 		}
 
 
-		if (grap != -1 && STAMM_HaveClientFeature(client, grap))
+		if (g_iGrap != -1 && STAMM_HaveClientFeature(client, g_iGrap))
 		{
 			HGR_ClientAccess(client, 0, 1);
 		}
@@ -134,7 +140,7 @@ public STAMM_OnClientReady(client)
 		}
 
 
-		if (rope != -1 && STAMM_HaveClientFeature(client, rope))
+		if (g_iRope != -1 && STAMM_HaveClientFeature(client, g_iRope))
 		{
 			HGR_ClientAccess(client, 0, 2);
 		}

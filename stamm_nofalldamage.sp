@@ -39,6 +39,7 @@
 
 
 
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Fall Damage",
@@ -47,6 +48,7 @@ public Plugin:myinfo =
 	description = "Give VIP's No Fall Damage",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -64,6 +66,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
+
 
 
 
@@ -88,11 +91,13 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Client is ready hook him
 public STAMM_OnClientReady(client)
 {
 	SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
 }
+
 
 
 

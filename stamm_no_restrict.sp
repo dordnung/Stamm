@@ -36,7 +36,8 @@
 
 
 
-new bool:weaponRestrict[WeaponID];
+new bool:g_bWeaponRestrict[WeaponID];
+
 
 
 public Plugin:myinfo =
@@ -79,12 +80,14 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
+
 	
 	// We need plugin weaponrestrict	
 	if (!LibraryExists("weaponrestrict")) 
 	{
 		SetFailState("Can't Load Feature, Weapon Restrict is not installed!");
 	}
+	
 	
 	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
 	{
@@ -137,7 +140,7 @@ public OnAllPluginsLoaded()
 			KvGoBack(kv);
 			
 			//  Get status of weapon
-			weaponRestrict[GetWeaponID(buffer)] = (KvGetNum(kv, buffer) == 1);
+			g_bWeaponRestrict[GetWeaponID(buffer)] = (KvGetNum(kv, buffer) == 1);
 			
 
 			KvJumpToKey(kv, buffer);
@@ -162,7 +165,7 @@ public Action:Restrict_OnCanBuyWeapon(client, team, WeaponID:id, &CanBuyResult:r
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Normally he can't buy it
-			if (result != CanBuy_Allow && weaponRestrict[id])
+			if (result != CanBuy_Allow && g_bWeaponRestrict[id])
 			{
 				// But now he can :)
 				result = CanBuy_Allow;
@@ -186,7 +189,7 @@ public Action:Restrict_OnCanPickupWeapon(client, team, WeaponID:id, &bool:result
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Normally he can't pick it up
-			if (result != true && weaponRestrict[id])
+			if (result != true && g_bWeaponRestrict[id])
 			{
 				// Now he can :)
 				result = true;

@@ -36,9 +36,8 @@
 
 
 
-new Handle:damage_area_c;
+new Handle:g_hDamageArea;
 
-new damage_area;
 
 
 
@@ -50,6 +49,7 @@ public Plugin:myinfo =
 	description = "VIP's can see the damage they done",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -70,6 +70,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 
+
 // Add Feature when all plugins are loaded
 public OnAllPluginsLoaded()
 {
@@ -85,13 +86,14 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Load config when plugin started
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("show_damage", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	damage_area_c = AutoExecConfig_CreateConVar("damage_area", "1", "Textarea where to show message, 1=Center Text, 2=Hint Text, 3=Chat");
+	g_hDamageArea = AutoExecConfig_CreateConVar("damage_area", "1", "Textarea where to show message, 1=Center Text, 2=Hint Text, 3=Chat");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -100,14 +102,6 @@ public OnPluginStart()
 	HookEvent("player_hurt", eventPlayerHurt);
 }
 
-
-
-
-// Read Config
-public OnConfigsExecuted()
-{
-	damage_area = GetConVarInt(damage_area_c);
-}
 
 
 
@@ -144,7 +138,7 @@ public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadc
 
 
 			// Switch the area to show to and show it
-			switch(damage_area)
+			switch(GetConVarInt(g_hDamageArea))
 			{
 				case 1:
 				{

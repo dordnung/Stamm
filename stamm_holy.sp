@@ -36,10 +36,9 @@
 
 
 
-new Handle:hear_all;
-new hear;
+new Handle:g_hHearAll;
+new bool:g_hUseNew = false;
 
-new bool:useNew = false;
 
 
 
@@ -51,6 +50,7 @@ public Plugin:myinfo =
 	description = "Give VIP's a holy granade",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -66,6 +66,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
+
 
 
 
@@ -89,13 +90,14 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Create Config
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("holy_grenade", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	hear_all = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
+	g_hHearAll = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -106,20 +108,19 @@ public OnPluginStart()
 
 
 
+
 // Load configs and download and precache files
 public OnConfigsExecuted()
 {
-	hear = GetConVarInt(hear_all);
-
 	// Check new Sound path
 	if (FileExists("sound/stamm/throw.mp3"))
 	{
-		useNew = true;
+		g_hUseNew = true;
 	}
 	
 
 	// Download all files
-	if (!useNew)
+	if (!g_hUseNew)
 	{
 		AddFileToDownloadsTable("sound/music/stamm/throw.mp3");
 		AddFileToDownloadsTable("sound/music/stamm/explode.mp3");
@@ -142,11 +143,11 @@ public OnConfigsExecuted()
 	
 
 	// Precache
-	PrecacheModel("models/stamm/holy_grenade.mdl", true);
-	PrecacheModel("materials/sprites/splodesprite.vmt", true);
+	PrecacheModel("models/stamm/holy_grenade.mdl");
+	PrecacheModel("materials/sprites/splodesprite.vmt");
 
 	// Sound Stuff
-	if (!useNew)
+	if (!g_hUseNew)
 	{
 		if (STAMM_GetGame() == GameCSGO)
 		{
@@ -155,8 +156,8 @@ public OnConfigsExecuted()
 		}
 		else
 		{
-			PrecacheSound("music/stamm/throw.mp3", true);
-			PrecacheSound("music/stamm/explode.mp3", true);
+			PrecacheSound("music/stamm/throw.mp3");
+			PrecacheSound("music/stamm/explode.mp3");
 		}
 	}
 	else
@@ -168,11 +169,20 @@ public OnConfigsExecuted()
 		}
 		else
 		{
-			PrecacheSound("stamm/throw.mp3", true);
-			PrecacheSound("stamm/explode.mp3", true);
+			PrecacheSound("stamm/throw.mp3");
+			PrecacheSound("stamm/explode.mp3");
 		}
 	}
 }
+
+
+
+
+public OnMapStart()
+{
+	OnConfigsExecuted();
+}
+
 
 
 
@@ -195,9 +205,9 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 			if (STAMM_HaveClientFeature(client))
 			{
 				// Play a sound to client or to all?
-				if (hear) 
+				if (GetConVarInt(g_hHearAll)) 
 				{
-					if (!useNew)
+					if (!g_hUseNew)
 					{
 						EmitSoundToClient(client, "music/stamm/throw.mp3");
 					}
@@ -291,9 +301,9 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			
 
 			// Play sound
-			if (hear) 
+			if (GetConVarInt(g_hHearAll)) 
 			{
-				if (!useNew)
+				if (!g_hUseNew)
 				{
 					EmitSoundToClient(client, "music/stamm/explode.mp3");
 				}
@@ -305,7 +315,7 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			}
 			else
 			{
-				if (!useNew)
+				if (!g_hUseNew)
 				{
 					EmitSoundToAll("music/stamm/explode.mp3");
 				}

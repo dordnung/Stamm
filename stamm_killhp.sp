@@ -32,16 +32,12 @@
 #include <updater>
 
 
-
 #pragma semicolon 1
 
 
 
-new hp;
-new mhp;
-
-new Handle:c_hp;
-new Handle:m_hp;
+new Handle:g_hHP;
+new Handle:g_hMHP;
 
 
 
@@ -71,6 +67,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Auto updater
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
@@ -85,8 +82,9 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	}
 
 
-	STAMM_AddBlockDescription(1, "%T", "GetKillHP", LANG_SERVER, hp);
+	STAMM_AddBlockDescription(1, "%T", "GetKillHP", LANG_SERVER, GetConVarInt(g_hHP));
 }
+
 
 
 
@@ -96,8 +94,8 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("killhp", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 	
-	c_hp = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
-	m_hp = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
+	g_hHP = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
+	g_hMHP = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -108,13 +106,6 @@ public OnPluginStart()
 
 
 
-// Load config
-public OnConfigsExecuted()
-{
-	hp = GetConVarInt(c_hp);
-	mhp = GetConVarInt(m_hp);
-}
-
 
 
 // Player died
@@ -122,14 +113,15 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
+	new mhp = GetConVarInt(g_hMHP);
 	
-	
+
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
 		// Give HP to Killer
 		if (STAMM_HaveClientFeature(attacker))
 		{
-			new newHP = GetClientHealth(attacker) + hp;
+			new newHP = GetClientHealth(attacker) + GetConVarInt(g_hHP);
 			
 			// Not more than Max HP
 			if (newHP >= mhp) 

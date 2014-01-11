@@ -35,7 +35,7 @@
 #pragma semicolon 1
 
 
-new stammview[MAXPLAYERS + 1];
+new g_iStammView[MAXPLAYERS + 1];
 
 
 
@@ -48,6 +48,7 @@ public Plugin:myinfo =
 	description = "Adds an Stamm Icon on top of a player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -82,6 +83,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Reset icons
 public OnPluginStart()
 {
@@ -91,9 +93,10 @@ public OnPluginStart()
 
 	for (new i=0; i <= MaxClients; i++) 
 	{
-		stammview[i] = 0;
+		g_iStammView[i] = 0;
 	}
 }
+
 
 
 
@@ -105,29 +108,29 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 		// Disabled it
 		if (!mode)
 		{
-			if (stammview[client] != 0) 
+			if (g_iStammView[client] != 0) 
 			{
 				// Delete old ICON
-				if (IsValidEntity(stammview[client]))
+				if (IsValidEntity(g_iStammView[client]))
 				{
 					decl String:class[128];
 					
-					GetEdictClassname(stammview[client], class, sizeof(class));
+					GetEdictClassname(g_iStammView[client], class, sizeof(class));
 					
 
 					if (StrEqual(class, "prop_dynamic")) 
 					{
-						RemoveEdict(stammview[client]);
+						RemoveEdict(g_iStammView[client]);
 					}
 				}
 				
-				stammview[client] = 0;
+				g_iStammView[client] = 0;
 			}
 		}
 		else if (STAMM_HaveClientFeature(client))
 		{
 			// Create an icon
-			CreateTimer(2.5, CreateStamm, client);
+			CreateTimer(2.5, CreateStamm, GetClientUserId(client));
 		}
 	}
 }
@@ -135,10 +138,11 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 
 
 
+
 // Download Icon and preache it
 public OnMapStart()
 {
-	PrecacheModel("models/stamm/stammview.mdl", true);
+	PrecacheModel("models/stamm/stammview.mdl");
 	
 	AddFileToDownloadsTable("materials/models/stamm/stammview.vtf");
 	AddFileToDownloadsTable("models/stamm/stammview.mdl");
@@ -152,11 +156,13 @@ public OnMapStart()
 
 
 
+
 // Create icons for vips on spawn
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
+
 	if (STAMM_IsClientValid(client))
 	{
 		if (STAMM_HaveClientFeature(client))
@@ -164,11 +170,12 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
 			{
 				// Create timer
-				CreateTimer(2.5, CreateStamm, client);
+				CreateTimer(2.5, CreateStamm, GetClientUserId(client));
 			}
 		}
 	}
 }
+
 
 
 
@@ -178,47 +185,52 @@ public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroad
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
 	// Client have an icon
-	if (stammview[client] != 0) 
+	if (g_iStammView[client] != 0) 
 	{
-		if (IsValidEntity(stammview[client]))
+		if (IsValidEntity(g_iStammView[client]))
 		{
 			decl String:class[128];
 			
-			GetEdictClassname(stammview[client], class, sizeof(class));
+			GetEdictClassname(g_iStammView[client], class, sizeof(class));
 			
 			// Delete
 			if (StrEqual(class, "prop_dynamic")) 
 			{
-				RemoveEdict(stammview[client]);
+				RemoveEdict(g_iStammView[client]);
 			}
 		}
 		
-		stammview[client] = 0;
+		g_iStammView[client] = 0;
 	}
 }
 
 
 
+
 // Create the icon
-public Action:CreateStamm(Handle:timer, any:client)
+public Action:CreateStamm(Handle:timer, any:userid)
 {
+	new client = GetClientOfUserId(userid);
+
+
 	if (STAMM_IsClientValid(client))
 	{
 		// Valid team
 		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 		{
 			// First delete old one
-			if (stammview[client] != 0) 
+			if (g_iStammView[client] != 0) 
 			{
-				if (IsValidEntity(stammview[client]))
+				if (IsValidEntity(g_iStammView[client]))
 				{
 					decl String:class[128];
 					
-					GetEdictClassname(stammview[client], class, sizeof(class));
+					
+					GetEdictClassname(g_iStammView[client], class, sizeof(class));
 					
 					if (StrEqual(class, "prop_dynamic")) 
 					{
-						RemoveEdict(stammview[client]);
+						RemoveEdict(g_iStammView[client]);
 					}
 				}
 			}
@@ -245,7 +257,7 @@ public Action:CreateStamm(Handle:timer, any:client)
 					if (IsValidEntity(view))
 					{
 						// Mark players entity and spawn it to him
-						stammview[client] = view;
+						g_iStammView[client] = view;
 						
 						GetClientAbsOrigin(client, origin);
 						

@@ -38,13 +38,11 @@
 
 
 
-new deathCounter[MAXPLAYERS + 1];
+new g_iDeathCounter[MAXPLAYERS + 1];
 
-new Handle:deathcount_c;
-new Handle:pointscount_c;
+new Handle:g_hDeathCount;
+new Handle:g_hPointScount;
 
-new deathcount;
-new pointscount;
 
 
 
@@ -56,6 +54,7 @@ public Plugin:myinfo =
 	description = "Non VIP's lose until a specific level points on death",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -116,8 +115,8 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("losepoints", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	deathcount_c = AutoExecConfig_CreateConVar("death_count", "2", "How much deaths a player needs to lose points");
-	pointscount_c = AutoExecConfig_CreateConVar("points_count", "2", "How much points a player loses after <death_count> deaths");
+	g_hDeathCount = AutoExecConfig_CreateConVar("death_count", "2", "How much deaths a player needs to lose points");
+	g_hPointScount = AutoExecConfig_CreateConVar("points_count", "2", "How much points a player loses after <death_count> deaths");
 
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -125,19 +124,11 @@ public OnPluginStart()
 
 
 
-// Load config
-public OnConfigsExecuted()
-{
-	deathcount = GetConVarInt(deathcount_c);
-	pointscount = GetConVarInt(pointscount_c);
-}
-
-
 
 // Death counter -> zero
 public OnClientAuthorized(client, const String:auth[])
 {
-	deathCounter[client] = 0;
+	g_iDeathCounter[client] = 0;
 }
 
 
@@ -150,7 +141,9 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
+	new deathcount = GetConVarInt(g_hDeathCount);
+	new pointscount = GetConVarInt(g_hPointScount);
+
 
 	if (STAMM_IsClientValid(client) && attacker > 0 && client != attacker)
 	{
@@ -158,7 +151,7 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 		if (!STAMM_HaveClientFeature(client) && IsClientInGame(attacker) && (GetClientTeam(client) != GetClientTeam(attacker)))
 		{
 			// check death count
-			if (++deathCounter[client] == deathcount)
+			if (++g_iDeathCounter[client] == deathcount)
 			{				
 				// Delete points ):
 				STAMM_DelClientPoints(client, pointscount);
@@ -174,7 +167,7 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 				}
 
 
-				deathCounter[client] = 0;
+				g_iDeathCounter[client] = 0;
 			}
 		}
 	}

@@ -45,8 +45,8 @@ new Handle:beamTimer[MAXPLAYERS+1];
 new haveBeam[MAXPLAYERS+1];
 new modelInd;
 
-new Handle:c_lifeTime;
-new Handle:c_material;
+new Handle:g_hLifeTime;
+new Handle:g_hMaterial;
 
 
 
@@ -102,11 +102,12 @@ public OnPluginStart()
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_death", eventPlayerDeath);
 
+
 	AutoExecConfig_SetFile("playertrail", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 	
-	c_lifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element");
-	c_material = AutoExecConfig_CreateConVar("ptrail_material", "sprites/laserbeam.vmt", "Material to use, start after materials/");
+	g_hLifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element");
+	g_hMaterial = AutoExecConfig_CreateConVar("ptrail_material", "sprites/laserbeam.vmt", "Material to use, start after materials/");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -121,14 +122,13 @@ public OnConfigsExecuted()
 	decl String:materialPrecache[PLATFORM_MAX_PATH + 1];
 
 
+	lifetime = GetConVarFloat(g_hLifeTime);
 
-	lifetime = GetConVarFloat(c_lifeTime);
-
-	GetConVarString(c_material, materialPrecache, sizeof(materialPrecache));
+	GetConVarString(g_hMaterial, materialPrecache, sizeof(materialPrecache));
 
 	Format(material, sizeof(material), "materials/%s", materialPrecache);
 
-	modelInd = PrecacheModel(material, true);
+	modelInd = PrecacheModel(material);
 
 
 
@@ -190,6 +190,7 @@ public OnClientDisconnect(client)
 
 
 
+
 // Also on player death
 public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {	
@@ -223,6 +224,7 @@ public Action:SetupTrail(Handle:timer, any:client)
 		}
 	}
 }
+
 
 
 

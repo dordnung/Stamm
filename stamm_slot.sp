@@ -36,10 +36,10 @@
 
 
 
-new Handle:c_let_free;
-new Handle:c_vip_kick_message;
-new Handle:c_vip_kick_message2;
-new Handle:c_vip_slots;
+new Handle:g_hLetFree;
+new Handle:g_hVIPKickMessage;
+new Handle:g_hVIPKickMessage2;
+new Handle:g_hVIPSlots;
 
 new let_free;
 new vip_slots;
@@ -102,10 +102,10 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("slot", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_let_free = AutoExecConfig_CreateConVar("slot_let_free", "0", "1 = Let a Slot always free and kick a random Player  0 = Off");
-	c_vip_kick_message = AutoExecConfig_CreateConVar("slot_vip_kick_message", "You joined on a Reserve Slot", "Message, when someone join on a Reserve Slot");
-	c_vip_kick_message2 = AutoExecConfig_CreateConVar("slot_vip_kick_message2", "You get kicked, to let a VIP slot free", "Message for the random kicked person");
-	c_vip_slots = AutoExecConfig_CreateConVar("slot_vip_slots", "0", "How many Reserve Slots should there be ?");
+	g_hLetFree = AutoExecConfig_CreateConVar("slot_let_free", "0", "1 = Let a Slot always free and kick a random Player  0 = Off");
+	g_hVIPKickMessage = AutoExecConfig_CreateConVar("slot_vip_kick_message", "You joined on a Reserve Slot", "Message, when someone join on a Reserve Slot");
+	g_hVIPKickMessage2 = AutoExecConfig_CreateConVar("slot_vip_kick_message2", "You get kicked, to let a VIP slot free", "Message for the random kicked person");
+	g_hVIPSlots = AutoExecConfig_CreateConVar("slot_vip_slots", "0", "How many Reserve Slots should there be ?");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -116,12 +116,12 @@ public OnPluginStart()
 // Load Config
 public OnConfigsExecuted()
 {
-	let_free = GetConVarInt(c_let_free);
+	let_free = GetConVarInt(g_hLetFree);
 	
-	GetConVarString(c_vip_kick_message, vip_kick_message, sizeof(vip_kick_message));
-	GetConVarString(c_vip_kick_message2, vip_kick_message2, sizeof(vip_kick_message2));
+	GetConVarString(g_hVIPKickMessage, vip_kick_message, sizeof(vip_kick_message));
+	GetConVarString(g_hVIPKickMessage2, vip_kick_message2, sizeof(vip_kick_message2));
 	
-	vip_slots = GetConVarInt(c_vip_slots);
+	vip_slots = GetConVarInt(g_hVIPSlots);
 }
 
 

@@ -51,6 +51,7 @@ public Plugin:myinfo =
 
 
 
+
 // Auto updater
 public STAMM_OnFeatureLoaded(const String:basename[])
 {

@@ -37,9 +37,8 @@
 
 
 
-new Handle:c_throwingknife;
+new Handle:g_hThrowingKnife;
 
-new throwingknife;
 
 
 
@@ -51,6 +50,7 @@ public Plugin:myinfo =
 	description = "Give VIP's every Round x Throwing Knifes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -83,6 +83,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Add to auto updater
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
@@ -97,8 +98,9 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	}
 
 
-	STAMM_AddBlockDescription(1, "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
+	STAMM_AddBlockDescription(1, "%T", "GetThrowingKnife", LANG_SERVER, GetConVarInt(g_hThrowingKnife));
 }
+
 
 
 
@@ -108,7 +110,7 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("throwing_knifes", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
+	g_hThrowingKnife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -117,13 +119,6 @@ public OnPluginStart()
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
 
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	throwingknife = GetConVarInt(c_throwingknife);
-}
 
 
 
@@ -138,6 +133,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 
 
 
+
 // A Player spawned, check his knifes
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {
@@ -145,6 +141,7 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 	CreateTimer(1.0, SetKnifes, client);
 }
+
 
 
 
@@ -162,7 +159,7 @@ public Action:SetKnifes(Handle:timer, any:client)
 			// If valid -> Give knifes
 			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
 			{
-				SetClientThrowingKnives(client, throwingknife);
+				SetClientThrowingKnives(client, GetConVarInt(g_hThrowingKnife));
 			}
 		}
 	}
