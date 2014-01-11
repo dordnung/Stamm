@@ -124,7 +124,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 		// Timer to add points
 		if (IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)) 
 		{
-			CreateTimer(0.5, changeHealth, client);
+			CreateTimer(0.5, changeHealth, GetClientUserId(client));
 		}
 	}
 }
@@ -133,9 +133,16 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Change here the health
-public Action:changeHealth(Handle:timer, any:client)
+public Action:changeHealth(Handle:timer, any:userid)
 {
 	// Get highest client block
+	new client = GetClientOfUserId(userid);
+
+	if (!STAMM_IsClientValid(client))
+	{
+		return Plugin_Stop;
+	}
+
 	new clientBlock = STAMM_GetClientBlock(client);
 
 
@@ -149,4 +156,6 @@ public Action:changeHealth(Handle:timer, any:client)
 		SetEntProp(client, Prop_Data, "m_iMaxHealth", newHP);
 		SetEntityHealth(client, newHP);
 	}
+
+	return Plugin_Stop;
 }

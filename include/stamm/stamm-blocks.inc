@@ -7,7 +7,7 @@
 
 
 /**
- * Blocks are used to get information about when a player shoukd to get your feature.
+ * Blocks are used to get information about when a player should get your feature.
  * It have to be a .txt file, named like the basename of your extension and you need to put it in cfg/stamm/levels.
  * You can set up to 100 blocks in the file.
  * A block structure is:
