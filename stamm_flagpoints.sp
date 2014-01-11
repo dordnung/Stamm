@@ -38,8 +38,7 @@
 
 
 
-new Handle:flagneed_c;
-new String:flagneed[32];
+new Handle:g_hFlagNeed;
 
 
 
@@ -60,7 +59,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	decl String:urlString[256];
 
 
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -77,7 +75,7 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("flagpoints", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag string a player needs to collect points");
+	g_hFlagNeed = AutoExecConfig_CreateConVar("flag_need", "s", "Flag string a player needs to collect points");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -109,17 +107,10 @@ public OnAllPluginsLoaded()
 
 	// Load Translation
 	STAMM_LoadTranslation();
-		
 	STAMM_AddFeature("VIP FlagPoints");
 }
 
 
-
-// Load Config
-public OnConfigsExecuted()
-{
-	GetConVarString(flagneed_c, flagneed, sizeof(flagneed));
-}
 
 
 
@@ -127,9 +118,13 @@ public OnConfigsExecuted()
 public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 {
 	decl String:tag[64];
+	decl String:flagNeed[32];
 
 
-	if ((GetUserFlagBits(client) & ReadFlagString(flagneed) || GetUserFlagBits(client) & ADMFLAG_ROOT))
+	GetConVarString(g_hFlagNeed, flagNeed, sizeof(flagNeed));
+
+
+	if ((GetUserFlagBits(client) & ReadFlagString(flagNeed) || GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
 		return Plugin_Continue;
 	}
@@ -140,11 +135,11 @@ public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 
 		if (STAMM_GetGame() == GameCSGO)
 		{
-			CPrintToChat(client, "%s %t", tag, "NoPoints", flagneed);
+			CPrintToChat(client, "%s %t", tag, "NoPoints", flagNeed);
 		}
 		else
 		{
-			MCPrintToChat(client, "%s %t", tag, "NoPoints", flagneed);
+			MCPrintToChat(client, "%s %t", tag, "NoPoints", flagNeed);
 		}
 	}
 
