@@ -158,6 +158,7 @@ native STAMM_GetTag(String:tag[], maxlength);
 native STAMM_AddCommand(const String:command[], const String:name[], any:...);
 
 
+
 /**
  * Checks whether stamm is available on the server.
  * Use this to stop your feature, when stamm isn't available.

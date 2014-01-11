@@ -155,6 +155,7 @@ native STAMM_LoadFeature(Handle:plugin);
 native STAMM_UnloadFeature(Handle:plugin);
 
 
+
 /**
  * Loads the translation file of your feature in languages/stamm.
  *
@@ -172,6 +173,7 @@ stock STAMM_LoadTranslation()
 	
 	LoadTranslations(basename);
 }
+
 
 
 /**
