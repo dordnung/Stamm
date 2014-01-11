@@ -40,6 +40,19 @@
 forward STAMM_OnFeatureLoaded(const String:basename[]);
 
 
+/**
+ * Executes when a player switched your feature on/off in the stamm menu.
+ * Use this to add/remove your Feature from the client.
+ *
+ * TODO: bought/sold it.
+ *
+ * @param client        Client index of the client.
+ * @param turnedOn      true = Switched the feature on (TODO: bought it), false = Switched the feature off (TODO: sold it).
+ * TODO: @param isShop  true = Was called from shop, false = Was called from menu (Currently this is always false)
+ */
+forward STAMM_OnClientChangedFeature(client, bool:turnedOn, bool:isShop);
+
+
 
 
 
@@ -72,6 +85,32 @@ native STAMM_AddFeature(const String:name[], const String:description[]="", bool
  */
 #pragma deprecated Use STAMM_AddBlockDescription instead!
 native bool:STAMM_AddFeatureText(level, const String:description[]);
+
+
+/**
+ * Checks whether a client has the minimum the level to get a specific block.
+ * Also checks whether the client wants your feature.
+ *
+ * TODO: He bought it and wants it.
+ *
+ * @param client        Client.
+ * @param block         Block to check access for.
+ *
+ * @return              true if clients level high enough and wants your feature, otherwise false.
+ * @error               Client, feature or block is invalid.
+ */
+native bool:STAMM_HaveClientFeature(client, block=1);
+
+
+/**
+ * Returns true when the specific player enabled this feature in his menu, false otherwise.
+ *
+ * @param client        Client.
+ *
+ * @return              true if the player enabled it, otherwise false.
+ * @error               Client or feature is invalid.
+ */
+native bool:STAMM_WantClientFeature(client);
 
 
 /**
