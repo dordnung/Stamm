@@ -161,7 +161,7 @@ public NameCheck(client)
 	if (StrContains(name, tag) != -1)
 	{
 		// But Player isn't a VIP oO?
-		if (!STAMM_IsClientVip(client, STAMM_GetLevel()))
+		if (!STAMM_IsClientVip(client, STAMM_GetBlockLevel()))
 		{
 			// Strip the tage out
 			ReplaceString(name, sizeof(name), tag, "");

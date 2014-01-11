@@ -166,19 +166,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 				STAMM_WriteToLog(false, "ATTENTION: Level Config is now in ModelSettings.txt under the key \"level\"!");
 
 				// Found nothing
-				if (STAMM_GetLevel() == 0)
+				if (STAMM_GetBlockLevel() == 0)
 				{
 					STAMM_WriteToLog(false, "ATTENTION: Found no level for model %s. Zero assumed!!", models[modelCount][MODELNAME]);
 				}
 
 
-				Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", STAMM_GetLevel());
+				Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", STAMM_GetBlockLevel());
 			}
 
 			else
 			{
 				// Get the level
-				new levelNumber = STAMM_GetLevelNumber(models[modelCount][MODELLEVEL]);
+				new levelNumber = STAMM_GetBlockLevelNumber(models[modelCount][MODELLEVEL]);
 
 				// Given as int
 				if (levelNumber != 0)
