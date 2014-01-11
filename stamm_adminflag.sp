@@ -82,7 +82,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 	// Get flags for each level
-	for (new i=1; i <= STAMM_GetBlockLevelCount(); i++)
+	for (new i=1; i <= STAMM_GetLevelCount(); i++)
 	{
 		Format(theflags, sizeof(theflags), "");
 		
@@ -169,7 +169,7 @@ public getLevelFlag(String:theflags[], size, level)
 
 
 				// Only Flags for specific level
-				if (STAMM_GetBlockLevelNumber(section) == level)
+				if (STAMM_GetLevelNumber(section) == level)
 				{
 					KvGoBack(flagvalue);
 					KvGetString(flagvalue, section, theflags, size);
