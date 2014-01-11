@@ -47,6 +47,7 @@ stock STAMM_PrintToChat(client, const String:message[], any:...)
 }
 
 
+
 /**
  * Writes a message to all clients with the correct stock for the game.
  *
@@ -73,9 +74,22 @@ stock STAMM_PrintToChatAll(const String:message[], any:...)
 	}
 	else
 	{
-		MCPrintToChatAll(client, buffer);
+		MCPrintToChatAll(buffer);
 	}
 }
+
+
+
+/**
+ * Returns whether you can use morecolors or not,
+ *
+ * @return       True when morecolors allowed, otherwise false.
+ */
+stock bool:STAMM_IsMoreColorsAvailable()
+{
+	return STAMM_GetGame() != GameCSGO;
+}
+
 
 
 /**
