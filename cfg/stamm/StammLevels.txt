@@ -2,18 +2,18 @@
 // ---------------------------------------------------------------
 // how to add a public level:
 //
-// "<name>"                             // Just a name for your memory ;)
+// "<name>"                             // You need it for the level settings of the features.
 // {
-//      "name"      "<levelname>"       // This is the name of your level. The players see this name! Also you need it for the level settings of the features.
-//      "points"    "<points>"          // This defines, how much points a player need for this level
+//      "name"      "<levelname>"       // This is the name of your level. The players see this name! You can also use this for the level settings of the features.
+//      "points"    "<points>"          // This defines, how much points a player need for this level.
 // }
 // ---------------------------------------------------------------
 // how to add a private level:
 //
-// "<name>"                             // Just a name for your memory ;)
+// "<name>"                             // You need it for the level settings of the features.
 // {
-//      "name"      "<levelname>"       // This is the name of your level. The players see this name ingame! Also you need it for the level settings of the features.
-//      "flag"      "<adminflags>"      // This defines the flags a player need to access this private level
+//      "name"      "<levelname>"       // This is the name of your level. The players see this name ingame! You can also use this for the level settings of the features.
+//      "flag"      "<adminflags>"      // This defines the flags a player need to access this private level.
 // }
 
 "StammLevels"
