@@ -41,10 +41,10 @@
 
 
 
-new FroggyJumped[MAXPLAYERS + 1];
+new g_iFroggyJumped[MAXPLAYERS + 1];
 
-new Handle:c_strong;
-new strong;
+new Handle:g_hStrong;
+
 
 
 
@@ -66,7 +66,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	decl String:urlString[256];
 
 
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -77,25 +76,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 
+
 // Create config
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("froggyjump", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_strong = AutoExecConfig_CreateConVar("froggyjump_strong", "200", "The push up strong");
+	g_hStrong = AutoExecConfig_CreateConVar("froggyjump_strong", "200", "The push up strong");
 
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 }
 
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	strong = GetConVarInt(c_strong);
-}
 
 
 
@@ -148,7 +141,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 	// Reset when on Ground
 	if (GetEntityFlags(client) & FL_ONGROUND)
 	{
-		FroggyJumped[client] = 0;
+		g_iFroggyJumped[client] = 0;
 		bPressed[client] = false;
 	}
 	else
@@ -158,7 +151,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 		{
 
 			// For second time?
-			if (!bPressed[client] && FroggyJumped[client]++ == 1)
+			if (!bPressed[client] && g_iFroggyJumped[client]++ == 1)
 			{
 				new Float:velocity[3];
 				new Float:velocity0;
@@ -171,7 +164,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 				velocity1 = GetEntPropFloat(client, Prop_Send, "m_vecVelocity[1]");
 				velocity2 = GetEntPropFloat(client, Prop_Send, "m_vecVelocity[2]");
 
-				velocity2_new = float(strong);
+				velocity2_new = float(GetConVarInt(g_hStrong));
 
 
 
