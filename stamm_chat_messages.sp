@@ -37,8 +37,9 @@
 
 
 
-new welcome;
-new leave;
+new g_iWelcome;
+new g_iLeave;
+
 
 
 
@@ -50,6 +51,7 @@ public Plugin:myinfo =
 	description = "Give VIP's VIP Chat and Message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
@@ -82,6 +84,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 // Feature loaded
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
@@ -99,21 +102,27 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 	// Get Blocks
-	welcome = STAMM_GetBlockOfName("welcome");
-	leave = STAMM_GetBlockOfName("leave");
+	g_iWelcome = STAMM_GetBlockOfName("welcome");
+	g_iLeave = STAMM_GetBlockOfName("leave");
 
 
 	// Check valid?
-	if (welcome != -1)
+	if (g_iWelcome != -1)
 	{
-		STAMM_AddBlockDescription(welcome, "%T", "GetWelcomeMessages", LANG_SERVER);
+		STAMM_AddBlockDescription(g_iWelcome, "%T", "GetWelcomeMessages", LANG_SERVER);
 	}
 
-	if (leave != -1)
+	if (g_iLeave != -1)
 	{
-		STAMM_AddBlockDescription(leave, "%T", "GetLeaveMessages", LANG_SERVER);
+		STAMM_AddBlockDescription(g_iLeave, "%T", "GetLeaveMessages", LANG_SERVER);
+	}
+
+	if (g_iWelcome == -1 && g_iLeave == -1)
+	{
+		SetFailState("Found neither block welcome nor block leave!");
 	}
 }
+
 
 
 
@@ -129,7 +138,7 @@ public STAMM_OnClientReady(client)
 
 
 	// Gets a welcome message?
-	if (welcome != -1 && STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, welcome))
+	if (g_iWelcome != -1 && STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, g_iWelcome))
 	{
 		if (STAMM_GetGame() == GameCSGO)
 		{
@@ -146,7 +155,7 @@ public STAMM_OnClientReady(client)
 // Client Disonnect
 public OnClientDisconnect(client)
 {
-	if (STAMM_IsClientValid(client) && leave != -1)
+	if (STAMM_IsClientValid(client) && g_iLeave != -1)
 	{
 		decl String:name[MAX_NAME_LENGTH + 1];
 		decl String:tag[64];
@@ -157,7 +166,7 @@ public OnClientDisconnect(client)
 
 
 		// Gets a leave message?
-		if (STAMM_HaveClientFeature(client, leave))
+		if (STAMM_HaveClientFeature(client, g_iLeave))
 		{
 			if (STAMM_GetGame() == GameCSGO)
 			{
