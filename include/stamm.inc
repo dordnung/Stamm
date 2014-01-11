@@ -10,3 +10,4 @@
 #include <stamm/stamm-clients>
 #include <stamm/stamm-features>
 #include <stamm/stamm-levels>
+#include <stamm/stamm-colors>
