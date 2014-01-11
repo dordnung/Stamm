@@ -50,7 +50,19 @@ native bool:STAMM_AddBlockDescription(block=1, const String:description[], any:.
  * @return              The level need to get that block. TODO: -1 if block is for buying.
  * @error               Block or feature is invalid TODO: it's a shop feature.
  */
+#pragma deprecated Use STAMM_GetBlockLevel instead!
 native STAMM_GetLevel(block=1);
+
+
+/**
+ * This will return the level the server admin wants for a block (TODO: No Buying).
+ *
+ * @param block         Block id to get level for.
+ *
+ * @return              The level need to get that block. TODO: -1 if block is for buying.
+ * @error               Block or feature is invalid TODO: it's a shop feature.
+ */
+native STAMM_GetBlockLevel(block=1);
 
 
 /**

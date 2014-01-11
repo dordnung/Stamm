@@ -56,6 +56,7 @@ nativelib_Start()
 	CreateNative("STAMM_GetBasename", nativelib_GetFeatureBasename);
 	CreateNative("STAMM_IsMyFeature", nativelib_IsMyFeature);
 	CreateNative("STAMM_GetLevel", nativelib_GetLevel);
+	CreateNative("STAMM_GetBlockLevel", nativelib_GetLevel);
 	/* TODO: IMPLEMENT
 	CreateNative("STAMM_GetPoints", nativelib_GetPoints);
 	CreateNative("STAMM_IsShop", nativelib_IsShop); */

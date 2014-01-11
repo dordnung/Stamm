@@ -196,6 +196,7 @@ public SharedPlugin:__pl_stamm =
 		MarkNativeAsOptional("STAMM_AddBlockDescription");
 		MarkNativeAsOptional("STAMM_IsMyFeature");
 		MarkNativeAsOptional("STAMM_GetLevel");
+		MarkNativeAsOptional("STAMM_GetBlockLevel");
 		/* TODO: MarkNativeAsOptional("STAMM_GetPoints"); */
 		/* TODO: MarkNativeAsOptional("STAMM_IsShop"); */
 		MarkNativeAsOptional("STAMM_GetBlockCount");
