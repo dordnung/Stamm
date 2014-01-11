@@ -38,16 +38,12 @@
 
 
 
-new Handle:c_MessageTag;
-new Handle:c_OwnChatTag;
-new Handle:c_NeedTag;
+new Handle:g_hMessageTag;
+new Handle:g_hOwnChatTag;
+new Handle:g_hNeedTag;
 
-new String:MessageTag[32];
-new String:OwnChatTag[32];
-new NeedTag;
-
-new messages;
-new chat;
+new g_iMessages;
+new g_iChat;
 
 
 
@@ -112,32 +108,37 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 	// Get block of messages
-	messages = STAMM_GetBlockOfName("messages");
-	chat = STAMM_GetBlockOfName("chat");
+	g_iMessages = STAMM_GetBlockOfName("messages");
+	g_iChat = STAMM_GetBlockOfName("chat");
 
 
 
 	// Found a valid block?
-	if (messages != -1)
+	if (g_iMessages != -1)
 	{
-		if (NeedTag)
+		if (GetConVarBool(g_hNeedTag))
 		{
 			Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "*");
 
-			STAMM_AddBlockDescription(messages, "%T", "GetVIPMessage", LANG_SERVER, activate);
+			STAMM_AddBlockDescription(g_iMessages, "%T", "GetVIPMessage", LANG_SERVER, activate);
 		}
 		else
 		{
-			STAMM_AddBlockDescription(messages, "%T", "GetVIPMessage", LANG_SERVER, "");
+			STAMM_AddBlockDescription(g_iMessages, "%T", "GetVIPMessage", LANG_SERVER, "");
 		}
 	}	
 
-	// Found valid block?
-	if (chat != -1)
-	{
-		Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "#");
 
-		STAMM_AddBlockDescription(chat, "%T", "GetVIPChat", LANG_SERVER, activate);
+	// Found valid block?
+	if (g_iChat != -1)
+	{
+		STAMM_AddBlockDescription(g_iChat, "%T", "GetVIPChat", LANG_SERVER);
+	}
+
+
+	if (g_iMessages == -1 && g_iChat == -1)
+	{
+		SetFailState("Found neither block messages nor block chat!");
 	}
 }
 
@@ -150,27 +151,18 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("chats", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	c_MessageTag = AutoExecConfig_CreateConVar("chats_messagetag", "VIP Message", "Tag when a player writes something as a VIP");
-	c_OwnChatTag = AutoExecConfig_CreateConVar("chats_ownchattag", "VIP Chat", "Tag when a player writes something in the VIP Chat");
-	c_NeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate it, 0 = Off");
+	g_hMessageTag = AutoExecConfig_CreateConVar("chats_messagetag", "VIP Message", "Tag when a player writes something as a VIP");
+	g_hOwnChatTag = AutoExecConfig_CreateConVar("chats_ownchattag", "VIP Chat", "Tag when a player writes something in the VIP Chat");
+	g_hNeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate a VIP message, 0 = Off");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 	
+
 	RegConsoleCmd("say", CmdSay);
 }
 
 
-
-
-// Load the config
-public OnConfigsExecuted()
-{
-	GetConVarString(c_MessageTag, MessageTag, sizeof(MessageTag));
-	GetConVarString(c_OwnChatTag, OwnChatTag, sizeof(OwnChatTag));
-
-	NeedTag = GetConVarInt(c_NeedTag);
-}
 
 
 
@@ -180,10 +172,18 @@ public Action:CmdSay(client, args)
 	decl String:text[128];
 	decl String:name[MAX_NAME_LENGTH+1];
 	decl String:tag[64];
+	decl String:messageTag[32];
+	decl String:ownChatTag[32];
 
 
 	GetClientName(client, name, sizeof(name));
+
 	GetCmdArgString(text, sizeof(text));
+
+	GetConVarString(g_hMessageTag, messageTag, sizeof(messageTag));
+	GetConVarString(g_hOwnChatTag, ownChatTag, sizeof(ownChatTag));
+
+
 	STAMM_GetTag(tag, sizeof(tag));
 
 	ReplaceString(text, sizeof(text), "\"", "");
@@ -193,29 +193,29 @@ public Action:CmdSay(client, args)
 	// Client valid?
 	if (STAMM_IsClientValid(client))
 	{
-		// Want feature?
-		if (!STAMM_WantClientFeature(client))
-		{
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChat(client, "%s %t", tag, "FeatureDisabled");
-			}
-			else
-			{
-				MCPrintToChat(client, "%s %t", tag, "FeatureDisabled");
-			}
-		}
-
-
 		// Can write VIP message?
-		if (messages != -1 && STAMM_HaveClientFeature(client, messages))
+		if (g_iMessages != -1 && STAMM_HaveClientFeature(client, g_iMessages))
 		{
-			if (!NeedTag || (FindCharInString(text, '*') == 0))
+			if (!GetConVarBool(g_hNeedTag) || (FindCharInString(text, '*') == 0 && !StrEqual(text, "*", false)))
 			{
-				if (NeedTag)
+				if (GetConVarBool(g_hNeedTag))
 				{
+					// Want feature?
+					if (!STAMM_WantClientFeature(client))
+					{
+						if (STAMM_GetGame() == GameCSGO)
+						{
+							CPrintToChat(client, "%s %t", tag, "FeatureDisabled");
+						}
+						else
+						{
+							MCPrintToChat(client, "%s %t", tag, "FeatureDisabled");
+						}
+
+						return Plugin_Continue;
+					}
+
 					ReplaceString(text, sizeof(text), "*", "");
-				
 				}
 
 
@@ -224,11 +224,11 @@ public Action:CmdSay(client, args)
 				{
 					if (STAMM_GetGame() == GameCSGO)
 					{
-						CPrintToChatAll("{red}[%s] {green}%s:{red} %s", MessageTag, name, text);
+						CPrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
 					}
 					else
 					{
-						MCPrintToChatAll("{red}[%s] {green}%s:{red} %s", MessageTag, name, text);
+						MCPrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
 					}
 				}
 
@@ -236,11 +236,11 @@ public Action:CmdSay(client, args)
 				{
 					if (STAMM_GetGame() == GameCSGO)
 					{
-						CPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", MessageTag, name, text);
+						CPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
 					}
 					else
 					{
-						MCPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", MessageTag, name, text);
+						MCPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
 					}
 				}
 
@@ -248,11 +248,11 @@ public Action:CmdSay(client, args)
 				{
 					if (STAMM_GetGame() == GameCSGO)
 					{
-						CPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", MessageTag, name, text);
+						CPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
 					}
 					else
 					{
-						MCPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", MessageTag, name, text);
+						MCPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
 					}
 				}
 
@@ -261,16 +261,29 @@ public Action:CmdSay(client, args)
 		}
 
 		// Can write to vip chat?
-		if (chat != -1 && STAMM_HaveClientFeature(client, chat))
+		if (g_iChat != -1 && STAMM_HaveClientFeature(client, g_iChat))
 		{
-			new index2 = FindCharInString(text, '#');
-
-
 			// Found tag?
-			if (index2 == 0)
+			if (FindCharInString(text, '#') == 0 && !StrEqual(text, "#", false))
 			{
 				ReplaceString(text, sizeof(text), "#", "");
-					
+
+
+				// Want feature?
+				if (!STAMM_WantClientFeature(client))
+				{
+					if (STAMM_GetGame() == GameCSGO)
+					{
+						CPrintToChat(client, "%s %t", tag, "FeatureDisabled");
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", tag, "FeatureDisabled");
+					}
+
+					return Plugin_Continue;
+				}
+
 
 				// Print to all VIP's
 				for (new i=1; i <= MaxClients; i++)
@@ -278,18 +291,18 @@ public Action:CmdSay(client, args)
 					if (STAMM_IsClientValid(i))
 					{
 						// Client have feature
-						if (STAMM_HaveClientFeature(i, chat))
+						if (STAMM_HaveClientFeature(i, g_iChat))
 						{
 							// Print according to team
 							if (GetClientTeam(i) == 2) 
 							{
 								if (STAMM_GetGame() == GameCSGO)
 								{
-									CPrintToChat(i, "{red}[%s] {green}%s:{red} %s", OwnChatTag, name, text);
+									CPrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
 								}
 								else
 								{
-									MCPrintToChat(i, "{red}[%s] {green}%s:{red} %s", OwnChatTag, name, text);
+									MCPrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
 								}
 							}
 							
@@ -297,11 +310,11 @@ public Action:CmdSay(client, args)
 							{
 								if (STAMM_GetGame() == GameCSGO)
 								{
-									CPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", OwnChatTag, name, text);
+									CPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
 								}
 								else
 								{
-									MCPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", OwnChatTag, name, text);
+									MCPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
 								}
 							}
 
@@ -309,11 +322,11 @@ public Action:CmdSay(client, args)
 							{
 								if (STAMM_GetGame() == GameCSGO)
 								{
-									CPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", OwnChatTag, name, text);
+									CPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
 								}
 								else
 								{
-									MCPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", OwnChatTag, name, text);
+									MCPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
 								}
 							}
 						}
