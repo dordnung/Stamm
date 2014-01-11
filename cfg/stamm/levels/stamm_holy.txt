@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get holy grenade
+	"level"         "Diamond"
+}

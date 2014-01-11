@@ -1,0 +1,11 @@
+"LevelSettings"
+{
+	// Level to get grap, -1 to Disable
+	"grap"          "Bronze"
+	
+	// Level to get hook, -1 to Disable
+	"hook"          "Silver"
+	
+	// Level to get rope, -1 to Disable
+	"rope"          "Gold"
+}

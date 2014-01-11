@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get colored smokes
+	"level"         "Bronze"
+}

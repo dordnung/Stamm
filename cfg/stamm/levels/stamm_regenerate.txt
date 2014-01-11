@@ -1,0 +1,15 @@
+// Here you can add as much levels as you want
+// x is the amount of hp you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// Get x hp per second
+	"1"             "Silver"
+	
+	// Get x*2 hp per second
+	"2"             "Gold"
+	
+	// Get x*3 hp per second
+	//"3"           "Platinum"
+}

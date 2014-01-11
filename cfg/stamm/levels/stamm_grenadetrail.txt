@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get grenade trail
+	"level"         "Silver"
+}

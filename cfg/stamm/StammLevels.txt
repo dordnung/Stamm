@@ -1,0 +1,56 @@
+// Here you can define your Levels
+// ---------------------------------------------------------------
+// how to add a public level:
+//
+// "<name>"                             // Just a name for your memory ;)
+// {
+//      "name"      "<levelname>"       // This is the name of your level. The players see this name! Also you need it for the level settings of the features.
+//      "points"    "<points>"          // This defines, how much points a player need for this level
+// }
+// ---------------------------------------------------------------
+// how to add a private level:
+//
+// "<name>"                             // Just a name for your memory ;)
+// {
+//      "name"      "<levelname>"       // This is the name of your level. The players see this name ingame! Also you need it for the level settings of the features.
+//      "flag"      "<adminflags>"      // This defines the flags a player need to access this private level
+// }
+
+"StammLevels"
+{
+	"bronze"
+	{
+		"name"              "Bronze"
+		"points"            "500"
+	}
+	"silver"
+	{
+		"name"              "Silver"
+		"points"            "1000"
+	}
+	"gold"
+	{
+		"name"              "Gold"
+		"points"            "1500"
+	}
+	"platinum"
+	{
+		"name"              "Platinum"
+		"points"            "2000"
+	}
+	"diamond"
+	{
+		"name"              "Diamond"
+		"points"            "2500"
+	}
+	"god"
+	{
+		"name"              "God"
+		"points"            "3000"
+	}
+	//"special"
+	//{
+	//  "name"              "Special"
+	//  "flag"              "abt"
+	//}
+}

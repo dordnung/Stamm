@@ -1,0 +1,15 @@
+// Here you can add as much levels as you want
+// x is the amount of HP you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// Get x hp more on spawn
+	"1"             "Silver"
+	
+	// Get x*2 hp more on spawn
+	"2"             "Gold"
+	
+	// Get x*3 hp more on spawn
+	//"3"           "Platinum"
+}

@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get end of round immunity
+	"level"         "Gold"
+}

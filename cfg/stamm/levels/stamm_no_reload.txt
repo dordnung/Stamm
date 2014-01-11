@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get no reload
+	"level"         "God"
+}

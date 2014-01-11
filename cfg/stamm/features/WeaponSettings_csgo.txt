@@ -1,0 +1,54 @@
+"WeaponSettings"
+{
+	// Max. uses per round
+	"maximum"               "2"
+	
+	// Pistols
+	"weapon_glock"          "1"
+	"weapon_hkp2000"        "1"
+	"weapon_p250"           "1"
+	"weapon_deagle"         "1"
+	"weapon_fiveseven"      "1"
+	"weapon_elite"          "1"
+	"weapon_tec9"           "1"
+	
+	// Sub-machine guns
+	"weapon_mac10"          "1"
+	"weapon_mp7"            "1"
+	"weapon_mp9"            "1"
+	"weapon_ump45"          "1"
+	"weapon_p90"            "1"
+	"weapon_bizon"          "1"
+	
+	// Shotguns
+	"weapon_nova"           "1"
+	"weapon_xm1014"         "1"
+	"weapon_sawedoff"       "1"
+	"weapon_mag7"           "1"
+	
+	// Rifles
+	"weapon_galilar"        "1"
+	"weapon_famas"          "1"
+	"weapon_ak47"           "1"
+	"weapon_m4a1"           "1"
+	"weapon_sg550"          "1"
+	"weapon_aug"            "1"
+	
+	// Machine guns
+	"weapon_m249"           "1"
+	"weapon_negev"          "1"
+	
+	// Sniper rifles
+	"weapon_ssg08"          "1"
+	"weapon_g3sg1"          "1"
+	"weapon_scar20"         "1"
+	"weapon_awp"            "1"
+	
+	// Grenades
+	"weapon_flashbang"      "1"
+	"weapon_smokegrenade"   "1"
+	"weapon_hegrenade"      "1"
+	"weapon_incgrenade"     "1"
+	"weapon_molotov"        "1"
+	"weapon_decoy"          "1"
+}

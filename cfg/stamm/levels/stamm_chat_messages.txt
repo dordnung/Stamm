@@ -1,0 +1,8 @@
+"LevelSettings"
+{
+	// Level to get a Welcome Message, -1 to Disable.
+	"welcome"       "Bronze"
+	
+	// Level to get a Leave Message, -1 to Disable.
+	"leave"         "Silver"
+}
