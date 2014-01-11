@@ -26,8 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
-#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -175,22 +173,6 @@ public OnAllPluginsLoaded()
 // Load the configs
 public OnPluginStart()
 {
-	// Good colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
-
-
 	// Register commands
 	RegConsoleCmd("sm_sgive", GiveCallback, "Give VIP's Weapons");
 	RegConsoleCmd("sm_sweapons", InfoCallback, "show Weaponlist");
@@ -294,27 +276,13 @@ public Action:GiveCallback(client, args)
 
 					else 
 					{
-						if (STAMM_GetGame() == GameCSGO)
-						{
-							CPrintToChat(client, "%s %T", tag, "WeaponFailed");
-						}
-						else
-						{
-							MCPrintToChat(client, "%s %T", tag, "WeaponFailed");
-						}
+						STAMM_PrintToChat(client, "%s %T", tag, "WeaponFailed");
 					}
 				}
 				
 				else
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChat(client, "%s %T", tag, "MaximumReached");
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %T", tag, "MaximumReached");
-					}
+					STAMM_PrintToChat(client, "%s %T", tag, "MaximumReached");
 				}
 			}
 		}

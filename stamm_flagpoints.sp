@@ -26,8 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
-#include <colors>
-#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -92,19 +90,6 @@ public OnAllPluginsLoaded()
 	}
 
 
-	// Good colors
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
 	// Load Translation
 	STAMM_LoadTranslation();
 	STAMM_AddFeature("VIP FlagPoints");
@@ -132,15 +117,7 @@ public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 	{
 		STAMM_GetTag(tag, sizeof(tag));
 
-
-		if (STAMM_GetGame() == GameCSGO)
-		{
-			CPrintToChat(client, "%s %t", tag, "NoPoints", flagNeed);
-		}
-		else
-		{
-			MCPrintToChat(client, "%s %t", tag, "NoPoints", flagNeed);
-		}
+		STAMM_PrintToChat(client, "%s %t", tag, "NoPoints", flagNeed);
 	}
 
 	return Plugin_Handled;

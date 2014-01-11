@@ -26,8 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
-#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -101,20 +99,6 @@ public OnAllPluginsLoaded()
 // Plugin started
 public OnPluginStart()
 {
-	// Replace lightgreen if not exists
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
-
 	// Register console cmds
 	RegConsoleCmd("sm_sadd", AddTele, "Adds a new Teleporter");
 	RegConsoleCmd("sm_stele", Tele, "Teleports an Player");
@@ -167,14 +151,7 @@ public Action:AddTele(client, args)
 			g_iTeleports[client][0] = 1;
 			
 			// Notice that added
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChat(client, "%s %t", "TeleportAdded");
-			}
-			else
-			{
-				MCPrintToChat(client, "%s %t", "TeleportAdded");
-			}
+			STAMM_PrintToChat(client, "%s %t", "TeleportAdded");
 		}
 	}
 	

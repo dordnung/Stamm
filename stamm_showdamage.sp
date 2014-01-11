@@ -25,7 +25,6 @@
 
 // Includes
 #include <sourcemod>
-#include <colors>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
@@ -152,7 +151,7 @@ public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadc
 				
 				case 3:
 				{
-					CPrintToChat(client, "{green}- %i HP", damage);
+					STAMM_PrintToChat(client, "{green}- %i HP", damage);
 				}
 			}
 		}

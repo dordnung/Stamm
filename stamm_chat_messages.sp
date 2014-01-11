@@ -25,8 +25,6 @@
 
 // Icnludes
 #include <sourcemod>
-#include <colors>
-#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -63,20 +61,6 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-
-	// Replace Invalid Colors
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-		
 
 	STAMM_LoadTranslation();	
 	STAMM_AddFeature("VIP Chat Messages");
@@ -140,14 +124,7 @@ public STAMM_OnClientReady(client)
 	// Gets a welcome message?
 	if (g_iWelcome != -1 && STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client, g_iWelcome))
 	{
-		if (STAMM_GetGame() == GameCSGO)
-		{
-			CPrintToChatAll("%s %t", tag, "WelcomeMessage", name);
-		}
-		else
-		{
-			MCPrintToChatAll("%s %t", tag, "WelcomeMessage", name);
-		}
+		STAMM_PrintToChatAll("%s %t", tag, "WelcomeMessage", name);
 	}
 }
 
@@ -168,14 +145,7 @@ public OnClientDisconnect(client)
 		// Gets a leave message?
 		if (STAMM_HaveClientFeature(client, g_iLeave))
 		{
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChatAll("%s %t", tag, "LeaveMessage", name);
-			}
-			else
-			{
-				MCPrintToChatAll("%s %t", tag, "LeaveMessage", name);
-			}
+			STAMM_PrintToChatAll("%s %t", tag, "LeaveMessage", name);
 		}
 	}
 }

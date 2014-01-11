@@ -25,8 +25,6 @@
 
 // Includes
 #include <sourcemod>
-#include <colors>
-#include <morecolors_stamm>
 #include <sdktools>
 #include <autoexecconfig>
 
@@ -80,20 +78,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	// Colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
-
 	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
@@ -276,25 +260,11 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 				{
 					g_iTimers[client] = dur;
 
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChat(client, "%s %t", tag, "YouGotTimeInfected", p_name, dur);
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", tag, "YouGotTimeInfected", p_name, dur);
-					}
+					STAMM_PrintToChat(client, "%s %t", tag, "YouGotTimeInfected", p_name, dur);
 				}
 				else 
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChat(client, "%s %t", tag, "YouGotRoundInfected", p_name);
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", tag, "YouGotRoundInfected", p_name);
-					}
+					STAMM_PrintToChat(client, "%s %t", tag, "YouGotRoundInfected", p_name);
 				}
 			}
 		}

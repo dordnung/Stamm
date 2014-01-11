@@ -26,8 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
-#include <morecolors_stamm>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
@@ -87,20 +85,6 @@ public OnAllPluginsLoaded()
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
-
-	// Colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-		
 
 	STAMM_LoadTranslation();
 	STAMM_AddFeature("VIP Models");
@@ -414,14 +398,7 @@ public Action:CmdModel(client, args)
 			Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 			
 
-			if (STAMM_GetGame() == GameCSGO)
-			{
-				CPrintToChat(client, "%s %t", tag, "NewModel", client);
-			}
-			else
-			{
-				MCPrintToChat(client, "%s %t", tag, "NewModel", client);
-			}
+			STAMM_PrintToChat(client, "%s %t", tag, "NewModel", client);
 		}
 	}
 	

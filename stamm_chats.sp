@@ -25,8 +25,6 @@
 
 // Includes
 #include <sourcemod>
-#include <colors>
-#include <morecolors_stamm>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
@@ -67,20 +65,6 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-
-	// Cool colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-	
 
 	// Load	
 	STAMM_LoadTranslation();
@@ -203,14 +187,7 @@ public Action:CmdSay(client, args)
 					// Want feature?
 					if (!STAMM_WantClientFeature(client))
 					{
-						if (STAMM_GetGame() == GameCSGO)
-						{
-							CPrintToChat(client, "%s %t", tag, "FeatureDisabled");
-						}
-						else
-						{
-							MCPrintToChat(client, "%s %t", tag, "FeatureDisabled");
-						}
+						STAMM_PrintToChat(client, "%s %t", tag, "FeatureDisabled");
 
 						return Plugin_Continue;
 					}
@@ -222,38 +199,17 @@ public Action:CmdSay(client, args)
 				// print according to Team
 				if (GetClientTeam(client) == 2) 
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
-					}
-					else
-					{
-						MCPrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
-					}
+					STAMM_PrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
 				}
 
 				else if (GetClientTeam(client) == 3) 
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
-					}
-					else
-					{
-						MCPrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
-					}
+					STAMM_PrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
 				}
 
 				else
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
-					}
-					else
-					{
-						MCPrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
-					}
+					STAMM_PrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
 				}
 
 				return Plugin_Handled;
@@ -272,14 +228,7 @@ public Action:CmdSay(client, args)
 				// Want feature?
 				if (!STAMM_WantClientFeature(client))
 				{
-					if (STAMM_GetGame() == GameCSGO)
-					{
-						CPrintToChat(client, "%s %t", tag, "FeatureDisabled");
-					}
-					else
-					{
-						MCPrintToChat(client, "%s %t", tag, "FeatureDisabled");
-					}
+					STAMM_PrintToChat(client, "%s %t", tag, "FeatureDisabled");
 
 					return Plugin_Continue;
 				}
@@ -296,38 +245,17 @@ public Action:CmdSay(client, args)
 							// Print according to team
 							if (GetClientTeam(i) == 2) 
 							{
-								if (STAMM_GetGame() == GameCSGO)
-								{
-									CPrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
-								}
-								else
-								{
-									MCPrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
-								}
+								STAMM_PrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
 							}
 							
 							else if (GetClientTeam(i) == 3) 
 							{
-								if (STAMM_GetGame() == GameCSGO)
-								{
-									CPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
-								}
-								else
-								{
-									MCPrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
-								}
+								STAMM_PrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
 							}
 
 							else
 							{
-								if (STAMM_GetGame() == GameCSGO)
-								{
-									CPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
-								}
-								else
-								{
-									MCPrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
-								}
+								STAMM_PrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
 							}
 						}
 					}

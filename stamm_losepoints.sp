@@ -26,8 +26,6 @@
 // Includes 
 #include <sourcemod>
 #include <autoexecconfig>
-#include <colors>
-#include <morecolors_stamm>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -93,23 +91,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Create Config
 public OnPluginStart()
 {
-	// Colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-	
-
-
 	HookEvent("player_death", PlayerDeath);
-
 
 
 	AutoExecConfig_SetFile("losepoints", "stamm/features");
@@ -156,15 +138,7 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 				// Delete points ):
 				STAMM_DelClientPoints(client, pointscount);
 
-
-				if (STAMM_GetGame() == GameCSGO)
-				{
-					CPrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
-				}
-				else
-				{
-					MCPrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
-				}
+				STAMM_PrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
 
 
 				g_iDeathCounter[client] = 0;
