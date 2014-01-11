@@ -28,17 +28,6 @@
 
 
 /**
- * Returns the stamm level of a client
- *
- * @param client        Client.
- *
- * @return              0=no VIP, x=Level.
- * @error               Client is invalid.
- */
-native STAMM_GetClientLevel(client);
-
-
-/**
  * Returns the name of a specific level id.
  *
  * @param level         Level id to get name for

@@ -112,6 +112,30 @@ native STAMM_GetClientPoints(client);
 
 
 /**
+ * Returns the stamm level of a client
+ *
+ * @param client        Client.
+ *
+ * @return              0=no VIP, x=Level.
+ * @error               Client is invalid.
+ */
+native STAMM_GetClientLevel(client);
+
+
+/**
+ * If you have more than one block (or one) this will return the highest block the user is in.
+ * So the if you have blocks with the levels "Bronze", "Silver" and "Gold", and the player is Gold VIP,
+ * It will return block 3.
+ *
+ * @param client        Client.
+
+ * @return              0 = client is in no  block, x = block id.
+ * @error               Client or feature is invalid.
+ */
+native STAMM_GetClientBlock(client);
+
+
+/**
  * Return whether the has a specific level.
  *
  * @param client        Client.
