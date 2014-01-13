@@ -123,7 +123,7 @@ native STAMM_GetClientLevel(client);
 
 
 /**
- * Return whether the has a specific level.
+ * Return whether the client has a specific level.
  *
  * @param client        Client.
  * @param level         Level to check.

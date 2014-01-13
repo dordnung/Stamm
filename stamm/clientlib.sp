@@ -442,7 +442,7 @@ clientlib_CheckVip(client)
 
 
 			// Notice to API
-			nativelib_PublicPlayerBecomeVip(client);
+			nativelib_PublicPlayerBecomeVip(client, g_iPlayerLevel[client]);
 		}
 
 		else if (levelstufe == 0 && levelstufe != g_iPlayerLevel[client])

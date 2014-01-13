@@ -90,9 +90,8 @@ native STAMM_GetBlockName(block=1, String:name[], maxlength);
 
 
 /**
- * If you have more than one block (or one) this will return the highest block the user is in.
- * So the if you have blocks with the levels "Bronze", "Silver" and "Gold", and the player is Gold VIP,
- * It will return block 3.
+ * If you have more than one block this will return the highest block the client is in.
+ * So if you have blocks with the levels "Bronze", "Silver" and "Gold", and the player is Gold VIP, it will return block 3.
  *
  * @param client        Client.
 

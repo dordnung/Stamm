@@ -98,7 +98,7 @@ nativelib_Start()
 	nativelib_stamm_ready = CreateGlobalForward("STAMM_OnReady", ET_Ignore);
 	nativelib_client_ready = CreateGlobalForward("STAMM_OnClientReady", ET_Ignore, Param_Cell);
 	nativelib_client_save = CreateGlobalForward("STAMM_OnSaveClient", ET_Ignore, Param_Cell);
-	nativelib_player_stamm = CreateGlobalForward("STAMM_OnClientBecomeVip", ET_Ignore, Param_Cell);
+	nativelib_player_stamm = CreateGlobalForward("STAMM_OnClientBecomeVip", ET_Ignore, Param_Cell, Param_Cell);
 	nativelib_stamm_get = CreateGlobalForward("STAMM_OnClientGetPoints", ET_Ignore, Param_Cell, Param_Cell);
 	nativelib_stamm_get_pre = CreateGlobalForward("STAMM_OnClientGetPoints_PRE", ET_Event, Param_Cell, Param_CellByRef);
 	nativelib_happy_start = CreateGlobalForward("STAMM_OnHappyHourStart", ET_Ignore, Param_Cell, Param_Cell);
@@ -189,11 +189,12 @@ nativelib_PublicPlayerGetPoints(client, number)
 
 
 // Notice to all plugins, that a player got VIP
-nativelib_PublicPlayerBecomeVip(client)
+nativelib_PublicPlayerBecomeVip(client, level)
 {
 	Call_StartForward(nativelib_player_stamm);
 	
 	Call_PushCell(client);
+	Call_PushCell(level);
 	
 	Call_Finish();
 }

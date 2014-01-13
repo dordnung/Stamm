@@ -404,7 +404,7 @@ featurelib_getPluginBaseName(Handle:plugin, String:name[], size)
 
 
 	// Now explore it (Linux style)
-	retriev = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
+	retrieve = ExplodeString(basename, "/", explodedBasename, sizeof(explodedBasename), sizeof(explodedBasename[]));
 	
 	// Found nothig? Maybe Windows server?
 	if (retrieve <= 1)
