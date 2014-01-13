@@ -19,7 +19,7 @@
  *
  * @param client        Client index of the new VIP.
  */
-forward STAMM_OnClientBecomeVip(client);
+forward STAMM_OnClientBecomeVip(client, level);
 
 
 /**
