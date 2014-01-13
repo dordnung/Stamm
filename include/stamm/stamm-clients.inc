@@ -15,11 +15,13 @@
 
 
 /**
- * Executes when a player becomes VIP.
+ * Executes when a client reaches a new level.
  *
  * @param client        Client index of the new VIP.
+ * @param oldlevel      Old level of the client.
+ * @param newlevel      New level of the client.
  */
-forward STAMM_OnClientBecomeVip(client, level);
+forward STAMM_OnClientBecomeVip(client, oldlevel, newlevel);
 
 
 /**

@@ -359,6 +359,7 @@ clientlib_CheckVip(client)
 			decl String:name[MAX_NAME_LENGTH+1];
 			decl String:setquery[256];	
 
+			new oldlevel = g_iPlayerLevel[client];
 			new bool:isUP = true;
 
 
@@ -442,7 +443,7 @@ clientlib_CheckVip(client)
 
 
 			// Notice to API
-			nativelib_PublicPlayerBecomeVip(client, g_iPlayerLevel[client]);
+			nativelib_PublicPlayerBecomeVip(client, oldlevel, g_iPlayerLevel[client]);
 		}
 
 		else if (levelstufe == 0 && levelstufe != g_iPlayerLevel[client])
