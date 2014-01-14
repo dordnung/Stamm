@@ -38,7 +38,7 @@
 
 
 new Handle:g_hThrowingKnife;
-
+new Handle:g_hAddThrowingKnifes;
 
 
 
@@ -111,7 +111,8 @@ public OnPluginStart()
 	AutoExecConfig_SetCreateFile(true);
 
 	g_hThrowingKnife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
-	
+	g_hAddThrowingKnifes = AutoExecConfig_CreateConVar("throwingknife_onlyadd", "0", "1 = Only append throwing knifes to old ones, 0 = Set them new");
+
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 	
@@ -125,7 +126,7 @@ public OnPluginStart()
 // Client changed feature
 public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
-	if (!mode) 
+	if (!mode && !GetConVarBool(g_hAddThrowingKnifes)) 
 	{
 		SetClientThrowingKnives(client, 0);
 	}
@@ -151,7 +152,10 @@ public Action:SetKnifes(Handle:timer, any:client)
 	if (STAMM_IsClientValid(client))
 	{
 		// First set to zero
-		SetClientThrowingKnives(client, 0);
+		if (!GetConVarBool(g_hAddThrowingKnifes))
+		{
+			SetClientThrowingKnives(client, 0);
+		}
 		
 		// Check if VIP and want it
 		if (STAMM_HaveClientFeature(client))
@@ -159,7 +163,14 @@ public Action:SetKnifes(Handle:timer, any:client)
 			// If valid -> Give knifes
 			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
 			{
-				SetClientThrowingKnives(client, GetConVarInt(g_hThrowingKnife));
+				if (GetConVarBool(g_hAddThrowingKnifes))
+				{
+					SetClientThrowingKnives(client, GetClientThrowingKnives(client) + GetConVarInt(g_hThrowingKnife));
+				}
+				else
+				{
+					SetClientThrowingKnives(client, GetConVarInt(g_hThrowingKnife));
+				}
 			}
 		}
 	}
