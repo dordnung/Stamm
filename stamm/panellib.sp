@@ -891,7 +891,6 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 				decl String:featureid[10];
 				decl String:arrayItem[128];
 
-
 				// Loop through levels
 				for (new i=0; i < g_iLevels+g_iPLevels; i++)
 				{
@@ -899,59 +898,46 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 					foundFeature = false;
 
 					// Loop through features, find one
-					for (new j=0; j < g_iFeatures; j++)
+					for (new j=0; j < g_iFeatures && !foundFeature; j++)
 					{
 						// Only enabled features
-						if (g_FeatureList[j][FEATURE_ENABLE])
+						if (!g_FeatureList[j][FEATURE_ENABLE])
 						{
-							for (new l=0; l < g_FeatureList[j][FEATURE_BLOCKS]; l++)
-							{
-								if (g_FeatureList[j][FEATURE_DESCS][l] != INVALID_HANDLE && i+1 == g_FeatureList[j][FEATURE_LEVEL][l])
-								{
-									// Loop through all descriptions on this block
-									for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][l]); k++)
-									{
-										GetArrayString(g_FeatureList[j][FEATURE_DESCS][l], k, arrayItem, sizeof(arrayItem));
-
-
-										// We have a description
-										if (!StrEqual(arrayItem, ""))
-										{
-											// Add level
-											Format(featureid, sizeof(featureid), "%i", i+1);
-											
-											AddMenuItem(featurelist, featureid, g_sLevelName[i]);
-
-
-
-											// Found Feature
-											foundFeature = true;
-
-											// Stop Feature loop
-											break;
-										}
-									}
-								}
-
-								// We Found a feature
-								if (foundFeature)
-								{
-									break;
-								}
-							}
-
-							// We Found a feature
-							if (foundFeature)
-							{
-								break;
-							}
+							continue;
 						}
 
-
-						// We Found a feature
-						if (foundFeature)
+						for (new l=0; l < g_FeatureList[j][FEATURE_BLOCKS] && !foundFeature; l++)
 						{
-							break;
+							if (g_FeatureList[j][FEATURE_DESCS][l] == INVALID_HANDLE || i+1 != g_FeatureList[j][FEATURE_LEVEL][l])
+							{
+								continue;
+							}
+
+							// Loop through all descriptions on this block
+							for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][l]) && !foundFeature; k++)
+							{
+								GetArrayString(g_FeatureList[j][FEATURE_DESCS][l], k, arrayItem, sizeof(arrayItem));
+
+
+								// We have a description
+								if (StrEqual(arrayItem, "") || arrayItem[0] == '\0')
+								{
+									continue;
+								}
+
+								// Add level
+								Format(featureid, sizeof(featureid), "%i", i+1);
+								
+								AddMenuItem(featurelist, featureid, g_sLevelName[i]);
+
+
+
+								// Found Feature
+								foundFeature = true;
+
+								// Stop Feature loop
+								break;
+							}
 						}
 					}
 				}
@@ -1000,23 +986,27 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 			{
 				for (new k=0; k < g_FeatureList[i][FEATURE_BLOCKS]; k++)
 				{
-					if (g_FeatureList[i][FEATURE_LEVEL][k] == id && g_FeatureList[i][FEATURE_DESCS][k] != INVALID_HANDLE)
+					if (g_FeatureList[i][FEATURE_LEVEL][k] != id || g_FeatureList[i][FEATURE_DESCS][k] == INVALID_HANDLE)
 					{
-						// Loop through all descriptions on this level
-						for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][k]); j++)
+						continue;
+					}
+
+					// Loop through all descriptions on this level
+					for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][k]); j++)
+					{
+						GetArrayString(g_FeatureList[i][FEATURE_DESCS][k], j, arrayItem, sizeof(arrayItem));
+
+
+						// Only valid textes
+						if (StrEqual(arrayItem, "") || arrayItem[0] == '\0')
 						{
-							GetArrayString(g_FeatureList[i][FEATURE_DESCS][k], j, arrayItem, sizeof(arrayItem));
-
-
-							// Only valid textes
-							if (!StrEqual(arrayItem, ""))
-							{
-								// Add text
-								Format(featuretext, sizeof(featuretext), "%s", arrayItem);
-								
-								AddMenuItem(featurelist, "", featuretext);
-							}
+							continue;
 						}
+
+						// Add text
+						Format(featuretext, sizeof(featuretext), "%s", arrayItem);
+						
+						AddMenuItem(featurelist, "", featuretext);
 					}
 				}
 			}
