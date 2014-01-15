@@ -26,7 +26,10 @@
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
+
+#undef REQUIRE_EXTENSIONS
 #include <tf2items>
+#define REQUIRE_EXTENSIONS
 
 #undef REQUIRE_PLUGIN
 #include <stamm>

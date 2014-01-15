@@ -26,7 +26,11 @@
 
 // Includes
 #include <sourcemod>
+
+#undef REQUIRE_EXTENSIONS
 #include <tf2_stocks>
+#define REQUIRE_EXTENSIONS
+
 #include <sdktools>
 
 #undef REQUIRE_PLUGIN
