@@ -142,8 +142,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 
 
 
-
-
 	// If we have a level config, parse it
 	if (goON)
 	{
@@ -207,27 +205,24 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 					found = true;
 				}
 				else*/
+				// Else search for the value of the level name with this loop
+				for (new i=0; i < g_iLevels+g_iPLevels; i++)
 				{
-					// Else search for the value of the level name with this loop
-					for (new i=0; i < g_iLevels+g_iPLevels; i++)
+					// Name or key equals
+					if (StrEqual(Svalue2, g_sLevelName[i], false) || StrEqual(Svalue2, g_sLevelKey[i], false))
 					{
-						// Name or key equals
-						if (StrEqual(Svalue2, g_sLevelName[i], false) || StrEqual(Svalue2, g_sLevelKey[i], false))
-						{
-							found = true; 
+						found = true; 
 
 
-							g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i + 1;
+						g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i + 1;
 
-							/* TODO: IMPLEMENT
-							g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0; */
+						/* TODO: IMPLEMENT
+						g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0; */
 
-							// Break
-							break;
-						}
+						// Break
+						break;
 					}
 				}
-
 
 
 				// Found an invalid value?

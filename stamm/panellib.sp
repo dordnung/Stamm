@@ -871,7 +871,7 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 			else if (param2 == 3)
 			{ 
 				// Open level overview
-				DisplayMenu(panellib_levels, param1, 20);
+				DisplayMenu(panellib_levels, param1, 30);
 			}
 
 			else if (param2 == 2) 
@@ -928,38 +928,54 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 					// Loop through features, find one
 					for (new j=0; j < g_iFeatures; j++)
 					{
-						// Only enabled features and changeable features
-						if (g_FeatureList[j][FEATURE_ENABLE] && g_FeatureList[j][FEATURE_DESCS][i+1] != INVALID_HANDLE)
+						// Only enabled features
+						if (g_FeatureList[j][FEATURE_ENABLE])
 						{
-							// Loop through all descriptions on this level
-							for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][i+1]); k++)
+							for (new l=0; l < g_FeatureList[j][FEATURE_BLOCKS]; l++)
 							{
-								GetArrayString(g_FeatureList[j][FEATURE_DESCS][i+1], k, arrayItem, sizeof(arrayItem));
-
-
-								// We have a description
-								if (!StrEqual(arrayItem, ""))
+								if (g_FeatureList[j][FEATURE_DESCS][l] != INVALID_HANDLE && i+1 == g_FeatureList[j][FEATURE_LEVEL][l])
 								{
-									// Add level
-									Format(featureid, sizeof(featureid), "%i", i+1);
-									
-									AddMenuItem(featurelist, featureid, g_sLevelName[i]);
+									// Loop through all descriptions on this block
+									for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][l]); k++)
+									{
+										GetArrayString(g_FeatureList[j][FEATURE_DESCS][l], k, arrayItem, sizeof(arrayItem));
+
+
+										// We have a description
+										if (!StrEqual(arrayItem, ""))
+										{
+											// Add level
+											Format(featureid, sizeof(featureid), "%i", i+1);
+											
+											AddMenuItem(featurelist, featureid, g_sLevelName[i]);
 
 
 
-									// Found Feature
-									foundFeature = true;
+											// Found Feature
+											foundFeature = true;
 
-									// Stop Feature loop
+											// Stop Feature loop
+											break;
+										}
+									}
+								}
+
+								// We Found a feature
+								if (foundFeature)
+								{
 									break;
 								}
+							}
+
+							// We Found a feature
+							if (foundFeature)
+							{
+								break;
 							}
 						}
 
 
-
-
-						// We Found a feature -> go to next level
+						// We Found a feature
 						if (foundFeature)
 						{
 							break;
@@ -970,7 +986,7 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 
 
 				// Send
-				DisplayMenu(featurelist, param1, 20);
+				DisplayMenu(featurelist, param1, MENU_TIME_FOREVER);
 			}
 		}
 	}
@@ -1004,28 +1020,31 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 		SetMenuExitBackButton(featurelist, true);
 		
 
-
-
-
 		// Loop through all features
 		for (new i=0; i < g_iFeatures; i++)
 		{
 			// Only enabled ones
-			if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_DESCS][id] != INVALID_HANDLE)
+			if (g_FeatureList[i][FEATURE_ENABLE])
 			{
-				// Loop through all descriptions on this level
-				for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][id]); j++)
+				for (new k=0; k < g_FeatureList[i][FEATURE_BLOCKS]; k++)
 				{
-					GetArrayString(g_FeatureList[i][FEATURE_DESCS][id], j, arrayItem, sizeof(arrayItem));
-
-
-					// Only valid textes
-					if (!StrEqual(arrayItem, ""))
+					if (g_FeatureList[i][FEATURE_LEVEL][k] == id && g_FeatureList[i][FEATURE_DESCS][k] != INVALID_HANDLE)
 					{
-						// Add text
-						Format(featuretext, sizeof(featuretext), "%s", arrayItem);
-						
-						AddMenuItem(featurelist, "", featuretext);
+						// Loop through all descriptions on this level
+						for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][k]); j++)
+						{
+							GetArrayString(g_FeatureList[i][FEATURE_DESCS][k], j, arrayItem, sizeof(arrayItem));
+
+
+							// Only valid textes
+							if (!StrEqual(arrayItem, ""))
+							{
+								// Add text
+								Format(featuretext, sizeof(featuretext), "%s", arrayItem);
+								
+								AddMenuItem(featurelist, "", featuretext);
+							}
+						}
 					}
 				}
 			}
@@ -1034,7 +1053,7 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 
 
 		// Display menu
-		DisplayMenu(featurelist, param1, 20);
+		DisplayMenu(featurelist, param1, MENU_TIME_FOREVER);
 	}
 
 	else if (action == MenuAction_Cancel)
@@ -1118,8 +1137,6 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 				// Display
 				DisplayMenu(playerlist, param1, 30);
 			}
-
-
 
 
 			// Start happy hour
@@ -1218,12 +1235,10 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 				
 
 
-
-
 				// If found open
 				if (found) 
 				{
-					DisplayMenu(featurelist, param1, 30);
+					DisplayMenu(featurelist, param1, MENU_TIME_FOREVER);
 				}
 				else
 				{ 

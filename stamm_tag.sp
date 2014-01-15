@@ -110,6 +110,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 	
+	GetConVarString(g_hTag, tag, sizeof(tag));
 
 	STAMM_AddBlockDescription(1, "%T", "GetTag", LANG_SERVER, tag);
 }
