@@ -3,10 +3,10 @@
 // By Dr. McKay
 // Inspired by: https://forums.alliedmods.net/showthread.php?t=96831
 
-#if defined _morecolors_included
+#if defined _morecolors_stamm_included
  #endinput
 #endif
-#define _morecolors_included
+#define _morecolors_stamm_included
 
 #include <regex>
 
@@ -14,16 +14,16 @@
 #define MAX_MESSAGE_LENGTH_MORE	256
 #define MAX_BUFFER_LENGTH_MORE	(MAX_MESSAGE_LENGTH_MORE * 4)
 
-#define COLOR_RED				0xFF4040
-#define COLOR_BLUE				0x99CCFF
-#define COLOR_GRAY				0xCCCCCC
-#define COLOR_GREEN				0x3EFF3E
+#define COLOR_RED_MORE				0xFF4040
+#define COLOR_BLUE_MORE				0x99CCFF
+#define COLOR_GRAY_MORE				0xCCCCCC
+#define COLOR_GREEN_MORE				0x3EFF3E
 
-#define GAME_DODS				0
+#define GAME_DODS_MORE				0
 
-new bool:CSkipListMore[MAXPLAYERS + 1];
-new Handle:CTrie;
-new CTeamColors[][] = {{0xCCCCCC, 0x4D7942, 0xFF4040}}; // Multi-dimensional array for games that don't support SayText2. First index is the game index (as defined by the GAME_ defines), second index is team. 0 = spectator, 1 = team1, 2 = team2
+new bool:MCSkipList[MAXPLAYERS + 1];
+new Handle:MCTrie;
+new MCTeamColors[][] = {{0xCCCCCC, 0x4D7942, 0xFF4040}}; // Multi-dimensional array for games that don't support SayText2. First index is the game index (as defined by the GAME_ defines), second index is team. 0 = spectator, 1 = team1, 2 = team2
 
 /**
  * Prints a message to a specific client in the chat area.
@@ -36,7 +36,7 @@ new CTeamColors[][] = {{0xCCCCCC, 0x4D7942, 0xFF4040}}; // Multi-dimensional arr
  * On error/Errors:		If the client is not connected an error will be thrown.
  */
 stock MCPrintToChat(client, const String:message[], any:...) {
-	CCheckTrie();
+	MCCheckTrie();
 	if(client <= 0 || client > MaxClients) {
 		ThrowError("Invalid client index %i", client);
 	}
@@ -47,8 +47,8 @@ stock MCPrintToChat(client, const String:message[], any:...) {
 	SetGlobalTransTarget(client);
 	Format(buffer, sizeof(buffer), "\x01%s", message);
 	VFormat(buffer2, sizeof(buffer2), buffer, 3);
-	CReplaceColorCodes(buffer2);
-	CSendMessage(client, buffer2);
+	MCReplaceColorCodes(buffer2);
+	MCSendMessage(client, buffer2);
 }
 
 /**
@@ -60,18 +60,18 @@ stock MCPrintToChat(client, const String:message[], any:...) {
  * @noreturn
  */
 stock MCPrintToChatAll(const String:message[], any:...) {
-	CCheckTrie();
+	MCCheckTrie();
 	decl String:buffer[MAX_BUFFER_LENGTH_MORE], String:buffer2[MAX_BUFFER_LENGTH_MORE];
 	for(new i = 1; i <= MaxClients; i++) {
-		if(!IsClientInGame(i) || CSkipListMore[i]) {
-			CSkipListMore[i] = false;
+		if(!IsClientInGame(i) || MCSkipList[i]) {
+			MCSkipList[i] = false;
 			continue;
 		}
 		SetGlobalTransTarget(i);
 		Format(buffer, sizeof(buffer), "\x01%s", message);
 		VFormat(buffer2, sizeof(buffer2), buffer, 2);
-		CReplaceColorCodes(buffer2);
-		CSendMessage(i, buffer2);
+		MCReplaceColorCodes(buffer2);
+		MCSendMessage(i, buffer2);
 	}
 }
 
@@ -87,7 +87,7 @@ stock MCPrintToChatAll(const String:message[], any:...) {
  * On error/Errors:		If the client or author are not connected an error will be thrown
  */
 stock MCPrintToChatEx(client, author, const String:message[], any:...) {
-	CCheckTrie();
+	MCCheckTrie();
 	if(client <= 0 || client > MaxClients) {
 		ThrowError("Invalid client index %i", client);
 	}
@@ -104,8 +104,8 @@ stock MCPrintToChatEx(client, author, const String:message[], any:...) {
 	SetGlobalTransTarget(client);
 	Format(buffer, sizeof(buffer), "\x01%s", message);
 	VFormat(buffer2, sizeof(buffer2), buffer, 4);
-	CReplaceColorCodes(buffer2, author);
-	CSendMessage(client, buffer2, author);
+	MCReplaceColorCodes(buffer2, author);
+	MCSendMessage(client, buffer2, author);
 }
 
 /**
@@ -119,7 +119,7 @@ stock MCPrintToChatEx(client, author, const String:message[], any:...) {
  * On error/Errors:   If the author is not connected an error will be thrown.
  */
 stock MCPrintToChatAllEx(author, const String:message[], any:...) {
-	CCheckTrie();
+	MCCheckTrie();
 	if(author <= 0 || author > MaxClients) {
 		ThrowError("Invalid client index %i", author);
 	}
@@ -128,15 +128,15 @@ stock MCPrintToChatAllEx(author, const String:message[], any:...) {
 	}
 	decl String:buffer[MAX_BUFFER_LENGTH_MORE], String:buffer2[MAX_BUFFER_LENGTH_MORE];
 	for(new i = 1; i <= MaxClients; i++) {
-		if(!IsClientInGame(i) || IsFakeClient(i) || CSkipListMore[i]) {
-			CSkipListMore[i] = false;
+		if(!IsClientInGame(i) || IsFakeClient(i) || MCSkipList[i]) {
+			MCSkipList[i] = false;
 			continue;
 		}
 		SetGlobalTransTarget(i);
 		Format(buffer, sizeof(buffer), "\x01%s", message);
 		VFormat(buffer2, sizeof(buffer2), buffer, 3);
-		CReplaceColorCodes(buffer2, author);
-		CSendMessage(i, buffer2, author);
+		MCReplaceColorCodes(buffer2, author);
+		MCSendMessage(i, buffer2, author);
 	}
 }
 
@@ -147,7 +147,7 @@ stock MCPrintToChatAllEx(author, const String:message[], any:...) {
  * @param message	Message to send
  * @noreturn
  */
-stock CSendMessage(client, const String:message[], author=0) {
+stock MCSendMessage(client, const String:message[], author=0) {
 	if(author == 0) {
 		author = client;
 	}
@@ -162,7 +162,7 @@ stock CSendMessage(client, const String:message[], author=0) {
 				ReplaceString(buffer, sizeof(buffer), "\x03", "\x04", false); // Unassigned gets green
 			} else {
 				decl String:temp[16];
-				Format(temp, sizeof(temp), "\x07%06X", CTeamColors[GAME_DODS][team - 1]);
+				Format(temp, sizeof(temp), "\x07%06X", MCTeamColors[GAME_DODS_MORE][team - 1]);
 				ReplaceString(buffer, sizeof(buffer), "\x03", temp, false);
 			}
 		}
@@ -199,7 +199,7 @@ stock MCSkipNextClient(client) {
 	if(client <= 0 || client > MaxClients) {
 		ThrowError("Invalid client index %i", client);
 	}
-	CSkipListMore[client] = true;
+	MCSkipList[client] = true;
 }
 
 /**
@@ -207,9 +207,9 @@ stock MCSkipNextClient(client) {
  * 
  * @return			No return
  */
-stock CCheckTrie() {
-	if(CTrie == INVALID_HANDLE) {
-		CTrie = InitColorTrie();
+stock MCCheckTrie() {
+	if(MCTrie == INVALID_HANDLE) {
+		MCTrie = InitColorTrieMore();
 	}
 }
 
@@ -224,8 +224,8 @@ stock CCheckTrie() {
  * 
  * On error/Errors:		If the client index passed for author is invalid or not in game.
  */
-stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxlen=MAX_BUFFER_LENGTH_MORE) {
-	CCheckTrie();
+stock MCReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxlen=MAX_BUFFER_LENGTH_MORE) {
+	MCCheckTrie();
 	if(!removeTags) {
 		ReplaceString(buffer, maxlen, "{default}", "\x01", false);
 	} else {
@@ -255,13 +255,13 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 			return;
 		}
 		GetRegexSubString(regex, 0, tag, sizeof(tag));
-		CStrToLower(tag);
+		MCStrToLower(tag);
 		cursor = StrContains(buffer[cursor], tag, false) + cursor + 1;
 		strcopy(buff, sizeof(buff), tag);
 		ReplaceString(buff, sizeof(buff), "{", "");
 		ReplaceString(buff, sizeof(buff), "}", "");
 		
-		if(!GetTrieValue(CTrie, buff, value)) {
+		if(!GetTrieValue(MCTrie, buff, value)) {
 			continue;
 		}
 		
@@ -285,7 +285,7 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
  * @param numChars		Number of characters to return, or 0 for the end of the string
  * @noreturn
  */
-stock CSubString(const String:input[], String:output[], maxlen, start, numChars=0) {
+stock MCSubString(const String:input[], String:output[], maxlen, start, numChars=0) {
 	new i = 0;
 	for(;;) {
 		if(i == maxlen - 1 || i >= numChars || input[start + i] == '\0') {
@@ -303,7 +303,7 @@ stock CSubString(const String:input[], String:output[], maxlen, start, numChars=
  * @param buffer		String to convert
  * @noreturn
  */
-stock CStrToLower(String:buffer[]) {
+stock MCStrToLower(String:buffer[]) {
 	new len = strlen(buffer);
 	for(new i = 0; i < len; i++) {
 		buffer[i] = CharToLower(buffer[i]);
@@ -317,16 +317,16 @@ stock CStrToLower(String:buffer[]) {
  * @param color			Hexadecimal representation of the color (0xRRGGBB)
  * @return				True if color was added successfully, false if a color already exists with that name
  */
-stock bool:CAddColor(const String:name[], color) {
-	CCheckTrie();
+stock bool:MCAddColor(const String:name[], color) {
+	MCCheckTrie();
 	new value;
-	if(GetTrieValue(CTrie, name, value)) {
+	if(GetTrieValue(MCTrie, name, value)) {
 		return false;
 	}
 	decl String:newName[64];
 	strcopy(newName, sizeof(newName), name);
-	CStrToLower(newName);
-	SetTrieValue(CTrie, newName, color);
+	MCStrToLower(newName);
+	SetTrieValue(MCTrie, newName, color);
 	return true;
 }
 
@@ -338,7 +338,7 @@ stock bool:CAddColor(const String:name[], color) {
  * @noreturn
  */
 stock MCRemoveTags(String:message[], maxlen) {
-	CReplaceColorCodes(message, 0, true, maxlen);
+	MCReplaceColorCodes(message, 0, true, maxlen);
 }
 
 /**
@@ -387,8 +387,8 @@ stock MCReplyToCommandEx(client, author, const String:message[], any:...) {
  * @param message		Message (formatting rules)
  * @noreturn
  */
-stock CShowActivity(client, const String:message[], any:...) {
-	CCheckTrie();
+stock MCShowActivity(client, const String:message[], any:...) {
+	MCCheckTrie();
 	if(client < 0 || client > MaxClients) {
 		ThrowError("Invalid client index %d", client);
 	}
@@ -398,7 +398,7 @@ stock CShowActivity(client, const String:message[], any:...) {
 	decl String:buffer[MAX_BUFFER_LENGTH_MORE], String:buffer2[MAX_BUFFER_LENGTH_MORE];
 	Format(buffer, sizeof(buffer), "\x01%s", message);
 	VFormat(buffer2, sizeof(buffer2), buffer, 3);
-	CReplaceColorCodes(buffer2);
+	MCReplaceColorCodes(buffer2);
 	ShowActivity(client, "%s", buffer2);
 }
 
@@ -410,8 +410,8 @@ stock CShowActivity(client, const String:message[], any:...) {
  * @param message		Message (formatting rules)
  * @noreturn
  */
-stock CShowActivityEx(client, const String:tag[], const String:message[], any:...) {
-	CCheckTrie();
+stock MCShowActivityEx(client, const String:tag[], const String:message[], any:...) {
+	MCCheckTrie();
 	if(client < 0 || client > MaxClients) {
 		ThrowError("Invalid client index %d", client);
 	}
@@ -421,9 +421,9 @@ stock CShowActivityEx(client, const String:tag[], const String:message[], any:..
 	decl String:buffer[MAX_BUFFER_LENGTH_MORE], String:buffer2[MAX_BUFFER_LENGTH_MORE];
 	Format(buffer, sizeof(buffer), "\x01%s", message);
 	VFormat(buffer2, sizeof(buffer2), buffer, 4);
-	CReplaceColorCodes(buffer2);
+	MCReplaceColorCodes(buffer2);
 	strcopy(buffer, sizeof(buffer), tag);
-	CReplaceColorCodes(buffer);
+	MCReplaceColorCodes(buffer);
 	ShowActivityEx(client, tag, "%s", buffer2);
 }
 
@@ -435,8 +435,8 @@ stock CShowActivityEx(client, const String:tag[], const String:message[], any:..
  * @param message		Message (formatting rules)
  * @noreturn
  */
-stock CShowActivity2(client, const String:tag[], const String:message[], any:...) {
-	CCheckTrie();
+stock MCShowActivity2(client, const String:tag[], const String:message[], any:...) {
+	MCCheckTrie();
 	if(client < 0 || client > MaxClients) {
 		ThrowError("Invalid client index %d", client);
 	}
@@ -446,9 +446,9 @@ stock CShowActivity2(client, const String:tag[], const String:message[], any:...
 	decl String:buffer[MAX_BUFFER_LENGTH_MORE], String:buffer2[MAX_BUFFER_LENGTH_MORE];
 	Format(buffer, sizeof(buffer), "\x01%s", message);
 	VFormat(buffer2, sizeof(buffer2), buffer, 4);
-	CReplaceColorCodes(buffer2);
+	MCReplaceColorCodes(buffer2);
 	strcopy(buffer, sizeof(buffer), tag);
-	CReplaceColorCodes(buffer);
+	MCReplaceColorCodes(buffer);
 	ShowActivity2(client, buffer, "%s", buffer2);
 }
 
@@ -458,9 +458,9 @@ stock CShowActivity2(client, const String:tag[], const String:message[], any:...
  * @param color			The color name to check
  * @return				True if the color exists, false otherwise
  */
-stock bool:CColorExists(const String:color[]) {
-	CCheckTrie();
-	return GetTrieValue(CTrie, color, 0);
+stock bool:MCColorExists(const String:color[]) {
+	MCCheckTrie();
+	return GetTrieValue(MCTrie, color, 0);
 }
 
 /**
@@ -470,7 +470,7 @@ stock bool:CColorExists(const String:color[]) {
  * @return				Client's team color in hexadecimal, or green if unknown
  * On error/Errors:		If the client index passed is invalid or not in game.
  */
-stock CGetTeamColor(client) {
+stock MCGetTeamColor(client) {
 	if(client <= 0 || client > MaxClients) {
 		ThrowError("Invalid client index %i", client);
 	}
@@ -480,22 +480,22 @@ stock CGetTeamColor(client) {
 	new value;
 	switch(GetClientTeam(client)) {
 		case 1: {
-			value = COLOR_GRAY;
+			value = COLOR_GRAY_MORE;
 		}
 		case 2: {
-			value = COLOR_RED;
+			value = COLOR_RED_MORE;
 		}
 		case 3: {
-			value = COLOR_BLUE;
+			value = COLOR_BLUE_MORE;
 		}
 		default: {
-			value = COLOR_GREEN;
+			value = COLOR_GREEN_MORE;
 		}
 	}
 	return value;
 }
 
-stock Handle:InitColorTrie() {
+stock Handle:InitColorTrieMore() {
 	new Handle:hTrie = CreateTrie();
 	SetTrieValue(hTrie, "aliceblue", 0xF0F8FF);
 	SetTrieValue(hTrie, "allies", 0x4D7942); // same as Allies team in DoD:S
