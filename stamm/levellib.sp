@@ -47,9 +47,7 @@ levellib_LoadLevels()
 	}
 
 
-
 	new Handle:all_levels = CreateKeyValues("StammLevels");
-
 
 
 	// Load the file to keyvalue

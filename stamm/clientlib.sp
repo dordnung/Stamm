@@ -57,14 +57,12 @@ bool:clientlib_isValidClient_PRE(client)
 
 
 
-
 // Is valid client
 bool:clientlib_isValidClient(client)
 {
 	// With ready state
 	return (clientlib_isValidClient_PRE(client) && g_bClientReady[client]);
 }
-
 
 
 
@@ -78,8 +76,6 @@ public OnClientPostAdminCheck(client)
 		sqllib_InsertPlayer(client);
 	}
 }
-
-
 
 
 
@@ -126,7 +122,6 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 
 
 
-
 // Check a client as ready
 clientlib_ClientReady(client)
 {
@@ -138,7 +133,6 @@ clientlib_ClientReady(client)
 		// Check VIP state
 		clientlib_CheckVip(client);
 		
-
 
 		// check admin flag
 		if (!StrEqual(g_sGiveFlagAdmin, "0") && !StrEqual(g_sGiveFlagAdmin, ""))
@@ -153,7 +147,6 @@ clientlib_ClientReady(client)
 		}
 
 
-
 		// Check Players again
 		clientlib_CheckPlayers();
 
@@ -161,7 +154,6 @@ clientlib_ClientReady(client)
 		nativelib_ClientReady(client);
 	}
 }
-
 
 
 
@@ -176,7 +168,6 @@ public OnClientDisconnect(client)
 	// Check Players
 	clientlib_CheckPlayers();
 }
-
 
 
 
@@ -303,7 +294,6 @@ public Action:clientlib_deleteOlds(Handle:timer, any:data)
 	new lastEntry = GetTime() - (g_iDelete * 24 * 60 * 60);
 
 
-
 	// Delete all players less this line
 	Format(query, sizeof(query), g_sDeleteOldQuery, g_sTableName, lastEntry);
 
@@ -351,8 +341,6 @@ clientlib_CheckVip(client)
 		}
 
 
-
-
 		// Only when level is a new one
 		if (levelstufe > 0 && levelstufe != g_iPlayerLevel[client])
 		{
@@ -379,8 +367,6 @@ clientlib_CheckVip(client)
 			
 
 
-
-
 			// Notice to all
 			if (!g_bStripTag)
 			{
@@ -404,8 +390,6 @@ clientlib_CheckVip(client)
 					MCPrintToChatAll("%s %t", g_sStammTag, "LevelNowLevel", name, g_sLevelName[levelstufe-1]);
 				}
 			}
-
-
 
 
 
@@ -467,7 +451,6 @@ clientlib_CheckVip(client)
 		}
 	}
 }
-
 
 
 
@@ -769,8 +752,6 @@ public Action:clientlib_CmdSay(client, args)
 
 
 
-
-
 // Check players
 clientlib_CheckPlayers()
 {
@@ -787,7 +768,6 @@ clientlib_CheckPlayers()
 		}
 	}
 }
-
 
 
 

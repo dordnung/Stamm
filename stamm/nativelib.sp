@@ -115,15 +115,11 @@ nativelib_Start()
 
 
 
-
-
 // Local forwards, let feature notice that it's loaded
 nativelib_startLoaded(Handle:plugin, String:basename[])
 {
 	// Get function id
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnFeatureLoaded");
-	
-
 
 	// Function found?
 	if (id != INVALID_FUNCTION)
@@ -136,8 +132,6 @@ nativelib_startLoaded(Handle:plugin, String:basename[])
 		Call_Finish();
 	}
 }
-
-
 
 
 
@@ -169,8 +163,6 @@ Action:nativelib_PublicPlayerGetPointsPlugin(client, &number)
 
 
 
-
-
 // Notice to all plugins, that a player got points
 nativelib_PublicPlayerGetPoints(client, number)
 {
@@ -182,8 +174,6 @@ nativelib_PublicPlayerGetPoints(client, number)
 	// Call
 	Call_Finish();
 }
-
-
 
 
 
@@ -203,8 +193,6 @@ nativelib_PublicPlayerBecomeVip(client, oldlevel, level)
 
 
 
-
-
 // Notice to all plugins, that Stamm is ready
 nativelib_StammReady()
 {
@@ -212,8 +200,6 @@ nativelib_StammReady()
 	
 	Call_Finish();
 }
-
-
 
 
 
@@ -227,8 +213,6 @@ nativelib_ClientReady(client)
 	
 	Call_Finish();
 }
-
-
 
 
 
@@ -247,16 +231,11 @@ nativelib_ClientSave(client)
 
 
 
-
-
-
 // Notice to feature, that a player changed the status of him
 nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLEMENT ,bool:shop */)
 {
 	// Search for the function 
 	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientChangedFeature");
-	
-
 
 	// Found?
 	if (id != INVALID_FUNCTION)
@@ -271,8 +250,6 @@ nativelib_ClientChanged(client, Handle:plugin, bool:status /* TODO: IMPLEMENT ,b
 		Call_Finish();
 	}
 }
-
-
 
 
 
@@ -314,7 +291,6 @@ public nativelib_IsMyFeature(Handle:plugin, numParams)
 	decl String:basename_orig[64];
 	
 
-
 	// Get basename
 	GetNativeString(1, basename, sizeof(basename));
 	
@@ -330,7 +306,6 @@ public nativelib_IsMyFeature(Handle:plugin, numParams)
 	{
 		return true;
 	}
-
 
 
 	// Not equal	
@@ -531,7 +506,6 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 	GetNativeString(1, name, sizeof(name));
 
 
-
 	// Feature found?
 	if (feature != -1)
 	{
@@ -607,7 +581,6 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 {
 	new client = GetNativeCell(1);
 	new feature = featurelib_getFeatureByHandle(plugin);
-
 
 	// Valid client?
 	if (clientlib_isValidClient(client))
@@ -749,8 +722,6 @@ public nativelib_GetStammLevelName(Handle:plugin, numParams)
 
 
 
-
-
 // Get the number of a level name
 public nativelib_GetStammLevelNumber(Handle:plugin, numParams)
 {
@@ -758,7 +729,6 @@ public nativelib_GetStammLevelNumber(Handle:plugin, numParams)
 	
 	GetNativeString(1, name, sizeof(name));
 	
-
 
 	// Loop through levels
 	for (new i=0; i < g_iLevels+g_iPLevels; i++)
@@ -841,7 +811,6 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 	new time = GetNativeCell(1);
 	new factor = GetNativeCell(2);
 	
-
 
 	// Check for valid time and factor
 	if (time > 1)
@@ -1156,13 +1125,11 @@ public nativelib_AddBlockDescription(Handle:plugin, numParams)
 
 
 
-
 	// Get the description
 	FormatNativeString(0, 2, 3, sizeof(description), _, description);
 
 	
 	new feature = featurelib_getFeatureByHandle(plugin);
-
 
 
 	// Valid feature?
@@ -1193,7 +1160,6 @@ public nativelib_AddBlockDescription(Handle:plugin, numParams)
 
 	return false;
 }
-
 
 
 
@@ -1339,7 +1305,6 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 
 
 
-
 // Stamm is loaded?
 public nativelib_IsLoaded(Handle:plugin, numParams)
 {
@@ -1417,8 +1382,6 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 	new bool:useDebug = GetNativeCell(1);
 
 
-
-
 	// Get basename
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
 	
@@ -1426,7 +1389,6 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 
 	// Format text parameter
 	FormatNativeString(0, 2, 3, sizeof(buffer), _, buffer);
-
 
 
 

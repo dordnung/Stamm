@@ -89,8 +89,6 @@ sqllib_LoadDB()
 
 
 
-
-
 	// Not connected?
 	if (sqllib_db == INVALID_HANDLE)
 	{
@@ -123,7 +121,6 @@ sqllib_LoadDB()
 		{
 			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
 		}
-
 
 
 
@@ -312,8 +309,6 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 		decl String:query[1024];
 		
 
-
-
 		// Only valid clients
 		if (clientlib_isValidClient_PRE(client))
 		{
@@ -322,15 +317,12 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			g_iHappyFactor[client] = 0;
 
 
-
 			// Get name and steamid
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
 			GetClientName(client, name, sizeof(name));
 			
 			// escape bad names
 			SQL_EscapeString(sqllib_db, name, name2, sizeof(name2));
-
-
 
 
 			// Found no entry?
@@ -361,7 +353,6 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				}
 
 
-
 				// Sync the steamid with version 0.00
 				sqlback_syncSteamid(client, "0.00");
 			}
@@ -387,8 +378,6 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				}
 				
 
-
-
 				// Get points
 				g_iPlayerPoints[client] = SQL_FetchInt(hndl, 0);
 				
@@ -403,9 +392,6 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				}
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
-
-
-
 
 
 				// Get the version of this client
@@ -649,14 +635,12 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 			decl String:steamid[64];
 			
 
-
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
 
 			Format(top_text, sizeof(top_text), "%T", "StammTop", client);
 			SetPanelTitle(Top10Menu, top_text);
 
 			DrawPanelText(Top10Menu, "------------------------------------");
-
 
 
 			// Fetch all founded
@@ -676,7 +660,6 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 				DrawPanelText(Top10Menu, top_text);
 			}
 			
-
 
 
 			// Found something?
@@ -794,7 +777,6 @@ public Action:sqllib_convertDB(args)
 
 
 
-
 	// Right use
 	if (GetCmdArgs() != 1)
 	{
@@ -829,7 +811,6 @@ public Action:sqllib_convertDB(args)
 
 		return Plugin_Handled;
 	}
-
 
 
 
@@ -876,12 +857,10 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 		new counter = 0;
 
 
-
 		// Format filename
 		Format(filename, sizeof(filename), "%s.sql", g_sTableName);
 
 		new Handle:file = OpenFile(filename, "wb");
-
 
 
 
@@ -978,7 +957,6 @@ public sqllib_SQLConvertDatabaseToFile(Handle:owner, Handle:hndl, const String:e
 			{
 				WriteFileLine(file, "COMMIT;");
 			}
-
 
 
 

@@ -110,8 +110,6 @@ public Action:pointlib_PointShower(Handle:timer)
 
 
 
-
-
 // add points to a player
 public Action:pointlib_AddPlayerPoints(args)
 {
@@ -121,11 +119,9 @@ public Action:pointlib_AddPlayerPoints(args)
 		decl String:numberString[25];
 		
 
-
 		// Get userid or steamid and number
 		GetCmdArg(1, useridString, sizeof(useridString));
 		GetCmdArg(2, numberString, sizeof(numberString));
-
 
 
 		// Get number
@@ -292,7 +288,6 @@ public Action:pointlib_DelPlayerPoints(args)
 		decl String:useridString[64];
 		decl String:numberString[25];
 		
-
 
 		GetCmdArg(1, useridString, sizeof(useridString));
 		GetCmdArg(2, numberString, sizeof(numberString));
@@ -478,13 +473,11 @@ pointlib_ShowPlayerPoints(client, bool:only)
 
 
 
-
 		// If not highest level, calculate rest points
 		if (index != g_iLevels && index < g_iLevels) 
 		{
 			restpoints = g_iLevelPoints[index] - g_iPlayerPoints[client];
 		}
-
 
 
 		// Show to all or only to client

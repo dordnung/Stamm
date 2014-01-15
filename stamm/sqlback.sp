@@ -64,7 +64,6 @@ sqlback_getDatabaseVersion()
 
 
 
-
 // check version
 bool:sqlback_isVersionNewer(String:version[])
 {
@@ -138,7 +137,6 @@ sqlback_syncSteamid(client, const String:version[])
 		decl String:steamid[64];
 		
 
-
 		// Get new steamid and replace
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		ReplaceString(steamid, sizeof(steamid), "STEAM_0:", "STEAM_1:");
@@ -177,7 +175,6 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 		decl String:steamid[64];
 		
 
-
 		// Updated client points of STEAM_1: entry
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		ReplaceString(steamid, sizeof(steamid), "STEAM_0:", "STEAM_1:");
@@ -208,7 +205,6 @@ sqlback_ModifyTableBackwards()
 {
 	decl String:query[256];
 
-
 	// Version <= 2.15
 	if (sqlback_isVersionNewer("2.16"))
 	{
@@ -224,8 +220,6 @@ sqlback_ModifyTableBackwards()
 	}
 
 
-
-
 	// Version <= 2.10
 	if (sqlback_isVersionNewer("2.11"))
 	{
@@ -239,7 +233,6 @@ sqlback_ModifyTableBackwards()
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 	}
-
 
 
 
@@ -270,9 +263,6 @@ sqlback_ModifyTableBackwards()
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 			
-
-
-
 
 
 			// Maybe we came from and old 1. version?
@@ -346,12 +336,9 @@ public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:d
 	{
 		decl String:query[600];
 		
-
-
 		// Insert from old database
 		Format(query, sizeof(query), g_sInsertBackupQuery, g_sTableName, g_sTableName);
 	
-			
 
 		if (g_bDebug) 
 		{

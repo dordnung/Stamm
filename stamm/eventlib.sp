@@ -93,7 +93,6 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 		}
 	}
 
-
 	// Announce Happy hour
 	if (g_bHappyHourON) 
 	{

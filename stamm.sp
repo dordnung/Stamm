@@ -87,7 +87,6 @@ public Plugin:myinfo =
 
 
 
-
 // Add Natives and handle late load
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
@@ -103,14 +102,11 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 
 
 
-
-
 // Finally it's loaded
 public OnPluginStart()
 {
 	// Check the folders we need
 	CheckStammFolders();
-
 
 
 	// Fix color when Lightgreen isn't available
@@ -131,11 +127,8 @@ public OnPluginStart()
 	}
 
 
-
-
 	// Load stamm Translation 
 	LoadTranslations("stamm.phrases");
-
 
 
 
@@ -144,11 +137,8 @@ public OnPluginStart()
 	g_bHappyHourON = false;
 	
 
-
-
 	// Register Say Filter
 	RegConsoleCmd("say", clientlib_CmdSay);
-
 
 
 	// Register the Server Commands
@@ -165,19 +155,15 @@ public OnPluginStart()
 
 
 
-
-
 	// Command listener for load, reload and unload commands
 	AddCommandListener(otherlib_commandListener);
 	
-
 
 	// Init. Stamm Components
 	otherlib_saveGame();
 	levellib_LoadLevels();
 	configlib_CreateConfig();
 	eventlib_Start();
-
 
 
 	// check for morecolor support
@@ -189,7 +175,6 @@ public OnPluginStart()
 	{
 		g_bMoreColors = true;
 	}
-
 	
 
 	// Create Hud Sync
@@ -288,7 +273,6 @@ public OnConfigsExecuted()
 	configlib_LoadConfig();
 
 
-
 	// Add Auto Updater if exit and want
 	if (LibraryExists("updater") && g_bAutoUpdate)
 	{
@@ -355,7 +339,6 @@ public OnConfigsExecuted()
 		}
 	}
 	
-
 
 	// Download files and load them
 	otherlib_PrepareFiles();

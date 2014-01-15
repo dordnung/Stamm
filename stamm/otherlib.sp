@@ -57,7 +57,6 @@ otherlib_PrepareFiles()
 
 
 
-
 // Add lvl up spound to downloads table
 otherlib_DownloadLevel()
 {
@@ -206,7 +205,6 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 
 
 
-
 // Info timer updated
 public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 {
@@ -288,18 +286,14 @@ otherlib_EndHappyHour()
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 
 
-
 		// Reset
 		g_iPoints = 1;
 		g_bHappyHourON = false;
 		
 
-
-
 		// Delete old timer
 		otherlib_checkTimer(g_hHappyTimer);
 		
-
 
 
 		// Print end
@@ -327,13 +321,10 @@ otherlib_EndHappyHour()
 
 
 
-
-
 // Start happy hour
 otherlib_StartHappyHour(time, factor)
 {
 	decl String:query[128];
-
 
 
 	// Insert new happy gour
@@ -349,13 +340,10 @@ otherlib_StartHappyHour(time, factor)
 
 
 
-
-
 	// Set global Points and mark as happy hour on 
 	g_iPoints = factor;
 	g_bHappyHourON = true;
 	
-
 
 
 	// Announce happy hour
@@ -368,7 +356,6 @@ otherlib_StartHappyHour(time, factor)
 		MCPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
 	}
 	
-
 
 
 	// Check old timer
