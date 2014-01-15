@@ -1,6 +1,6 @@
 "Phrases"
 {
-	"GetGrap"
+	"GetGrab"
 	{
 		"en"		"Command +grab to grab a player/object"
 		"de"		"Befehl +grab um einen Spieler/Objekt zu greifen"

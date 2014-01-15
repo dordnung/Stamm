@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------
- * File        stamm_g_iHookg_iGrapeg_iRope.sp
+ * File        stamm_hookgrabrope.sp
  * Authors     David <popoklopsi> Ordnung
  * License     GPLv3
  * Web         http://popoklopsi.de
@@ -35,7 +35,7 @@
 
 
 
-new g_iGrap;
+new g_iGrab;
 new g_iHook;
 new g_iRope;
 
@@ -44,10 +44,10 @@ new g_iRope;
 
 public Plugin:myinfo =
 {
-	name = "Stamm Feature Hook Grape Rope",
+	name = "Stamm Feature Hook Grab Rope",
 	author = "Popoklopsi",
 	version = "1.1.0",
-	description = "Allows VIP's to grap, hook or rope",
+	description = "Allows VIP's to grab, hook or rope",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
@@ -62,8 +62,14 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+	// We need plugin hgr	
+	if (!LibraryExists("hookgrabrope")) 
+	{
+		SetFailState("Can't Load Feature, hookgrabrope is not installed!");
+	}
+
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP HookGrapeRope");
+	STAMM_AddFeature("VIP HookGrabRope");
 }
 
 
@@ -83,15 +89,15 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 
 
 	// Load Descriptions for each block
-	g_iGrap = STAMM_GetBlockOfName("grap");
+	g_iGrab = STAMM_GetBlockOfName("grab");
 	g_iHook = STAMM_GetBlockOfName("hook");
 	g_iRope = STAMM_GetBlockOfName("rope");
 
 
 
-	if (g_iGrap != -1)
+	if (g_iGrab != -1)
 	{
-		STAMM_AddBlockDescription(g_iGrap, "%T", "GetGrap", LANG_SERVER);
+		STAMM_AddBlockDescription(g_iGrab, "%T", "GetGrab", LANG_SERVER);
 	}
 
 	if (g_iHook != -1)
@@ -104,7 +110,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		STAMM_AddBlockDescription(g_iRope, "%T", "GetRope", LANG_SERVER);
 	}
 
-	if (g_iGrap == -1 && g_iHook == -1 && g_iRope == -1)
+	if (g_iGrab == -1 && g_iHook == -1 && g_iRope == -1)
 	{
 		SetFailState("Found neither block grap nor block hoo nor block rope!");
 	}
@@ -129,7 +135,7 @@ public STAMM_OnClientReady(client)
 		}
 
 
-		if (g_iGrap != -1 && STAMM_HaveClientFeature(client, g_iGrap))
+		if (g_iGrab != -1 && STAMM_HaveClientFeature(client, g_iGrab))
 		{
 			HGR_ClientAccess(client, 0, 1);
 		}
