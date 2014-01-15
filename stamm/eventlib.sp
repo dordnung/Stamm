@@ -76,9 +76,7 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 				if (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)
 				{
 					// Give global points
-					pointlib_GivePlayerPoints(client, g_iPoints, true);
-
-					if (g_bShowTextOnPoints)
+					if (pointlib_GivePlayerPoints(client, g_iPoints, true) && g_bShowTextOnPoints)
 					{
 						// Notify player
 						if (!g_bMoreColors)
@@ -132,10 +130,7 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 			if (clientlib_GetPlayerCount() >= g_iMinPlayer && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && userid != client && GetClientTeam(userid) != GetClientTeam(client))
 			{
 				// Give global Points
-				pointlib_GivePlayerPoints(client, g_iPoints, true);
-
-
-				if (g_bShowTextOnPoints)
+				if (pointlib_GivePlayerPoints(client, g_iPoints, true) && g_bShowTextOnPoints)
 				{
 					// Notify player
 					if (!g_bMoreColors)

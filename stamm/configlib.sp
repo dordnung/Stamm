@@ -80,7 +80,7 @@ configlib_CreateConfig()
 	configlib_StammDebug = AutoExecConfig_CreateConVar("stamm_debug", "0", "1=Log in an extra File lot of information, 0=disable");
 	configlib_ExtraPoints = AutoExecConfig_CreateConVar("stamm_extrapoints", "0", "1 = Give less Players more Points, with factor: ((max players on your server) - (current players)), 0 = disable");
 	configlib_ShowPoints = AutoExecConfig_CreateConVar("stamm_showpoints", "480", "Shows every x Seconds all Players their Points (480 = 8 minutes), 0 = Off");
-	configlib_GiveFlagAdmin = AutoExecConfig_CreateConVar("stamm_oflag", "0", "Flags a player needs to get instantly highest VIP see addons/sourcemod/configs/admin_levels.cfg for all flags), 0 = Off");
+	configlib_GiveFlagAdmin = AutoExecConfig_CreateConVar("stamm_oflag", "0", "Flags a player needs to get instantly highest VIP see (addons/sourcemod/configs/admin_levels.cfg for all flags), 0 = Off");
 	configlib_Delete = AutoExecConfig_CreateConVar("stamm_delete", "0", "x = Days until a inactive player gets deleted, 0 = Off");
 	configlib_AdminFlag = AutoExecConfig_CreateConVar("stamm_adminflag", "bt", "Flag a player needs to access the stamm admin menu (see addons/sourcemod/configs/admin_levels.cfg for all flags)");
 	configlib_InfoTime = AutoExecConfig_CreateConVar("stamm_infotime", "300", "Info Message Interval in seconds (300 = 5 minutes), 0 = Off");

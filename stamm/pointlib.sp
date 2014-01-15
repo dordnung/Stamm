@@ -71,9 +71,7 @@ public Action:pointlib_PlayerTime(Handle:timer)
 			// right team -> add global points
 			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && g_iMinPlayer <= clientlib_GetPlayerCount())
 			{
-				pointlib_GivePlayerPoints(i, g_iPoints, true);
-
-				if (g_bShowTextOnPoints)
+				if (pointlib_GivePlayerPoints(i, g_iPoints, true) && g_bShowTextOnPoints)
 				{
 					// Notify player
 					if (!g_bMoreColors)
@@ -375,7 +373,7 @@ public Action:pointlib_ShowPoints2(Handle:timer, any:userid)
 	pointlib_ShowPlayerPoints(client, false);
 	
 
-	return Plugin_Handled;
+	return Plugin_Stop;
 }
 
 
@@ -410,7 +408,7 @@ public Action:pointlib_ShowPoints(client, arg)
 
 
 // Give points to player
-pointlib_GivePlayerPoints(client, number, bool:check)
+bool:pointlib_GivePlayerPoints(client, number, bool:check)
 {
 	// Check if a feature stop getting points
 	if (check)
@@ -422,7 +420,7 @@ pointlib_GivePlayerPoints(client, number, bool:check)
 		// maybe block?
 		if (result != Plugin_Changed && result != Plugin_Continue)
 		{
-			return;
+			return false;
 		}
 	}
 
@@ -446,6 +444,8 @@ pointlib_GivePlayerPoints(client, number, bool:check)
 
 	// Notice to API
 	nativelib_PublicPlayerGetPoints(client, number);
+	
+	return true;
 }
 
 

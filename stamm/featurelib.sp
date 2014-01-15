@@ -374,7 +374,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 		}
 	}
 	
-	return Plugin_Handled;
+	return Plugin_Stop;
 }
 
 
