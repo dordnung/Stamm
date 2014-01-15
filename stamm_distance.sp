@@ -38,6 +38,7 @@
 new g_iBlockDirection;
 new g_iBlockDistance;
 new g_iBlockName;
+new Handle:g_hUnit;
 
 new bool:g_bVipPlayers[MAXPLAYERS + 1][3];
 
