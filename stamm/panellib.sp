@@ -583,6 +583,13 @@ public panellib_FeaturelistLoadHandler(Handle:menu, MenuAction:action, param1, p
 		GetMenuItem(menu, param2, choose, sizeof(choose));
 		
 		featurelib_loadFeature(g_FeatureList[StringToInt(choose)][FEATURE_HANDLE]);
+
+		panellib_AdminHandler(panellib_adminpanel, MenuAction_Select, param1, 5);
+	}
+
+	else if (action == MenuAction_Cancel)
+	{
+		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
 	}
 
 	// Stop menu
@@ -608,6 +615,13 @@ public panellib_FeaturelistUnloadHandler(Handle:menu, MenuAction:action, param1,
 		GetMenuItem(menu, param2, choose, sizeof(choose));
 		
 		featurelib_UnloadFeature(g_FeatureList[StringToInt(choose)][FEATURE_HANDLE]);
+
+		panellib_AdminHandler(panellib_adminpanel, MenuAction_Select, param1, 6);
+	}
+
+	else if (action == MenuAction_Cancel)
+	{
+		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
 	}
 
 	// Close
@@ -692,6 +706,12 @@ public panellib_PlayerListHandler(Handle:menu, MenuAction:action, param1, param2
 			}
 		}
 	}
+
+	else if (action == MenuAction_Cancel)
+	{
+		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+	}
+
 	else if (action == MenuAction_End) 
 	{
 		// Close
@@ -717,14 +737,11 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 	
 
 
-
 		// get player to delete
 		GetMenuItem(menu, param2, menuinfo, sizeof(menuinfo));
 		
 		new client = StringToInt(menuinfo);
 		
-
-
 
 
 		// Must be valid
@@ -776,6 +793,12 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 		}
 	}
+
+	else if (action == MenuAction_Cancel)
+	{
+		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+	}
+
 	else if (action == MenuAction_End)
 	{
 		// Close
@@ -1158,6 +1181,8 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 					{
 						MCPrintToChat(param1, "%s %t", g_sStammTag, "HappyRunning");
 					}
+
+					SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
 				}
 			}
 
@@ -1185,6 +1210,8 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 						MCPrintToChat(param1, "%s %t", g_sStammTag, "HappyNotRunning");
 					}
 				}
+
+				SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
 			}
 
 
@@ -1250,6 +1277,8 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 					{
 						MCPrintToChat(param1, "%s %t", g_sStammTag, "NoFeatureFound");
 					}
+
+					SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
 				}
 			}
 		}

@@ -244,7 +244,6 @@ public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 
 
 
-
 // Client want to start new Happy Hour
 otherlib_MakeHappyHour(client)
 {
@@ -264,7 +263,6 @@ otherlib_MakeHappyHour(client)
 		MCPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyTimeInfo");
 	}
 }
-
 
 
 
