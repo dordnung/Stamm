@@ -57,7 +57,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Admin Flags");
+	STAMM_AddFeature("VIP Admin Flags", "", false);
 }
 
 
@@ -103,10 +103,10 @@ public STAMM_OnClientReady(client)
 
 		// Get Flags for client level
 		Format(theflags, sizeof(theflags), "");
-		getLevelFlag(theflags, sizeof(theflags), STAMM_GetClientLevel(client));
+		getClientFlags(client, theflags, sizeof(theflags));
 
 
-		if (!StrEqual(theflags, "")) 
+		if (!StrEqual(theflags, "") && theflags[0] != '\0') 
 		{
 			// Get bits of the string
 			bytes = ReadFlagString(theflags);
@@ -131,7 +131,7 @@ public getLevelFlag(String:theflags[], size, level)
 	// Do we have a file?
 	if (!FileExists("cfg/stamm/features/adminflags.txt") && blocks <= 0)
 	{
-		STAMM_WriteToLog(false, "Couldn't find any block and also 'cfg/stamm/features/adminflags.txt' doesn't exist!");
+		SetFailState("Couldn't find any block and also 'cfg/stamm/features/adminflags.txt' doesn't exist!");
 
 		return;
 	}
@@ -173,8 +173,51 @@ public getLevelFlag(String:theflags[], size, level)
 				{
 					KvGoBack(flagvalue);
 					KvGetString(flagvalue, section, theflags, size);
+				}
+			}
+			while (KvGotoNextKey(flagvalue, false));
+		}
+		
+		CloseHandle(flagvalue);
+	}
+}
 
-					break;
+
+
+// Read out the flags
+public getClientFlags(client, String:theflags[], size)
+{
+	if (STAMM_GetBlockCount() > 0)
+	{
+		new block = STAMM_GetClientBlock(client);
+
+		if (block > 0)
+		{
+			STAMM_GetBlockName(block, theflags, size);
+		}
+	}
+	else
+	{
+		new Handle:flagvalue = CreateKeyValues("AdminFlags");
+		
+		FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
+		
+
+		// Key Value loop
+		if (KvGotoFirstSubKey(flagvalue, false))
+		{
+			do
+			{
+				decl String:section[64];
+				
+				KvGetSectionName(flagvalue, section, sizeof(section));
+
+
+				// Only Flags for specific level
+				if (STAMM_GetLevelNumber(section) == STAMM_GetClientLevel(client))
+				{
+					KvGoBack(flagvalue);
+					KvGetString(flagvalue, section, theflags, size);
 				}
 			}
 			while (KvGotoNextKey(flagvalue, false));
