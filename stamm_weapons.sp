@@ -276,13 +276,13 @@ public Action:GiveCallback(client, args)
 
 					else 
 					{
-						STAMM_PrintToChat(client, "%s %T", tag, "WeaponFailed");
+						STAMM_PrintToChat(client, "%s %t", tag, "WeaponFailed");
 					}
 				}
 				
 				else
 				{
-					STAMM_PrintToChat(client, "%s %T", tag, "MaximumReached");
+					STAMM_PrintToChat(client, "%s %t", tag, "MaximumReached");
 				}
 			}
 		}

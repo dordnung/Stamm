@@ -151,7 +151,7 @@ public Action:AddTele(client, args)
 			g_iTeleports[client][0] = 1;
 			
 			// Notice that added
-			STAMM_PrintToChat(client, "%s %t", "TeleportAdded");
+			STAMM_PrintToChat(client, "%s %t", tag, "TeleportAdded");
 		}
 	}
 	
