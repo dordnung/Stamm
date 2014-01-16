@@ -230,7 +230,7 @@ public Action:InfoCallback(client, args)
 {
 	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 	{
-		DisplayMenu(g_hWeaponList, client, 30);
+		DisplayMenu(g_hWeaponList, client, 40);
 	}
 
 	return Plugin_Handled;
@@ -245,11 +245,11 @@ public Action:GiveCallback(client, args)
 	decl String:tag[64];
 
 
-	if (GetCmdArgs() == 1)
+	if (STAMM_IsClientValid(client))
 	{
-		if (STAMM_IsClientValid(client))
+		if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client))
 		{
-			if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client))
+			if (GetCmdArgs() == 1)
 			{
 				// max. usages not reached
 				if (g_iUsages[client] < g_iMaximum)
@@ -272,18 +272,19 @@ public Action:GiveCallback(client, args)
 						
 						g_iUsages[client]++;
 					}
-
-
 					else 
 					{
 						STAMM_PrintToChat(client, "%s %t", tag, "WeaponFailed");
 					}
 				}
-				
 				else
 				{
 					STAMM_PrintToChat(client, "%s %t", tag, "MaximumReached");
 				}
+			}
+			else 
+			{
+				STAMM_PrintToChat(client, "%s %t", tag, "WeaponFailed");
 			}
 		}
 	}
