@@ -121,7 +121,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
 	// Does the client have this feature?
-	if (STAMM_IsClientValid(client))
+	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
 		if (STAMM_HaveClientFeature(client))
 		{
