@@ -106,7 +106,7 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("playertrail", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 	
-	g_hLifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element");
+	g_hLifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element in seconds");
 	g_hMaterial = AutoExecConfig_CreateConVar("ptrail_material", "sprites/laserbeam.vmt", "Material to use, start after materials/");
 	
 	AutoExecConfig_CleanFile();
