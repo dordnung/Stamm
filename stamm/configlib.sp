@@ -91,7 +91,7 @@ configlib_CreateConfig()
 	configlib_ServerID = AutoExecConfig_CreateConVar("stamm_serverid", "1", "If you have more than one Server, type here your Server number in, e.g. 1. Server = 1");
 	configlib_TextToWrite = AutoExecConfig_CreateConVar("stamm_texttowrite", "sm_stamm", "Command to see currently points");
 	configlib_VipType = AutoExecConfig_CreateConVar("stamm_vip_type", "1", "How to get Points, 1=kills, 2=rounds, 3=time, 4=kills&rounds, 5=kills&time, 6=rounds&time, 7=kills&rounds&time");
-	configlib_TimePoint = AutoExecConfig_CreateConVar("stamm_time_point", "1", "How much minutes are one point?");
+	configlib_TimePoint = AutoExecConfig_CreateConVar("stamm_time_point", "1", "If you set points for time: How much minutes are one point?");
 	configlib_VipList = AutoExecConfig_CreateConVar("stamm_viplist", "sm_slist", "Command for VIP Top 10");
 	configlib_TableName = AutoExecConfig_CreateConVar("stamm_table_name", "STAMM_DB", "Your Stamm Table Name. It appends '_<serverid>' at the end!");
 	configlib_Info = AutoExecConfig_CreateConVar("stamm_info_cmd", "sm_sinfo", "Command to see infos about stamm");
