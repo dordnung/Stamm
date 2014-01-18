@@ -146,8 +146,8 @@ public VipSlotCheck(client)
 	// vip slots greater than max slots?
 	if (vip_slots > max_slots)
 	{
-		// -> Kick non VIP's
-		if (!STAMM_HaveClientFeature(client)) 
+		// -> Kick non VIP's and non admin's
+		if (!STAMM_HaveClientFeature(client) && GetUserAdmin(client) == INVALID_ADMIN_ID) 
 		{
 			KickClient(client, vip_kick_message);
 		}
@@ -174,8 +174,8 @@ public VipSlotCheck(client)
 				// Get random player
 				new RandPlayer = GetRandomInt(1, MaxClients);
 				
-				// Check if client is valid
-				if (STAMM_IsClientValid(RandPlayer))
+				// Check if client is valid and non admin
+				if (STAMM_IsClientValid(RandPlayer) && GetUserAdmin(client) == INVALID_ADMIN_ID)
 				{
 					// Only non admins and non vips
 					if (!STAMM_HaveClientFeature(RandPlayer) && !STAMM_IsClientAdmin(RandPlayer))
