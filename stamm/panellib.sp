@@ -93,7 +93,7 @@ panellib_Start()
 	for (new i=0; i < g_iLevels; i++)
 	{
 		Format(infoString, sizeof(infoString), "%s - %i %T", g_sLevelName[i], g_iLevelPoints[i], "Points", LANG_SERVER);
-		AddMenuItem(panellib_levels, "", infoString);
+		AddMenuItem(panellib_levels, "", infoString, ITEMDRAW_DISABLED);
 	}
 
 
@@ -101,7 +101,7 @@ panellib_Start()
 	for (new i=0; i < g_iPLevels; i++)
 	{
 		Format(infoString, sizeof(infoString), "%s - %T %s", g_sLevelName[g_iLevels+i], "Flag", LANG_SERVER, g_sLevelFlag[i]);
-		AddMenuItem(panellib_levels, "", infoString);
+		AddMenuItem(panellib_levels, "", infoString, ITEMDRAW_DISABLED);
 	}
 	
 
@@ -1006,7 +1006,7 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 						// Add text
 						Format(featuretext, sizeof(featuretext), "%s", arrayItem);
 						
-						AddMenuItem(featurelist, "", featuretext);
+						AddMenuItem(featurelist, "", featuretext, ITEMDRAW_DISABLED);
 					}
 				}
 			}
