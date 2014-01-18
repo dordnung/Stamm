@@ -73,8 +73,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
-
-	STAMM_AddCommand("!sadd", "%T", "GetTeleport", LANG_SERVER);
 }
 
 
@@ -125,6 +123,14 @@ public OnMapStart()
 }
 
 
+// Add Command for teleporting
+public STAMM_OnClientRequestCommands(client)
+{
+	if (STAMM_HaveClientFeature(client))
+	{
+		STAMM_AddCommand("!sadd", "%T", "GetTeleport", client);
+	}
+}
 
 
 // Add a new Teleport to the list

@@ -569,7 +569,7 @@ public Action:clientlib_CmdSay(client, args)
 					MCPrintToChat(client, "%s %t", g_sStammTag, "aborted");
 				}
 
-				SendPanelToClient(panellib_adminpanel, client, panellib_AdminHandler, 40);
+				panellib_CreateUserPanels(client, 4);
 				
 				return Plugin_Handled;
 			}
@@ -631,7 +631,7 @@ public Action:clientlib_CmdSay(client, args)
 				g_iHappyFactor[client] = 0;
 			}
 
-			SendPanelToClient(panellib_adminpanel, client, panellib_AdminHandler, 40);
+			panellib_CreateUserPanels(client, 4);
 				
 			return Plugin_Handled;	
 		}
@@ -652,7 +652,7 @@ public Action:clientlib_CmdSay(client, args)
 					MCPrintToChat(client, "%s %t", g_sStammTag, "aborted");
 				}
 
-				SendPanelToClient(panellib_adminpanel, client, panellib_AdminHandler, 40);
+				panellib_CreateUserPanels(client, 4);
 				
 				return Plugin_Handled;
 			}
@@ -687,7 +687,7 @@ public Action:clientlib_CmdSay(client, args)
 					MCPrintToChat(choose, "%s %t", g_sStammTag, "SetPoints2", g_iPlayerPoints[choose]);
 				}
 
-				SendPanelToClient(panellib_adminpanel, client, panellib_AdminHandler, 40);
+				panellib_CreateUserPanels(client, 4);
 			}
 			
 

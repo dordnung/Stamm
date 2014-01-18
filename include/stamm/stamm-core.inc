@@ -61,6 +61,15 @@ forward STAMM_OnHappyHourStart(time, factor);
 forward STAMM_OnHappyHourEnd();
 
 
+/**
+ * Executes when a client requests the command menu.
+ * Here you can add your commands.
+ * Use the parameter client to format language phrases or whether he can use that command or not.
+ *
+ * @param client      Client that requests the command menu.
+ */
+forward STAMM_OnClientRequestCommands(client);
+
 
 
 
@@ -144,6 +153,8 @@ native STAMM_GetTag(String:tag[], maxlength);
 
 
 /**
+ * Only use this in forward STAMM_OnClientRequestCommands
+ *
  * Adds a new command to the command list in the stamm menu.
  * Use this to inform the player of a command you registered for your feature.
  *
@@ -151,7 +162,7 @@ native STAMM_GetTag(String:tag[], maxlength);
  * @param name          The name of the command.
  * @param ...           The name Format arguments.
  *
- * @error               Max Commands reached.
+ * @error               Max Commands reached, outside forward STAMM_OnClientRequestCommands
  *
  * @noreturn
  */

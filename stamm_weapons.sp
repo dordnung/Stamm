@@ -69,9 +69,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
-
-
-	STAMM_AddCommand("!sweapons", "VIP Weapons", "%T", "GetWeapons", LANG_SERVER);
 }
 
 
@@ -181,6 +178,14 @@ public OnPluginStart()
 }
 
 
+// Add Command for weapons
+public STAMM_OnClientRequestCommands(client)
+{
+	if (STAMM_HaveClientFeature(client))
+	{
+		STAMM_AddCommand("!sweapons", "%T", "GetWeapons", client);
+	}
+}
 
 
 // Menu handler 

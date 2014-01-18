@@ -30,11 +30,7 @@
 
 
 // Panels
-new Handle:panellib_levels;
 new Handle:panellib_credits;
-new Handle:panellib_adminpanel;
-
-
 
 
 
@@ -75,85 +71,8 @@ panellib_Start()
 
 	// Create new Panels
 	panellib_credits = CreatePanel();
-	panellib_levels = CreateMenu(panellib_PassPanelHandler);
-	panellib_adminpanel = CreatePanel();
-
-
-
-	// Create Level Overview
-	Format(infoString, sizeof(infoString), "%T", "AllLevels", LANG_SERVER);
-
-	SetMenuTitle(panellib_levels, infoString);
-	SetMenuExitBackButton(panellib_levels, true);
-	SetMenuExitButton(panellib_levels, true);
-
-
-
-	// Add all non privat levels
-	for (new i=0; i < g_iLevels; i++)
-	{
-		Format(infoString, sizeof(infoString), "%s - %i %T", g_sLevelName[i], g_iLevelPoints[i], "Points", LANG_SERVER);
-		AddMenuItem(panellib_levels, "", infoString, ITEMDRAW_DISABLED);
-	}
-
-
-	// Add private levels
-	for (new i=0; i < g_iPLevels; i++)
-	{
-		Format(infoString, sizeof(infoString), "%s - %T %s", g_sLevelName[g_iLevels+i], "Flag", LANG_SERVER, g_sLevelFlag[i]);
-		AddMenuItem(panellib_levels, "", infoString, ITEMDRAW_DISABLED);
-	}
-	
-
-
-	// Create Admin Menu
-	Format(infoString, sizeof(infoString), "%T", "AdminMenu", LANG_SERVER);
-	SetPanelTitle(panellib_adminpanel, infoString);
-	
-	DrawPanelText(panellib_adminpanel, "----------------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T", "PointsOfPlayer", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "ResetPlayer", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "HappyHour", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "HappyHourEnd", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "LoadFeature", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-	
-	Format(infoString, sizeof(infoString), "%T", "UnloadFeature", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-	
-	DrawPanelText(panellib_adminpanel, "----------------------------------------------------");
-	
-	Format(infoString, sizeof(infoString), "%T", "Close", LANG_SERVER);
-	DrawPanelItem(panellib_adminpanel, infoString);
-
-
-
-	// Add first four commands
-	g_iCommands = 4;
-
-	Format(g_sCommandName[0], sizeof(g_sCommandName[]), "%T", "StammPoints", LANG_SERVER);
-	Format(g_sCommand[0], sizeof(g_sCommand[]), g_sTextToWriteF);
-
-	Format(g_sCommandName[1], sizeof(g_sCommandName[]), "%T", "StammTop", LANG_SERVER);
-	Format(g_sCommand[1], sizeof(g_sCommand[]), g_sVipListF);
-
-	Format(g_sCommandName[2], sizeof(g_sCommandName[]), "%T", "StammRank", LANG_SERVER);
-	Format(g_sCommand[2], sizeof(g_sCommand[]), g_sVipRankF);
-
-	Format(g_sCommandName[3], sizeof(g_sCommandName[]), "%T", "StammChange", LANG_SERVER);
-	Format(g_sCommand[3], sizeof(g_sCommand[]), g_sChangeF);
 
 	
-
 	// Create Stamm Credits
 	SetPanelTitle(panellib_credits, "Stamm Beta Credits");
 	
@@ -458,6 +377,38 @@ panellib_CreateUserPanels(client, mode)
 	// Open Admin menu
 	if (mode == 4) 
 	{
+		new Handle:panellib_adminpanel = CreatePanel();
+		decl String:infoString[256];
+
+		// Create Admin Menu
+		Format(infoString, sizeof(infoString), "%T", "AdminMenu", client);
+		SetPanelTitle(panellib_adminpanel, infoString);
+		
+		DrawPanelText(panellib_adminpanel, "----------------------------------------------------");
+		
+		Format(infoString, sizeof(infoString), "%T", "PointsOfPlayer", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "ResetPlayer", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "HappyHour", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "HappyHourEnd", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "LoadFeature", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+		
+		Format(infoString, sizeof(infoString), "%T", "UnloadFeature", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+		
+		DrawPanelText(panellib_adminpanel, "----------------------------------------------------");
+		
+		Format(infoString, sizeof(infoString), "%T", "Close", client);
+		DrawPanelItem(panellib_adminpanel, infoString);
+
 		SendPanelToClient(panellib_adminpanel, client, panellib_AdminHandler, 40);
 	}
 }
@@ -544,12 +495,12 @@ public panellib_FeaturelistLoadHandler(Handle:menu, MenuAction:action, param1, p
 		
 		featurelib_loadFeature(g_FeatureList[StringToInt(choose)][FEATURE_HANDLE]);
 
-		panellib_AdminHandler(panellib_adminpanel, MenuAction_Select, param1, 5);
+		panellib_AdminHandler(INVALID_HANDLE, MenuAction_Select, param1, 5);
 	}
 
 	else if (action == MenuAction_Cancel)
 	{
-		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+		panellib_CreateUserPanels(param1, 4);
 	}
 
 	// Stop menu
@@ -576,12 +527,12 @@ public panellib_FeaturelistUnloadHandler(Handle:menu, MenuAction:action, param1,
 		
 		featurelib_UnloadFeature(g_FeatureList[StringToInt(choose)][FEATURE_HANDLE]);
 
-		panellib_AdminHandler(panellib_adminpanel, MenuAction_Select, param1, 6);
+		panellib_AdminHandler(INVALID_HANDLE, MenuAction_Select, param1, 6);
 	}
 
 	else if (action == MenuAction_Cancel)
 	{
-		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+		panellib_CreateUserPanels(param1, 4);
 	}
 
 	// Close
@@ -602,7 +553,7 @@ public panellib_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 {
 	if (action == MenuAction_Select)
 	{
-		if (param2 == 2 && clientlib_isValidClient(param1)) 
+		if ((param2 == 1 || param2 == 2) && clientlib_isValidClient(param1)) 
 		{
 			SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
 		}
@@ -616,7 +567,7 @@ public panellib_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 
 
 // Just a pass panel handler for back button
-public panellib_PassPanelHandler(Handle:menu, MenuAction:action, param1, param2) 
+public panellib_LevelHandler(Handle:menu, MenuAction:action, param1, param2) 
 {
 	if (action == MenuAction_Cancel)
 	{
@@ -626,6 +577,12 @@ public panellib_PassPanelHandler(Handle:menu, MenuAction:action, param1, param2)
 			// Send info panel again
 			SendPanelToClient(panellib_createInfoPanel(param1), param1, panellib_InfoHandler, 40);
 		}
+	}
+
+	else if (action == MenuAction_End) 
+	{
+		// Close
+		CloseHandle(menu);
 	}
 }
 
@@ -669,7 +626,7 @@ public panellib_PlayerListHandler(Handle:menu, MenuAction:action, param1, param2
 
 	else if (action == MenuAction_Cancel)
 	{
-		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+		panellib_CreateUserPanels(param1, 4);
 	}
 
 	else if (action == MenuAction_End) 
@@ -750,7 +707,7 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 
 	else if (action == MenuAction_Cancel)
 	{
-		SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+		panellib_CreateUserPanels(param1, 4);
 	}
 
 	else if (action == MenuAction_End)
@@ -844,6 +801,33 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 			else if (param2 == 3)
 			{ 
 				// Open level overview
+				new Handle:panellib_levels = CreateMenu(panellib_LevelHandler);
+				decl String:infoString[256];
+				
+				// Create Level Overview
+				Format(infoString, sizeof(infoString), "%T", "AllLevels", param1);
+
+				SetMenuTitle(panellib_levels, infoString);
+				SetMenuExitBackButton(panellib_levels, true);
+				SetMenuExitButton(panellib_levels, true);
+
+
+				// Add all non privat levels
+				for (new i=0; i < g_iLevels; i++)
+				{
+					Format(infoString, sizeof(infoString), "%s - %i %T", g_sLevelName[i], g_iLevelPoints[i], "Points", param1);
+					AddMenuItem(panellib_levels, "", infoString, ITEMDRAW_DISABLED);
+				}
+
+
+				// Add private levels
+				for (new i=0; i < g_iPLevels; i++)
+				{
+					Format(infoString, sizeof(infoString), "%s - %T %s", g_sLevelName[g_iLevels+i], "Flag", param1, g_sLevelFlag[i]);
+					AddMenuItem(panellib_levels, "", infoString, ITEMDRAW_DISABLED);
+				}
+
+
 				DisplayMenu(panellib_levels, param1, 30);
 			}
 
@@ -858,6 +842,34 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 
 				SetMenuTitle(cmdlist, "%T", "StammCMD", param1);
 				SetMenuExitBackButton(cmdlist, true);
+
+
+				// Reset old commands
+				for (new i=0; i < g_iCommands; i++)
+				{
+					// Add command			
+					Format(g_sCommandName[i], sizeof(g_sCommandName[]), "");
+					Format(g_sCommand[i], sizeof(g_sCommand[]), "");
+				}
+
+				// Add first four commands
+				g_iCommands = 4;
+
+				Format(g_sCommandName[0], sizeof(g_sCommandName[]), "%T", "StammPoints", param1);
+				Format(g_sCommand[0], sizeof(g_sCommand[]), g_sTextToWriteF);
+
+				Format(g_sCommandName[1], sizeof(g_sCommandName[]), "%T", "StammTop", param1);
+				Format(g_sCommand[1], sizeof(g_sCommand[]), g_sVipListF);
+
+				Format(g_sCommandName[2], sizeof(g_sCommandName[]), "%T", "StammRank", param1);
+				Format(g_sCommand[2], sizeof(g_sCommand[]), g_sVipRankF);
+
+				Format(g_sCommandName[3], sizeof(g_sCommandName[]), "%T", "StammChange", param1);
+				Format(g_sCommand[3], sizeof(g_sCommand[]), g_sChangeF);
+
+
+				// Notice request
+				nativelib_RequestCommands(param1);
 
 
 				// Add all commands
@@ -1118,7 +1130,7 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 						MCPrintToChat(param1, "%s %t", g_sStammTag, "HappyRunning");
 					}
 
-					SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+					panellib_CreateUserPanels(param1, 4);
 				}
 			}
 
@@ -1145,7 +1157,7 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 					}
 				}
 
-				SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+				panellib_CreateUserPanels(param1, 4);
 			}
 
 
@@ -1210,9 +1222,15 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 						MCPrintToChat(param1, "%s %t", g_sStammTag, "NoFeatureFound");
 					}
 
-					SendPanelToClient(panellib_adminpanel, param1, panellib_AdminHandler, 40);
+					panellib_CreateUserPanels(param1, 4);
 				}
 			}
 		}
+	}
+
+	// Close
+	if (action == MenuAction_End) 
+	{
+		CloseHandle(menu);
 	}
 }

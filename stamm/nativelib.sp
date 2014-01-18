@@ -38,8 +38,9 @@ new Handle:nativelib_client_ready;
 new Handle:nativelib_client_save;
 new Handle:nativelib_happy_start;
 new Handle:nativelib_happy_end;
+new Handle:nativelib_request_commands;
 
-
+new bool:nativelib_requesting_commands;
 
 
 
@@ -47,6 +48,7 @@ new Handle:nativelib_happy_end;
 // Init. Nativelib
 nativelib_Start()
 {
+	nativelib_requesting_commands = false;
 
 	// compatiblity to old sourcemod versions
 	MarkNativeAsOptional("GetUserMessageType");
@@ -97,6 +99,7 @@ nativelib_Start()
 	// And create all the global forwards
 	nativelib_stamm_ready = CreateGlobalForward("STAMM_OnReady", ET_Ignore);
 	nativelib_client_ready = CreateGlobalForward("STAMM_OnClientReady", ET_Ignore, Param_Cell);
+	nativelib_request_commands = CreateGlobalForward("STAMM_OnClientRequestCommands", ET_Ignore, Param_Cell);
 	nativelib_client_save = CreateGlobalForward("STAMM_OnSaveClient", ET_Ignore, Param_Cell);
 	nativelib_player_stamm = CreateGlobalForward("STAMM_OnClientBecomeVip", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	nativelib_stamm_get = CreateGlobalForward("STAMM_OnClientGetPoints", ET_Ignore, Param_Cell, Param_Cell);
@@ -225,6 +228,23 @@ nativelib_ClientSave(client)
 	Call_PushCell(client);
 	
 	Call_Finish();
+}
+
+
+
+
+// Notice to all plugins, that a player want commands
+nativelib_RequestCommands(client)
+{
+	nativelib_requesting_commands = true;
+
+	Call_StartForward(nativelib_request_commands);
+	
+	Call_PushCell(client);
+	
+	Call_Finish();
+
+	nativelib_requesting_commands = false;
 }
 
 
@@ -1426,6 +1446,11 @@ public nativelib_AddCommand(Handle:plugin, numParams)
 	if (g_iCommands == MAXFEATURES)
 	{
 		ThrowNativeError(1, "Max commands of %i reached!", MAXFEATURES);
+	}
+
+	if (!nativelib_requesting_commands)
+	{
+		ThrowNativeError(2, "You can only use this native in forward STAMM_OnClientRequestCommands");
 	}
 
 
