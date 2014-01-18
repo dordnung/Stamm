@@ -137,19 +137,22 @@ public Action:OnGetPercentageOfFlashForPlayer(client, entity, Float:pos[3], &Flo
 	new team2 = GetClientTeam(owner);
 
 
-	// Anti team flash	
-	if (STAMM_IsClientValid(owner) && STAMM_IsClientValid(client))
+	// Anti team flash
+	if (STAMM_IsClientValid(client))
 	{
-		if (team == team2 && owner != client && GetConVarBool(g_hAntiTeamFlash) && STAMM_HaveClientFeature(owner)) 
+		if (STAMM_IsClientValid(owner))
+		{
+			if (team == team2 && owner != client && GetConVarBool(g_hAntiTeamFlash) && STAMM_HaveClientFeature(owner)) 
+			{
+				return Plugin_Handled;
+			}
+		}
+
+		// Anti flash
+		if (STAMM_HaveClientFeature(client) && ((GetConVarBool(g_hAntiFlash)) || (team == team2)))
 		{
 			return Plugin_Handled;
 		}
-	}
-
-	// Anti flash
-	if (STAMM_HaveClientFeature(client) && ((GetConVarBool(g_hAntiFlash)) || (team == team2)))
-	{
-		return Plugin_Handled;
 	}
 
 	return Plugin_Continue;
