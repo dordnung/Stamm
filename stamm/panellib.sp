@@ -51,17 +51,17 @@ panellib_Start()
 
 
 	// register sinfo and schange and take out "_sm"
+	RegConsoleCmd(g_sInfo, panellib_InfoPanel);
+	RegConsoleCmd(g_sChange, panellib_ChangePanel);
+
 	if (!StrContains(g_sInfo, "sm_"))
 	{
-		RegConsoleCmd(g_sInfo, panellib_InfoPanel);
-		
 		ReplaceString(g_sInfoF, sizeof(g_sInfoF), "sm_", "!");
 	}
 	
+		
 	if (!StrContains(g_sChange, "sm_"))
 	{
-		RegConsoleCmd(g_sChange, panellib_ChangePanel);
-		
 		ReplaceString(g_sChangeF, sizeof(g_sChangeF), "sm_", "!");
 	}
 	

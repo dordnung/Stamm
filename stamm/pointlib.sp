@@ -48,10 +48,10 @@ pointlib_Start()
 
 
 	// Register main stamm command and strip "sm_"
+	RegConsoleCmd(g_sTextToWrite, pointlib_ShowPoints);
+
 	if (!StrContains(g_sTextToWrite, "sm_"))
 	{
-		RegConsoleCmd(g_sTextToWrite, pointlib_ShowPoints);
-		
 		ReplaceString(g_sTextToWriteF, sizeof(g_sTextToWriteF), "sm_", "!");
 	}
 }

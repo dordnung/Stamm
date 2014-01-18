@@ -43,17 +43,16 @@ sqllib_Start()
 
 
 	// Register viplist and viprank command
+	RegConsoleCmd(g_sVipList, sqllib_GetVipTop);
+	RegConsoleCmd(g_sVipRank, sqllib_GetVipRank);
+
 	if (!StrContains(g_sVipList, "sm_"))
 	{
-		RegConsoleCmd(g_sVipList, sqllib_GetVipTop);
-		
 		ReplaceString(g_sVipListF, sizeof(g_sVipListF), "sm_", "!");
 	}
 	
 	if (!StrContains(g_sVipRank, "sm_"))
 	{
-		RegConsoleCmd(g_sVipRank, sqllib_GetVipRank);
-	
 		ReplaceString(g_sVipRankF, sizeof(g_sVipRankF), "sm_", "!");
 	}
 }
