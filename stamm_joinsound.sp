@@ -91,7 +91,7 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("joinsound", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	g_hPath = AutoExecConfig_CreateConVar("joinsound_path", "music/stamm/vip_sound.mp3", "Path to joinsound, after sound/");
+	g_hPath = AutoExecConfig_CreateConVar("joinsound_path", "stamm/vip_sound.mp3", "Path to joinsound, after sound/");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
