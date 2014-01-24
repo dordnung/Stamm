@@ -250,16 +250,16 @@ nativelib_RequestCommands(client)
 	// Add first our four commands
 	g_iCommands = 4;
 
-	Format(g_sCommandName[0], sizeof(g_sCommandName[]), "%T", "StammPoints", param1);
+	Format(g_sCommandName[0], sizeof(g_sCommandName[]), "%T", "StammPoints", client);
 	Format(g_sCommand[0], sizeof(g_sCommand[]), g_sTextToWriteF);
 
-	Format(g_sCommandName[1], sizeof(g_sCommandName[]), "%T", "StammTop", param1);
+	Format(g_sCommandName[1], sizeof(g_sCommandName[]), "%T", "StammTop", client);
 	Format(g_sCommand[1], sizeof(g_sCommand[]), g_sVipListF);
 
-	Format(g_sCommandName[2], sizeof(g_sCommandName[]), "%T", "StammRank", param1);
+	Format(g_sCommandName[2], sizeof(g_sCommandName[]), "%T", "StammRank", client);
 	Format(g_sCommand[2], sizeof(g_sCommand[]), g_sVipRankF);
 
-	Format(g_sCommandName[3], sizeof(g_sCommandName[]), "%T", "StammChange", param1);
+	Format(g_sCommandName[3], sizeof(g_sCommandName[]), "%T", "StammChange", client);
 	Format(g_sCommand[3], sizeof(g_sCommand[]), g_sChangeF);
 
 
