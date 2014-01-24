@@ -157,6 +157,8 @@ public getLevelFlag(String:theflags[], size, level)
 		FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
 		
 
+		STAMM_WriteToLog(false, "Attention: Found only old AdminFlags level config. New one is in: cfg/stamm/levels/adminflags.txt!");
+
 
 		// Key Value loop
 		if (KvGotoFirstSubKey(flagvalue, false))
