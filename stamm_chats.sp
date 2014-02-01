@@ -26,7 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
-#include <sourcecomms>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -185,7 +184,7 @@ public Action:CmdSay(client, args)
 
 
 	// Client valid?
-	if (STAMM_IsClientValid(client) && SourceComms_GetClientGagType(client) == bNot)
+	if (STAMM_IsClientValid(client))
 	{
 		// Can write VIP message?
 		if (g_iMessages != -1 && STAMM_HaveClientFeature(client, g_iMessages))
@@ -207,19 +206,19 @@ public Action:CmdSay(client, args)
 
 
 				// print according to Team
-				if (GetClientTeam(client) == 2 && SourceComms_GetClientGagType(client) == bNot) 
+				if (GetClientTeam(client) == 2) 
 				{
 					STAMM_PrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
 					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
 				}
 
-				else if (GetClientTeam(client) == 3 && SourceComms_GetClientGagType(client) == bNot) 
+				else if (GetClientTeam(client) == 3) 
 				{
 					STAMM_PrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
 					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
 				}
 
-				else if (SourceComms_GetClientGagType(client) == bNot)
+				else
 				{
 					STAMM_PrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
 					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
@@ -256,19 +255,19 @@ public Action:CmdSay(client, args)
 						if (STAMM_HaveClientFeature(i, g_iChat))
 						{
 							// Print according to team
-							if (GetClientTeam(i) == 2 && SourceComms_GetClientGagType(client) == bNot) 
+							if (GetClientTeam(i) == 2) 
 							{
 								STAMM_PrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
 								LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
 							}
 							
-							else if (GetClientTeam(i) == 3 && SourceComms_GetClientGagType(client) == bNot) 
+							else if (GetClientTeam(i) == 3) 
 							{
 								STAMM_PrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
 								LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
 							}
 
-							else if(SourceComms_GetClientGagType(client) == bNot)
+							else
 							{
 								STAMM_PrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
 								LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
