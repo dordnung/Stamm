@@ -26,6 +26,7 @@
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
+#include <sourcecomms>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -39,6 +40,10 @@
 new Handle:g_hMessageTag;
 new Handle:g_hOwnChatTag;
 new Handle:g_hNeedTag;
+new String:g_sMessageFile[PLATFORM_MAX_PATH + 1];
+new String:g_sChatFile[PLATFORM_MAX_PATH + 1];
+new String:smFolder[PLATFORM_MAX_PATH + 1];
+new String:CurrentDate[20];
 
 new g_iMessages;
 new g_iChat;
@@ -65,6 +70,11 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+	BuildPath(Path_SM, smFolder, sizeof(smFolder), "logs");
+	FormatTime(CurrentDate, sizeof(CurrentDate), "%d-%m-%y");
+
+	Format(g_sMessageFile, sizeof(g_sMessageFile), "%s/stamm_message_(%s).log", smFolder, CurrentDate);
+	Format(g_sChatFile, sizeof(g_sChatFile), "%s/stamm_chat_(%s).log", smFolder, CurrentDate);
 
 	// Load	
 	STAMM_LoadTranslation();
@@ -175,7 +185,7 @@ public Action:CmdSay(client, args)
 
 
 	// Client valid?
-	if (STAMM_IsClientValid(client))
+	if (STAMM_IsClientValid(client) && SourceComms_GetClientGagType(client) == bNot)
 	{
 		// Can write VIP message?
 		if (g_iMessages != -1 && STAMM_HaveClientFeature(client, g_iMessages))
@@ -197,19 +207,22 @@ public Action:CmdSay(client, args)
 
 
 				// print according to Team
-				if (GetClientTeam(client) == 2) 
+				if (GetClientTeam(client) == 2 && SourceComms_GetClientGagType(client) == bNot) 
 				{
 					STAMM_PrintToChatAll("{red}[%s] {green}%s:{red} %s", messageTag, name, text);
+					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
 				}
 
-				else if (GetClientTeam(client) == 3) 
+				else if (GetClientTeam(client) == 3 && SourceComms_GetClientGagType(client) == bNot) 
 				{
 					STAMM_PrintToChatAll("{blue}[%s] {green}%s:{blue} %s", messageTag, name, text);
+					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
 				}
 
-				else
+				else if (SourceComms_GetClientGagType(client) == bNot)
 				{
 					STAMM_PrintToChatAll("{lightgreen}[%s] {green}%s:{lightgreen} %s", messageTag, name, text);
+					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
 				}
 
 				return Plugin_Handled;
@@ -243,19 +256,22 @@ public Action:CmdSay(client, args)
 						if (STAMM_HaveClientFeature(i, g_iChat))
 						{
 							// Print according to team
-							if (GetClientTeam(i) == 2) 
+							if (GetClientTeam(i) == 2 && SourceComms_GetClientGagType(client) == bNot) 
 							{
 								STAMM_PrintToChat(i, "{red}[%s] {green}%s:{red} %s", ownChatTag, name, text);
+								LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
 							}
 							
-							else if (GetClientTeam(i) == 3) 
+							else if (GetClientTeam(i) == 3 && SourceComms_GetClientGagType(client) == bNot) 
 							{
 								STAMM_PrintToChat(i, "{blue}[%s] {green}%s:{blue} %s", ownChatTag, name, text);
+								LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
 							}
 
-							else
+							else if(SourceComms_GetClientGagType(client) == bNot)
 							{
 								STAMM_PrintToChat(i, "{lightgreen}[%s] {green}%s:{lightgreen} %s", ownChatTag, name, text);
+								LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
 							}
 						}
 					}
