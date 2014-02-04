@@ -63,6 +63,14 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 	{
 		if (StrEqual(g_FeatureList[i][FEATURE_BASE], basename, false))
 		{
+			if (!StrEqual(g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL], false))
+			{
+				LogToFile(g_sLogFile, "[ STAMM ] Found duplicate Feature. First Plugin at: %s. Second Plugin at: %s", g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+
+				return;
+			}
+
+
 			// Duplicate found, assign new values
 			g_FeatureList[i][FEATURE_ENABLE] = true;
 			g_FeatureList[i][FEATURE_HANDLE] = plugin;
