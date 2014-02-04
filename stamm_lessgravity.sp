@@ -157,3 +157,22 @@ public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 		}
 	}
 }
+
+
+
+// When client is on a ladder gravity will go back to normal
+public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
+{
+	if (STAMM_IsClientValid(client))
+	{
+		static MoveType:lastMove[MAXPLAYERS + 1] = MOVETYPE_NONE;
+		new MoveType:current = GetEntityMoveType(client);
+
+		if (current != MOVETYPE_LADDER && lastMove[client] == MOVETYPE_LADDER)
+		{
+			STAMM_OnClientChangedFeature(client, true, false);
+		}
+
+		lastMove[client] = current;
+	}
+}
