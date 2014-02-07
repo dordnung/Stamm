@@ -96,7 +96,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP No Restrict", "%T", "GetNoRestrict", LANG_SERVER);
+	STAMM_RegisterFeature("VIP No Restrict");
 
 
 	if (STAMM_GetGame() == GameCSGO)
@@ -152,6 +152,19 @@ public OnAllPluginsLoaded()
 	}
 
 	CloseHandle(kv);
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetNoRestrict", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

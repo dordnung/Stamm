@@ -87,7 +87,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Models");
+	STAMM_RegisterFeature("VIP Models");
 }
 
 
@@ -186,17 +186,44 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	
 
 	CloseHandle(model_settings);
+}
 
 
-	// Load Translation files
-	if (model_change && same_models)
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	new bool:found = false;
+	
+	for (new item = 0; item < modelCount; item++)
 	{
-		STAMM_AddBlockDescription(1, "%T", "GetModelChange", LANG_SERVER, model_change_cmd);
+		// Right team and right level?
+		if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_GetClientLevel(client) >= StringToInt(models[item][MODELLEVEL]))
+		{
+			if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
+			{
+				found = true;
+				
+				break;
+			}
+		}
 	}
-	else 
+	
+	
+	if (found)
 	{
+		if (model_change && same_models)
+		{
+			Format(fmt, sizeof(fmt), "%T", "GetModelChange", client, model_change_cmd);
+		}
+		else 
+		{
+			Format(fmt, sizeof(fmt), "%T", "GetModel", client);
+		}
 
-		STAMM_AddBlockDescription(1, "%T", "GetModel", LANG_SERVER);
+		PushArrayString(array, fmt);
 	}
 }
 

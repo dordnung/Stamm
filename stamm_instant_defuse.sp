@@ -79,7 +79,20 @@ public OnAllPluginsLoaded()
 		
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP Instant Defuse", "%T", "GetInstantDefuse", LANG_SERVER);
+	STAMM_RegisterFeature("VIP Instant Defuse");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetInstantDefuse", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

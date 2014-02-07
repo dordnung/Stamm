@@ -92,7 +92,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP Weapons", "%T", "GetWeapons", LANG_SERVER);
+	STAMM_RegisterFeature("VIP Weapons");
 
 
 	if (STAMM_GetGame() == GameCSGO)
@@ -162,6 +162,19 @@ public OnAllPluginsLoaded()
 		// Go Back
 		KvRewind(g_hKV);
 	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetWeapons", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

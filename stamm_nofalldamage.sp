@@ -85,7 +85,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP No Fall Damage", "%T", "GetNoFallDamage", LANG_SERVER);
+	STAMM_RegisterFeature("VIP No Fall Damage");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetNoFallDamage", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

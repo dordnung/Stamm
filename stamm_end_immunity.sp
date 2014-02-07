@@ -103,7 +103,20 @@ public OnAllPluginsLoaded()
 	
 	
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP End of Round Immunity", "%T", "GetImmunity", LANG_SERVER);
+	STAMM_RegisterFeature("VIP End of Round Immunity");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetImmunity", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

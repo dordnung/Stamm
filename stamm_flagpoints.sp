@@ -92,7 +92,7 @@ public OnAllPluginsLoaded()
 
 	// Load Translation
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP FlagPoints");
+	STAMM_RegisterFeature("VIP FlagPoints");
 }
 
 

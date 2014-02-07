@@ -63,7 +63,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();	
-	STAMM_AddFeature("VIP Chat Messages");
+	STAMM_RegisterFeature("VIP Chat Messages");
 }
 
 
@@ -88,22 +88,34 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	// Get Blocks
 	g_iWelcome = STAMM_GetBlockOfName("welcome");
 	g_iLeave = STAMM_GetBlockOfName("leave");
-
-
-	// Check valid?
-	if (g_iWelcome != -1)
-	{
-		STAMM_AddBlockDescription(g_iWelcome, "%T", "GetWelcomeMessages", LANG_SERVER);
-	}
-
-	if (g_iLeave != -1)
-	{
-		STAMM_AddBlockDescription(g_iLeave, "%T", "GetLeaveMessages", LANG_SERVER);
-	}
+	
 
 	if (g_iWelcome == -1 && g_iLeave == -1)
 	{
 		SetFailState("Found neither block welcome nor block leave!");
+	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	if (block == g_iWelcome)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetWelcomeMessages", client);
+		
+		PushArrayString(array, fmt);
+	}
+
+	if (block == g_iLeave)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetLeaveMessages", client);
+		
+		PushArrayString(array, fmt);
 	}
 }
 

@@ -69,7 +69,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP HookGrabRope");
+	STAMM_RegisterFeature("VIP HookGrabRope");
 }
 
 
@@ -94,25 +94,36 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	g_iRope = STAMM_GetBlockOfName("rope");
 
 
-
-	if (g_iGrab != -1)
-	{
-		STAMM_AddBlockDescription(g_iGrab, "%T", "GetGrab", LANG_SERVER);
-	}
-
-	if (g_iHook != -1)
-	{
-		STAMM_AddBlockDescription(g_iHook, "%T", "GetHook", LANG_SERVER);
-	}
-
-	if (g_iRope != -1)
-	{
-		STAMM_AddBlockDescription(g_iRope, "%T", "GetRope", LANG_SERVER);
-	}
-
 	if (g_iGrab == -1 && g_iHook == -1 && g_iRope == -1)
 	{
 		SetFailState("Found neither block grap nor block hoo nor block rope!");
+	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	if (block == g_iGrab)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetGrab", client);
+		PushArrayString(array, fmt);
+	}
+
+	if (block == g_iHook)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetHook", client);
+		PushArrayString(array, fmt);
+	}
+
+	if (block == g_iRope)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetRope", client);
+		PushArrayString(array, fmt);
 	}
 }
 

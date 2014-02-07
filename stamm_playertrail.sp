@@ -90,7 +90,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP PlayerTrail", "%T", "GetPlayerTrail", LANG_SERVER);
+	STAMM_RegisterFeature("VIP PlayerTrail");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetPlayerTrail", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

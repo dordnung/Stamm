@@ -76,7 +76,20 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP FastLadder", "%T", "GetFastLadder", LANG_SERVER);
+	STAMM_RegisterFeature("VIP FastLadder");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetFastLadder", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

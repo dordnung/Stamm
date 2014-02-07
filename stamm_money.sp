@@ -68,7 +68,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Cash");
+	STAMM_RegisterFeature("VIP Cash");
 }
 
 
@@ -86,10 +86,21 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
-
-
-	STAMM_AddBlockDescription(1, "%T", "GetCash", LANG_SERVER, GetConVarInt(g_hCash));
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetCash", client, GetConVarInt(g_hCash));
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 

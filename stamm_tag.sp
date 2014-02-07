@@ -70,9 +70,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Tag", "", true, false);
+	STAMM_RegisterFeature("VIP Tag", true, false);
 }
 
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetTag", client, tag);
+	
+	PushArrayString(array, fmt);
+}
 
 
 
@@ -111,8 +122,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	}
 	
 	GetConVarString(g_hTag, tag, sizeof(tag));
-
-	STAMM_AddBlockDescription(1, "%T", "GetTag", LANG_SERVER, tag);
 }
 
 

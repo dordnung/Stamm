@@ -74,7 +74,7 @@ public OnAllPluginsLoaded()
 
 	// Load	
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Chats");
+	STAMM_RegisterFeature("VIP Chats");
 }
 
 
@@ -102,33 +102,40 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	g_iChat = STAMM_GetBlockOfName("chat");
 
 
-
-	// Found a valid block?
-	if (g_iMessages != -1)
-	{
-		if (GetConVarBool(g_hNeedTag))
-		{
-			Format(activate, sizeof(activate), "%T", "Activate", LANG_SERVER, "*");
-
-			STAMM_AddBlockDescription(g_iMessages, "%T", "GetVIPMessage", LANG_SERVER, activate);
-		}
-		else
-		{
-			STAMM_AddBlockDescription(g_iMessages, "%T", "GetVIPMessage", LANG_SERVER, "");
-		}
-	}	
-
-
-	// Found valid block?
-	if (g_iChat != -1)
-	{
-		STAMM_AddBlockDescription(g_iChat, "%T", "GetVIPChat", LANG_SERVER);
-	}
-
-
 	if (g_iMessages == -1 && g_iChat == -1)
 	{
 		SetFailState("Found neither block messages nor block chat!");
+	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	if (block == g_iMessages)
+	{
+		if (GetConVarBool(g_hNeedTag))
+		{
+			Format(fmt, sizeof(fmt), "%T", "Activate", client, "*");
+			Format(fmt, sizeof(fmt), "%T", "GetVIPMessage", client, activate);
+		}
+		else
+		{
+			Format(fmt, sizeof(fmt), "%T", "GetVIPMessage", client, "");
+		}
+		
+		PushArrayString(array, fmt);
+	}
+
+	if (block == g_iChat)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetVIPChat", client);
+		
+		PushArrayString(array, fmt);
 	}
 }
 

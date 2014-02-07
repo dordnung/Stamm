@@ -92,38 +92,45 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (STAMM_GetBlockCount() < 3)
 	{
 		g_iBlockDirection = g_iBlockDistance = g_iBlockName = 1;
-
-		STAMM_AddBlockDescription(1, "%T", "GetAll", LANG_SERVER);
 	}
-
 	else
 	{
 		// Get Blocks
 		g_iBlockDirection = STAMM_GetBlockOfName("direction");
 		g_iBlockDistance = STAMM_GetBlockOfName("distance");
 		g_iBlockName = STAMM_GetBlockOfName("name");
-
-
-		// Check valid?
-		if (g_iBlockDirection != -1)
-		{
-			STAMM_AddBlockDescription(g_iBlockDirection, "%T", "GetDirection", LANG_SERVER);
-		}
-
-		if (g_iBlockDistance != -1)
-		{
-			STAMM_AddBlockDescription(g_iBlockDistance, "%T", "GetDistance", LANG_SERVER);
-		}
-
-		if (g_iBlockName != -1)
-		{
-			STAMM_AddBlockDescription(g_iBlockName, "%T", "GetName", LANG_SERVER);
-		}
 	}
 
 
 	// check for nearest player
 	CreateTimer(0.2, checkPlayers, _, TIMER_REPEAT);
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	if (block == g_iBlockDirection)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetDirection", client);
+		PushArrayString(array, fmt);
+	}
+
+	if (block == g_iBlockDistance)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetDistance", client);
+		PushArrayString(array, fmt);
+	}
+
+	if (block == g_iBlockName)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetName", client);
+		PushArrayString(array, fmt);
+	}
 }
 
 
@@ -138,7 +145,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Distance");
+	STAMM_RegisterFeature("VIP Distance");
 }
 
 

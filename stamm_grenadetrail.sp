@@ -90,7 +90,20 @@ public OnAllPluginsLoaded()
 		
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP Grenade Trail", "%T", "GetGrenadeTrail", LANG_SERVER);
+	STAMM_RegisterFeature("VIP Grenade Trail");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetGrenadeTrail", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

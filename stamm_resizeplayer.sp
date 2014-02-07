@@ -73,7 +73,7 @@ public OnAllPluginsLoaded()
 
 	// Load translation and add feaure
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Resize Player");
+	STAMM_RegisterFeature("VIP Resize Player");
 }
 
 
@@ -113,13 +113,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+}
 
 
-	// Write level descriptions
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		STAMM_AddBlockDescription(i, "%T", "GetResize", LANG_SERVER, GetConVarInt(g_hResize) * i);
-	}
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetResize", client, GetConVarInt(g_hResize) * block);
+	
+	PushArrayString(array, fmt);
 }
 
 

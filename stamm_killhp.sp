@@ -62,7 +62,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP KillHP");
+	STAMM_RegisterFeature("VIP KillHP");
 }
 
 
@@ -80,9 +80,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+}
 
 
-	STAMM_AddBlockDescription(1, "%T", "GetKillHP", LANG_SERVER, GetConVarInt(g_hHP));
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetKillHP", client, GetConVarInt(g_hHP));
+	
+	PushArrayString(array, fmt);
 }
 
 

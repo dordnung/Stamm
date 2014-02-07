@@ -78,7 +78,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP Icon", "%T", "GetIcon", LANG_SERVER);
+	STAMM_RegisterFeature("VIP Icon");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetIcon", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

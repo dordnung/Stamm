@@ -76,7 +76,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Anti Flash");
+	STAMM_RegisterFeature("VIP Anti Flash");
 }
 
 
@@ -94,18 +94,26 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+}
 
 
 
-	// Antiflash translations
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
 	if (GetConVarBool(g_hAntiFlash)) 
 	{
-		STAMM_AddBlockDescription(1, "%T", "GetAntiFlash", LANG_SERVER);
+		Format(fmt, sizeof(fmt), "%T", "GetAntiFlash", client);
 	}
 	else 
 	{
-		STAMM_AddBlockDescription(1, "%T", "GetTeamFlash", LANG_SERVER);
+		Format(fmt, sizeof(fmt), "%T", "GetTeamFlash", client);
 	}
+	
+	PushArrayString(array, fmt);
 }
 
 

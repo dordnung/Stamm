@@ -57,7 +57,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Admin Flags", "", false);
+	STAMM_RegisterFeature("VIP Admin Flags", false);
 }
 
 
@@ -88,6 +88,20 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		
 		getLevelFlag(theflags, sizeof(theflags), i);
 	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	STAMM_GetBlockName(block, fmt, sizeof(fmt));
+	Format(fmt, sizeof(fmt), "%T", "GetAdminFlags", client, fmt);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -144,7 +158,6 @@ public getLevelFlag(String:theflags[], size, level)
 			if (STAMM_GetBlockLevel(i) == level)
 			{
 				STAMM_GetBlockName(i, theflags, size);
-				STAMM_AddBlockDescription(i, "%T", "GetAdminFlags", LANG_SERVER, theflags);
 
 				break;
 			}

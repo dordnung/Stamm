@@ -65,7 +65,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP SpawnHP");
+	STAMM_RegisterFeature("VIP SpawnHP");
 }
 
 
@@ -83,15 +83,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
-
-
-	// Add for each block a description
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		STAMM_AddBlockDescription(i, "%T", "GetSpawnHP", LANG_SERVER, GetConVarInt(g_hHP) * i);
-	}
 }
 
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetSpawnHP", client, GetConVarInt(g_hHP) * block);
+	
+	PushArrayString(array, fmt);
+}
 
 
 

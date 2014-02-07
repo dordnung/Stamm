@@ -62,7 +62,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Less Gravity");
+	STAMM_RegisterFeature("VIP Less Gravity");
 }
 
 
@@ -99,13 +99,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+}
 
 
-	// Add dsecription for each feature
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		STAMM_AddBlockDescription(i, "%T", "GetLessGravity", LANG_SERVER, grav * i);
-	}
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetLessGravity", client, grav * block);
+	
+	PushArrayString(array, fmt);
 }
 
 

@@ -54,7 +54,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	decl String:urlString[256];
 
 
-
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
@@ -62,7 +61,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 		Updater_AddPlugin(urlString);
 	}
 }
-
 
 
 
@@ -77,7 +75,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP FireWeapon", "%T", "GetFireWeapon", LANG_SERVER);
+	STAMM_RegisterFeature("VIP FireWeapon");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetFireWeapon", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

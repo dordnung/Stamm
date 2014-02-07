@@ -101,7 +101,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFastFeature("VIP LongJump", "%T", "GetLongJump", LANG_SERVER);
+	STAMM_RegisterFeature("VIP LongJump");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetLongJump", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

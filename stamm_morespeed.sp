@@ -62,7 +62,7 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP MoreSpeed");
+	STAMM_RegisterFeature("VIP MoreSpeed");
 }
 
 
@@ -99,13 +99,19 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
+}
 
 
-	// Set description for each block
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		STAMM_AddBlockDescription(i, "%T", "GetMoreSpeed", LANG_SERVER, GetConVarInt(g_hSpeed) * i);
-	}
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetMoreSpeed", client, GetConVarInt(g_hSpeed) * block);
+	
+	PushArrayString(array, fmt);
 }
 
 
