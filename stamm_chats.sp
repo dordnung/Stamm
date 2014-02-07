@@ -83,7 +83,6 @@ public OnAllPluginsLoaded()
 // Add to auto updater and make descriptions
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:activate[64];
 	decl String:urlString[256];
 
 
@@ -121,7 +120,7 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 		if (GetConVarBool(g_hNeedTag))
 		{
 			Format(fmt, sizeof(fmt), "%T", "Activate", client, "*");
-			Format(fmt, sizeof(fmt), "%T", "GetVIPMessage", client, activate);
+			Format(fmt, sizeof(fmt), "%T", "GetVIPMessage", client, fmt);
 		}
 		else
 		{

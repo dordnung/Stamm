@@ -80,7 +80,8 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 {
 	decl String:fmt[256];
 	
-	Format(fmt, sizeof(fmt), "%T", "GetTag", client, tag);
+	GetConVarString(g_hTag, fmt, sizeof(fmt));
+	Format(fmt, sizeof(fmt), "%T", "GetTag", client, fmt);
 	
 	PushArrayString(array, fmt);
 }
@@ -110,7 +111,6 @@ public OnPluginStart()
 public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
-	decl String:tag[PLATFORM_MAX_PATH + 1];
 
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -120,8 +120,6 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		Updater_AddPlugin(urlString);
 	}
-	
-	GetConVarString(g_hTag, tag, sizeof(tag));
 }
 
 
