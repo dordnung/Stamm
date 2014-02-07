@@ -39,7 +39,6 @@ new Handle:nativelib_client_save;
 new Handle:nativelib_happy_start;
 new Handle:nativelib_happy_end;
 new Handle:nativelib_request_commands;
-new Handle:nativelib_request_feature;
 
 new bool:nativelib_requesting_commands;
 
@@ -102,7 +101,6 @@ nativelib_Start()
 	nativelib_stamm_ready = CreateGlobalForward("STAMM_OnReady", ET_Ignore);
 	nativelib_client_ready = CreateGlobalForward("STAMM_OnClientReady", ET_Ignore, Param_Cell);
 	nativelib_request_commands = CreateGlobalForward("STAMM_OnClientRequestCommands", ET_Ignore, Param_Cell);
-	nativelib_request_feature = CreateGlobalForward("STAMM_OnClientRequestFeatureInfo", ET_Ignore, Param_Cell, Param_Cell, Param_CellByRef);
 	nativelib_client_save = CreateGlobalForward("STAMM_OnSaveClient", ET_Ignore, Param_Cell);
 	nativelib_player_stamm = CreateGlobalForward("STAMM_OnClientBecomeVip", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	nativelib_stamm_get = CreateGlobalForward("STAMM_OnClientGetPoints", ET_Ignore, Param_Cell, Param_Cell);
@@ -279,19 +277,26 @@ nativelib_RequestCommands(client)
 
 
 // Notice to all plugins, that a player wants feature info
-Handle:nativelib_RequestFeature(client, block)
+Handle:nativelib_RequestFeature(Handle:plugin, client, block)
 {
-	new Handle:infoHandle = CreateArray(256);
+	new Function:id = GetFunctionByName(plugin, "STAMM_OnClientRequestFeatureInfo");
 
-	Call_StartForward(nativelib_request_feature);
-	
-	Call_PushCell(client);
-	Call_PushCell(block);
-	Call_PushCellRef(infoHandle);
-	
-	Call_Finish();
+	if (id != INVALID_FUNCTION)
+	{
+		new Handle:infoHandle = CreateArray(256);
 
-	return infoHandle;
+		Call_StartFunction(plugin, id);
+		
+		Call_PushCell(client);
+		Call_PushCell(block);
+		Call_PushCellRef(infoHandle);
+		
+		Call_Finish();
+
+		return infoHandle;
+	}
+
+	return INVALID_HANDLE;
 }
 
 

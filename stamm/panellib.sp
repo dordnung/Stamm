@@ -893,10 +893,21 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 
 						for (new l=0; l < g_FeatureList[j][FEATURE_BLOCKS] && !foundFeature; l++)
 						{
-							new Handle:hArray = nativelib_RequestFeature(param1, l+1);
+							if (i+1 != g_FeatureList[j][FEATURE_LEVEL][l])
+							{
+								continue;
+							}
+
+							new Handle:hArray = nativelib_RequestFeature(g_FeatureList[j][FEATURE_HANDLE], param1, l+1);
 
 
-							if (hArray == INVALID_HANDLE || GetArraySize(hArray) <= 0)
+							if (hArray == INVALID_HANDLE)
+							{
+								continue;
+							}
+
+
+							if (GetArraySize(hArray) <= 0)
 							{
 								CloseHandle(hArray);
 
@@ -969,10 +980,16 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 					}
 
 
-					new Handle:hArray = nativelib_RequestFeature(param1, k+1);
+					new Handle:hArray = nativelib_RequestFeature(g_FeatureList[i][FEATURE_HANDLE], param1, k+1);
 
 
-					if (hArray == INVALID_HANDLE || GetArraySize(hArray) <= 0)
+					if (hArray == INVALID_HANDLE)
+					{
+						continue;
+					}
+
+
+					if (GetArraySize(hArray) <= 0)
 					{
 						CloseHandle(hArray);
 
