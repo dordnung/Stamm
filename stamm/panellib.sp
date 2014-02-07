@@ -865,6 +865,7 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 			else if (param2 == 1)
 			{
 				// Found feature?
+				decl String:featureid[10];
 				new bool:foundFeature = false;
 				new Handle:featurelist = CreateMenu(panellib_FeatureListHandler);
 				
@@ -874,10 +875,6 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 				SetMenuTitle(featurelist, "%T", "HaveFeatures", param1);
 				SetMenuExitBackButton(featurelist, true);
 				
-
-
-				decl String:featureid[10];
-				decl String:arrayItem[128];
 
 				// Loop through levels
 				for (new i=0; i < g_iLevels+g_iPLevels; i++)
@@ -896,36 +893,28 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 
 						for (new l=0; l < g_FeatureList[j][FEATURE_BLOCKS] && !foundFeature; l++)
 						{
-							if (g_FeatureList[j][FEATURE_DESCS][l] == INVALID_HANDLE || i+1 != g_FeatureList[j][FEATURE_LEVEL][l])
+							new Handle:hArray = nativelib_RequestFeature(param1, l+1);
+
+
+							if (hArray == INVALID_HANDLE || GetArraySize(hArray) <= 0)
 							{
+								CloseHandle(hArray);
+
 								continue;
 							}
 
-							// Loop through all descriptions on this block
-							for (new k=0; k < GetArraySize(g_FeatureList[j][FEATURE_DESCS][l]) && !foundFeature; k++)
-							{
-								GetArrayString(g_FeatureList[j][FEATURE_DESCS][l], k, arrayItem, sizeof(arrayItem));
+
+							CloseHandle(hArray);
 
 
-								// We have a description
-								if (StrEqual(arrayItem, "") || arrayItem[0] == '\0')
-								{
-									continue;
-								}
-
-								// Add level
-								Format(featureid, sizeof(featureid), "%i", i+1);
-								
-								AddMenuItem(featurelist, featureid, g_sLevelName[i]);
+							// Add level
+							Format(featureid, sizeof(featureid), "%i", i+1);
+							
+							AddMenuItem(featurelist, featureid, g_sLevelName[i]);
 
 
-
-								// Found Feature
-								foundFeature = true;
-
-								// Stop Feature loop
-								break;
-							}
+							// Found Feature
+							foundFeature = true;
 						}
 					}
 				}
@@ -974,28 +963,36 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 			{
 				for (new k=0; k < g_FeatureList[i][FEATURE_BLOCKS]; k++)
 				{
-					if (g_FeatureList[i][FEATURE_LEVEL][k] != id || g_FeatureList[i][FEATURE_DESCS][k] == INVALID_HANDLE)
+					if (g_FeatureList[i][FEATURE_LEVEL][k] != id)
 					{
 						continue;
 					}
 
-					// Loop through all descriptions on this level
-					for (new j=0; j < GetArraySize(g_FeatureList[i][FEATURE_DESCS][k]); j++)
+
+					new Handle:hArray = nativelib_RequestFeature(param1, k+1);
+
+
+					if (hArray == INVALID_HANDLE || GetArraySize(hArray) <= 0)
 					{
-						GetArrayString(g_FeatureList[i][FEATURE_DESCS][k], j, arrayItem, sizeof(arrayItem));
+						CloseHandle(hArray);
+
+						continue;
+					}
 
 
-						// Only valid textes
-						if (StrEqual(arrayItem, "") || arrayItem[0] == '\0')
-						{
-							continue;
-						}
+					// Loop through all descriptions on this level
+					for (new j=0; j < GetArraySize(hArray); j++)
+					{
+						GetArrayString(hArray, j, arrayItem, sizeof(arrayItem));
 
 						// Add text
 						Format(featuretext, sizeof(featuretext), "%s", arrayItem);
 						
 						AddMenuItem(featurelist, "", featuretext, ITEMDRAW_DISABLED);
 					}
+
+
+					CloseHandle(hArray);
 				}
 			}
 		}

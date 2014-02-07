@@ -53,6 +53,21 @@ forward STAMM_OnFeatureLoaded(const String:basename[]);
 forward STAMM_OnClientChangedFeature(client, bool:turnedOn, bool:isShop);
 
 
+/**
+ * Executes when a client requests information about your plugin.
+ *
+ * This will convert the block to the level and add a text in the stamm menu
+ * with information what the player will get on this level, so make this detailed!
+ *
+ * Use the parameter client to format language phrases.
+ *
+ * @param client      Client that requests the feature menu.
+ * @param block       Block the player wants information about.
+ * @param array       An ADT Array. Push your information strings here in. Never close this!
+ */
+forward STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array);
+
+
 
 
 
@@ -62,29 +77,13 @@ forward STAMM_OnClientChangedFeature(client, bool:turnedOn, bool:isShop);
  * Registers a new Stamm Feature.
  *
  * @param name          Short Name of the Feature.
- * @param description   Feature description for all blocks (Also can be added with STAMM_AddBlockDescription).
  * @param allowChange   true = Player can switch Feature on/off, false = he can't.
  * @param standard      true = Plugin is default enabled, false = Player have to enable it first.
  *
  * @noreturn
  * @error               Max features reached.
  */
-native STAMM_AddFeature(const String:name[], const String:description[]="", bool:allowChange=true, bool:standard=true);
-
-
-/**
- * DEPRECATED! USE STAMM_AddBlockDescription INSTEAD!
- *
- * Adds information about what a player get on a specific level with this feature.
- *
- * @param level         The level, 0=No VIP, x=Level.
- * @param description   What a player get on this level.
- *
- * @return              true = success, false = error.
- * @error               Level or feature is invalid.
- */
-#pragma deprecated Use STAMM_AddBlockDescription instead!
-native bool:STAMM_AddFeatureText(level, const String:description[]);
+native STAMM_RegisterFeature(const String:name[], bool:allowChange=true, bool:standard=true);
 
 
 /**
@@ -135,6 +134,39 @@ native bool:STAMM_IsMyFeature(const String:basename[]);
 native STAMM_GetBasename(String:basename[], maxlength);
 
 
+/**
+ * DEPRECATED! Use STAMM_RegisterFeature instead!
+ *
+ * Registers a new Stamm Feature.
+ *
+ * @param name          Short Name of the Feature.
+ * @param description   Feature description for all blocks (Also can be added with STAMM_AddBlockDescription).
+ * @param allowChange   true = Player can switch Feature on/off, false = he can't.
+ * @param standard      true = Plugin is default enabled, false = Player have to enable it first.
+ *
+ * @noreturn
+ * @error               Max features reached.
+ */
+#pragma deprecated Use STAMM_RegisterFeature instead!
+native STAMM_AddFeature(const String:name[], const String:description[]="", bool:allowChange=true, bool:standard=true);
+
+
+/**
+ * DEPRECATED! Does nothing. Use Forward STAMM_OnClientRequestFeatureInfo instead!
+ *
+ * Adds information about what a player get on a specific level with this feature.
+ *
+ * @param level         The level, 0=No VIP, x=Level.
+ * @param description   What a player get on this level.
+ *
+ * @return              true = success, false = error.
+ * @error               Level or feature is invalid.
+ */
+#pragma deprecated Does nothing. Use Forward STAMM_OnClientRequestFeatureInfo instead!
+native bool:STAMM_AddFeatureText(level, const String:description[]);
+
+
+
 
 /**
  * Loads the translation file of your feature in languages/stamm.
@@ -152,26 +184,4 @@ stock STAMM_LoadTranslation()
 	Format(basename, sizeof(basename), "stamm/%s", basename);
 	
 	LoadTranslations(basename);
-}
-
-
-
-/**
- * Registers a new Stamm Feature with allowing to format the description.
- * This will add the feature with default enabled and the permission to switch it on/off.
- *
- * @param name          Short Name of the Feature.
- * @param description   Feature description for all blocks (Also can be added with STAMM_AddBlockDescription).
- * @param ...           Description format arguments.
- *
- * @noreturn
- * @error               Max features reached.
- */
-stock STAMM_AddFastFeature(const String:name[], const String:description[], any:...)
-{
-	new String:formatedDescription[256];
-
-	VFormat(formatedDescription, sizeof(formatedDescription), description, 3);
-
-	STAMM_AddFeature(name, formatedDescription, true, true);
 }

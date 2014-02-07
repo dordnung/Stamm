@@ -33,7 +33,7 @@
 
 
 // Add a new Feature
-featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:allowChange, bool:standard)
+featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:standard)
 {
 	// Detail strings
 	decl String:basename[64];
@@ -236,20 +236,6 @@ featurelib_addFeature(Handle:plugin, String:name[], String:description[], bool:a
 
 					// Stop here
 					return;
-				}
-
-
-				// Description not empty?
-				if (!StrEqual(description, ""))
-				{
-					// Create description array
-					if (g_FeatureList[g_iFeatures][FEATURE_DESCS][start] == INVALID_HANDLE)
-					{
-						g_FeatureList[g_iFeatures][FEATURE_DESCS][start] = CreateArray(128);
-					}
-
-
-					PushArrayString(g_FeatureList[g_iFeatures][FEATURE_DESCS][start], description);
 				}
 
 

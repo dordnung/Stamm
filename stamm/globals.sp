@@ -54,7 +54,6 @@ enum FeatureEnum
 	String:FEATURE_BASEREAL[64],
 	String:FEATURE_NAME[64],
 	Handle:FEATURE_HANDLE,
-	Handle:FEATURE_DESCS[MAXLEVELS],
 }
 
 

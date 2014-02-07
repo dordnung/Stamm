@@ -39,6 +39,7 @@ new Handle:nativelib_client_save;
 new Handle:nativelib_happy_start;
 new Handle:nativelib_happy_end;
 new Handle:nativelib_request_commands;
+new Handle:nativelib_request_feature;
 
 new bool:nativelib_requesting_commands;
 
@@ -81,6 +82,7 @@ nativelib_Start()
 	CreateNative("STAMM_IsClientVip", nativelib_IsClientVip);
 	CreateNative("STAMM_HaveClientFeature", nativelib_HaveClientFeature);
 	CreateNative("STAMM_AddFeature", nativelib_AddFeature);
+	CreateNative("STAMM_RegisterFeature", nativelib_RegFeature);
 	CreateNative("STAMM_AddFeatureText", nativelib_AddFeatureText);
 	CreateNative("STAMM_AddBlockDescription", nativelib_AddBlockDescription);
 	CreateNative("STAMM_IsClientValid", nativelib_IsClientValid);
@@ -100,6 +102,7 @@ nativelib_Start()
 	nativelib_stamm_ready = CreateGlobalForward("STAMM_OnReady", ET_Ignore);
 	nativelib_client_ready = CreateGlobalForward("STAMM_OnClientReady", ET_Ignore, Param_Cell);
 	nativelib_request_commands = CreateGlobalForward("STAMM_OnClientRequestCommands", ET_Ignore, Param_Cell);
+	nativelib_request_feature = CreateGlobalForward("STAMM_OnClientRequestFeatureInfo", ET_Ignore, Param_Cell, Param_Cell, Param_CellByRef);
 	nativelib_client_save = CreateGlobalForward("STAMM_OnSaveClient", ET_Ignore, Param_Cell);
 	nativelib_player_stamm = CreateGlobalForward("STAMM_OnClientBecomeVip", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	nativelib_stamm_get = CreateGlobalForward("STAMM_OnClientGetPoints", ET_Ignore, Param_Cell, Param_Cell);
@@ -233,7 +236,7 @@ nativelib_ClientSave(client)
 
 
 
-// Notice to all plugins, that a player want commands
+// Notice to all plugins, that a player wants commands
 nativelib_RequestCommands(client)
 {
 	nativelib_requesting_commands = true;
@@ -271,6 +274,26 @@ nativelib_RequestCommands(client)
 
 	nativelib_requesting_commands = false;
 }
+
+
+
+
+// Notice to all plugins, that a player wants feature info
+Handle:nativelib_RequestFeature(client, block)
+{
+	new Handle:infoHandle = CreateArray(256);
+
+	Call_StartForward(nativelib_request_feature);
+	
+	Call_PushCell(client);
+	Call_PushCell(block);
+	Call_PushCellRef(infoHandle);
+	
+	Call_Finish();
+
+	return infoHandle;
+}
+
 
 
 
@@ -1076,19 +1099,39 @@ public nativelib_AddFeature(Handle:plugin, numParams)
 	}
 
 	decl String:name[64];
-	decl String:description[256];
 	
 
 	// Get the details
 	GetNativeString(1, name, sizeof(name));
-	GetNativeString(2, description, sizeof(description));
 	
 
 	// Give work to the featurelib
-	featurelib_addFeature(plugin, name, description, GetNativeCell(3), GetNativeCell(4));
+	featurelib_addFeature(plugin, name, GetNativeCell(3), GetNativeCell(4));
 }
 
 
+
+
+
+// Registers a Feature
+public nativelib_RegFeature(Handle:plugin, numParams)
+{
+	// Max features reached?
+	if (g_iFeatures >= MAXFEATURES)
+	{
+		ThrowNativeError(1, "Max features of %i reached!", MAXFEATURES);
+	}
+
+	decl String:name[64];
+	
+
+	// Get the details
+	GetNativeString(1, name, sizeof(name));
+	
+
+	// Give work to the featurelib
+	featurelib_addFeature(plugin, name, GetNativeCell(2), GetNativeCell(3));
+}
 
 
 
@@ -1098,60 +1141,6 @@ public nativelib_AddFeature(Handle:plugin, numParams)
 // Deprecated
 public nativelib_AddFeatureText(Handle:plugin, numParams)
 {
-	decl String:description[256];
-	
-	// Level to add
-	new level = GetNativeCell(1);
-	
-
-
-	// Get the description
-	GetNativeString(2, description, sizeof(description));
-	
-	new feature = featurelib_getFeatureByHandle(plugin);
-
-
-
-	// Valid feature?
-	if (feature != -1)
-	{
-		new block = -1;
-
-		// Found feature
-		for (new i=0; i < MAXLEVELS; i++)
-		{
-			if (g_FeatureList[feature][FEATURE_LEVEL][i] == level)
-			{
-				block = i;
-
-				break;
-			}
-		}
-
-
-		if (block == -1)
-		{
-			ThrowNativeError(1, "Level %i is invalid", level);
-		}
-
-
-		// Create description array
-		if (g_FeatureList[feature][FEATURE_DESCS][block] == INVALID_HANDLE)
-		{
-			g_FeatureList[feature][FEATURE_DESCS][block] = CreateArray(128);
-		}
-
-		PushArrayString(g_FeatureList[feature][FEATURE_DESCS][block], description);
-
-
-		return true;
-	}
-	else
-	{
-		ThrowNativeError(2, "Your Feature is invalid");
-	}
-
-
 	return false;
 }
 
@@ -1161,51 +1150,11 @@ public nativelib_AddFeatureText(Handle:plugin, numParams)
 
 
 // Add a text to display
+// Deprecated
 public nativelib_AddBlockDescription(Handle:plugin, numParams)
 {
-	decl String:description[256];
-	
-	// block to add
-	new block = GetNativeCell(1);
-
-
-
-	// Get the description
-	FormatNativeString(0, 2, 3, sizeof(description), _, description);
-
-	
-	new feature = featurelib_getFeatureByHandle(plugin);
-
-
-	// Valid feature?
-	if (feature != -1)
-	{
-		// Check valid block
-		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
-		{
-			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
-		}
-
-
-		// Create description array
-		if (g_FeatureList[feature][FEATURE_DESCS][block-1] == INVALID_HANDLE)
-		{
-			g_FeatureList[feature][FEATURE_DESCS][block-1] = CreateArray(128);
-		}
-
-		PushArrayString(g_FeatureList[feature][FEATURE_DESCS][block-1], description);
-
-		return true;
-	}
-	else
-	{
-		ThrowNativeError(2, "Your Feature is invalid");
-	}
-
-
 	return false;
 }
-
 
 
 

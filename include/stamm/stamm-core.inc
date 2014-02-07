@@ -224,6 +224,7 @@ public SharedPlugin:__pl_stamm =
 	public __pl_stamm_SetNTVOptional()
 	{
 		MarkNativeAsOptional("STAMM_AddFeature");
+		MarkNativeAsOptional("STAMM_RegisterFeature");
 		MarkNativeAsOptional("STAMM_AddFeatureText");
 		MarkNativeAsOptional("STAMM_AddBlockDescription");
 		MarkNativeAsOptional("STAMM_IsMyFeature");

@@ -28,19 +28,6 @@
 
 
 
-/**
- * This will convert the block to the level and add a text in the stamm menu
- * with information what the player will get on this level, so make this detailed!
- *
- * @param block         The block id you want to add a description to.
- * @param description   Description for this block.
- * @param ...           Format arguments.
- *
- * @return              Returns true on success, otherwise false.
- * @error               Block or feature is invalid.
- */
-native bool:STAMM_AddBlockDescription(block=1, const String:description[], any:...);
-
 
 /**
  * This will return the level the server admin wants for a block (TODO: No Buying).
@@ -108,6 +95,23 @@ native STAMM_GetClientBlock(client);
  * @error               Feature is invalid.
  */
 native STAMM_GetBlockCount();
+
+
+/**
+ * DEPRECATED! Does nothing. Use Forward STAMM_OnClientRequestFeatureInfo instead!
+ *
+ * This will convert the block to the level and add a text in the stamm menu
+ * with information what the player will get on this level, so make this detailed!
+ *
+ * @param block         The block id you want to add a description to.
+ * @param description   Description for this block.
+ * @param ...           Format arguments.
+ *
+ * @return              Returns true on success, otherwise false.
+ * @error               Block or feature is invalid.
+ */
+#pragma deprecated Does nothing. Use Forward STAMM_OnClientRequestFeatureInfo instead!
+native bool:STAMM_AddBlockDescription(block=1, const String:description[], any:...);
 
 
 /**
