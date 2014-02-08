@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
