@@ -116,7 +116,7 @@ LoadItems()
 
 	if (!FileExists("cfg/stamm/features/items_tf2.txt"))
 	{
-		SetFailState("Couldn't load Stamm Models. items_tf2.txt missing.");
+		SetFailState("Couldn't load TF2 Items. items_tf2.txt missing.");
 	}
 
 	new Handle:kvalue = CreateKeyValues("stamm_items");
