@@ -46,7 +46,7 @@
 	{
 		"attribute"      "45"
 		"value"          "10.0"
-		"description"    "You get have 10% more bullets per shot"
+		"description"    "You have 10% more bullets per shot"
 		"class"          ""
 		"definition"     ""
 		"slot"           "0,1,2"
