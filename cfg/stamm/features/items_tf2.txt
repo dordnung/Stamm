@@ -1,0 +1,54 @@
+// Here you can define the item attributes VIPs get.
+//
+// The name of the first outer-block is the block name you defined in "cfg/stamm/levels/stamm_tf2_items.txt".
+//
+// "attribute" is the attribute number. You can find a list here: http://optf2.com/440/attributes.
+// "value" is the new value of the attribute.
+// "description" is the text shown in the stamm menu.
+//
+// "class" is a list of classes that can get that attribute, empty for all.
+// "definition" is a list of definition indexes that can get that attribute, empty for all. (http://optf2.com/440/items)
+// "slot" is a list of slots that can get that attribute, empty for all.
+//
+// Slots are:
+//     Primary = 0
+//     Secondary, Sapper = 1
+//     Melee = 2
+//     PDA, PDA1 = 3
+//     PDA2 = 4
+//     Building, Hat, Head = 5
+//     Misc = 6
+//     Action = 7
+//
+"stamm_items"
+{
+	"DMG_BONUS"
+	{
+		"attribute"      "2"
+		"value"          "5.0"
+		"description"    "You get 5% damage bonus"
+		"class"          ""
+		"definition"     ""
+		"slot"           "0,1,2"
+	}
+	
+	"CLIP_BONUS"
+	{
+		"attribute"      "4"
+		"value"          "8.0"
+		"description"    "You get 8% clip size bonus"
+		"class"          ""
+		"definition"     ""
+		"slot"           "0,1,2"
+	}
+	
+	"BULLETS_BONUS"
+	{
+		"attribute"      "45"
+		"value"          "10.0"
+		"description"    "You get have 10% more bullets per shot"
+		"class"          ""
+		"definition"     ""
+		"slot"           "0,1,2"
+	}
+}
