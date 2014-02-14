@@ -245,31 +245,35 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 // Add descriptions
 public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 {
-	new bool:foundTag = false;
-	new bool:foundColor = false;
+	new foundTag = -1;
+	new foundColor = -1;
 	decl String:buffer[128];
 
 	for (new i=0; i < g_iColorCount; i++)
 	{
-		if (g_Colors[i][COLOR_BLOCK] == block)
+		if (g_Colors[i][COLOR_TAG] && (foundTag == -1 || STAMM_GetBlockLevel(foundTag) > STAMM_GetBlockLevel(g_Colors[i][COLOR_BLOCK]))) 
 		{
-			if (g_Colors[i][COLOR_TAG] && !foundTag)
-			{
-				foundTag = true;
-
-				Format(buffer, sizeof(buffer), "%T", "CanChooseTag", client);
-
-				PushArrayString(array, buffer);
-			}
-			else if (!g_Colors[i][COLOR_TAG] && !foundColor)
-			{
-				foundColor = true;
-
-				Format(buffer, sizeof(buffer), "%T", "CanChooseColor", client);
-
-				PushArrayString(array, buffer);
-			}
+			foundTag = g_Colors[i][COLOR_BLOCK];
 		}
+		else if (!g_Colors[i][COLOR_TAG] && (foundColor == -1 || STAMM_GetBlockLevel(foundColor) > STAMM_GetBlockLevel(g_Colors[i][COLOR_BLOCK])))
+		{
+			foundColor = g_Colors[i][COLOR_BLOCK];
+		}
+	}
+
+
+	if (foundTag == block)
+	{
+		Format(buffer, sizeof(buffer), "%T", "CanChooseTag", client);
+
+		PushArrayString(array, buffer);
+	}
+
+	if (foundColor == block)
+	{
+		Format(buffer, sizeof(buffer), "%T", "CanChooseColor", client);
+
+		PushArrayString(array, buffer);
 	}
 }
 
@@ -441,6 +445,8 @@ public Action:OnTag(client, args)
 		new bool:found = false;
 		new Handle:menu = CreateMenu(OnChooseTag);
 
+		AddMenuItem(menu, "-1", "-");
+
 		for (new i=0; i < g_iColorCount; i++)
 		{
 			if (g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
@@ -483,6 +489,8 @@ public Action:OnColor(client, args)
 		new bool:found = false;
 		new Handle:menu = CreateMenu(OnChooseColor);
 
+		AddMenuItem(menu, "-1", "-");
+
 		for (new i=0; i < g_iColorCount; i++)
 		{
 			if (!g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
@@ -524,6 +532,8 @@ public Action:OnName(client, args)
 
 		new bool:found = false;
 		new Handle:menu = CreateMenu(OnChooseName);
+
+		AddMenuItem(menu, "-1", "-");
 
 		for (new i=0; i < g_iColorCount; i++)
 		{
