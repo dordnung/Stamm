@@ -1,0 +1,33 @@
+"Phrases"
+{
+	"CanChooseTag"
+	{	
+		"en"		"You can choose a chat tag"
+		"de"		"Du kannst dir ein Chat Tag aussuchen"
+	}
+	"CanChooseColor"
+	{	
+		"en"		"You can choose a chat color"
+		"de"		"Du kannst dir eine Chat Farbe aussuchen"
+	}
+	"denied"
+	{	
+		"en"		"You can't access that menu"
+		"de"		"Du kannst nicht auf das Menü zugreifen"
+	}
+	"CommandColor"
+	{	
+		"en"		"Choose a Chat Color"
+		"de"		"Wähle eine Chat Farbe"
+	}
+	"CommandTag"
+	{	
+		"en"		"Choose a Chat Tag"
+		"de"		"Wähle ein Chat Tag"
+	}
+	"CommandName"
+	{	
+		"en"		"Choose a Chat Name Color"
+		"de"		"Wähle eine Chat Namens Farbe"
+	}
+}

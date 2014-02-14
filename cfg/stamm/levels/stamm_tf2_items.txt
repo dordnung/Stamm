@@ -1,5 +1,5 @@
-// Here you can add the blocks for the item config
-// You need them in the cfg/stamm/features/items_tf2.txt
+// Here you can add the blocks for the item config.
+// You need them in the cfg/stamm/features/items_tf2.txt file.
 
 "LevelSettings"
 {

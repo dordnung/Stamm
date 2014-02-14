@@ -1,0 +1,79 @@
+// Here you can define the available colors and tags.
+//
+// Colors are defined by a color name, a hex string representing the color and a block on that a VIP get that color.
+// Blocks have to be defined in the stamm_chatcolors.txt.
+// You can generate colors here: http://hexcolorgenerator.com/
+//
+// The second part are the tags.
+// They are defined by a tag name and a block on that a VIP get that tag.
+//
+"chatcolors"
+{
+	"colors"
+	{
+		// This is the name of the color
+		"blue"
+		{
+			// This is the hex string of the color
+			"color"     "99CCFF"
+			
+			// This is the name of the block on that a VIP get the color
+			"block"     "l1"
+		}
+		
+		"beige"
+		{
+			"color"     "F5F5DC"
+			"block"     "l1"
+		}
+		
+		"green"
+		{
+			"color"     "3EFF3E"
+			"block"     "l2"
+		}
+		"lime"
+		{
+			"color"     "00FF00"
+			"block"     "l2"
+		}
+		
+		"orange"
+		{
+			"color"     "FFA500"
+			"block"     "l3"
+		}
+		
+		"pink"
+		{
+			"color"     "FFC0CB"
+			"block"     "l3"
+		}
+		
+		"silver"
+		{
+			"color"     "C0C0C0"
+			"block"     "l4"
+		}
+		
+		"yellow"
+		{
+			"color"     "FFFF00"
+			"block"     "l4"
+		}
+		
+		"white"
+		{
+			"color"     "FFFFFF"
+			"block"     "l5"
+		}
+	}
+	
+	"tags"
+	{
+		"Player"    "l1"
+		"Master"    "l2"
+		"King"      "l3"
+		"Star"      "l4"
+	}
+}
