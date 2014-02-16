@@ -394,9 +394,48 @@ public ModelDownloads()
 			ReplaceString(filecontent, sizeof(filecontent), "\r", "");
 			
 
-			if (!StrEqual(filecontent, "")) 
+			if (strlen(filecontent) > 2 && !(filecontent[0] == '/' && filecontent[1] == '/'))
 			{
-				AddFileToDownloadsTable(filecontent);
+				if (filecontent[strlen(filecontent) - 1] == '*')
+				{
+					filecontent[strlen(filecontent) - 2] = '\0';
+
+					if (DirExists(filecontent))
+					{
+						new Handle:dir = OpenDirectory(filecontent);
+
+						if (dir != INVALID_HANDLE)
+						{
+							decl String:content[PLATFORM_MAX_PATH + 1];
+							new FileType:type;
+
+							while (ReadDirEntry(dir, content, sizeof(content), type))
+							{
+								if (type == FileType_File)
+								{
+									Format(content, sizeof(content), "%s/%s", filecontent, content);
+
+									AddFileToDownloadsTable(filecontent);
+								}
+							}
+						}
+					}
+					else
+					{
+						STAMM_WriteToLog(false, "Found folder '%s' in ModelDownloads, but folder does not exist!", filecontent);
+					}
+				}
+				else
+				{
+					if (FileExists(filecontent))
+					{
+						AddFileToDownloadsTable(filecontent);
+					}
+					else
+					{
+						STAMM_WriteToLog(false, "Found file '%s' in ModelDownloads, but file does not exist!", filecontent);
+					}
+				}
 			}
 		}
 
