@@ -104,9 +104,7 @@ public OnAllPluginsLoaded()
 	}
 
 
-	RegConsoleCmd("sm_ctag", OnTag, "Choose a chat tag");
-	RegConsoleCmd("sm_ccolor", OnColor, "Choose a chat color");
-	RegConsoleCmd("sm_cname", OnName, "Choose a chat name color");
+	RegConsoleCmd("sm_scolor", OnColorOption, "Choose a chat tag or color");
 
 
 	g_hClientCookieColor = RegClientCookie("Stamm_Chat_Color", "Stamm Chat Color", CookieAccess_Private);
@@ -284,9 +282,7 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 // Adding Commands
 public STAMM_OnClientRequestCommands(client)
 {
-	STAMM_AddCommand("!ccolor", "%T", "CommandColor", client);
-	STAMM_AddCommand("!ctag", "%T", "CommandTag", client);
-	STAMM_AddCommand("!cname", "%T", "CommandName", client);
+	STAMM_AddCommand("!scolor", "%T:", "CommandGeneral", client);
 }
 
 
@@ -302,13 +298,16 @@ public OnClientCookiesCached(client)
 	{
 		GetClientCookie(client, g_hClientCookieColor, buffer, sizeof(buffer));
 
-		if (strlen(buffer) > 0 && STAMM_HaveClientFeature(client, g_Colors[StringToInt(buffer)][COLOR_BLOCK]))
+		new color = StrToColor(false, buffer);
+
+
+		if (strlen(buffer) > 0 && color != -1 && STAMM_HaveClientFeature(client, g_Colors[color][COLOR_BLOCK]))
 		{
-			g_iClientColor[client][0] = StringToInt(buffer);
+			g_iClientColor[client][0] = color;
 
 			if (LibraryExists("ccc"))
 			{
-				CCC_SetColor(client, CCC_ChatColor, StringToInt(g_Colors[g_iClientColor[client][0]][COLOR_STRING], 16), false);
+				CCC_SetColor(client, CCC_ChatColor, StringToInt(g_Colors[color][COLOR_STRING], 16), false);
 			}
 		}
 		else
@@ -319,13 +318,16 @@ public OnClientCookiesCached(client)
 
 		GetClientCookie(client, g_hClientCookieTag, buffer, sizeof(buffer));
 
-		if (strlen(buffer) > 0 && STAMM_HaveClientFeature(client, g_Colors[StringToInt(buffer)][COLOR_BLOCK]))
+		color = StrToColor(true, buffer);
+
+
+		if (strlen(buffer) > 0 && color != -1 && STAMM_HaveClientFeature(client, g_Colors[color][COLOR_BLOCK]))
 		{
-			g_iClientColor[client][1] = StringToInt(buffer);
+			g_iClientColor[client][1] = color;
 
 			if (LibraryExists("ccc"))
 			{
-				CCC_SetTag(client, g_Colors[g_iClientColor[client][1]][COLOR_STRING]);
+				CCC_SetTag(client, g_Colors[color][COLOR_STRING]);
 			}
 		}
 		else
@@ -336,13 +338,16 @@ public OnClientCookiesCached(client)
 
 		GetClientCookie(client, g_hClientCookieName, buffer, sizeof(buffer));
 
-		if (strlen(buffer) > 0 && STAMM_HaveClientFeature(client, g_Colors[StringToInt(buffer)][COLOR_BLOCK]))
+		color = StrToColor(false, buffer);
+
+
+		if (strlen(buffer) > 0 && color != -1 && STAMM_HaveClientFeature(client, g_Colors[color][COLOR_BLOCK]))
 		{
-			g_iClientColor[client][2] = StringToInt(buffer);
+			g_iClientColor[client][2] = color;
 
 			if (LibraryExists("ccc"))
 			{
-				CCC_SetColor(client, CCC_NameColor, StringToInt(g_Colors[g_iClientColor[client][2]][COLOR_STRING], 16), false);
+				CCC_SetColor(client, CCC_NameColor, StringToInt(g_Colors[color][COLOR_STRING], 16), false);
 			}
 		}
 		else
@@ -390,7 +395,6 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 
 	if (g_iClientColor[author][1] != -1)
 	{
-
 		Format(sTitle, sizeof(sTitle), "%s \x03", g_Colors[g_iClientColor[author][1]][COLOR_STRING]);
 		found = true;
 	}
@@ -436,30 +440,49 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 
 
 
-public Action:OnTag(client, args)
+
+public Action:OnColorOption(client, args)
 {
 	if (STAMM_IsClientValid(client))
 	{
 		decl String:buffer[32];
 
-		new bool:found = false;
-		new Handle:menu = CreateMenu(OnChooseTag);
+		new bool:found[3] = {false, false, false};
+		new Handle:menu = CreateMenu(OnChooseColorOption);
 
-		AddMenuItem(menu, "-1", "-");
+		SetMenuTitle(menu, "%T", "CommandGeneral", client);
 
 		for (new i=0; i < g_iColorCount; i++)
 		{
-			if (g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
+			if (!found[0] && g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
 			{
-				IntToString(i, buffer, sizeof(buffer));
+				Format(buffer, sizeof(buffer), "%T", "CommandTag", client);
 
-				AddMenuItem(menu, buffer, g_Colors[i][COLOR_STRING]);
+				AddMenuItem(menu, "1", buffer);
 
-				found = true;
+				found[0] = true;
+			}
+
+			if (!found[1] && !g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
+			{
+				Format(buffer, sizeof(buffer), "%T", "CommandColor", client);
+
+				AddMenuItem(menu, "2", buffer);
+
+				found[1] = true;
+			}
+
+			if (!found[2] && !g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
+			{
+				Format(buffer, sizeof(buffer), "%T", "CommandName", client);
+
+				AddMenuItem(menu, "3", buffer);
+
+				found[2] = true;
 			}
 		}
 
-		if (found)
+		if (found[0] || found[1] || found[2])
 		{
 			DisplayMenu(menu, client, 40);
 		}
@@ -480,88 +503,165 @@ public Action:OnTag(client, args)
 
 
 
-public Action:OnColor(client, args)
+public OnChooseColorOption(Handle:menu, MenuAction:action, param1, param2)
 {
-	if (STAMM_IsClientValid(client))
+	if (action == MenuAction_Select)
 	{
-		decl String:buffer[32];
+		decl String:buf[6];
 
-		new bool:found = false;
-		new Handle:menu = CreateMenu(OnChooseColor);
-
-		AddMenuItem(menu, "-1", "-");
-
-		for (new i=0; i < g_iColorCount; i++)
+		if (STAMM_IsClientValid(param1))
 		{
-			if (!g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
+			GetMenuItem(menu, param2, buf, sizeof(buf));
+
+			new item = StringToInt(buf);
+
+			if (item == 1)
 			{
-				IntToString(i, buffer, sizeof(buffer));
-
-				AddMenuItem(menu, buffer, g_Colors[i][COLOR_NAME]);
-
-				found = true;
+				OnTag(param1);
+			}
+			else if (item == 2)
+			{
+				OnColor(param1);
+			}
+			else if (item == 3)
+			{
+				OnName(param1);
 			}
 		}
-
-		if (found)
-		{
-			DisplayMenu(menu, client, 40);
-		}
-		else
-		{
-			decl String:tag[64];
-
-			STAMM_GetTag(tag, sizeof(tag));
-
-			STAMM_PrintToChat(client, "%s %t", tag, "denied");
-		}
 	}
-
-	return Plugin_Handled;
+	else if (action == MenuAction_End)
+	{
+		CloseHandle(menu);
+	}
 }
 
 
 
 
 
-public Action:OnName(client, args)
+OnTag(client)
 {
-	if (STAMM_IsClientValid(client))
+	decl String:buffer[32];
+
+	new bool:found = false;
+	new Handle:menu = CreateMenu(OnChooseTag);
+
+	SetMenuTitle(menu, "%T", "CommandTag", client);
+	SetMenuExitBackButton(menu, true);
+
+	Format(buffer, sizeof(buffer), "%T", "disable", client);
+	AddMenuItem(menu, "-1", buffer);
+
+	for (new i=0; i < g_iColorCount; i++)
 	{
-		decl String:buffer[32];
-
-		new bool:found = false;
-		new Handle:menu = CreateMenu(OnChooseName);
-
-		AddMenuItem(menu, "-1", "-");
-
-		for (new i=0; i < g_iColorCount; i++)
+		if (g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
 		{
-			if (!g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
-			{
-				IntToString(i, buffer, sizeof(buffer));
+			IntToString(i, buffer, sizeof(buffer));
 
-				AddMenuItem(menu, buffer, g_Colors[i][COLOR_NAME]);
+			AddMenuItem(menu, buffer, g_Colors[i][COLOR_STRING]);
 
-				found = true;
-			}
-		}
-
-		if (found)
-		{
-			DisplayMenu(menu, client, 40);
-		}
-		else
-		{
-			decl String:tag[64];
-
-			STAMM_GetTag(tag, sizeof(tag));
-
-			STAMM_PrintToChat(client, "%s %t", tag, "denied");
+			found = true;
 		}
 	}
 
-	return Plugin_Handled;
+	if (found)
+	{
+		DisplayMenu(menu, client, 40);
+	}
+	else
+	{
+		decl String:tag[64];
+
+		STAMM_GetTag(tag, sizeof(tag));
+
+		STAMM_PrintToChat(client, "%s %t", tag, "denied");
+	}
+}
+
+
+
+
+
+OnColor(client)
+{
+	decl String:buffer[32];
+
+	new bool:found = false;
+	new Handle:menu = CreateMenu(OnChooseColor);
+
+	SetMenuTitle(menu, "%T", "CommandColor", client);
+	SetMenuExitBackButton(menu, true);
+
+	Format(buffer, sizeof(buffer), "%T", "disable", client);
+	AddMenuItem(menu, "-1", buffer);
+
+	for (new i=0; i < g_iColorCount; i++)
+	{
+		if (!g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
+		{
+			IntToString(i, buffer, sizeof(buffer));
+
+			AddMenuItem(menu, buffer, g_Colors[i][COLOR_NAME]);
+
+			found = true;
+		}
+	}
+
+	if (found)
+	{
+		DisplayMenu(menu, client, 40);
+	}
+	else
+	{
+		decl String:tag[64];
+
+		STAMM_GetTag(tag, sizeof(tag));
+
+		STAMM_PrintToChat(client, "%s %t", tag, "denied");
+	}
+}
+
+
+
+
+
+OnName(client)
+{
+	decl String:buffer[32];
+
+	new bool:found = false;
+	new Handle:menu = CreateMenu(OnChooseName);
+
+	SetMenuTitle(menu, "%T", "CommandName", client);
+	SetMenuExitBackButton(menu, true);
+
+	Format(buffer, sizeof(buffer), "%T", "disable", client);
+	AddMenuItem(menu, "-1", buffer);
+
+	for (new i=0; i < g_iColorCount; i++)
+	{
+		if (!g_Colors[i][COLOR_TAG] && STAMM_HaveClientFeature(client, g_Colors[i][COLOR_BLOCK]))
+		{
+			IntToString(i, buffer, sizeof(buffer));
+
+			AddMenuItem(menu, buffer, g_Colors[i][COLOR_NAME]);
+
+			found = true;
+		}
+	}
+
+	if (found)
+	{
+		DisplayMenu(menu, client, 40);
+	}
+	else
+	{
+		decl String:tag[64];
+
+		STAMM_GetTag(tag, sizeof(tag));
+
+		STAMM_PrintToChat(client, "%s %t", tag, "denied");
+	}
 }
 
 
@@ -577,16 +677,36 @@ public OnChooseTag(Handle:menu, MenuAction:action, param1, param2)
 		{
 			GetMenuItem(menu, param2, buf, sizeof(buf));
 
+			new item = StringToInt(buf);
+
 
 			g_iClientColor[param1][1] = StringToInt(buf);
 
-			SetClientCookie(param1, g_hClientCookieTag, buf);
-
-
-			if (LibraryExists("ccc"))
+			if (item > -1)
 			{
-				CCC_SetTag(param1, g_Colors[StringToInt(buf)][COLOR_STRING]);
+				SetClientCookie(param1, g_hClientCookieTag, g_Colors[StringToInt(buf)][COLOR_STRING]);
+
+				if (LibraryExists("ccc"))
+				{
+					CCC_SetTag(param1, g_Colors[StringToInt(buf)][COLOR_STRING]);
+				}
 			}
+			else
+			{
+				SetClientCookie(param1, g_hClientCookieTag, "");
+
+				if (LibraryExists("ccc"))
+				{
+					CCC_SetTag(param1, "");
+				}
+			}
+		}
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		if (param2 == MenuCancel_ExitBack && STAMM_IsClientValid(param1))
+		{
+			OnColorOption(param1, 0);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -608,16 +728,36 @@ public OnChooseName(Handle:menu, MenuAction:action, param1, param2)
 		{
 			GetMenuItem(menu, param2, buf, sizeof(buf));
 
-
-			g_iClientColor[param1][2] = StringToInt(buf);
-
-			SetClientCookie(param1, g_hClientCookieName, buf);
+			new item = StringToInt(buf);
 
 
-			if (LibraryExists("ccc"))
+			g_iClientColor[param1][2] = item;
+
+			if (item > -1)
 			{
-				CCC_SetColor(param1, CCC_NameColor, StringToInt(g_Colors[StringToInt(buf)][COLOR_STRING], 16), false);
+				SetClientCookie(param1, g_hClientCookieName, g_Colors[item][COLOR_NAME]);
+
+				if (LibraryExists("ccc"))
+				{
+					CCC_SetColor(param1, CCC_NameColor, StringToInt(g_Colors[item][COLOR_NAME], 16), false);
+				}
 			}
+			else
+			{
+				SetClientCookie(param1, g_hClientCookieName, "");
+
+				if (LibraryExists("ccc"))
+				{
+					CCC_SetColor(param1, CCC_NameColor, 0, false);
+				}
+			}
+		}
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		if (param2 == MenuCancel_ExitBack && STAMM_IsClientValid(param1))
+		{
+			OnColorOption(param1, 0);
 		}
 	}
 	else if (action == MenuAction_End)
@@ -639,20 +779,63 @@ public OnChooseColor(Handle:menu, MenuAction:action, param1, param2)
 		{
 			GetMenuItem(menu, param2, buf, sizeof(buf));
 
-
-			g_iClientColor[param1][0] = StringToInt(buf);
-
-			SetClientCookie(param1, g_hClientCookieColor, buf);
+			new item = StringToInt(buf);
 
 
-			if (LibraryExists("ccc"))
+			g_iClientColor[param1][0] = item;
+
+			if (item > -1)
 			{
-				CCC_SetColor(param1, CCC_ChatColor, StringToInt(g_Colors[StringToInt(buf)][COLOR_STRING], 16), false);
+				SetClientCookie(param1, g_hClientCookieColor, g_Colors[item][COLOR_NAME]);
+
+				if (LibraryExists("ccc"))
+				{
+					CCC_SetColor(param1, CCC_ChatColor, StringToInt(g_Colors[item][COLOR_NAME], 16), false);
+				}
 			}
+			else
+			{
+				SetClientCookie(param1, g_hClientCookieColor, "");
+
+				if (LibraryExists("ccc"))
+				{
+					CCC_SetColor(param1, CCC_ChatColor, 0, false);
+				}
+			}
+		}
+	}
+	else if (action == MenuAction_Cancel)
+	{
+		if (param2 == MenuCancel_ExitBack && STAMM_IsClientValid(param1))
+		{
+			OnColorOption(param1, 0);
 		}
 	}
 	else if (action == MenuAction_End)
 	{
 		CloseHandle(menu);
 	}
+}
+
+
+
+
+stock StrToColor(bool:tag, String:name[])
+{
+	for (new i=0; i < g_iColorCount; i++)
+	{
+		if (g_Colors[i][COLOR_TAG] == tag)
+		{
+			if (tag == true && StrEqual(g_Colors[i][COLOR_STRING], name, false))
+			{
+				return i;
+			}
+			else if (!tag && StrEqual(g_Colors[i][COLOR_NAME], name, false))
+			{
+				return i;
+			}
+		}
+	}
+
+	return -1;
 }

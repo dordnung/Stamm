@@ -30,4 +30,14 @@
 		"en"		"Choose a Chat Name Color"
 		"de"		"Wähle eine Chat Namens Farbe"
 	}
+	"CommandGeneral"
+	{	
+		"en"		"Choose a Color or a Tag"
+		"de"		"Wähle eine Farbe oder ein Tag"
+	}
+	"disable"
+	{	
+		"en"		"Disable"
+		"de"		"Deaktivieren"
+	}
 }
