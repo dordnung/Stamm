@@ -32,6 +32,7 @@
 // Config handles 
 new Handle:configlib_StammVersion;
 new Handle:configlib_StammTag;
+new Handle:configlib_StammTagMoreColors;
 new Handle:configlib_AdminMenu;
 new Handle:configlib_GiveFlagAdmin;
 new Handle:configlib_InfoTime;
@@ -75,7 +76,8 @@ configlib_CreateConfig()
 
 
 	// Add all the natives
-	configlib_StammTag = AutoExecConfig_CreateConVar("stamm_tag", "{lightgreen}[ {green}Stamm {lightgreen}]", "Stamm Tag to use in Chat. For Source 2009 Games you can use morecolors.");
+	configlib_StammTag = AutoExecConfig_CreateConVar("stamm_tag", "{lightgreen}[ {green}Stamm {lightgreen}]", "Stamm Tag to use in Chat.");
+	configlib_StammTagMoreColors = AutoExecConfig_CreateConVar("stamm_tag_morecolors", "{strange}[ {mediumseagreen}Stamm {strange}]", "Stamm Tag to use for Source 2009 Games with morecolors support. This will overwrite the stamm_tag convar.");
 	configlib_AdminMenu = AutoExecConfig_CreateConVar("stamm_admin_menu", "sm_sadmin", "Command for Admin Menu");
 	configlib_StammDebug = AutoExecConfig_CreateConVar("stamm_debug", "0", "1=Log in an extra File lot of information, 0=disable");
 	configlib_ExtraPoints = AutoExecConfig_CreateConVar("stamm_extrapoints", "0", "1 = Give less Players more Points, with factor: ((max players on your server) - (current players)), 0 = disable");
@@ -113,6 +115,7 @@ configlib_CreateConfig()
 	SetConVarString(configlib_StammVersion, g_sPluginVersion);
 	HookConVarChange(configlib_StammVersion, OnCvarChanged);
 	HookConVarChange(configlib_StammTag, OnCvarChanged);
+	HookConVarChange(configlib_StammTagMoreColors, OnCvarChanged);
 	HookConVarChange(configlib_StammDebug, OnCvarChanged);
 	HookConVarChange(configlib_ExtraPoints, OnCvarChanged);
 	HookConVarChange(configlib_GiveFlagAdmin, OnCvarChanged);
@@ -143,7 +146,15 @@ configlib_LoadConfig()
 
 
 	// Strings
-	GetConVarString(configlib_StammTag, g_sStammTag, sizeof(g_sStammTag));
+	if (g_bMoreColors)
+	{
+		GetConVarString(configlib_StammTagMoreColors, g_sStammTag, sizeof(g_sStammTag));
+	}
+	else
+	{
+		GetConVarString(configlib_StammTag, g_sStammTag, sizeof(g_sStammTag));
+	}
+
 	GetConVarString(configlib_AdminMenu, g_sAdminMenu, sizeof(g_sAdminMenu));
 	GetConVarString(configlib_LvlUpSound, g_sLvlUpSound, sizeof(g_sLvlUpSound));
 	GetConVarString(configlib_TextToWrite, g_sTextToWrite, sizeof(g_sTextToWrite));
@@ -200,9 +211,14 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 		g_bDebug = GetConVarBool(configlib_StammDebug);
 	}
 
-	else if (cvar == configlib_StammTag)
+	else if (cvar == configlib_StammTag && !g_bMoreColors)
 	{
 		GetConVarString(configlib_StammTag, g_sStammTag, sizeof(g_sStammTag));
+	}
+
+	else if (cvar == configlib_StammTagMoreColors && g_bMoreColors)
+	{
+		GetConVarString(configlib_StammTagMoreColors, g_sStammTag, sizeof(g_sStammTag));
 	}
 
 	else if (cvar == configlib_ExtraPoints)

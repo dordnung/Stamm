@@ -176,12 +176,27 @@ native bool:STAMM_AddFeatureText(level, const String:description[]);
 stock STAMM_LoadTranslation()
 {
 	decl String:basename[64];
-	
-	
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
 	STAMM_GetBasename(basename, sizeof(basename));
 	
+	if (STAMM_IsMoreColorsAvailable())
+	{
+		BuildPath(Path_SM, path, sizeof(path), "translations/stamm/%s.morecolors.txt", basename);
 
-	Format(basename, sizeof(basename), "stamm/%s", basename);
+		if (!FileExists(path))
+		{
+			Format(basename, sizeof(basename), "stamm/%s", basename);
+		}
+		else
+		{
+			Format(basename, sizeof(basename), "stamm/%s.morecolors", basename);
+		}
+	}
+	else
+	{
+		Format(basename, sizeof(basename), "stamm/%s", basename);
+	}
 	
 	LoadTranslations(basename);
 }

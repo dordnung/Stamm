@@ -105,6 +105,8 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 // Finally it's loaded
 public OnPluginStart()
 {
+	decl String:path[PLATFORM_MAX_PATH + 1];
+	
 	// Check the folders we need
 	CheckStammFolders();
 
@@ -127,8 +129,39 @@ public OnPluginStart()
 	}
 
 
-	// Load stamm Translation 
-	LoadTranslations("stamm.phrases");
+	otherlib_saveGame();
+
+	// check for morecolor support
+	if (g_iGameID == GAME_CSGO)
+	{
+		g_bMoreColors = false;
+	}
+	else
+	{
+		g_bMoreColors = true;
+	}
+
+
+	if (g_bMoreColors)
+	{
+		BuildPath(Path_SM, path, sizeof(path), "translations/stamm.phrases.morecolors.txt");
+
+		if (!FileExists(path))
+		{
+			// Load stamm Translation 
+			LoadTranslations("stamm.phrases");
+		}
+		else
+		{
+			// Load morecolors stamm Translation 
+			LoadTranslations("stamm.phrases.morecolors");
+		}
+	}
+	else
+	{
+		// Load stamm Translation 
+		LoadTranslations("stamm.phrases");
+	}
 
 
 
@@ -160,21 +193,9 @@ public OnPluginStart()
 	
 
 	// Init. Stamm Components
-	otherlib_saveGame();
 	levellib_LoadLevels();
 	configlib_CreateConfig();
 	eventlib_Start();
-
-
-	// check for morecolor support
-	if (g_iGameID == GAME_CSGO)
-	{
-		g_bMoreColors = false;
-	}
-	else
-	{
-		g_bMoreColors = true;
-	}
 	
 
 	// Create Hud Sync
