@@ -2,7 +2,7 @@
 {
 	"GetHoly"
 	{
-		"en"		"Get a Holy Granade"
-		"de"		"Bekomme eine heilige Granate"
+		"en"        "Get a Holy Granade"
+		"de"        "Bekomme eine heilige Granate"
 	}
 }

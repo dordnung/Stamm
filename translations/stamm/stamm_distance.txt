@@ -2,25 +2,25 @@
 {
 	"GetAll"
 	{
-		"en"		"See the name, distance and direction to the nearest player"
-		"de"		"Sehe die Distanz und Richtung und den Namen zum nähesten Spieler"
+		"en"        "See the name, distance and direction to the nearest player"
+		"de"        "Sehe die Distanz und Richtung und den Namen zum nähesten Spieler"
 	}
 	
 	"GetDirection"
 	{
-		"en"		"See the direction to the nearest player"
-		"de"		"Sehe die Richtung zum nähesten Spieler"
+		"en"        "See the direction to the nearest player"
+		"de"        "Sehe die Richtung zum nähesten Spieler"
 	}
 	
 	"GetDistance"
 	{
-		"en"		"See the distance to the nearest player"
-		"de"		"Sehe die Distanz zum nähesten Spieler"
+		"en"        "See the distance to the nearest player"
+		"de"        "Sehe die Distanz zum nähesten Spieler"
 	}
 	
 	"GetName"
 	{
-		"en"		"See the name of the nearest player"
-		"de"		"Sehe den Namen des nähesten Spieler"
+		"en"        "See the name of the nearest player"
+		"de"        "Sehe den Namen des nähesten Spieler"
 	}
 }

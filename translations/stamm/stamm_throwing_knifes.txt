@@ -2,8 +2,8 @@
 {
 	"GetThrowingKnife"
 	{	
-		"#format"	"{1:i}"
-		"en"		"Get {1} throwing knifes"
-		"de"		"Bekomme {1} Wurfmesser"
+		"#format"   "{1:i}"
+		"en"        "Get {1} throwing knifes"
+		"de"        "Bekomme {1} Wurfmesser"
 	}
 }

@@ -2,7 +2,7 @@
 {
 	"GetInstantDefuse"
 	{
-		"en"		"Defuse the bomb instantly"
-		"de"		"Entschärfe die Bombe sofort"
+		"en"        "Defuse the bomb instantly"
+		"de"        "Entschärfe die Bombe sofort"
 	}
 }

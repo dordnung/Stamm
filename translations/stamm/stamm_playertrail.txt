@@ -2,7 +2,7 @@
 {
 	"GetPlayerTrail"
 	{	
-		"en"		"Get a player trail"
-		"de"		"Bekomme eine Spieler Spur"
+		"en"        "Get a player trail"
+		"de"        "Bekomme eine Spieler Spur"
 	}
 }

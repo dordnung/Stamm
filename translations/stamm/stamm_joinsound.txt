@@ -2,7 +2,7 @@
 {
 	"GetJoinsound"
 	{
-		"en"		"Get a Joinsound"
-		"de"		"Bekomme einen Joinsound"
+		"en"        "Get a Joinsound"
+		"de"        "Bekomme einen Joinsound"
 	}
 }

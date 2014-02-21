@@ -2,7 +2,7 @@
 {
 	"GetEasyBhop"
 	{	
-		"en"		"Get easy Bunnyhop"
-		"de"		"Bekomme leichtes Bunnyhoppen"
+		"en"        "Get easy Bunnyhop"
+		"de"        "Bekomme leichtes Bunnyhoppen"
 	}
 }

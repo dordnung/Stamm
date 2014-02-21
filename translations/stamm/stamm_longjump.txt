@@ -2,7 +2,7 @@
 {
 	"GetLongJump"
 	{
-		"en"		"Get Long Jump"
-		"de"		"Bekomme Long Jump"
+		"en"        "Get Long Jump"
+		"de"        "Bekomme Long Jump"
 	}
 }

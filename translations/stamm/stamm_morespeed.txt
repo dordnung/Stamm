@@ -2,8 +2,8 @@
 {
 	"GetMoreSpeed"
 	{
-		"#format"	"{1:i}"
-		"en"		"Get {1} percent more speed"
-		"de"		"Bekomme {1} Prozent mehr Geschwindigkeit"
+		"#format"   "{1:i}"
+		"en"        "Get {1} percent more speed"
+		"de"        "Bekomme {1} Prozent mehr Geschwindigkeit"
 	}
 }

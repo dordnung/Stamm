@@ -2,7 +2,7 @@
 {
 	"GetNoRestrict"
 	{	
-		"en"		"Have restricted weapons"
-		"de"		"Benutze gesperrte Waffen"
+		"en"        "Have restricted weapons"
+		"de"        "Benutze gesperrte Waffen"
 	}
 }
