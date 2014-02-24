@@ -76,8 +76,8 @@ configlib_CreateConfig()
 
 
 	// Add all the natives
-	configlib_StammTag = AutoExecConfig_CreateConVar("stamm_tag", "{lightgreen}[ {green}Stamm {lightgreen}]", "Stamm Tag to use in Chat.");
-	configlib_StammTagMoreColors = AutoExecConfig_CreateConVar("stamm_tag_morecolors", "{strange}[ {mediumseagreen}Stamm {strange}]", "Stamm Tag to use for Source 2009 Games with morecolors support. This will overwrite the stamm_tag convar.");
+	configlib_StammTag = AutoExecConfig_CreateConVar("stamm_tag", "{lightgreen}[ {green}Stamm {lightgreen}]", "Stamm Tag to use in Chat. Use this for a CSGO Server");
+	configlib_StammTagMoreColors = AutoExecConfig_CreateConVar("stamm_tag_morecolors", "{strange}[ {mediumseagreen}Stamm {strange}]", "Stamm Tag to use for CSS, DODS and TF2 with morecolors support. This will overwrite the stamm_tag cvar.");
 	configlib_AdminMenu = AutoExecConfig_CreateConVar("stamm_admin_menu", "sm_sadmin", "Command for Admin Menu");
 	configlib_StammDebug = AutoExecConfig_CreateConVar("stamm_debug", "0", "1=Log in an extra File lot of information, 0=disable");
 	configlib_ExtraPoints = AutoExecConfig_CreateConVar("stamm_extrapoints", "0", "1 = Give less Players more Points, with factor: ((max players on your server) - (current players)), 0 = disable");
