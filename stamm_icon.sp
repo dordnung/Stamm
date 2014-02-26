@@ -192,6 +192,21 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	if (STAMM_HaveClientFeature(client))
+	{
+		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
+		{
+			// Create timer
+			CreateTimer(2.5, CreateStamm, GetClientUserId(client));
+		}
+	}
+}
+
+
+
+
 // Delete icon on death
 public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {	

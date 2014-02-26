@@ -128,6 +128,11 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientChangedFeature(client, true, false);
+}
+
 
 
 // Client changed feature state

@@ -126,6 +126,12 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientChangedFeature(client, true, false);
+}
+
+
 
 // Also change it, if he changed the state
 public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)

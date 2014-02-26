@@ -370,6 +370,11 @@ public STAMM_OnClientReady(client)
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	OnClientCookiesCached(client);
+}
+
 
 
 // Client Got load

@@ -194,6 +194,22 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	// First delete old ones
+	DeleteTrail(client);
+
+	if (STAMM_HaveClientFeature(client))
+	{
+		// Create new one
+		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3)) 
+		{
+			CreateTimer(2.5, SetupTrail, client);
+		}
+	}
+}
+
+
 
 // On disconnect delete trails
 public OnClientDisconnect(client)

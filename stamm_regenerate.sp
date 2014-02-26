@@ -145,6 +145,26 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	if (IsPlayerAlive(client))
+	{
+		if (STAMM_HaveClientFeature(client))
+		{
+			// Reset timer if available
+			if (g_hClientTimers[client] != INVALID_HANDLE) 
+			{
+				KillTimer(g_hClientTimers[client]);
+			}
+
+			// Start timer to add health
+			g_hClientTimers[client] = CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, GetClientUserId(client), TIMER_REPEAT);
+		}
+	}
+}
+
+
+
 // Regenerate Timer
 public Action:GiveHealth(Handle:timer, any:userid)
 {

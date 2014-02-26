@@ -176,3 +176,11 @@ public STAMM_OnClientReady(client)
 		HGR_ClientAccess(client, 1, 2);
 	}
 }
+
+
+
+
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientReady(client);
+}

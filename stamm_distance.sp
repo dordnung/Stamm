@@ -198,6 +198,27 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	if (g_iBlockDirection != -1 && STAMM_HaveClientFeature(client, g_iBlockDirection))
+	{
+		g_bVipPlayers[client][2] = true;
+	}
+
+	if (g_iBlockDistance != -1 && STAMM_HaveClientFeature(client, g_iBlockDistance))
+	{
+		g_bVipPlayers[client][1] = true;
+	}
+
+	if (g_iBlockName != -1 && STAMM_HaveClientFeature(client, g_iBlockName))
+	{
+		g_bVipPlayers[client][0] = true;
+	}
+}
+
+
+
+
 // Client disconnected
 public OnClientDisconnect(client)
 {

@@ -133,6 +133,13 @@ public STAMM_OnClientReady(client)
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	// Name Check
+	NameCheck(client);
+}
+
+
 
 // Client spawned, check also name
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)

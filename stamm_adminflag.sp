@@ -136,6 +136,15 @@ public STAMM_OnClientReady(client)
 
 
 
+
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientReady(client);
+}
+
+
+
+
 // Read out the flags
 public getLevelFlag(String:theflags[], size, level)
 {
