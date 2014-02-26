@@ -1084,7 +1084,7 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 				for (new i = 1; i <= MaxClients; i++)
 				{
 					// Check valid
-					if (clientlib_isValidClient(i))
+					if (clientlib_isValidClient(i) && CanUserTarget(param1, i) && !IsClientInKickQueue(i))
 					{
 						// Add client
 						Format(clientString, sizeof(clientString), "%i", i);
