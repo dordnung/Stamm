@@ -65,7 +65,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 		{
 			if (!StrEqual(g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL], false))
 			{
-				LogToFile(g_sLogFile, "[ STAMM ] Found duplicate Feature. First Plugin at: %s. Second Plugin at: %s", g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+				StammLog(false, "Found duplicate Feature. First Plugin at: %s. Second Plugin at: %s", g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
 
 				return;
 			}
@@ -86,10 +86,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 
 
 			// Announce new feature if debug is on
-			if (g_bDebug)
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s again", basename);
-			}
+			StammLog(true, "Loaded Feature %s again", basename);
 
 
 			// Thats enough for a duplicate
@@ -132,10 +129,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
 
 			// Debug
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Found no Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
-			}
+			StammLog(true, "Found no Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
 		}
 	}
 
@@ -160,10 +154,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
 
 			// Debug
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Found invalid Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
-			}
+			StammLog(true, "Found invalid Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
 		}
 		else
 		{
@@ -231,7 +222,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 					
 
 					// Log the error
-					LogToFile(g_sLogFile, "[ STAMM ] Invalid Level for Feature: %s", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+					StammLog(false, "Invalid Level for Feature: %s", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
 
 
 					// Stop here
@@ -280,11 +271,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 	if (featureIndex != -1)
 	{
 		// Announce if debug
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
-		}
-
+		StammLog(true, "Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
 
 		// Add new Column for this feature
 		sqllib_AddColumn(g_FeatureList[featureIndex][FEATURE_BASE], g_FeatureList[featureIndex][FEATURE_STANDARD]);
@@ -312,10 +299,7 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 
 
 			// Notice to all if debug
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Loaded Feature %s successfully", g_FeatureList[i][FEATURE_BASE]);
-			}
+			StammLog(true, "Loaded Feature %s successfully", g_FeatureList[i][FEATURE_BASE]);
 		}
 		
 
@@ -509,7 +493,7 @@ public Action:featurelib_Load(args)
 	else
 	{
 		// So it's correct ->
-		ReplyToCommand(0, "Usage: stamm_feature_load <basename>");
+		ReplyToCommand(0, "Usage: stamm_load_feature <basename>");
 	}
 
 
@@ -565,7 +549,7 @@ public Action:featurelib_UnLoad(args)
 	else
 	{
 		// So it's correct ->
-		ReplyToCommand(0, "Usage: stamm_feature_unload <basename>");
+		ReplyToCommand(0, "Usage: stamm_unload_feature <basename>");
 	}
 
 
@@ -618,7 +602,7 @@ public Action:featurelib_ReLoad(args)
 	}
 	else
 	{
-		ReplyToCommand(0, "Usage: stamm_feature_reload <basename>");
+		ReplyToCommand(0, "Usage: stamm_reload_feature <basename>");
 	}
 
 	return Plugin_Handled;

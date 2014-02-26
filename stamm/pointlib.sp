@@ -174,10 +174,7 @@ public Action:pointlib_AddPlayerPoints(args)
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-				}
+				StammLog(true, "Execute %s", query);
 			}
 		}
 	}
@@ -258,10 +255,7 @@ public Action:pointlib_SetPlayerPoints(args)
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-				}
+				StammLog(true, "Execute %s", query);
 			}
 		}
 	}
@@ -337,10 +331,7 @@ public Action:pointlib_DelPlayerPoints(args)
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-				}
+				StammLog(true, "Execute %s", query);
 			}
 		}
 	}

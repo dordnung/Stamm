@@ -1385,22 +1385,12 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
 	
 
-
 	// Format text parameter
 	FormatNativeString(0, 2, 3, sizeof(buffer), _, buffer);
 
 
-
-	// Write to debug only if debug is enabled
-	if (useDebug && g_bDebug)
-	{
-	 	LogToFile(g_sDebugFile, "[ STAMM-%s ] %s", basename, buffer);
-	}
-	else if (!useDebug)
-	{
-		// Seems to be an error
-		LogToFile(g_sLogFile, "[ STAMM-%s ] %s", basename, buffer);
-	}
+	// Write to logs
+	StammLog(GetNativeCell(1), "[%s] %s", basename, buffer);
 }
 
 

@@ -278,10 +278,8 @@ otherlib_EndHappyHour()
 		Format(query, sizeof(query), g_sDeleteHappyQuery, g_sTableName);
 		
 		// Announce step
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
+		
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 
@@ -330,10 +328,8 @@ otherlib_StartHappyHour(time, factor)
 	// Insert new happy gour
 	Format(query, sizeof(query), g_sInsertHappyQuery, g_sTableName, GetTime() + time, factor);
 	
-	if (g_bDebug) 
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
+	StammLog(true, "Execute %s", query);
+	
 
 	// Query
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
@@ -460,4 +456,23 @@ otherlib_checkTimer(Handle:timer)
 
 	// Reset Timer
 	timer = INVALID_HANDLE;
+}
+
+
+// Logging Stuff
+StammLog(bool:debug, String:fmt[], any:...)
+{
+	decl String:format[1024];
+
+	VFormat(format, sizeof(format), fmt, 3);
+
+
+	if (debug && GetConVarBool(configlib_StammDebug))
+	{
+		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] %s", format);
+	}
+	else if (!debug)
+	{
+		LogToFile(g_sLogFile, "[ STAMM ] %s", format);
+	}
 }

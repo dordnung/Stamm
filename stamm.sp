@@ -178,11 +178,11 @@ public OnPluginStart()
 	RegServerCmd("stamm_start_happyhour", otherlib_StartHappy, "Starts happy hour: stamm_start_happyhour <time> <factor>");
 	RegServerCmd("stamm_stop_happyhour", otherlib_StopHappy, "Stops happy hour");
 
-	RegServerCmd("stamm_feature_load", featurelib_Load, "Loads a feature: stamm_feature_load <basename>");
-	RegServerCmd("stamm_feature_unload", featurelib_UnLoad, "Unloads a feature: stamm_feature_unload <basename>");
-	RegServerCmd("stamm_feature_reload", featurelib_ReLoad, "Reloads a feature: stamm_feature_reload <basename>");
+	RegServerCmd("stamm_load_feature", featurelib_Load, "Loads a feature: stamm_load_feature <basename>");
+	RegServerCmd("stamm_unload_feature", featurelib_UnLoad, "Unloads a feature: stamm_unload_feature <basename>");
+	RegServerCmd("stamm_reload_feature", featurelib_ReLoad, "Reloads a feature: stamm_reload_feature <basename>");
 
-	RegServerCmd("stamm_feature_list", featurelib_List, "List all features.");
+	RegServerCmd("stamm_list_feature", featurelib_List, "List all features.");
 
 	RegServerCmd("stamm_convert_db", sqllib_convertDB, "Converts the stamm database to a file. stamm_convert_db <mysql>");
 
@@ -277,7 +277,7 @@ CheckStammFolders()
 	// Check for old folders
 	if (DirExists(oldFolder2) || DirExists(oldFolder))
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder 'levels' inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
+		StammLog(false, "ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder 'levels' inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
 		PrintToServer("[ STAMM ] ATTENTION: Found Folder '%s' in Sourcemod directory. Please move the folder 'levels' inside to 'cfg/stamm'. Then delete the folder '%s'!", oldFolder2, oldFolder2);
 	}
 }
@@ -429,11 +429,7 @@ stammStarted()
 
 
 	// If debug, notice stamm started
-	if (g_bDebug)
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Stamm successfully loaded");
-	}
-
+	StammLog(true, "Stamm successfully loaded");
 
 	// Start check timer
 	CreateTimer(60.0, checkFeatures, _, TIMER_REPEAT);

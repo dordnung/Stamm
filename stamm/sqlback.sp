@@ -40,10 +40,7 @@ sqlback_getDatabaseVersion()
 		// Get highest version
 		Format(query, sizeof(query), g_sSelectVersionQuery, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_getVersion, query);
 		
@@ -51,10 +48,7 @@ sqlback_getDatabaseVersion()
 		// Get running happy hour
 		Format(query, sizeof(query), g_sSelectHappyQuery, g_sTableName, GetTime());
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_getHappy, query);
 	}
@@ -147,11 +141,7 @@ sqlback_syncSteamid(client, const String:version[])
 		Format(query, sizeof(query), g_sSelectPointsQuery, g_sTableName, steamid);
 		
 
-
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 
 		SQL_TQuery(sqllib_db, sqlback_syncSteamid1, query, GetClientUserId(client));
@@ -186,10 +176,7 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 		// Delete STEAM_1: entry
 		Format(query, sizeof(query), g_sDeletePlayerQuery, g_sTableName, steamid);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 	}
@@ -211,10 +198,7 @@ sqlback_ModifyTableBackwards()
 		// Add admin
 		Format(query, sizeof(query), g_sAlterAdminQuery, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 	}
@@ -226,10 +210,7 @@ sqlback_ModifyTableBackwards()
 		// Add last visit
 		Format(query, sizeof(query), g_sAlterLastVisitQuery, g_sTableName, GetTime());
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 	}
@@ -244,10 +225,7 @@ sqlback_ModifyTableBackwards()
 			// Add version column
 			Format(query, sizeof(query), g_sAlterVersionQuery, g_sTableName);
 			
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-			}
+			StammLog(true, "Execute %s", query);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 
@@ -256,10 +234,7 @@ sqlback_ModifyTableBackwards()
 			// Drop payed	
 			Format(query, sizeof(query), g_sAlterPayedQuery, g_sTableName);
 			
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-			}
+			StammLog(true, "Execute %s", query);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
 			
@@ -268,10 +243,7 @@ sqlback_ModifyTableBackwards()
 			// Maybe we came from and old 1. version?
 			Format(query, sizeof(query), g_sSelectAllPointsQuery, g_sTableName);
 			
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-			}
+			StammLog(true, "Execute %s", query);
 
 			SQL_TQuery(sqllib_db, sqlback_SQLModify1, query);
 		}
@@ -312,10 +284,7 @@ public sqlback_SQLModify1(Handle:owner, Handle:hndl, const String:error[], any:d
 		}
 		
 
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_SQLModify2, query);
 	}
@@ -340,10 +309,7 @@ public sqlback_SQLModify2(Handle:owner, Handle:hndl, const String:error[], any:d
 		Format(query, sizeof(query), g_sInsertBackupQuery, g_sTableName, g_sTableName);
 	
 
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_SQLModify3, query);
 	}
@@ -370,10 +336,7 @@ public sqlback_SQLModify3(Handle:owner, Handle:hndl, const String:error[], any:d
 		// Rename old database to old
 		Format(query, sizeof(query), g_sAlterRenameQuery, g_sTableName, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_SQLModify4, query);
 	}
@@ -401,10 +364,7 @@ public sqlback_SQLModify4(Handle:owner, Handle:hndl, const String:error[], any:d
 		// Make new database to main
 		Format(query, sizeof(query), g_sAlterRename2Query, g_sTableName, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_SQLModify5, query);
 	}

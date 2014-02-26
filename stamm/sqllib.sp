@@ -91,9 +91,7 @@ sqllib_LoadDB()
 	// Not connected?
 	if (sqllib_db == INVALID_HANDLE)
 	{
-		// Log error and stop plugin
-		LogToFile(g_sLogFile, "[ STAMM ] Stamm couldn't connect to the Database!! Error: %s", sqlError);
-
+		// Stop plugin
 		SetFailState("[ STAMM ] Stamm couldn't connect to the Database!! Error: %s", sqlError);
 	}
 	else 
@@ -116,10 +114,7 @@ sqllib_LoadDB()
 		}
 
 
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 
 
@@ -132,7 +127,7 @@ sqllib_LoadDB()
 		{
 			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
 			
-			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Table. Error: %s", sqlError);
+			StammLog(false, "Couldn't create Table. Error: %s", sqlError);
 		}
 
 
@@ -141,17 +136,14 @@ sqllib_LoadDB()
 		// Create feature table
 		Format(query, sizeof(query), g_sCreateFeatureQuery, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
+		StammLog(true,  "Execute %s", query);
+	
 		// Fast query
 		if (!SQL_FastQuery(sqllib_db, query))
 		{
 			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
 			
-			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Feature Table. Error: %s", sqlError);
+			StammLog(false, "Couldn't create Feature Table. Error: %s", sqlError);
 		}*/
 
 
@@ -159,10 +151,7 @@ sqllib_LoadDB()
 		// Create happy hour table
 		Format(query, sizeof(query), g_sCreatHappyQuery, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 
 
@@ -171,12 +160,12 @@ sqllib_LoadDB()
 		{
 			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
 			
-			LogToFile(g_sLogFile, "[ STAMM ] Couldn't create Happy Table. Error: %s", sqlError);
+			StammLog(false, "Couldn't create Happy Table. Error: %s", sqlError);
 		}
 		
-		else if (g_bDebug)
+		else
 		{ 
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Connected to Database successfully");
+			StammLog(true, "Connected to Database successfully");
 		}
 
 
@@ -239,10 +228,7 @@ sqllib_InsertPlayer(client)
 
 		Format(query, sizeof(query), g_sInsertMiddleQuery, query, g_sTableName, steamid);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 
 		// Get it
@@ -277,10 +263,7 @@ sqllib_AddColumn(String:name[], bool:standard)
 
 
 
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		// Add column
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
@@ -330,10 +313,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// Insert the player 
 				Format(query, sizeof(query), g_sInsertPlayerQuery, g_sTableName, steamid, name2, (clientlib_IsAdmin(client) ? 1 : 0), GetTime());
 				
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-				}
+				StammLog(true, "Execute %s", query);
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 				
@@ -385,10 +365,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// Update version, name and last visit
 				Format(query, sizeof(query), g_sUpdatePlayer2Query, g_sTableName, name2, (clientlib_IsAdmin(client) ? 1 : 0), g_sPluginVersion, GetTime(), steamid);
 				
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-				}
+				StammLog(true, "Execute %s", query);
 
 				SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 
@@ -406,10 +383,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 			// Get Feature of the player
 			Format(query, sizeof(query), g_sSelectPlayerShopQuery, g_sTableName, steamid);
 			
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-			}
+			StammLog(true, "Execute %s", query);
 
 
 			// Get it
@@ -422,7 +396,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 	else
 	{
 		// Couldn't check
-		LogToFile(g_sLogFile, "[ STAMM ] Error checking Player %N:   %s", client, error);
+		StammLog(false, "Error checking Player %N:   %s", client, error);
 	}
 }
 
@@ -548,7 +522,7 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 	else
 	{
 		// Couldn't check
-		LogToFile(g_sLogFile, "[ STAMM ] Error checking Player Shop %N:   %s", client, error);
+		StammLog(false, "Error checking Player Shop %N:   %s", client, error);
 	}
 }
 */
@@ -569,10 +543,7 @@ public Action:sqllib_GetVipTop(client, args)
 		// Select all vips DESC by points
 		Format(query, sizeof(query), g_sSelectTop10Query, g_sTableName);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqllib_GetVIPTopQuery, query, GetClientUserId(client));
 	}
@@ -597,10 +568,7 @@ public Action:sqllib_GetVipRank(client, args)
 		// Get the count of players with points higher than that of the client
 		Format(query, sizeof(query), g_sSelectRankQuery, g_sTableName, g_iPlayerPoints[client]);
 		
-		if (g_bDebug) 
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqllib_GetVIPRankQuery, query, GetClientUserId(client));
 	}
@@ -694,7 +662,7 @@ public sqllib_GetVIPTopQuery(Handle:owner, Handle:hndl, const String:error[], an
 	}
 	else
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] Database Error:   %s", error);
+		StammLog(false, "Database Error:   %s", error);
 	}
 }
 
@@ -727,7 +695,7 @@ public sqllib_GetVIPRankQuery(Handle:owner, Handle:hndl, const String:error[], a
 	}
 	else
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] Database Error:   %s", error);
+		StammLog(false, "Database Error:   %s", error);
 	}
 }
 
@@ -742,7 +710,7 @@ public sqllib_SQLErrorCheckCallback(Handle:owner, Handle:hndl, const String:erro
 	if (!StrEqual("", error))
 	{
 		// Save error
-		LogToFile(g_sLogFile, "[ STAMM ] Database Error: %s", error);
+		StammLog(false, "Database Error: %s", error);
 	}
 }
 
@@ -756,10 +724,7 @@ public sqllib_SQLErrorCheckCallback2(Handle:owner, Handle:hndl, const String:err
 	// Duplicate column is fine
 	if (!StrEqual("", error) && StrContains(error, "Duplicate column name", false) == -1)
 	{
-		if (g_bDebug)
-		{
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Maybe VALID Database Error: %s", error);
-		}
+		StammLog(true, "Maybe VALID Database Error: %s", error);
 	}
 }
 

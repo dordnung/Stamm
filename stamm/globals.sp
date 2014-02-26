@@ -155,7 +155,6 @@ new bool:g_bIsLate;
 new bool:g_bAutoUpdate;
 new bool:g_bJoinShow;
 new bool:g_bSeeText;
-new bool:g_bDebug = true;
 new bool:g_bExtraPoints;
 new bool:g_bHudText;
 new bool:g_bStripTag;

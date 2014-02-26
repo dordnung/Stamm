@@ -41,7 +41,7 @@ levellib_LoadLevels()
 	// Didn't find the stamm level file -> Stop plugin, we can't do anything here
 	if (!FileExists("cfg/stamm/StammLevels.txt"))
 	{
-		LogToFile(g_sLogFile, "Attention: Couldn't load cfg/stamm/StammLevels.txt. File doesn't exist!");
+		SetFailState("Fatal Error: Couldn't load \"cfg/stamm/StammLevels.txt\". File doesn't exist!");
 
 		return;
 	}
@@ -66,7 +66,7 @@ levellib_LoadLevels()
 
 
 			// Check now, and check if we under the maxlevels line
-			if (StrEqual(flagTest, "") && g_iLevels < MAXLEVELS)
+			if (strlen(flagTest) < 1 && g_iLevels < MAXLEVELS)
 			{
 				// Get point count
 				new points = KvGetNum(all_levels, "points");
@@ -79,7 +79,7 @@ levellib_LoadLevels()
 					if (points == g_iLevelPoints[i])
 					{
 						// But first say it 
-						LogToFile(g_sLogFile, "[ STAMM ] Stamm Level with %i Points duplicated!!", points);
+						StammLog(false, "Level with %i Points is duplicated!", points);
 
 						duplicate = true;
 					}
@@ -104,11 +104,7 @@ levellib_LoadLevels()
 
 
 				// save on debug
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added non priavte Level %s", g_sLevelName[g_iLevels]);
-				}
-
+				StammLog(true, "Added non priavte Level %s", g_sLevelName[g_iLevels]);
 
 				// Update level counter
 				g_iLevels++;
@@ -120,6 +116,12 @@ levellib_LoadLevels()
 
 		// Sort the levels
 		levellib_sortLevels();
+	}
+	else
+	{
+		SetFailState("Fatal Error: Couldn't parse \"cfg/stamm/StammLevels.txt\". File contains invalid content!");
+
+		return;
 	}
 
 
@@ -140,7 +142,7 @@ levellib_LoadLevels()
 
 
 			// Yes it exists
-			if (!StrEqual(flagTest, "") && g_iLevels + g_iPLevels < MAXLEVELS)
+			if (strlen(flagTest) > 0 && g_iLevels + g_iPLevels < MAXLEVELS)
 			{
 				// Get the flag
 				Format(g_sLevelFlag[g_iPLevels], sizeof(g_sLevelFlag[]), flagTest);
@@ -153,10 +155,7 @@ levellib_LoadLevels()
 
 
 				// Notice that it loaded the level
-				if (g_bDebug) 
-				{
-					LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Added priavte Level %s", g_sLevelName[g_iLevels+g_iPLevels]);
-				}
+				StammLog(true, "Added priavte Level %s", g_sLevelName[g_iLevels+g_iPLevels]);
 
 
 				// Update privat counter
@@ -197,11 +196,11 @@ levellib_sortLevels()
 
 
 // Find the level of clients points
-levellib_PointsToID(client, points)
+levellib_ClientPointsToID(client)
 {
 	// First check if he's a special vip
 	new spec = clientlib_IsSpecialVIP(client);
-
+	new points = g_iPlayerPoints[client];
 
 
 	// if so, just give it's level back

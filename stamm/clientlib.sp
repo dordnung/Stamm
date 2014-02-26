@@ -298,12 +298,7 @@ public Action:clientlib_deleteOlds(Handle:timer, any:data)
 	Format(query, sizeof(query), g_sDeleteOldQuery, g_sTableName, lastEntry);
 
 
-
-	if (g_bDebug) 
-	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
-
+	StammLog(true, "Execute %s", query);
 
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
@@ -323,18 +318,17 @@ clientlib_CheckVip(client)
 	{
 		decl String:steamid[64];
 		new clientpoints = g_iPlayerPoints[client];
-		new levelstufe;
 
 
 
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		
 		// Get level with client points
-		levelstufe = levellib_PointsToID(client, clientpoints);
+		new levelstufe = levellib_ClientPointsToID(client);
 		
 
 
-		// is a private vip
+		// Shouldn't happen
 		if (levelstufe == -1)
 		{ 
 			return;
@@ -416,10 +410,7 @@ clientlib_CheckVip(client)
 			// Update client on database
 			Format(setquery, sizeof(setquery), g_sUpdatePlayerQuery, g_sTableName, levelstufe, steamid);
 			
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", setquery);
-			}
+			StammLog(true, "Execute %s", setquery);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, setquery);
 
@@ -442,10 +433,7 @@ clientlib_CheckVip(client)
 			// Update to database
 			Format(queryback, sizeof(queryback), g_sUpdatePlayerQuery, g_sTableName, 0, steamid);
 			
-			if (g_bDebug) 
-			{
-				LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", queryback);
-			}
+			StammLog(true, "Execute %s", queryback);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, queryback);
 		}
@@ -493,11 +481,7 @@ clientlib_SavePlayer(client, number)
 		// Execute
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 		
-		if (g_bDebug)
-		{ 
-			LogToFile(g_sDebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
-
+		StammLog(true, "Execute %s", query);
 
 		// Notice to API
 		nativelib_ClientSave(client);
@@ -638,8 +622,12 @@ public Action:clientlib_CmdSay(client, args)
 
 		else if (g_iPointsNumber[client] > 0)
 		{
-			// want to add points
-			if (StrEqual(text, " "))
+			new choose = g_iPointsNumber[client];
+			new pointstoset = StringToInt(text);
+			
+
+			// Valid input?
+			if (StrEqual(text, " ") || (pointstoset == 0 && !StrEqual(text, "0")))
 			{
 				g_iPointsNumber[client] = 0;
 
@@ -656,12 +644,6 @@ public Action:clientlib_CmdSay(client, args)
 				
 				return Plugin_Handled;
 			}
-			
-
-
-			new choose = g_iPointsNumber[client];
-			new pointstoset = StringToInt(text);
-			
 
 
 			if (clientlib_isValidClient(choose))
@@ -762,7 +744,7 @@ clientlib_CheckPlayers()
 		if (!g_bHappyHourON)
 		{ 
 			new players = clientlib_GetPlayerCount();
-			new factor = (MaxClients - players) + 1;
+			new factor = ((MaxClients - players) / 4) + 1;
 			
 			g_iPoints = factor;
 		}
