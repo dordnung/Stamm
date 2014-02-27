@@ -224,6 +224,11 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 // Playe said something
 public Action:CmdSay(client, args)
 {
+	if (!STAMM_IsClientValid(client))
+	{
+		return Plugin_Continue;
+	}
+
 	decl String:text[128];
 	decl String:name[MAX_NAME_LENGTH+1];
 	decl String:tag[64];
