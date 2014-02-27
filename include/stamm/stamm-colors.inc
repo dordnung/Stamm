@@ -80,6 +80,76 @@ stock STAMM_PrintToChatAll(const String:message[], any:...)
 
 
 
+
+
+/**
+ * Writes a message to a client with the correct stock for the game.
+ *
+ * @param client        Client index.
+ * @param author        Author index.
+ * @param message       Message (formatting rules).
+ *
+ * @noreturn
+ * @error               If the client is not connected an error will be thrown.
+ */
+stock STAMM_PrintToChatEx(client, author, const String:message[], any:...)
+{
+	decl String:buffer[MAX_MESSAGE_LENGTH_MORE];
+
+	VFormat(buffer, sizeof(buffer), message, 3);
+
+
+	if (!g_bStammColorsFixed)
+	{
+		STAMM_FixColors();
+	}
+	
+
+	if (STAMM_GetGame() == GameCSGO)
+	{
+		CPrintToChatEx(client, author, buffer);
+	}
+	else
+	{
+		MCPrintToChatEx(client, author, buffer);
+	}
+}
+
+
+
+/**
+ * Writes a message to all clients with the correct stock for the game.
+ *
+ * @param author        Author index.
+ * @param message       Message (formatting rules).
+ *
+ * @noreturn
+ */
+stock STAMM_PrintToChatAllEx(author, const String:message[], any:...)
+{
+	decl String:buffer[MAX_MESSAGE_LENGTH_MORE];
+
+	VFormat(buffer, sizeof(buffer), message, 2);
+
+
+	if (!g_bStammColorsFixed)
+	{
+		STAMM_FixColors();
+	}
+
+
+	if (STAMM_GetGame() == GameCSGO)
+	{
+		CPrintToChatAllEx(author, buffer);
+	}
+	else
+	{
+		MCPrintToChatAllEx(author, buffer);
+	}
+}
+
+
+
 /**
  * Returns whether you can use morecolors or not,
  *
