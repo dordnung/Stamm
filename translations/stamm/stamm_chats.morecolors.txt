@@ -22,4 +22,28 @@
 		"en"        " (start message with {1})"
 		"de"        " (Starte Nachricht mit {1})"
 	}
+	"VIPMessageName"
+	{
+		"#format"   "{1:s}"
+		"en"        "{strange}[VIP Message] {mediumseagreen}{1}"
+		"de"        "{strange}[VIP Nachricht] {mediumseagreen}{1}"
+	}
+	"VIPMessage"
+	{
+		"#format"   "{1:s}"
+		"en"        "{teamcolor}{1}"
+		"de"        "{teamcolor}{1}"
+	}
+	"VIPChatName"
+	{
+		"#format"   "{1:s}"
+		"en"        "{strange}[VIP Chat] {mediumseagreen}{1}"
+		"de"        "{strange}[VIP Chat] {mediumseagreen}{1}"
+	}
+	"VIPChat"
+	{
+		"#format"   "{1:s}"
+		"en"        "{teamcolor}{1}"
+		"de"        "{teamcolor}{1}"
+	}
 }

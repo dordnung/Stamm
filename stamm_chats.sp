@@ -36,9 +36,6 @@
 
 
 
-
-new Handle:g_hMessageTag;
-new Handle:g_hOwnChatTag;
 new Handle:g_hNeedTag;
 
 new g_iMessages;
@@ -147,8 +144,6 @@ public OnPluginStart()
 	AutoExecConfig_SetFile("chats", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
-	g_hMessageTag = AutoExecConfig_CreateConVar("chats_messagetag", "VIP Message", "Tag when a player writes something as a VIP");
-	g_hOwnChatTag = AutoExecConfig_CreateConVar("chats_ownchattag", "VIP Chat", "Tag when a player writes something in the VIP Chat");
 	g_hNeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate a VIP message, 0 = Off");
 	
 	AutoExecConfig_CleanFile();
@@ -166,12 +161,9 @@ public OnPluginStart()
 public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:message[])
 {
 	decl String:tag[64];
-	decl String:messageTag[32];
 	decl String:nameBackup[MAXLENGTH_NAME];
 	decl String:messageBackup[MAXLENGTH_MESSAGE];
 
-
-	GetConVarString(g_hMessageTag, messageTag, sizeof(messageTag));
 
 	STAMM_GetTag(tag, sizeof(tag));
 	
@@ -184,30 +176,22 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 		strcopy(messageBackup, sizeof(messageBackup), message);
 
 
-		if (!GetConVarBool(g_hNeedTag) || (message[0] == '*' && !StrEqual(message, "*", false)))
+		if (!GetConVarBool(g_hNeedTag))
 		{
-			if (GetConVarBool(g_hNeedTag) && !STAMM_WantClientFeature(author))
+			if (!STAMM_WantClientFeature(author))
 			{
 				return Plugin_Continue;
-			}
-
-			if (GetConVarBool(g_hNeedTag))
-			{
-				ReplaceString(messageBackup, MAXLENGTH_MESSAGE, "*", "");
 			}
 
 			// Can write VIP message?
 			if (g_iMessages != -1 && STAMM_HaveClientFeature(author, g_iMessages))
 			{
 				// print according to Team
-				Format(name, MAXLENGTH_NAME, "{teamcolor}[%s] {green}", messageTag);
-				CFormat(name, MAXLENGTH_NAME, author);
-				Format(name, MAXLENGTH_NAME, "%s%s", name, nameBackup);
+				Format(name, MAXLENGTH_NAME, "%t", "VIPMessageName", nameBackup);
+				STAMM_FormatColor(name, MAXLENGTH_NAME, author);
 
-
-				Format(message, MAXLENGTH_MESSAGE, "{teamcolor}");
-				CFormat(message, MAXLENGTH_MESSAGE, author);
-				Format(message, MAXLENGTH_MESSAGE, "%s%s", message, messageBackup);
+				Format(message, MAXLENGTH_MESSAGE, "%t", "VIPMessage", messageBackup);
+				STAMM_FormatColor(message, MAXLENGTH_MESSAGE, author);
 
 				return Plugin_Changed;
 			}
@@ -230,26 +214,48 @@ public Action:CmdSay(client, args)
 	}
 
 	decl String:text[128];
-	decl String:name[MAX_NAME_LENGTH+1];
 	decl String:tag[64];
-	decl String:ownChatTag[32];
+	decl String:name[64];
 
-
-	GetClientName(client, name, sizeof(name));
 
 	GetCmdArgString(text, sizeof(text));
-	GetConVarString(g_hOwnChatTag, ownChatTag, sizeof(ownChatTag));
+	GetClientName(client, name, sizeof(name));
 
-	
 	STAMM_GetTag(tag, sizeof(tag));
 	ReplaceString(text, sizeof(text), "\"", "");
 
 
+	if (GetConVarBool(g_hNeedTag) && text[0] == '*' && !StrEqual(text, "*", false))
+	{
+		ReplaceString(text, sizeof(text), "*", "");
+
+		if (!STAMM_WantClientFeature(client))
+		{
+			STAMM_PrintToChat(client, "%s %t", tag, "FeatureDisabled");
+
+			return Plugin_Continue;
+		}
+
+
+		// Can write VIP message?
+		if (g_iMessages != -1 && STAMM_HaveClientFeature(client, g_iMessages))
+		{
+			for (new i=1; i <= MaxClients; i++)
+			{
+				if (STAMM_IsClientValid(i))
+				{
+					STAMM_PrintToChatEx(i, client, "%t{default} :  %t", "VIPMessageName", name, "VIPMessage", text);
+				}
+			}
+
+			return Plugin_Handled;
+		}
+	}
+
 	// Found tag?
-	if (text[0] == '#' && !StrEqual(text, "#", false))
+	else if (text[0] == '#' && !StrEqual(text, "#", false))
 	{
 		ReplaceString(text, sizeof(text), "#", "");
-
 
 		// Want feature?
 		if (!STAMM_WantClientFeature(client))
@@ -271,20 +277,7 @@ public Action:CmdSay(client, args)
 					if (STAMM_HaveClientFeature(i, g_iChat))
 					{
 						// Print according to team
-						if (GetClientTeam(i) == 2) 
-						{
-							STAMM_PrintToChat(i, "{red}[%s] {green}%s{default}:{red} %s", ownChatTag, name, text);
-						}
-						
-						else if (GetClientTeam(i) == 3) 
-						{
-							STAMM_PrintToChat(i, "{blue}[%s] {green}%s{default}:{blue} %s", ownChatTag, name, text);
-						}
-
-						else
-						{
-							STAMM_PrintToChat(i, "{lightgreen}[%s] {green}%s{default}:{lightgreen} %s", ownChatTag, name, text);
-						}
+						STAMM_PrintToChatEx(i, client, "%t{default} :  %t", "VIPChatName", name, "VIPChat", text);
 					}
 				}
 			}
