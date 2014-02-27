@@ -96,7 +96,7 @@ stock STAMM_PrintToChatEx(client, author, const String:message[], any:...)
 {
 	decl String:buffer[MAX_MESSAGE_LENGTH_MORE];
 
-	VFormat(buffer, sizeof(buffer), message, 3);
+	VFormat(buffer, sizeof(buffer), message, 4);
 
 
 	if (!g_bStammColorsFixed)
@@ -129,7 +129,7 @@ stock STAMM_PrintToChatAllEx(author, const String:message[], any:...)
 {
 	decl String:buffer[MAX_MESSAGE_LENGTH_MORE];
 
-	VFormat(buffer, sizeof(buffer), message, 2);
+	VFormat(buffer, sizeof(buffer), message, 3);
 
 
 	if (!g_bStammColorsFixed)
@@ -145,6 +145,44 @@ stock STAMM_PrintToChatAllEx(author, const String:message[], any:...)
 	else
 	{
 		MCPrintToChatAllEx(author, buffer);
+	}
+}
+
+
+
+/**
+ * Replaces color tags in a string with color codes
+ *
+ * @param message       String.
+ * @param maxlength     Maximum length of the string buffer.
+ *
+ * @noreturn
+ */
+stock STAMM_FormatColor(String:message[], maxlength, author=-1)
+{
+	if (!g_bStammColorsFixed)
+	{
+		STAMM_FixColors();
+	}
+
+
+	if (STAMM_GetGame() == GameCSGO)
+	{
+		if (author == 0)
+		{
+			author = -1;
+		}
+
+		CFormat(message, maxlength, author);
+	}
+	else
+	{
+		if (author == -1)
+		{
+			author = 0;
+		}
+
+		MCReplaceColorCodes(message, author, false, maxlength);
 	}
 }
 
