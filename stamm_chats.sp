@@ -37,6 +37,11 @@
 
 
 new Handle:g_hNeedTag;
+new Handle:g_hMessageLog;
+new Handle:g_hChatLog;
+
+new String:g_sMessageFile[PLATFORM_MAX_PATH + 1];
+new String:g_sChatFile[PLATFORM_MAX_PATH + 1];
 
 new g_iMessages;
 new g_iChat;
@@ -141,16 +146,25 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 // Create the config
 public OnPluginStart()
 {
+	decl String:cdate[64];
+
 	AutoExecConfig_SetFile("chats", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
 	g_hNeedTag = AutoExecConfig_CreateConVar("chats_needtag", "1", "1 = Player have to write * at the start of the message to activate a VIP message, 0 = Off");
-	
+	g_hMessageLog = AutoExecConfig_CreateConVar("chats_message_logging", "0", "1 = Enable VIP Message logging, 0 = Off");
+	g_hChatLog = AutoExecConfig_CreateConVar("chats_chat_logging", "0", "1 = Enable VIP Chat logging, 0 = Off");
+
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
 
 
 	RegConsoleCmd("say", CmdSay);
+
+
+	FormatTime(cdate, sizeof(cdate), "%d-%m-%y");
+	BuildPath(Path_SM, g_sMessageFile, sizeof(g_sMessageFile), "logs/stamm_message_(%s).log", cdate);
+	BuildPath(Path_SM, g_sChatFile, sizeof(g_sChatFile), "logs/stamm_chat_(%s).log", cdate);
 }
 
 
@@ -192,6 +206,11 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 
 				Format(message, MAXLENGTH_MESSAGE, "%t", "VIPMessage", messageBackup);
 				STAMM_FormatColor(message, MAXLENGTH_MESSAGE, author);
+
+				if (GetConVarBool(g_hMessageLog))
+				{
+					LogToFile(g_sMessageFile, "\"%L\" executes: say %s", author, message);
+				}
 
 				return Plugin_Changed;
 			}
@@ -240,6 +259,11 @@ public Action:CmdSay(client, args)
 		// Can write VIP message?
 		if (g_iMessages != -1 && STAMM_HaveClientFeature(client, g_iMessages))
 		{
+			if (GetConVarBool(g_hMessageLog))
+			{
+				LogToFile(g_sMessageFile, "\"%L\" executes: say %s", client, text);
+			}
+
 			for (new i=1; i <= MaxClients; i++)
 			{
 				if (STAMM_IsClientValid(i))
@@ -268,6 +292,11 @@ public Action:CmdSay(client, args)
 
 		if (g_iChat != -1 && STAMM_HaveClientFeature(client, g_iChat))
 		{
+			if (GetConVarBool(g_hChatLog))
+			{
+				LogToFile(g_sChatFile, "\"%L\" executes: say %s", client, text);
+			}
+
 			// Print to all VIP's
 			for (new i=1; i <= MaxClients; i++)
 			{
