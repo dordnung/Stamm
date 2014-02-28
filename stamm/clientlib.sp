@@ -132,13 +132,53 @@ clientlib_ClientReady(client)
 		
 
 		// check admin flag
-		if (!StrEqual(g_sGiveFlagAdmin, "0") && !StrEqual(g_sGiveFlagAdmin, ""))
+		decl String:giveFlagAdmin[32];
+
+		GetConVarString(configlib_GiveFlagAdmin, giveFlagAdmin, sizeof(giveFlagAdmin));
+
+		// Before we had numbers, now we have flags
+		// Replace numbers with flags
+		if (StrEqual(giveFlagAdmin, "1"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "o");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "2"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "p");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "3"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "q");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "4"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "r");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "5"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "s");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "6"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "t");
+		}
+
+		if (!StrEqual(giveFlagAdmin, "0") && !StrEqual(giveFlagAdmin, ""))
 		{ 
-			clientlib_CheckFlagAdmin(client);
+			// Flag checking
+			if (GetUserFlagBits(client) & ReadFlagString(giveFlagAdmin))
+			{
+				clientlib_GiveFastVIP(client);
+			}
 		}
 
 		// Show points	
-		if (g_bJoinShow)
+		if (GetConVarBool(configlib_JoinShow))
 		{ 
 			CreateTimer(5.0, pointlib_ShowPoints2, GetClientUserId(client));
 		}
@@ -213,9 +253,12 @@ clientlib_IsSteamIDConnected(String:steamid[])
 // Check if a client is a stamm admin
 bool:clientlib_IsAdmin(client)
 {
+	decl String:adminflag[32];
+	GetConVarString(configlib_AdminFlag, adminflag, sizeof(adminflag));
+
 	if (clientlib_isValidClient_PRE(client))
 	{
-		return (GetUserFlagBits(client) & ReadFlagString(g_sAdminFlag) || GetUserFlagBits(client) & ADMFLAG_ROOT);
+		return (GetUserFlagBits(client) & ReadFlagString(adminflag) || GetUserFlagBits(client) & ADMFLAG_ROOT);
 	}
 	
 
@@ -247,21 +290,6 @@ clientlib_IsSpecialVIP(client)
 	// No special
 	return -1;
 }
-
-
-
-
-
-// Give Player fast VIP
-clientlib_CheckFlagAdmin(client)
-{
-	// Flag checking
-	if (GetUserFlagBits(client) & ReadFlagString(g_sGiveFlagAdmin))
-	{
-		clientlib_GiveFastVIP(client);
-	}
-}
-
 
 
 
@@ -330,7 +358,7 @@ clientlib_CheckVip(client)
 
 
 			// Notice to all
-			if (!g_bStripTag)
+			if (!GetConVarBool(configlib_StripTag))
 			{
 				if (!g_bMoreColors)
 				{
@@ -368,9 +396,13 @@ clientlib_CheckVip(client)
 
 
 			// Play lvl up sound if wanted
-			if (!StrEqual(g_sLvlUpSound, "0") && isUP)
+			decl String:lvlUpSound[PLATFORM_MAX_PATH + 1];
+
+			GetConVarString(configlib_LvlUpSound, lvlUpSound, sizeof(lvlUpSound));
+
+			if (!StrEqual(lvlUpSound, "0") && isUP && IsSoundPrecached(lvlUpSound))
 			{
-				EmitSoundToAll(g_sLvlUpSound);
+				EmitSoundToAll(lvlUpSound);
 			}
 
 
@@ -676,7 +708,7 @@ public Action:clientlib_CmdSay(client, args)
 		else if (StrEqual(text, g_sTextToWrite) && StrContains(g_sTextToWrite, "sm_") != 0)
 		{
 			// Show player points
-			if (!g_bUseMenu)
+			if (!GetConVarBool(configlib_UseMenu))
 			{
 				pointlib_ShowPlayerPoints(client, false);
 			}
@@ -706,7 +738,7 @@ public Action:clientlib_CmdSay(client, args)
 clientlib_CheckPlayers()
 {
 	// update global points	
-	if (g_bExtraPoints)
+	if (GetConVarBool(configlib_ExtraPoints))
 	{
 		// Only if happy hour not started
 		if (!g_bHappyHourON)

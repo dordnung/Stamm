@@ -84,13 +84,9 @@ new g_FeatureList[MAXFEATURES][FeatureEnum];
 
 // Cell globals
 new g_iFeatures;
-new g_iMinPlayer;
-new g_iServerID;
 new g_iVipType;
 new g_iTimePoint;
-new g_iShowPoints;
 new g_iCommands;
-new g_iDelete;
 new g_iLevels;
 new g_iPLevels;
 new g_iLevelPoints[MAXLEVELS];
@@ -106,18 +102,8 @@ new StammGames:g_iGameID;
 
 
 
-// Float globals
-new Float:g_fInfoTime;
-
-
-
-
-
 // String globals
 new String:g_sAdminMenu[32];
-new String:g_sLogFile[PLATFORM_MAX_PATH + 1];
-new String:g_sDebugFile[PLATFORM_MAX_PATH + 1];
-new String:g_sLvlUpSound[PLATFORM_MAX_PATH + 1];
 new String:g_sPluginVersion[10] = "2.2";
 new String:g_sPluginVersionUpdate[10] = "2.2.0";
 new String:g_sTableName[64];
@@ -132,8 +118,6 @@ new String:g_sInfoF[32];
 new String:g_sChange[32];
 new String:g_sChangeF[32];
 new String:g_sStammTag[64];
-new String:g_sAdminFlag[26];
-new String:g_sGiveFlagAdmin[26];
 new String:g_sDatabaseVersion[12];
 new String:g_sCommandName[MAXFEATURES][64];
 new String:g_sCommand[MAXFEATURES][64];
@@ -152,16 +136,8 @@ new String:g_sLevelFlag[MAXLEVELS][26];
 new bool:g_bClientReady[MAXPLAYERS + 1];
 new bool:g_bPluginStarted;
 new bool:g_bIsLate;
-new bool:g_bAutoUpdate;
-new bool:g_bJoinShow;
-new bool:g_bSeeText;
-new bool:g_bExtraPoints;
-new bool:g_bHudText;
-new bool:g_bStripTag;
-new bool:g_bUseMenu;
 new bool:g_bHappyHourON;
 new bool:g_bMoreColors;
-new bool:g_bShowTextOnPoints;
 
 
 

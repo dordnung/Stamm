@@ -226,7 +226,7 @@ public Action:sqllib_deleteOlds(Handle:timer, any:data)
 	decl String:query[128];
 
 	// check last valid entry
-	new lastEntry = GetTime() - (g_iDelete * 24 * 60 * 60);
+	new lastEntry = GetTime() - (GetConVarInt(configlib_Delete) * 24 * 60 * 60);
 
 
 	// Delete all players less this line

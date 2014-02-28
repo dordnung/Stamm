@@ -260,20 +260,12 @@ CheckStammFolders()
 	decl String:oldFolder[PLATFORM_MAX_PATH + 1];
 	decl String:oldFolder2[PLATFORM_MAX_PATH + 1];
 	decl String:smFolder[PLATFORM_MAX_PATH + 1];
-	decl String:CurrentDate[20];
 
 
-	// Current time
-	FormatTime(CurrentDate, sizeof(CurrentDate), "%d-%m-%y");
-	
 	// Build Path to the needed folders
 	BuildPath(Path_SM, smFolder, sizeof(smFolder), "logs");
 	BuildPath(Path_SM, oldFolder2, sizeof(oldFolder2), "stamm");
 	BuildPath(Path_SM, oldFolder, sizeof(oldFolder), "Stamm");
-
-
-	Format(g_sLogFile, sizeof(g_sLogFile), "%s/stamm_errors_(%s).log", smFolder, CurrentDate);
-	Format(g_sDebugFile, sizeof(g_sDebugFile), "%s/stamm_debugs_(%s).log", smFolder, CurrentDate);
 
 
 	// Check for old folders
@@ -297,7 +289,7 @@ public OnConfigsExecuted()
 
 
 	// Add Auto Updater if exit and want
-	if (LibraryExists("updater") && g_bAutoUpdate)
+	if (LibraryExists("updater") && GetConVarBool(configlib_WantUpdate))
 	{
 		Updater_AddPlugin(UPDATE_URL);
 	}
@@ -335,28 +327,30 @@ public OnConfigsExecuted()
 
 
 		// Show points some times
-		if (g_iShowPoints > 0) 
+		new showPoints = GetConVarInt(configlib_ShowPoints);
+		if (showPoints > 0) 
 		{
-			pointlib_showpointer = CreateTimer(float(g_iShowPoints), pointlib_PointShower, _, TIMER_REPEAT);
+			pointlib_showpointer = CreateTimer(float(showPoints), pointlib_PointShower, _, TIMER_REPEAT);
 		}
 		
 
-		// Show information about stamm	
-		if (g_fInfoTime > 0.0) 
+		// Show information about stamm
+		new Float:infoTime = GetConVarFloat(configlib_InfoTime);
+		if (infoTime > 0.0) 
 		{
-			otherlib_inftimer = CreateTimer(g_fInfoTime, otherlib_PlayerInfoTimer, _, TIMER_REPEAT);
+			otherlib_inftimer = CreateTimer(infoTime, otherlib_PlayerInfoTimer, _, TIMER_REPEAT);
 		}
 
 
 		// Delete old players
-		if (g_iDelete) 
+		if (GetConVarInt(configlib_Delete)) 
 		{
 			sqllib_olddelete = CreateTimer(36000.0, sqllib_deleteOlds, _, TIMER_REPEAT);
 		}
 
 
 		// Hud Text?
-		if (g_iGameID == GAME_TF2 && g_bHudText)
+		if (g_iGameID == GAME_TF2 && GetConVarBool(configlib_HudText))
 		{
 			CreateTimer(0.5, clientlib_ShowHudText, _, TIMER_REPEAT);
 		}

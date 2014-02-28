@@ -871,7 +871,7 @@ public nativelib_GetStammGame(Handle:plugin, numParams)
 // Returns if the player want autoupdates
 public nativelib_AutoUpdate(Handle:plugin, numParams)
 {
-	return g_bAutoUpdate;
+	return GetConVarBool(configlib_WantUpdate);
 }
 
 

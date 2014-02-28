@@ -108,6 +108,7 @@ Handle:panellib_createInfoPanel(client)
 		new restpoints = 0;
 		new index = g_iPlayerLevel[client];
 		new points = g_iPlayerPoints[client];
+		new striptag = GetConVarBool(configlib_StripTag);
 
 		// Strings
 		decl String:infoString[512];
@@ -146,7 +147,7 @@ Handle:panellib_createInfoPanel(client)
 		// Highest level?
 		if (index != g_iLevels && index < g_iLevels) 
 		{
-			if (!g_bStripTag)
+			if (!striptag)
 			{
 				Format(infoString, sizeof(infoString), "%T", "NoVIPClientPlain", client, points, restpoints, g_sLevelName[g_iPlayerLevel[client]], vip);
 			}
@@ -157,7 +158,7 @@ Handle:panellib_createInfoPanel(client)
 		}
 		else
 		{ 
-			if (!g_bStripTag)
+			if (!striptag)
 			{
 				Format(infoString, sizeof(infoString), "%T", "VIPClientPlain", client, points, g_sLevelName[index-1], vip);
 			}

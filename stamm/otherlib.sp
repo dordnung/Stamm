@@ -35,41 +35,33 @@ new Handle:otherlib_inftimer;
 // Download files and precache
 otherlib_PrepareFiles()
 {
+	decl String:lvlUpSound[PLATFORM_MAX_PATH + 1];
+
 	// Want a lvl up sound?
-	if (!StrEqual(g_sLvlUpSound, "0")) 
+	GetConVarString(configlib_LvlUpSound, lvlUpSound, sizeof(lvlUpSound));
+
+	if (!StrEqual(lvlUpSound, "0")) 
 	{
+		decl String:downloadfile[PLATFORM_MAX_PATH + 1];
+
 		// Download and precache it
-		otherlib_DownloadLevel();
+		// Add with sound/
+		Format(downloadfile, sizeof(downloadfile), "sound/%s", lvlUpSound);
+		
+		AddFileToDownloadsTable(downloadfile);
 
 
 		// CSGO Fix
 		if (g_iGameID == GAME_CSGO)
 		{
-			AddToStringTable(FindStringTable("soundprecache"), g_sLvlUpSound);
+			AddToStringTable(FindStringTable("soundprecache"), lvlUpSound);
 		}
 		else
 		{
-			PrecacheSound(g_sLvlUpSound);
+			PrecacheSound(lvlUpSound);
 		}
 	}
 }
-
-
-
-
-// Add lvl up spound to downloads table
-otherlib_DownloadLevel()
-{
-	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
-	
-
-	// Add with sound/
-	Format(downloadfile, sizeof(downloadfile), "sound/%s", g_sLvlUpSound);
-	
-	AddFileToDownloadsTable(downloadfile);
-}
-
-
 
 
 
@@ -221,7 +213,7 @@ public Action:otherlib_PlayerInfoTimer(Handle:timer, any:data)
 
 
 
-	if (!g_bUseMenu)
+	if (!GetConVarBool(configlib_UseMenu))
 	{
 		if (!g_bMoreColors)
 		{
@@ -503,17 +495,28 @@ otherlib_checkTimer(&Handle:timer)
 StammLog(bool:useDebug, String:fmt[], any:...)
 {
 	decl String:format[1024];
+	decl String:file[PLATFORM_MAX_PATH + 1];
+	decl String:CurrentDate[32];
+
+
+	// Build Path to the needed folders
+	BuildPath(Path_SM, file, sizeof(file), "logs");
 
 	VFormat(format, sizeof(format), fmt, 3);
+	FormatTime(CurrentDate, sizeof(CurrentDate), "%d-%m-%y");
 
 
 	if (useDebug && GetConVarBool(configlib_StammDebug))
 	{
-		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] %s", format);
+		Format(file, sizeof(file), "%s/stamm_debugs_(%s).log", file, CurrentDate);
+
+		LogToFile(file, "[ STAMM DEBUG ] %s", format);
 	}
 	else if (!useDebug)
 	{
-		LogToFile(g_sLogFile, "[ STAMM ] %s", format);
+		Format(file, sizeof(file), "%s/stamm_errors_(%s).log", file, CurrentDate);
+
+		LogToFile(file, "[ STAMM ] %s", format);
 	}
 }
 

@@ -69,9 +69,9 @@ public Action:pointlib_PlayerTime(Handle:timer)
 		if (clientlib_isValidClient(i))
 		{
 			// right team -> add global points
-			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && g_iMinPlayer <= clientlib_GetPlayerCount())
+			if ((GetClientTeam(i) == 2 || GetClientTeam(i) == 3) && GetConVarInt(configlib_MinPlayer) <= clientlib_GetPlayerCount())
 			{
-				if (pointlib_GivePlayerPoints(i, g_iPoints, true) && g_bShowTextOnPoints)
+				if (pointlib_GivePlayerPoints(i, g_iPoints, true) && GetConVarBool(configlib_ShowTextOnPoints))
 				{
 					// Notify player
 					if (!g_bMoreColors)
@@ -371,7 +371,7 @@ public Action:pointlib_ShowPoints2(Handle:timer, any:userid)
 public Action:pointlib_ShowPoints(client, arg)
 {
 	// Show player points
-	if (!g_bUseMenu)
+	if (!GetConVarBool(configlib_UseMenu))
 	{
 		pointlib_ShowPlayerPoints(client, false);
 	}
@@ -456,7 +456,7 @@ pointlib_ShowPlayerPoints(client, bool:only)
 		new restpoints = 0;
 		new index = g_iPlayerLevel[client];
 		new points = g_iPlayerPoints[client];
-
+		new striptag = GetConVarBool(configlib_StripTag);
 
 
 		// Format VIP String
@@ -472,12 +472,12 @@ pointlib_ShowPlayerPoints(client, bool:only)
 
 
 		// Show to all or only to client
-		if (!g_bSeeText || only)
+		if (!GetConVarBool(configlib_SeeText) || only)
 		{
 			// Highest level?
 			if (index != g_iLevels && index < g_iLevels) 
 			{
-				if (!g_bStripTag)
+				if (!striptag)
 				{
 					if (!g_bMoreColors)
 					{
@@ -513,7 +513,7 @@ pointlib_ShowPlayerPoints(client, bool:only)
 						MCPrintToChat(client, "%s %t", g_sStammTag, "VIPClientZero", points);
 					}
 				}
-				else if (!g_bStripTag)
+				else if (!striptag)
 				{
 					if (!g_bMoreColors)
 					{
@@ -541,7 +541,7 @@ pointlib_ShowPlayerPoints(client, bool:only)
 		{
 			if (index != g_iLevels && index < g_iLevels) 
 			{
-				if (!g_bStripTag)
+				if (!striptag)
 				{
 					if (!g_bMoreColors)
 					{
@@ -577,7 +577,7 @@ pointlib_ShowPlayerPoints(client, bool:only)
 						MCPrintToChat(client, "%s %t", g_sStammTag, "VIPAllZero", name, points);
 					}
 				}
-				else if (!g_bStripTag)
+				else if (!striptag)
 				{
 					if (!g_bMoreColors)
 					{

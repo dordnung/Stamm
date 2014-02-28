@@ -64,7 +64,7 @@ eventlib_Start()
 public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	// Get points with rounds and enough players on server?
-	if ((g_iVipType == 2 || g_iVipType == 4 || g_iVipType == 6 || g_iVipType == 7) && clientlib_GetPlayerCount() >= g_iMinPlayer)
+	if ((g_iVipType == 2 || g_iVipType == 4 || g_iVipType == 6 || g_iVipType == 7) && clientlib_GetPlayerCount() >= GetConVarInt(configlib_MinPlayer))
 	{
 		// Client loop
 		for (new client = 1; client <= MaxClients; client++)
@@ -76,7 +76,7 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 				if (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)
 				{
 					// Give global points
-					if (pointlib_GivePlayerPoints(client, g_iPoints, true) && g_bShowTextOnPoints)
+					if (pointlib_GivePlayerPoints(client, g_iPoints, true) && GetConVarBool(configlib_ShowTextOnPoints))
 					{
 						// Notify player
 						if (!g_bMoreColors)
@@ -126,10 +126,10 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 		if (g_iVipType == 1 || g_iVipType == 4 || g_iVipType == 5 || g_iVipType == 7)
 		{
 			// Valid Team? Enough Players? No suicide?
-			if (clientlib_GetPlayerCount() >= g_iMinPlayer && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && userid != client && GetClientTeam(userid) != GetClientTeam(client))
+			if (clientlib_GetPlayerCount() >= GetConVarInt(configlib_MinPlayer) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && userid != client && GetClientTeam(userid) != GetClientTeam(client))
 			{
 				// Give global Points
-				if (pointlib_GivePlayerPoints(client, g_iPoints, true) && g_bShowTextOnPoints)
+				if (pointlib_GivePlayerPoints(client, g_iPoints, true) && GetConVarBool(configlib_ShowTextOnPoints))
 				{
 					// Notify player
 					if (!g_bMoreColors)

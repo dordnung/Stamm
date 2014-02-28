@@ -116,16 +116,6 @@ configlib_CreateConfig()
 	HookConVarChange(configlib_StammVersion, OnCvarChanged);
 	HookConVarChange(configlib_StammTag, OnCvarChanged);
 	HookConVarChange(configlib_StammTagMoreColors, OnCvarChanged);
-	HookConVarChange(configlib_ExtraPoints, OnCvarChanged);
-	HookConVarChange(configlib_GiveFlagAdmin, OnCvarChanged);
-	HookConVarChange(configlib_AdminFlag, OnCvarChanged);
-	HookConVarChange(configlib_JoinShow, OnCvarChanged);
-	HookConVarChange(configlib_MinPlayer, OnCvarChanged);
-	HookConVarChange(configlib_SeeText, OnCvarChanged);
-	HookConVarChange(configlib_StripTag, OnCvarChanged);
-	HookConVarChange(configlib_UseMenu, OnCvarChanged);
-	HookConVarChange(configlib_WantUpdate, OnCvarChanged);
-	HookConVarChange(configlib_ShowTextOnPoints, OnCvarChanged);
 }
 
 
@@ -135,12 +125,7 @@ configlib_CreateConfig()
 configlib_LoadConfig()
 {
 	// Read all values from the cvars
-	g_fInfoTime = GetConVarFloat(configlib_InfoTime);
-	g_iShowPoints = GetConVarInt(configlib_ShowPoints);
-	g_iDelete = GetConVarInt(configlib_Delete);
-	g_iMinPlayer = GetConVarInt(configlib_MinPlayer);
 	g_iTimePoint = GetConVarInt(configlib_TimePoint);
-	g_iServerID = GetConVarInt(configlib_ServerID);
 	g_iVipType = GetConVarInt(configlib_VipType);
 
 
@@ -155,31 +140,16 @@ configlib_LoadConfig()
 	}
 
 	GetConVarString(configlib_AdminMenu, g_sAdminMenu, sizeof(g_sAdminMenu));
-	GetConVarString(configlib_LvlUpSound, g_sLvlUpSound, sizeof(g_sLvlUpSound));
 	GetConVarString(configlib_TextToWrite, g_sTextToWrite, sizeof(g_sTextToWrite));
 	GetConVarString(configlib_VipList, g_sVipList, sizeof(g_sVipList));
 	GetConVarString(configlib_VipRank, g_sVipRank, sizeof(g_sVipRank));
 	GetConVarString(configlib_Change, g_sChange, sizeof(g_sChange));
 	GetConVarString(configlib_Info, g_sInfo, sizeof(g_sInfo));
 	GetConVarString(configlib_TableName, g_sTableName, sizeof(g_sTableName));
-	GetConVarString(configlib_AdminFlag, g_sAdminFlag, sizeof(g_sAdminFlag));
-	GetConVarString(configlib_GiveFlagAdmin, g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin));
-	configlib_FixGiveFlagAdmin();
-
-
-	// Bools
-	g_bAutoUpdate = GetConVarBool(configlib_WantUpdate);
-	g_bExtraPoints = GetConVarBool(configlib_ExtraPoints);
-	g_bJoinShow = GetConVarBool(configlib_JoinShow);
-	g_bSeeText = GetConVarBool(configlib_SeeText);
-	g_bHudText = GetConVarBool(configlib_HudText);
-	g_bStripTag = GetConVarBool(configlib_StripTag);
-	g_bUseMenu = GetConVarBool(configlib_UseMenu);
-	g_bShowTextOnPoints = GetConVarBool(configlib_ShowTextOnPoints);
 
 
 	// Format the tablename
-	Format(g_sTableName, sizeof(g_sTableName), "%s_%i", g_sTableName, g_iServerID);
+	Format(g_sTableName, sizeof(g_sTableName), "%s_%i", g_sTableName, GetConVarInt(configlib_ServerID));
 
 
 	// Found any level?
@@ -212,96 +182,5 @@ public OnCvarChanged(Handle:cvar, const String:oldValue[], const String:newValue
 	else if (cvar == configlib_StammTagMoreColors && g_bMoreColors)
 	{
 		GetConVarString(configlib_StammTagMoreColors, g_sStammTag, sizeof(g_sStammTag));
-	}
-
-	else if (cvar == configlib_ExtraPoints)
-	{
-		g_bExtraPoints = GetConVarBool(configlib_ExtraPoints);
-	}
-
-	else if (cvar == configlib_WantUpdate)
-	{
-		g_bAutoUpdate = GetConVarBool(configlib_WantUpdate);
-	}
-
-	else if (cvar == configlib_GiveFlagAdmin)
-	{
-		GetConVarString(configlib_GiveFlagAdmin, g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin));
-		configlib_FixGiveFlagAdmin();
-	}
-
-	else if (cvar == configlib_AdminFlag)
-	{
-		GetConVarString(configlib_AdminFlag, g_sAdminFlag, sizeof(g_sAdminFlag));
-	}
-
-	else if (cvar == configlib_JoinShow)
-	{
-		g_bJoinShow = GetConVarBool(configlib_JoinShow);
-	}
-
-	else if (cvar == configlib_MinPlayer)
-	{
-		g_iMinPlayer = GetConVarInt(configlib_MinPlayer);
-	}
-
-	else if (cvar == configlib_SeeText)
-	{
-		g_bSeeText = GetConVarBool(configlib_SeeText);
-	}
-
-	else if (cvar == configlib_StripTag)
-	{
-		g_bStripTag = GetConVarBool(configlib_StripTag);
-	}
-
-	else if (cvar == configlib_UseMenu)
-	{
-		g_bUseMenu = GetConVarBool(configlib_UseMenu);
-	}
-
-	else if (cvar == configlib_ShowTextOnPoints)
-	{
-		g_bShowTextOnPoints = GetConVarBool(configlib_ShowTextOnPoints);
-	}
-}
-
-
-
-
-
-// Backwards Compatiblity
-configlib_FixGiveFlagAdmin()
-{
-	// Before we had numbers, now we have flags
-	// Replace numbers with flags
-	if (StrEqual(g_sGiveFlagAdmin, "1"))
-	{
-		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "o");
-	}
-
-	else if (StrEqual(g_sGiveFlagAdmin, "2"))
-	{
-		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "p");
-	}
-
-	else if (StrEqual(g_sGiveFlagAdmin, "3"))
-	{
-		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "q");
-	}
-
-	else if (StrEqual(g_sGiveFlagAdmin, "4"))
-	{
-		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "r");
-	}
-
-	else if (StrEqual(g_sGiveFlagAdmin, "5"))
-	{
-		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "s");
-	}
-
-	else if (StrEqual(g_sGiveFlagAdmin, "6"))
-	{
-		Format(g_sGiveFlagAdmin, sizeof(g_sGiveFlagAdmin), "t");
 	}
 }
