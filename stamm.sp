@@ -317,6 +317,7 @@ public OnConfigsExecuted()
 		otherlib_checkTimer(pointlib_showpointer);
 		otherlib_checkTimer(otherlib_inftimer);
 		otherlib_checkTimer(sqllib_olddelete);
+		otherlib_checkTimer(sqllib_olddelete_points);
 
 
 		// get Time points? start timer
@@ -345,7 +346,14 @@ public OnConfigsExecuted()
 		// Delete old players
 		if (GetConVarInt(configlib_Delete)) 
 		{
-			sqllib_olddelete = CreateTimer(36000.0, sqllib_deleteOlds, _, TIMER_REPEAT);
+			sqllib_olddelete = CreateTimer(1800.0, sqllib_deleteOlds, _, TIMER_REPEAT);
+		}
+
+
+		// Delete old players
+		if (GetConVarInt(configlib_DeletePoints)) 
+		{
+			sqllib_olddelete_points = CreateTimer(60.0, sqllib_deletePointsOlds, _, TIMER_REPEAT);
 		}
 
 

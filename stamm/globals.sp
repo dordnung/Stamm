@@ -174,6 +174,8 @@ new Handle:g_hHudSync;
 #define g_sUpdateAddPointsQuery "UPDATE `%s` SET `points`=`points`+(%i) "
 #define g_sUpdateAddPointsSteamidQuery "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'"
 #define g_sUpdatePlayer2Query "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'"
+#define g_sUpdatePointsOldQuery "UPDATE `%s` SET `points`=`points`-(%i) WHERE `last_visit` < %i"
+#define g_sUpdateNegativePointsQuery "UPDATE `%s` SET `points`=0 WHERE `points` < 0"
 
 
 #define g_sInsertMiddleQuery "%s FROM `%s` WHERE steamid = '%s'"

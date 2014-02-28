@@ -29,6 +29,7 @@
 
 new Handle:sqllib_db;
 new Handle:sqllib_olddelete;
+new Handle:sqllib_olddelete_points;
 new sqllib_convert = -1;
 new sqllib_convert_cur = 2;
 
@@ -225,6 +226,7 @@ public Action:sqllib_deleteOlds(Handle:timer, any:data)
 {
 	decl String:query[128];
 
+
 	// check last valid entry
 	new lastEntry = GetTime() - (GetConVarInt(configlib_Delete) * 24 * 60 * 60);
 
@@ -232,12 +234,76 @@ public Action:sqllib_deleteOlds(Handle:timer, any:data)
 	// Delete all players less this line
 	Format(query, sizeof(query), g_sDeleteOldQuery, g_sTableName, lastEntry);
 
-
 	StammLog(true, "Execute %s", query);
-
 
 	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 	
+
+	return Plugin_Continue;
+}
+
+
+
+
+
+
+// Delete old players
+public Action:sqllib_deletePointsOlds(Handle:timer, any:data)
+{
+	decl String:query[128];
+
+
+	new Handle:tmpFile = otherlib_openTempFile();
+	new last = -1;
+	new time = GetTime();
+
+	if (tmpFile != INVALID_HANDLE)
+	{
+		if (KvJumpToKey(tmpFile, "lastcheck"))
+		{
+			last = KvGetNum(tmpFile, "time", -1);
+
+			KvGoBack(tmpFile);
+		}
+	}
+
+	if (last == -1)
+	{
+		if (KvJumpToKey(tmpFile, "lastcheck", true))
+		{
+			KvSetNum(tmpFile, "time", time);
+		}
+	}
+	else
+	{
+		if (time - last >= (GetConVarInt(configlib_DeletePointsInterval) * 60 * 60))
+		{
+			// Delete points of old players
+			Format(query, sizeof(query), g_sUpdatePointsOldQuery, g_sTableName, GetConVarInt(configlib_DeletePointsCount), time - (GetConVarInt(configlib_DeletePoints) * 24 * 60 * 60));
+
+			StammLog(true, "Execute %s", query);
+
+			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+
+
+			// We have to update points that are less than zero
+			Format(query, sizeof(query), g_sUpdateNegativePointsQuery, g_sTableName);
+
+			StammLog(true, "Execute %s", query);
+
+			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+
+
+			if (KvJumpToKey(tmpFile, "lastcheck", true))
+			{
+				KvSetNum(tmpFile, "time", time);
+			}
+		}
+	}
+
+	otherlib_saveTempFile(tmpFile);
+	
+
 	return Plugin_Continue;
 }
 

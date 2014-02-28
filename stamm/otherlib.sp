@@ -457,7 +457,7 @@ otherlib_checkOldHappy()
 			factor = KvGetNum(tmpFile, "factor", -1);
 		}
 
-		otherlib_saveTempFile(tmpFile);
+		CloseHandle(tmpFile);
 	}
 
 
@@ -536,8 +536,8 @@ Handle:otherlib_openTempFile()
 		}
 	}
 
-	new Handle:kvalue = CreateKeyValues("stamm_tmp");
-	Format(path, sizeof(path), "cfg/stamm/tmp.txt");
+	new Handle:kvalue = CreateKeyValues("stamm_storage");
+	Format(path, sizeof(path), "cfg/stamm/external_storage.txt");
 
 	if (!FileExists(path))
 	{
@@ -563,13 +563,15 @@ Handle:otherlib_openTempFile()
 
 
 
-otherlib_saveTempFile(Handle:tmpFile)
+otherlib_saveTempFile(&Handle:tmpFile)
 {
 	if (tmpFile != INVALID_HANDLE)
 	{
 		KvRewind(tmpFile);
-		KeyValuesToFile(tmpFile, "cfg/stamm/tmp.txt");
+		KeyValuesToFile(tmpFile, "cfg/stamm/external_storage.txt");
 
 		CloseHandle(tmpFile);
 	}
+
+	tmpFile = INVALID_HANDLE;
 }
