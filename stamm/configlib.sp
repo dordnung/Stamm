@@ -88,7 +88,7 @@ configlib_CreateConfig()
 	configlib_GiveFlagAdmin = AutoExecConfig_CreateConVar("stamm_oflag", "0", "Flags a player needs to get instantly highest VIP (see addons/sourcemod/configs/admin_levels.cfg for all flags), 0 = Off");
 	configlib_Delete = AutoExecConfig_CreateConVar("stamm_delete", "0", "x = Days until a inactive player gets deleted, 0 = Off");
 	configlib_DeletePoints = AutoExecConfig_CreateConVar("stamm_delete_points", "0", "x = Days until a inactive player starts losing points, 0 = Off");
-	configlib_DeletePointsCount = AutoExecConfig_CreateConVar("stamm_delete_points_count", "0", "x = Points a player loses for beeng inactive");
+	configlib_DeletePointsCount = AutoExecConfig_CreateConVar("stamm_delete_points_count", "0", "x = Points a player loses for being inactive");
 	configlib_DeletePointsInterval = AutoExecConfig_CreateConVar("stamm_delete_points_interval", "24", "x = Interval in hours, after being inactive, in which a player will losing the specific points");
 	configlib_AdminFlag = AutoExecConfig_CreateConVar("stamm_adminflag", "bt", "Flags a player needs to access the stamm admin menu (see addons/sourcemod/configs/admin_levels.cfg for all flags)");
 	configlib_InfoTime = AutoExecConfig_CreateConVar("stamm_infotime", "300", "Info Message Interval in seconds (300 = 5 minutes), 0 = Off");
