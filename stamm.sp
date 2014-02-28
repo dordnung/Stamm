@@ -107,6 +107,9 @@ public OnPluginStart()
 {
 	decl String:path[PLATFORM_MAX_PATH + 1];
 	
+	// First of all load config
+	configlib_CreateConfig();
+
 	// Check the folders we need
 	CheckStammFolders();
 
@@ -175,7 +178,7 @@ public OnPluginStart()
 
 
 	// Register the Server Commands
-	RegServerCmd("stamm_start_happyhour", otherlib_StartHappy, "Starts happy hour: stamm_start_happyhour <time> <factor>");
+	RegServerCmd("stamm_start_happyhour", otherlib_StartHappy, "Starts happy hour: stamm_start_happyhour <time_in_seconds> <factor>");
 	RegServerCmd("stamm_stop_happyhour", otherlib_StopHappy, "Stops happy hour");
 
 	RegServerCmd("stamm_load_feature", featurelib_Load, "Loads a feature: stamm_load_feature <basename>");
@@ -194,7 +197,6 @@ public OnPluginStart()
 
 	// Init. Stamm Components
 	levellib_LoadLevels();
-	configlib_CreateConfig();
 	eventlib_Start();
 	
 

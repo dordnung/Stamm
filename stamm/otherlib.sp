@@ -282,7 +282,7 @@ otherlib_EndHappyHour()
 				KvDeleteKey(tmpFile, "factor");
 			}
 
-			CloseHandle(tmpFile);
+			otherlib_saveTempFile(tmpFile);
 		}
 
 
@@ -294,7 +294,6 @@ otherlib_EndHappyHour()
 
 		// Delete old timer
 		otherlib_checkTimer(g_hHappyTimer);
-		
 
 
 		// Print end
@@ -327,7 +326,6 @@ otherlib_StartHappyHour(time, factor)
 {
 	new Handle:tmpFile = otherlib_openTempFile();
 
-
 	if (tmpFile != INVALID_HANDLE)
 	{
 		if (KvJumpToKey(tmpFile, "happyhour", true))
@@ -336,7 +334,7 @@ otherlib_StartHappyHour(time, factor)
 			KvSetNum(tmpFile, "factor", factor);
 		}
 
-		CloseHandle(tmpFile);
+		otherlib_saveTempFile(tmpFile);
 	}
 
 
@@ -370,7 +368,7 @@ otherlib_StartHappyHour(time, factor)
 
 
 	// Notice to api
-	nativelib_HappyStart(time / 60, g_iPoints);
+	nativelib_HappyStart(time, g_iPoints);
 }
 
 
@@ -419,7 +417,7 @@ public Action:otherlib_StartHappy(args)
 		if (time > 1 && factor > 1)
 		{
 			// Start happy
-			otherlib_StartHappyHour(time * 60, factor);
+			otherlib_StartHappyHour(time, factor);
 		}
 		else
 		{
@@ -427,10 +425,14 @@ public Action:otherlib_StartHappy(args)
 			ReplyToCommand(0, "[ STAMM ] Time and Factor have to be greater than 1 !");
 		}
 	}
-	else
+	else if (GetCmdArgs() != 2)
 	{
 		// How to use command
-		ReplyToCommand(0, "Usage: stamm_start_happyhour <time> <factor>");
+		ReplyToCommand(0, "Usage: stamm_start_happyhour <time_in_seconds> <factor>");
+	}
+	else
+	{
+		ReplyToCommand(0, "Stamm Happy-Hour is already running!");
 	}
 }
 
@@ -463,7 +465,7 @@ otherlib_checkOldHappy()
 			factor = KvGetNum(tmpFile, "factor", -1);
 		}
 
-		CloseHandle(tmpFile);
+		otherlib_saveTempFile(tmpFile);
 	}
 
 
@@ -482,7 +484,7 @@ otherlib_checkOldHappy()
 
 
 // Checks a timer, end it when it's running and reset it
-otherlib_checkTimer(Handle:timer)
+otherlib_checkTimer(&Handle:timer)
 {
 	// End it
 	if (timer != INVALID_HANDLE)
@@ -554,4 +556,17 @@ Handle:otherlib_openTempFile()
 	}
 
 	return kvalue;
+}
+
+
+
+otherlib_saveTempFile(Handle:tmpFile)
+{
+	if (tmpFile != INVALID_HANDLE)
+	{
+		KvRewind(tmpFile);
+		KeyValuesToFile(tmpFile, "cfg/stamm/tmp.txt");
+
+		CloseHandle(tmpFile);
+	}
 }
