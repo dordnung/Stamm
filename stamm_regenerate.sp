@@ -120,6 +120,18 @@ public OnPluginStart()
 
 
 
+public OnClientDisconnect(client)
+{
+	if (STAMM_IsClientValid(client))
+	{
+		if (g_hClientTimers[client] != INVALID_HANDLE) 
+		{
+			KillTimer(g_hClientTimers[client]);
+			g_hClientTimers[client] = INVALID_HANDLE;
+		}
+	}
+}
+
 
 // a Player spawned
 public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
@@ -204,10 +216,9 @@ public Action:GiveHealth(Handle:timer, any:userid)
 			
 			return Plugin_Continue;
 		}
+		
+		g_hClientTimers[client] = INVALID_HANDLE;
 	}
-	
-
-	g_hClientTimers[client] = INVALID_HANDLE;
 	
 	return Plugin_Stop;
 }
