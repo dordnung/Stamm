@@ -316,13 +316,13 @@ public OnConfigsExecuted()
 
 		// Get the database version
 		sqlback_getDatabaseVersion();
-
+		otherlib_checkOldHappy();
 
 		// Delete old Timers
 		otherlib_checkTimer(pointlib_timetimer);
 		otherlib_checkTimer(pointlib_showpointer);
 		otherlib_checkTimer(otherlib_inftimer);
-		otherlib_checkTimer(clientlib_olddelete);
+		otherlib_checkTimer(sqllib_olddelete);
 
 
 		// get Time points? start timer
@@ -349,7 +349,7 @@ public OnConfigsExecuted()
 		// Delete old players
 		if (g_iDelete) 
 		{
-			clientlib_olddelete = CreateTimer(36000.0, clientlib_deleteOlds, _, TIMER_REPEAT);
+			sqllib_olddelete = CreateTimer(36000.0, sqllib_deleteOlds, _, TIMER_REPEAT);
 		}
 
 

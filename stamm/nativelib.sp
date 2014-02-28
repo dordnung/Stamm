@@ -1378,8 +1378,6 @@ public nativelib_WriteToStammLog(Handle:plugin, numParams)
 	decl String:buffer[1024];
 	decl String:basename[64];
 
-	new bool:useDebug = GetNativeCell(1);
-
 
 	// Get basename
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));

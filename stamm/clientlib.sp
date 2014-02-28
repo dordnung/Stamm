@@ -26,9 +26,6 @@
 // semicolon
 #pragma semicolon 1
 
-new Handle:clientlib_olddelete;
-
-
 
 
 
@@ -284,41 +281,12 @@ clientlib_GiveFastVIP(client)
 
 
 
-
-// Delete old players
-public Action:clientlib_deleteOlds(Handle:timer, any:data)
-{
-	decl String:query[128];
-
-	// check last valid entry
-	new lastEntry = GetTime() - (g_iDelete * 24 * 60 * 60);
-
-
-	// Delete all players less this line
-	Format(query, sizeof(query), g_sDeleteOldQuery, g_sTableName, lastEntry);
-
-
-	StammLog(true, "Execute %s", query);
-
-
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
-	
-	return Plugin_Continue;
-}
-
-
-
-
-
-
 // Check VIP state
 clientlib_CheckVip(client)
 {
 	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client) && (g_iLevels + g_iPLevels > 0))
 	{
 		decl String:steamid[64];
-		new clientpoints = g_iPlayerPoints[client];
-
 
 
 		clientlib_getSteamid(client, steamid, sizeof(steamid));

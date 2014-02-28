@@ -43,14 +43,6 @@ sqlback_getDatabaseVersion()
 		StammLog(true, "Execute %s", query);
 
 		SQL_TQuery(sqllib_db, sqlback_getVersion, query);
-		
-
-		// Get running happy hour
-		Format(query, sizeof(query), g_sSelectHappyQuery, g_sTableName, GetTime());
-		
-		StammLog(true, "Execute %s", query);
-
-		SQL_TQuery(sqllib_db, sqlback_getHappy, query);
 	}
 }
 
@@ -92,31 +84,6 @@ public sqlback_getVersion(Handle:owner, Handle:hndl, const String:error[], any:d
 	// Check if we need to modify
 	sqlback_ModifyTableBackwards();
 }
-
-
-
-
-// Get running happy hour
-public sqlback_getHappy(Handle:owner, Handle:hndl, const String:error[], any:data)
-{
-	// find something?
-	if (hndl != INVALID_HANDLE && StrEqual(error, "") && SQL_FetchRow(hndl))
-	{
-		// End time and factor
-		new end = SQL_FetchInt(hndl, 0);
-		new factor = SQL_FetchInt(hndl, 1);
-
-		new time = GetTime();
-
-
-		// is end in future?
-		if (end > time)
-		{
-			otherlib_StartHappyHour(end-time, factor);
-		}
-	}
-}
-
 
 
 
@@ -191,6 +158,18 @@ public sqlback_syncSteamid1(Handle:owner, Handle:hndl, const String:error[], any
 sqlback_ModifyTableBackwards()
 {
 	decl String:query[256];
+
+
+	// Version <= 2.2
+	if (sqlback_isVersionNewer("2.20"))
+	{
+		// Remove Happy table
+		Format(query, sizeof(query), g_sDropHappyTable, g_sTableName);
+		
+		StammLog(true, "Execute %s", query);
+
+		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback2, query);
+	}
 
 	// Version <= 2.15
 	if (sqlback_isVersionNewer("2.16"))

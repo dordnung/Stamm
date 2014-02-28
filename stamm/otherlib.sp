@@ -271,17 +271,20 @@ otherlib_EndHappyHour()
 {
 	if (g_bHappyHourON)
 	{
-		decl String:query[128];
+		new Handle:tmpFile = otherlib_openTempFile();
 
 
-		// Delete out of database
-		Format(query, sizeof(query), g_sDeleteHappyQuery, g_sTableName);
-		
-		// Announce step
-		StammLog(true, "Execute %s", query);
-		
+		if (tmpFile != INVALID_HANDLE)
+		{
+			if (KvJumpToKey(tmpFile, "happyhour"))
+			{
+				KvDeleteKey(tmpFile, "end");
+				KvDeleteKey(tmpFile, "factor");
+			}
 
-		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+			CloseHandle(tmpFile);
+		}
+
 
 
 		// Reset
@@ -322,17 +325,19 @@ otherlib_EndHappyHour()
 // Start happy hour
 otherlib_StartHappyHour(time, factor)
 {
-	decl String:query[128];
+	new Handle:tmpFile = otherlib_openTempFile();
 
 
-	// Insert new happy gour
-	Format(query, sizeof(query), g_sInsertHappyQuery, g_sTableName, GetTime() + time, factor);
-	
-	StammLog(true, "Execute %s", query);
-	
+	if (tmpFile != INVALID_HANDLE)
+	{
+		if (KvJumpToKey(tmpFile, "happyhour", true))
+		{
+			KvSetNum(tmpFile, "end", GetTime() + time);
+			KvSetNum(tmpFile, "factor", factor);
+		}
 
-	// Query
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+		CloseHandle(tmpFile);
+	}
 
 
 
@@ -443,6 +448,38 @@ public Action:otherlib_StopHappy(args)
 
 
 
+// Check for old happy hour
+otherlib_checkOldHappy()
+{
+	new Handle:tmpFile = otherlib_openTempFile();
+	new end = -1;
+	new factor = -1;
+
+	if (tmpFile != INVALID_HANDLE)
+	{
+		if (KvJumpToKey(tmpFile, "happyhour", true))
+		{
+			end = KvGetNum(tmpFile, "end", -1);
+			factor = KvGetNum(tmpFile, "factor", -1);
+		}
+
+		CloseHandle(tmpFile);
+	}
+
+
+	if (factor > 1 && end > -1)
+	{
+		new time = GetTime();
+
+		// is end in future?
+		if (end > time)
+		{
+			otherlib_StartHappyHour(end-time, factor);
+		}
+	}
+}
+
+
 
 // Checks a timer, end it when it's running and reset it
 otherlib_checkTimer(Handle:timer)
@@ -459,20 +496,62 @@ otherlib_checkTimer(Handle:timer)
 }
 
 
+
 // Logging Stuff
-StammLog(bool:debug, String:fmt[], any:...)
+StammLog(bool:useDebug, String:fmt[], any:...)
 {
 	decl String:format[1024];
 
 	VFormat(format, sizeof(format), fmt, 3);
 
 
-	if (debug && GetConVarBool(configlib_StammDebug))
+	if (useDebug && GetConVarBool(configlib_StammDebug))
 	{
 		LogToFile(g_sDebugFile, "[ STAMM DEBUG ] %s", format);
 	}
-	else if (!debug)
+	else if (!useDebug)
 	{
 		LogToFile(g_sLogFile, "[ STAMM ] %s", format);
 	}
+}
+
+
+
+Handle:otherlib_openTempFile()
+{
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
+	Format(path, sizeof(path), "cfg/stamm");
+
+	if (!DirExists(path))
+	{
+		if (!CreateDirectory(path, 493))
+		{
+			return INVALID_HANDLE;
+		}
+	}
+
+	new Handle:kvalue = CreateKeyValues("stamm_tmp");
+	Format(path, sizeof(path), "cfg/stamm/tmp.txt");
+
+	if (!FileExists(path))
+	{
+		if (!KeyValuesToFile(kvalue, path))
+		{
+			CloseHandle(kvalue);
+
+			return INVALID_HANDLE;
+		}
+	}
+	else
+	{
+		if (!FileToKeyValues(kvalue, path))
+		{
+			CloseHandle(kvalue);
+
+			return INVALID_HANDLE;
+		}
+	}
+
+	return kvalue;
 }

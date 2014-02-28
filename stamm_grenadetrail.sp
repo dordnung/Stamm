@@ -220,7 +220,7 @@ public AddTrail(client, ent, tcolor[4])
 		if (IsValidEntity(ent) && owner == client)
 		{
 			// Create trail
-			TE_SetupBeamFollow(ent, g_iBeamSprite,	0, 5.0, 3.0, 3.0, 1, tcolor);
+			TE_SetupBeamFollow(ent, g_iBeamSprite, 0, 5.0, 3.0, 3.0, 1, tcolor);
 			TE_SendToAll();
 		}
 	}

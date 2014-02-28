@@ -28,6 +28,7 @@
 #pragma semicolon 1
 
 new Handle:sqllib_db;
+new Handle:sqllib_olddelete;
 new sqllib_convert = -1;
 new sqllib_convert_cur = 2;
 
@@ -147,28 +148,6 @@ sqllib_LoadDB()
 		}*/
 
 
-
-		// Create happy hour table
-		Format(query, sizeof(query), g_sCreatHappyQuery, g_sTableName);
-		
-		StammLog(true, "Execute %s", query);
-
-
-
-		// Create fast
-		if (!SQL_FastQuery(sqllib_db, query))
-		{
-			SQL_GetError(sqllib_db, sqlError, sizeof(sqlError));
-			
-			StammLog(false, "Couldn't create Happy Table. Error: %s", sqlError);
-		}
-		
-		else
-		{ 
-			StammLog(true, "Connected to Database successfully");
-		}
-
-
 		// unLock DB
 		SQL_UnlockDatabase(sqllib_db);
 	}
@@ -234,6 +213,32 @@ sqllib_InsertPlayer(client)
 		// Get it
 		SQL_TQuery(sqllib_db, sqllib_InsertHandler, query, GetClientUserId(client));
 	}
+}
+
+
+
+
+
+
+// Delete old players
+public Action:sqllib_deleteOlds(Handle:timer, any:data)
+{
+	decl String:query[128];
+
+	// check last valid entry
+	new lastEntry = GetTime() - (g_iDelete * 24 * 60 * 60);
+
+
+	// Delete all players less this line
+	Format(query, sizeof(query), g_sDeleteOldQuery, g_sTableName, lastEntry);
+
+
+	StammLog(true, "Execute %s", query);
+
+
+	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+	
+	return Plugin_Continue;
 }
 
 

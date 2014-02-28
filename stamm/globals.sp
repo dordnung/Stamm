@@ -178,19 +178,17 @@ new Handle:g_hHudSync;
 
 
 // Define here the SQL querys
-#define g_sCreateBackupQuery "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))"
-#define g_sCreateTableQuery "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))"
-#define g_sCreateBackupQueryMySQL "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(20) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
-#define g_sCreateTableQueryMySQL "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(64) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
-
+#define g_sCreateBackupQuery "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(128) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))"
+#define g_sCreateTableQuery "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(128) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`))"
+#define g_sCreateBackupQueryMySQL "CREATE TABLE IF NOT EXISTS `%s_backup` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` INT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(128) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
+#define g_sCreateTableQueryMySQL "CREATE TABLE IF NOT EXISTS `%s` (`steamid` VARCHAR(21) NOT NULL DEFAULT '', `level` TINYINT NOT NULL DEFAULT 0, `points` INT NOT NULL DEFAULT 0, `name` VARCHAR(128) NOT NULL DEFAULT '', `admin` TINYINT UNSIGNED NOT NULL DEFAULT 0, `version` FLOAT NOT NULL DEFAULT 0.0, `last_visit` INT UNSIGNED NOT NULL DEFAULT %i, PRIMARY KEY (`steamid`)) COLLATE='utf8_general_ci'"
 /* TODO: IMPLEMENT #define g_sCreateFeatureQuery "CREATE TABLE IF NOT EXISTS `%s_shop` (`steamid` VARCHAR(21) NOT NULL, `feature` varchar(64) NOT NULL, `block` varchar(64) NOT NULL, UNIQUE (steamid, feature, block))" */
-#define g_sCreatHappyQuery "CREATE TABLE IF NOT EXISTS `%s_happy` (`end` INT UNSIGNED NOT NULL DEFAULT 2, `factor` TINYINT UNSIGNED NOT NULL DEFAULT 2)"
 
 
+#define g_sDropHappyTable "DROP TABLE IF EXISTS `%s_happy`"
 #define g_sDeleteOldQuery "DELETE FROM `%s` WHERE `last_visit` < %i"
 #define g_sDeletePlayerQuery "DELETE FROM `%s` WHERE `steamid`='%s'"
-#define g_sDeletePlayerShopQuery "DELETE FROM `%s_shop` WHERE `steamid`='%s' AND `feature`='%s' AND `block`='%s'"
-#define g_sDeleteHappyQuery "DELETE FROM `%s_happy`"
+/* TODO: IMPLEMENT #define g_sDeletePlayerShopQuery "DELETE FROM `%s_shop` WHERE `steamid`='%s' AND `feature`='%s' AND `block`='%s'" */
 
 
 #define g_sUpdatePlayerQuery "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'"
@@ -202,7 +200,6 @@ new Handle:g_hHudSync;
 #define g_sUpdatePlayer2Query "UPDATE `%s` SET `name`='%s', `admin` = %i, `version`=%s, `last_visit`=%i WHERE `steamid`='%s'"
 
 
-#define g_sInsertHappyQuery "INSERT INTO `%s_happy` (`end`, `factor`) VALUES (%i, %i)"
 #define g_sInsertMiddleQuery "%s FROM `%s` WHERE steamid = '%s'"
 #define g_sInsertPlayerQuery "INSERT INTO `%s` (`steamid`, `name`, `admin`, `version`, `last_visit`) VALUES ('%s', '%s', %i, 0.0, %i)"
 /* TODO: IMPLEMENT #define g_sInsertPlayerShopQuery "INSERT INTO `%s_shop` (`steamid`, `feature`, `block`) VALUES ('%s', '%s', '%s')" */
