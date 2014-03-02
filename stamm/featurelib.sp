@@ -95,8 +95,8 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 	}
 	
 
-	// Backwards compatiblity, search in old path
-	BuildPath(Path_SM, levelPath, sizeof(levelPath), "stamm/levels/%s.txt", basename);
+	// search in new path
+	Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
 			
 
 	// Assign values of the new feature
@@ -115,7 +115,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 	if (!FileExists(levelPath))
 	{
 		// Backwards compatiblity, search in old path
-		Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
+		BuildPath(Path_SM, levelPath, sizeof(levelPath), "stamm/levels/%s.txt", basename);
 			
 
 		// If this doesnt exist, stop here, but don't abort, because maybe it needs no level config
@@ -129,8 +129,23 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
 
 			// Debug
-			StammLog(true, "Found no Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
+			StammLog(true, "Found no Block-File for %s. Switch to Zero level", basename);
 		}
+		else
+		{
+			StammLog(false, "Found Block-File '%s' at old path '%s'. Please move it to 'cfg/stamm/levels/%s.txt'", basename, levelPath, basename);
+		}
+	}
+	else
+	{
+		BuildPath(Path_SM, levelPath, sizeof(levelPath), "stamm/levels/%s.txt", basename);
+
+		if (FileExists(levelPath))
+		{
+			StammLog(false, "Found Block-File '%s' at old path '%s' and new path 'cfg/stamm/levels/%s.txt'. Please move it to 'cfg/stamm/levels/%s.txt', or delete it. New path will be preferred.", basename, levelPath, basename, basename);
+		}
+
+		Format(levelPath, sizeof(levelPath), "cfg/stamm/levels/%s.txt", basename);
 	}
 
 
