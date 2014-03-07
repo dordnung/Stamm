@@ -38,9 +38,6 @@
 
 new Handle:g_hHP;
 new Handle:g_hTime;
-new Handle:g_hClientTimers[MAXPLAYERS + 1];
-
-
 
 
 // Plugin Info
@@ -105,9 +102,6 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 // Create Config
 public OnPluginStart()
 {
-	HookEvent("player_spawn", PlayerSpawn);
-
-
 	AutoExecConfig_SetFile("regenerate", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
@@ -120,105 +114,52 @@ public OnPluginStart()
 
 
 
-public OnClientDisconnect(client)
+
+public OnConfigsExecuted()
 {
-	if (STAMM_IsClientValid(client))
-	{
-		if (g_hClientTimers[client] != INVALID_HANDLE) 
-		{
-			KillTimer(g_hClientTimers[client]);
-			g_hClientTimers[client] = INVALID_HANDLE;
-		}
-	}
-}
-
-
-// a Player spawned
-public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
-{
-	new client = GetClientOfUserId(GetEventInt(event, "userid"));
-	
-	// Does the client have this feature?
-	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
-	{
-		if (STAMM_HaveClientFeature(client))
-		{
-			// Reset timer if available
-			if (g_hClientTimers[client] != INVALID_HANDLE) 
-			{
-				KillTimer(g_hClientTimers[client]);
-			}
-
-			// Start timer to add health
-			g_hClientTimers[client] = CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, GetClientUserId(client), TIMER_REPEAT);
-		}
-	}
-}
-
-
-
-public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
-{
-	if (IsPlayerAlive(client))
-	{
-		if (STAMM_HaveClientFeature(client))
-		{
-			// Reset timer if available
-			if (g_hClientTimers[client] != INVALID_HANDLE) 
-			{
-				KillTimer(g_hClientTimers[client]);
-			}
-
-			// Start timer to add health
-			g_hClientTimers[client] = CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, GetClientUserId(client), TIMER_REPEAT);
-		}
-	}
+	 CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, _, TIMER_REPEAT);
 }
 
 
 
 // Regenerate Timer
-public Action:GiveHealth(Handle:timer, any:userid)
+public Action:GiveHealth(Handle:timer, any:data)
 {
-	new client = GetClientOfUserId(userid);
-
-
-	// Is client valid?
-	if (STAMM_IsClientValid(client))
+	for (new client=1; client <= MaxClients; client++)
 	{
-		// Get highest client block
-		new clientBlock = STAMM_GetClientBlock(client);
-
-
-		// Have client block and is player alive and in right team?
-		if (clientBlock > 0 && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
+		// Is client valid?
+		if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 		{
-			// Get max Health and add regenerate HP
-			new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+			// Get highest client block
+			new clientBlock = STAMM_GetClientBlock(client);
 
-			new oldHP = GetClientHealth(client);
-			new newHP = oldHP + GetConVarInt(g_hHP) * clientBlock;
-			
-			// Only if not higher than max Health
-			if (newHP > maxHealth)
+
+			// Have client block and is player alive and in right team?
+			if (clientBlock > 0 && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
 			{
-				if (oldHP < maxHealth) 
+				// Get max Health and add regenerate HP
+				new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+
+				new oldHP = GetClientHealth(client);
+				new newHP = oldHP + GetConVarInt(g_hHP) * clientBlock;
+				
+				// Only if not higher than max Health
+				if (newHP > maxHealth)
 				{
-					newHP = maxHealth;
+					if (oldHP < maxHealth) 
+					{
+						newHP = maxHealth;
+					}
+					else 
+					{
+						continue;
+					}
 				}
-				else 
-				{
-					return Plugin_Continue;
-				}
+				
+				SetEntityHealth(client, newHP);
 			}
-			
-			SetEntityHealth(client, newHP);
-			
-			return Plugin_Continue;
 		}
-		
-		g_hClientTimers[client] = INVALID_HANDLE;
 	}
 	
-	return Plugin_Stop;
+	return Plugin_Continue;
 }
