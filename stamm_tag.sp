@@ -91,7 +91,7 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 // Create the config
 public OnPluginStart()
 {
-	AutoExecConfig_SetFile("tag", "stamm/features");
+	AutoExecConfig_SetFile("clantag", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
 	g_hTag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
