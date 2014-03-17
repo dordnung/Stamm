@@ -255,7 +255,7 @@ stock CReplaceColor(Colors:color, Colors:newColor)
 	CProfile_TeamIndex[color] = CProfile_TeamIndex[newColor];
 	
 	CTagReqSayText2[color] = CTagReqSayText2[newColor];
-	Format(CTagCode[color], sizeof(CTagCode[]), CTagCode[newColor])
+	Format(CTagCode[color], sizeof(CTagCode[]), CTagCode[newColor]));
 }
 
 /**
