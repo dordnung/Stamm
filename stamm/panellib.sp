@@ -74,14 +74,15 @@ panellib_Start()
 
 	
 	// Create Stamm Credits
-	SetPanelTitle(panellib_credits, "Stamm Beta Credits");
+	SetPanelTitle(panellib_credits, "Stamm Credits");
 	
 	DrawPanelText(panellib_credits, "-------------------------------------------");
-	DrawPanelText(panellib_credits, "Author:");
-	DrawPanelItem(panellib_credits, "Stamm Author is Popoklopsi");
-	DrawPanelText(panellib_credits, "-------------------------------------------");
-	DrawPanelText(panellib_credits, "Official Stamm Page: https://forums.alliedmods.net/showthread.php?t=142073");
-	DrawPanelText(panellib_credits, "Beta Link: http://popoklopsi.de/stamm/beta");
+	DrawPanelText(panellib_credits, "Author:     Popoklopsi");
+	
+	Format(infoString, sizeof(infoString), "Version:    %s", g_sPluginVersionUpdate);
+	DrawPanelText(panellib_credits, infoString);
+
+	DrawPanelText(panellib_credits, "Stamm Page: https://forums.alliedmods.net/showthread.php?t=142073");
 	DrawPanelText(panellib_credits, "-------------------------------------------");
 	
 	Format(infoString, sizeof(infoString), "%T", "Back", LANG_SERVER);

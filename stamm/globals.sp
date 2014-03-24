@@ -104,8 +104,8 @@ new StammGames:g_iGameID;
 
 // String globals
 new String:g_sAdminMenu[32];
-new String:g_sPluginVersion[10] = "2.2";
-new String:g_sPluginVersionUpdate[10] = "2.2.0";
+new String:g_sPluginVersion[16] = "2.2";
+new String:g_sPluginVersionUpdate[16] = "2.2.0";
 new String:g_sTableName[64];
 new String:g_sTextToWrite[32];
 new String:g_sTextToWriteF[32];
@@ -118,7 +118,7 @@ new String:g_sInfoF[32];
 new String:g_sChange[32];
 new String:g_sChangeF[32];
 new String:g_sStammTag[64];
-new String:g_sDatabaseVersion[12];
+new String:g_sDatabaseVersion[16];
 new String:g_sCommandName[MAXFEATURES][64];
 new String:g_sCommand[MAXFEATURES][64];
 
@@ -126,7 +126,7 @@ new String:g_sCommand[MAXFEATURES][64];
 // Level and Feature string globals
 new String:g_sLevelName[MAXLEVELS][32];
 new String:g_sLevelKey[MAXLEVELS][32];
-new String:g_sLevelFlag[MAXLEVELS][26];
+new String:g_sLevelFlag[MAXLEVELS][22];
 
 
 
