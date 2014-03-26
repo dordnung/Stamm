@@ -51,7 +51,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature GrenadeTrail",
 	author = "Popoklopsi",
-	version = "1.4.0",
+	version = "1.4.1",
 	description = "Give VIP's a grenade trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -69,6 +69,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 

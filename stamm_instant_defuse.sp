@@ -39,7 +39,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Instant Defuse",
 	author = "Popoklopsi",
-	version = "1.3.0",
+	version = "1.3.1",
 	description = "VIP's can defuse the bomb instantly",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -58,6 +58,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 

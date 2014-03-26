@@ -40,7 +40,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Admin Flags",
 	author = "Popoklopsi",
-	version = "1.4.0",
+	version = "1.4.1",
 	description = "Give VIP's Admin Flags",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -77,6 +77,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	{
 		// Add to auto updater
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 
 

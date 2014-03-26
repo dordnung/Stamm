@@ -47,7 +47,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature ResizePlayer",
 	author = "Popoklopsi",
-	version = "1.1.0",
+	version = "1.1.1",
 	description = "Resizes VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -112,6 +112,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 

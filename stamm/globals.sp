@@ -104,8 +104,8 @@ new StammGames:g_iGameID;
 
 // String globals
 new String:g_sAdminMenu[32];
-new String:g_sPluginVersion[16] = "2.2";
-new String:g_sPluginVersionUpdate[16] = "2.2.0";
+new String:g_sPluginVersion[16] = "2.21";
+new String:g_sPluginVersionUpdate[16] = "2.2.1";
 new String:g_sTableName[64];
 new String:g_sTextToWrite[32];
 new String:g_sTextToWriteF[32];

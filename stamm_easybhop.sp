@@ -38,7 +38,7 @@ public Plugin:myinfo =
 {
 	name = "EasyBhop",
 	author = "Bara",
-	version = "1.1.0",
+	version = "1.1.1",
 	description = "Give VIP's eady bunnyhop",
 	url = "www.bara.in"
 };
@@ -57,6 +57,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 

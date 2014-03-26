@@ -45,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Money",
 	author = "Popoklopsi",
-	version = "1.3.0",
+	version = "1.3.1",
 	description = "Give VIP's every Round x Cash",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -85,6 +85,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 

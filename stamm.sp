@@ -292,6 +292,7 @@ public OnConfigsExecuted()
 	if (LibraryExists("updater") && GetConVarBool(configlib_WantUpdate))
 	{
 		Updater_AddPlugin(UPDATE_URL);
+		Updater_ForceUpdate();
 	}
 
 

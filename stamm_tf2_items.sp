@@ -46,7 +46,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature TF2 Items",
 	author = "Popoklopsi",
-	version = "1.0.0",
+	version = "1.0.1",
 	description = "Give VIP's Attributes on Items",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -245,6 +245,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 

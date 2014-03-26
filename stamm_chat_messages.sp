@@ -45,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Chat Messages",
 	author = "Popoklopsi",
-	version = "1.3.0",
+	version = "1.3.1",
 	description = "Give VIP's VIP Chat and Message",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -82,6 +82,7 @@ public STAMM_OnFeatureLoaded(const String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 
 
