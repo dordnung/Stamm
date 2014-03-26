@@ -1,0 +1,12 @@
+// Remove the // before the blocks to activate the block.
+// Use "<admin_flags>"     "<levelname>"
+
+"LevelSettings"
+{
+	//"a"           "Bronze"
+	//"ab"          "Silver"
+	//"abc"         "Gold"
+	//"abcd"        "Platinum"
+	//"abcde"       "Diamond"
+	//"abcdef"      "God"
+}

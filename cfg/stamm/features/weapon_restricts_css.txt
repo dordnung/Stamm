@@ -1,0 +1,46 @@
+"WeaponRestricts"
+{
+	// 1 = Weapon not restricted for VIP's (no overwrite with original plugin!)
+	// 0 = Weapon also restricted for VIP's (no overwrite with original plugin!)
+	
+	// Pistols
+	"weapon_glock"          "1"
+	"weapon_usp"            "1"
+	"weapon_p228"           "1"
+	"weapon_deagle"         "1"
+	"weapon_fiveseven"      "1"
+	"weapon_elite"          "1"
+	
+	// Sub-machine guns
+	"weapon_mac10"          "1"
+	"weapon_tmp"            "1"
+	"weapon_mp5navy"        "1"
+	"weapon_ump45"          "1"
+	"weapon_p90"            "1"
+	
+	// Shotguns
+	"weapon_m3"             "1"
+	"weapon_xm1014"         "1"
+	
+	// Rifles
+	"weapon_galil"          "1"
+	"weapon_famas"          "1"
+	"weapon_ak47"           "1"
+	"weapon_m4a1"           "1"
+	"weapon_sg552"          "1"
+	"weapon_aug"            "1"
+	
+	// Machine guns
+	"weapon_m249"           "1"
+	
+	// Sniper rifles
+	"weapon_scout"          "1"
+	"weapon_g3sg1"          "1"
+	"weapon_sg550"          "1"
+	"weapon_awp"            "1"
+	
+	// Grenades
+	"weapon_flashbang"      "1"
+	"weapon_smokegrenade"   "1"
+	"weapon_hegrenade"      "1"
+}

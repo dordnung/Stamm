@@ -1,0 +1,21 @@
+// Here you can add as much levels as you want
+// x is the amount of size you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// Become x percent size of your normal size
+	"1"             "Bronze"
+	
+	// Become x*2 percent size of your normal size
+	"2"             "Gold"
+	
+	// Become x*3 percent size of your normal size
+	"3"             "Platinum"
+	
+	// Become x*4 percent size of your normal size
+	"4"             "Special"
+	
+	// Become x*5 percent size of your normal size
+	//"5"           "OtherLevel"
+}

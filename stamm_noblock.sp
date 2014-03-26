@@ -1,64 +1,124 @@
+/**
+ * -----------------------------------------------------
+ * File        stamm_noblock.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+// Includes
 #include <sourcemod>
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
-new v_level;
+
 new coll_offset;
 
-new String:basename[64];
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature NoBlock",
 	author = "Popoklopsi",
-	version = "1.0",
-	description = "VIP's can walk through other players",
+	version = "1.1.1",
+	description = "Non VIP's cant' walk through VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
-public OnAllPluginsLoaded()
+
+
+
+// Auto updater
+public STAMM_OnFeatureLoaded(String:basename[])
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
-	
-	coll_offset = FindSendPropOffs("CBaseEntity", "m_CollisionGroup");
-	if (coll_offset == -1) SetFailState("Can't Load Feature, failed to find CBaseEntity::m_CollisionGroup");
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater") && STAMM_AutoUpdate())
+	{
+		Updater_AddPlugin(urlString);
+	}
 }
 
+
+
+// Add feature
+public OnAllPluginsLoaded()
+{
+	decl String:description[64];
+
+	if (!LibraryExists("stamm")) 
+	{
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	}
+
+
+	STAMM_LoadTranslation();
+		
+	Format(description, sizeof(description), "%T", "GetNoBlock", LANG_SERVER);
+	
+	STAMM_AddFeature("VIP NoBlock", description);
+	
+
+	// Get Noblock offset
+	coll_offset = FindSendPropOffs("CBaseEntity", "m_CollisionGroup");
+	
+	// Found?
+	if (coll_offset == -1)
+	{ 
+		SetFailState("Can't Load Feature, failed to find CBaseEntity::m_CollisionGroup");
+	}
+}
+
+
+
+
+// Hook spawn
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
-	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
 	HookEvent("player_spawn", PlayerSpawn);
 }
 
+
+
+
+// Playe spawned
 public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (IsStammClientValid(client))
+	// Valid client?
+	if (STAMM_IsClientValid(client))
 	{
-		if (!IsClientVip(client, v_level)) SetEntData(client, coll_offset, 2, 4, true);
+		if (!STAMM_HaveClientFeature(client))
+		{
+			// Non VIP's are in no blocking mode
+			SetEntData(client, coll_offset, 2, 4, true);
+		}
 	}
-	else SetEntData(client, coll_offset, 2, 4, true);
-}
-
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[256];
-	
-	Format(description, sizeof(description), "%T", "GetNoBlock", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP NoBlock", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetNoBlock", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
+	else
+	{
+		// Set noblock
+		SetEntData(client, coll_offset, 2, 4, true);
+	}
 }

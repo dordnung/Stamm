@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"GetShowDamage"
+	{
+		"en"        "See the damage you done"
+		"de"        "Sehe den Schaden, den du gemacht hast"
+	}
+}

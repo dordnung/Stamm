@@ -1,97 +1,173 @@
+/**
+ * -----------------------------------------------------
+ * File        stamm_joinsound.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+// Includes
 #include <sourcemod>
 #include <sdktools>
+#include <autoexecconfig>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
-new Handle:j_path;
 
-new bool:MapTimer = true;
 
-new v_level;
+new Handle:g_hPath;
+new bool:g_bMapTimer = true;
 
-new String:path[PLATFORM_MAX_PATH + 1];
-new String:basename[64];
+
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Joinsound",
 	author = "Popoklopsi",
-	version = "1.2",
+	version = "1.4.1",
 	description = "Give VIP's a Joinsound",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
+
+
+// Auto updater
+public STAMM_OnFeatureLoaded(const String:basename[])
+{
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater") && STAMM_AutoUpdate())
+	{
+		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
+	}
+}
+
+
+
+// Add feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	if (!STAMM_IsAvailable()) 
+	{
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	}
+
+
+	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP Joinsound");
 }
 
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetJoinsound", client);
+	
+	PushArrayString(array, fmt);
+}
+
+
+
+// Create Config
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
+	AutoExecConfig_SetFile("joinsound", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hPath = AutoExecConfig_CreateConVar("joinsound_path", "stamm/vip_sound.mp3", "Path to joinsound, after sound/");
 	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	j_path = CreateConVar("joinsound_path", "music/stamm/vip_sound.mp3", "Path to joinsound, after sound/");
-	
-	AutoExecConfig(true, "joinsound", "stamm/features");
+	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
+
+
+// Load config and precache sound
 public OnConfigsExecuted()
 {
-	new String:downloadfile[PLATFORM_MAX_PATH + 1];
+	decl String:downloadfile[PLATFORM_MAX_PATH + 1];
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
+	GetConVarString(g_hPath, path, sizeof(path));
 	
-	GetConVarString(j_path, path, sizeof(path));
-	
-	PrecacheSound(path, true);
-	
+
+	if (STAMM_GetGame() != GameCSGO)
+	{
+		PrecacheSound(path, true);
+	}
+	else
+	{
+		AddToStringTable(FindStringTable("soundprecache"), path);
+	}
+
+
 	Format(downloadfile, sizeof(downloadfile), "sound/%s", path);
+
 	AddFileToDownloadsTable(downloadfile);
 }
 
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
 
-	Format(description, sizeof(description), "%T", "GetJoinsound", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP Joinsound", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetJoinsound", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
+
+// Client ready, start sound
+public STAMM_OnClientReady(client)
+{
+	if (STAMM_HaveClientFeature(client) && g_bMapTimer) 
+	{
+		CreateTimer(4.0, StartSound);
+	}
 }
 
-public OnStammClientReady(client)
-{
-	if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename) && MapTimer) CreateTimer(4.0, StartSound);
-}
 
+
+// Mapchange protect
 public OnMapStart()
 {
-	MapTimer = false;
+	g_bMapTimer = false;
+	
 	CreateTimer(60.0, MapTimer_Change);
 }
 
 public Action:MapTimer_Change(Handle:timer)
 {
-	MapTimer = true;
+	g_bMapTimer = true;
 }
 
+
+
+// Emit the sound
 public Action:StartSound(Handle:timer)
 {
-	if (GetStammGame() != GameCSGO) EmitSoundToAll(path);
-	else
-	{
-		for (new i=0; i <= MaxClients; i++)
-		{
-			if (IsStammClientValid(i)) ClientCommand(i, "play %s", path);
-		}
-	}
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
+	GetConVarString(g_hPath, path, sizeof(path));
+	
+	EmitSoundToAll(path);
 }

@@ -1,0 +1,21 @@
+// Here you can add as much levels as you want
+// x is the amount of percent you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// Get x Percent higher firingrate
+	"1"             "Bronze"
+	
+	// Get x*2 Percent higher firingrate
+	"2"             "Gold"
+	
+	// Get x*3 Percent higher firingrate
+	"3"             "Platinum"
+	
+	// Get x*4 Percent higher firingrate
+	"4"             "Special"
+	
+	// Get x*5 Percent higher firingrate
+	//"5"           "OtherLevel"
+}

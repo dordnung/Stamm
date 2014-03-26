@@ -1,8 +1,0 @@
-"Phrases"
-{
-	"GetColoredSmokes"
-	{
-		"en"		"Get colored smokes"
-		"de"		"Bekomme farbige Rauchgranaten"
-	}
-}

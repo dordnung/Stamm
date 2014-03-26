@@ -1,0 +1,18 @@
+// Here you can add as much levels as you want
+// x is the amount of ammo you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// Become x percent more ammo
+	"1"             "Silver"
+	
+	// Become x*2 percent more ammo
+	"2"             "Gold"
+	
+	// Become x*3 percent more ammo
+	"3"             "God"
+	
+	// Become x*4 percent more ammo
+	"4"             "Special"
+}

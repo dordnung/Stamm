@@ -1,93 +1,166 @@
+/**
+ * -----------------------------------------------------
+ * File        stamm_showdamage.sp
+ * Authors     David <popoklopsi> Ordnung
+ * License     GPLv3
+ * Web         http://popoklopsi.de
+ * -----------------------------------------------------
+ * 
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
+
+// Includes
 #include <sourcemod>
-#include <colors>
+#include <autoexecconfig>
+
 #undef REQUIRE_PLUGIN
 #include <stamm>
+#include <updater>
 
 #pragma semicolon 1
 
-new Handle:damage_area_c;
 
-new v_level;
 
-new damage_area;
+new Handle:g_hDamageArea;
 
-new String:basename[64];
+
+
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Show Damage",
 	author = "Popoklopsi",
-	version = "1.1",
+	version = "1.3.1",
 	description = "VIP's can see the damage they done",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
-public OnAllPluginsLoaded()
+
+
+
+
+// Add to updater on feature loaded
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	if (!LibraryExists("stamm")) SetFailState("Can't Load Feature, Stamm is not installed!");
+	decl String:urlString[256];
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+
+	if (LibraryExists("updater") && STAMM_AutoUpdate())
+	{
+		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
+	}
 }
 
+
+
+
+// Add Feature when all plugins are loaded
+public OnAllPluginsLoaded()
+{
+	if (!STAMM_IsAvailable()) 
+	{
+		SetFailState("Can't Load Feature, Stamm is not installed!");
+	}
+
+
+	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP Show Damage");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetShowDamage", client);
+	
+	PushArrayString(array, fmt);
+}
+
+
+
+
+// Load config when plugin started
 public OnPluginStart()
 {
-	new Handle:myPlugin = GetMyHandle();
+	AutoExecConfig_SetFile("show_damage", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hDamageArea = AutoExecConfig_CreateConVar("damage_area", "1", "Textarea where to show message, 1=Center Text, 2=Hint Text, 3=Chat");
 	
-	GetPluginFilename(myPlugin, basename, sizeof(basename));
-	ReplaceString(basename, sizeof(basename), ".smx", "");
-	ReplaceString(basename, sizeof(basename), "stamm/", "");
-	ReplaceString(basename, sizeof(basename), "stamm\\", "");
-	
-	damage_area_c = CreateConVar("damage_area", "1", "Textarea where to show message, 1=Center Text, 2=Hint Text, 3=Chat");
-	
-	AutoExecConfig(true, "show_damage", "stamm/features");
+	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 	HookEvent("player_hurt", eventPlayerHurt);
 }
 
-public OnConfigsExecuted()
-{
-	damage_area = GetConVarInt(damage_area_c);
-}
 
-public OnStammReady()
-{
-	LoadTranslations("stamm-features.phrases");
-	
-	new String:description[64];
-	
-	Format(description, sizeof(description), "%T", "GetShowDamage", LANG_SERVER);
-	
-	v_level = AddStammFeature(basename, "VIP Show Damage", description);
-	
-	Format(description, sizeof(description), "%T", "YouGetShowDamage", LANG_SERVER);
-	AddStammFeatureInfo(basename, v_level, description);
-}
 
+
+
+// A player hurts
 public Action:eventPlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "attacker"));
 
-	if (IsStammClientValid(client))
+	// Is client valid and want feature?
+	if (STAMM_IsClientValid(client))
 	{
-		if (IsClientVip(client, v_level) && ClientWantStammFeature(client, basename))
+		if (STAMM_HaveClientFeature(client))
 		{
+			// Get damage done, the games have different event types oO
 			new damage;
 			
-			if (GetStammGame() == GameTF2) damage = GetEventInt(event, "damageamount");
-			else damage = GetEventInt(event, "dmg_health");
-			
-			switch(damage_area)
+			if (STAMM_GetGame() == GameTF2) 
+			{
+				damage = GetEventInt(event, "damageamount");
+			}
+
+			else if (STAMM_GetGame() == GameDOD)
+			{
+				damage = GetEventInt(event, "damage");
+			}
+
+			else 
+			{
+				damage = GetEventInt(event, "dmg_health");
+			}
+
+			// Switch the area to show to and show it
+			switch(GetConVarInt(g_hDamageArea))
 			{
 				case 1:
 				{
 					PrintCenterText(client, "- %i HP", damage);
 				}
+
 				case 2:
 				{
 					PrintHintText(client, "- %i HP", damage);
 				}
+				
 				case 3:
 				{
-					CPrintToChat(client, "{green}- %i HP", damage);
+					STAMM_PrintToChat(client, "{green}- %i HP", damage);
 				}
 			}
 		}

@@ -1,0 +1,18 @@
+// Here you can add as much levels as you want
+// x is the amount of speed you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// x Percent more speed
+	"1"             "Bronze"
+	
+	// x*2 Percent more speed
+	"2"             "Gold"
+	
+	// x*3 Percent more speed
+	"3"             "God"
+	
+	// x*4 Percent more speed
+	"4"             "Special"
+}

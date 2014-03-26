@@ -1,0 +1,14 @@
+// Here you can add the blocks for the item config.
+// You need them in the cfg/stamm/features/items_tf2.txt file.
+
+"LevelSettings"
+{
+	// Block for Damage bonus on bronze
+	"DMG_BONUS"             "Bronze"
+	
+	// Block for clip size bonus on silver
+	"CLIP_BONUS"            "Silver"
+	
+	// Block for bullets bonus on god
+	"BULLETS_BONUS"         "God"
+}

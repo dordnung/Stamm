@@ -1,0 +1,11 @@
+"LevelSettings"
+{
+	// Level to see name of the nearest player, -1 to Disable
+	"name"          "Silver"
+	
+	// Level to see Distance to nearest player, -1 to Disable
+	"distance"      "Gold"
+	
+	// Level to see direction to nearest player, -1 to Disable
+	"direction"     "Platinum"
+}

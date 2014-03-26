@@ -13,6 +13,6 @@
 	"WeaponFailed"
 	{
 		"en"		"{green}Weapon invalid {lightgreen}or {green}not allowed!"
-		"de"		"{green}Waffe ungültig {lightgreen}oder {green}nicht erlaubt!"
+		"de"		"{green}Waffe ungÃƒÂ¼ltig {lightgreen}oder {green}nicht erlaubt!"
 	}
 }
