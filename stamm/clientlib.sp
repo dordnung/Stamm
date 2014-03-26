@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@
 // semicolon
 #pragma semicolon 1
 
-new Handle:clientlib_olddelete;
+
 
 
 // Is Client valid, without ready state
-public bool:clientlib_isValidClient_PRE(client)
+bool:clientlib_isValidClient_PRE(client)
 {
 	if (client > 0 && client <= MaxClients)
 	{
@@ -41,15 +41,7 @@ public bool:clientlib_isValidClient_PRE(client)
 				// No fake client
 				if (!IsClientSourceTV(client) && !IsClientReplay(client) && !IsFakeClient(client))
 				{
-					decl String:steamid[32];
-					
-					clientlib_getSteamid(client, steamid, sizeof(steamid));
-					
-					// Good steamid format
-					if (SimpleRegexMatch(steamid, "^STEAM_[0-1]{1}:[0-1]{1}:[0-9]+$") == 1)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -59,12 +51,17 @@ public bool:clientlib_isValidClient_PRE(client)
 }
 
 
+
+
+
 // Is valid client
-public bool:clientlib_isValidClient(client)
+bool:clientlib_isValidClient(client)
 {
 	// With ready state
-	return (clientlib_isValidClient_PRE(client) && g_ClientReady[client]);
+	return (clientlib_isValidClient_PRE(client) && g_bClientReady[client]);
 }
+
+
 
 
 
@@ -76,6 +73,7 @@ public OnClientPostAdminCheck(client)
 		sqllib_InsertPlayer(client);
 	}
 }
+
 
 
 
@@ -91,6 +89,8 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 			new Float:startPos;
 			new Float:endPos;
 			
+
+			// Set position of text.
 			if (TF2_GetPlayerClass(client) != TFClass_Engineer)
 			{
 				startPos = 0.01;
@@ -102,38 +102,87 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 				endPos = 0.02;
 			}
 
+
+			// Show the hud text
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
-			ShowSyncHudText(client, g_hHudSync, "[STAMM] %T: %i", "Points", client, g_playerpoints[client]);
+			ShowSyncHudText(client, g_hHudSync, "[STAMM] %t: %i", "Points", g_iPlayerPoints[client]);
 		}
 	}
+
+
 
 	return Plugin_Continue;
 }
 
 
 
+
+
+
 // Check a client as ready
-public clientlib_ClientReady(client)
+clientlib_ClientReady(client)
 {
 	if (clientlib_isValidClient_PRE(client))
 	{
 		// ready state to true
-		g_ClientReady[client] = true;
+		g_bClientReady[client] = true;
 		
 		// Check VIP state
 		clientlib_CheckVip(client);
 		
+
 		// check admin flag
-		if (g_giveflagadmin)
+		decl String:giveFlagAdmin[32];
+
+		GetConVarString(configlib_GiveFlagAdmin, giveFlagAdmin, sizeof(giveFlagAdmin));
+
+		// Before we had numbers, now we have flags
+		// Replace numbers with flags
+		if (StrEqual(giveFlagAdmin, "1"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "o");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "2"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "p");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "3"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "q");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "4"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "r");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "5"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "s");
+		}
+
+		else if (StrEqual(giveFlagAdmin, "6"))
+		{
+			Format(giveFlagAdmin, sizeof(giveFlagAdmin), "t");
+		}
+
+		if (!StrEqual(giveFlagAdmin, "0") && !StrEqual(giveFlagAdmin, ""))
 		{ 
-			clientlib_CheckFlagAdmin(client);
+			// Flag checking
+			if (GetUserFlagBits(client) & ReadFlagString(giveFlagAdmin))
+			{
+				clientlib_GiveFastVIP(client);
+			}
 		}
 
 		// Show points	
-		if (g_join_show)
+		if (GetConVarBool(configlib_JoinShow))
 		{ 
-			CreateTimer(5.0, pointlib_ShowPoints2, client);
+			CreateTimer(5.0, pointlib_ShowPoints2, GetClientUserId(client));
 		}
+
 
 		// Check Players again
 		clientlib_CheckPlayers();
@@ -142,6 +191,9 @@ public clientlib_ClientReady(client)
 		nativelib_ClientReady(client);
 	}
 }
+
+
+
 
 
 // A client disconnected
@@ -156,10 +208,21 @@ public OnClientDisconnect(client)
 
 
 
+
+
 // Checks if a steamid is connected
-public clientlib_IsSteamIDConnected(String:steamid[])
+clientlib_IsSteamIDConnected(String:steamid[])
 {
 	decl String:cSteamid[64];
+	decl String:search[64];
+
+
+	// Copy to buffer
+	strcopy(search, sizeof(search), steamid);
+
+	// Replace STEAM_1: with STEAM_0:
+	ReplaceString(search, sizeof(search), "STEAM_1:", "STEAM_0:");
+
 
 	// Client Loop
 	for (new client = 1; client <= MaxClients; client++)
@@ -169,7 +232,8 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 			// Get steamid and check if it's equal
 			clientlib_getSteamid(client, cSteamid, sizeof(cSteamid));
 
-			if (StrEqual(steamid, cSteamid, false))
+
+			if (StrEqual(search, cSteamid, false))
 			{
 				// return client
 				return client;
@@ -177,203 +241,199 @@ public clientlib_IsSteamIDConnected(String:steamid[])
 		}
 	}
 
+
 	return 0;
 }
 
 
 
+
+
+
 // Check if a client is a stamm admin
-public bool:clientlib_IsAdmin(client)
+bool:clientlib_IsAdmin(client)
 {
+	decl String:adminflag[32];
+	GetConVarString(configlib_AdminFlag, adminflag, sizeof(adminflag));
+
 	if (clientlib_isValidClient_PRE(client))
 	{
-		new AdminId:adminid = GetUserAdmin(client);
-		new AdminFlag:flag;
-
-		// Get AdminFlag of char
-		FindFlagByChar(g_adminflag[0], flag);
-
-		return GetAdminFlag(adminid, flag);
+		return (GetUserFlagBits(client) & ReadFlagString(adminflag) || GetUserFlagBits(client) & ADMFLAG_ROOT);
 	}
 	
+
 	return false;
 }
 
 
+
+
+
+
+
 // Check if a client is a special VIP
-public clientlib_IsSpecialVIP(client)
+clientlib_IsSpecialVIP(client)
 {
 	if (clientlib_isValidClient(client))
 	{
-		new AdminId:adminid = GetUserAdmin(client);
-		new AdminFlag:flag;
-
 		// Private level loop
-		for (new i=0; i < g_plevels; i++)
+		for (new i=0; i < g_iPLevels; i++)
 		{		
-			// Check all flags, YEAH :D
-			FindFlagByChar(g_LevelFlag[i][0], flag);
-
-			if (GetAdminFlag(adminid, flag))
+			if ((GetUserFlagBits(client) & ReadFlagString(g_sLevelFlag[i])))
 			{
 				return i;
 			}
 		}
 	}
 	
+
+	// No special
 	return -1;
 }
 
-// Give Player fast VIP
-public clientlib_CheckFlagAdmin(client)
-{
-	new AdminId:adminid = GetUserAdmin(client);
-	
-	// and again, flag checking , oh man...
-	if (g_giveflagadmin == 1 && GetAdminFlag(adminid, Admin_Custom1)) clientlib_GiveFastVIP(client);
-	if (g_giveflagadmin == 2 && GetAdminFlag(adminid, Admin_Custom2)) clientlib_GiveFastVIP(client);
-	if (g_giveflagadmin == 3 && GetAdminFlag(adminid, Admin_Custom3)) clientlib_GiveFastVIP(client);
-	if (g_giveflagadmin == 4 && GetAdminFlag(adminid, Admin_Custom4)) clientlib_GiveFastVIP(client);
-	if (g_giveflagadmin == 5 && GetAdminFlag(adminid, Admin_Custom5)) clientlib_GiveFastVIP(client);
-	if (g_giveflagadmin == 6 && GetAdminFlag(adminid, Admin_Custom6)) clientlib_GiveFastVIP(client);
-}
 
 
 
 
 // Set level to highest level
-public clientlib_GiveFastVIP(client)
+clientlib_GiveFastVIP(client)
 {
-	if (g_playerlevel[client] < g_levels)
+	if (g_iPlayerLevel[client] < g_iLevels)
 	{
-		pointlib_GivePlayerPoints(client, g_LevelPoints[g_levels-1], false);
+		// Set points to highest level
+		pointlib_GivePlayerPoints(client, g_iLevelPoints[g_iLevels - 1], false);
 	}
 }
 
-
-
-// Delete old players
-public Action:clientlib_deleteOlds(Handle:timer, any:data)
-{
-	// check last valid entry
-	new lastEntry = GetTime() - (g_delete * 24 * 60 * 60);
-
-	decl String:query[128];
-
-	// Delete all players less this line
-	Format(query, sizeof(query), "DELETE FROM `%s` WHERE `last_visit` < %i", g_tablename, lastEntry);
-
-	if (g_debug) 
-	{
-		LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
-	}
-
-	SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
-	
-	return Plugin_Continue;
-}
 
 
 
 
 // Check VIP state
-public clientlib_CheckVip(client)
+clientlib_CheckVip(client)
 {
-	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client))
+	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client) && (g_iLevels + g_iPLevels > 0))
 	{
 		decl String:steamid[64];
-		new clientpoints = g_playerpoints[client];
-		
+
+
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
 		
 		// Get level with client points
-		new levelstufe = levellib_PointsToID(client, clientpoints);
+		new levelstufe = levellib_ClientPointsToID(client);
 		
 
-		// is a private vip
+
+		// Shouldn't happen
 		if (levelstufe == -1)
 		{ 
 			return;
 		}
 
+
 		// Only when level is a new one
-		if (levelstufe > 0 && levelstufe != g_playerlevel[client])
+		if (levelstufe > 0 && levelstufe != g_iPlayerLevel[client])
 		{
 			decl String:name[MAX_NAME_LENGTH+1];
 			decl String:setquery[256];	
 
+			new oldlevel = g_iPlayerLevel[client];
 			new bool:isUP = true;
 
+
+
 			// new level not higher?
-			if (g_playerlevel[client] > levelstufe)
+			if (g_iPlayerLevel[client] > levelstufe)
 			{
 				isUP = false;
 			}
 
+
+
 			// Set new level
-			g_playerlevel[client] = levelstufe;
+			g_iPlayerLevel[client] = levelstufe;
 			
 			GetClientName(client, name, sizeof(name));
 			
 
+
 			// Notice to all
-			if (!g_stripTag)
+			if (!GetConVarBool(configlib_StripTag))
 			{
-				CPrintToChatAll("%s %t", g_StammTag, "LevelNowVIP", name, g_LevelName[levelstufe-1]);
+				if (!g_bMoreColors)
+				{
+					CPrintToChatAll("%s %t", g_sStammTag, "LevelNowVIP", name, g_sLevelName[levelstufe-1]);
+				}
+				else
+				{
+					MCPrintToChatAll("%s %t", g_sStammTag, "LevelNowVIP", name, g_sLevelName[levelstufe-1]);
+				}
 			}
 			else
 			{
-				CPrintToChatAll("%s %t", g_StammTag, "LevelNowLevel", name, g_LevelName[levelstufe-1]);
+				if (!g_bMoreColors)
+				{
+					CPrintToChatAll("%s %t", g_sStammTag, "LevelNowLevel", name, g_sLevelName[levelstufe-1]);
+				}
+				else
+				{
+					MCPrintToChatAll("%s %t", g_sStammTag, "LevelNowLevel", name, g_sLevelName[levelstufe-1]);
+				}
 			}
 
 
-			if (!g_stripTag)
+
+			// Rejoin
+			if (!g_bMoreColors)
 			{
-				// VIP
-				CPrintToChat(client, "%s %t", g_StammTag, "JoinVIP");
+				CPrintToChat(client, "%s %t", g_sStammTag, "JoinVIP");
 			}
 			else
 			{
-				// Level
-				CPrintToChat(client, "%s %t", g_StammTag, "JoinLevel");
+				MCPrintToChat(client, "%s %t", g_sStammTag, "JoinVIP");
 			}
 			
+
+
 			// Play lvl up sound if wanted
-			if (!StrEqual(g_lvl_up_sound, "0") && isUP)
+			decl String:lvlUpSound[PLATFORM_MAX_PATH + 1];
+
+			GetConVarString(configlib_LvlUpSound, lvlUpSound, sizeof(lvlUpSound));
+
+			if (!StrEqual(lvlUpSound, "0") && isUP && IsSoundPrecached(lvlUpSound))
 			{
-				EmitSoundToAll(g_lvl_up_sound);
+				EmitSoundToAll(lvlUpSound);
 			}
+
+
 
 			// Update client on database
-			Format(setquery, sizeof(setquery), "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'", g_tablename, levelstufe, steamid);
+			Format(setquery, sizeof(setquery), g_sUpdatePlayerQuery, g_sTableName, levelstufe, steamid);
 			
-			if (g_debug) 
-			{
-				LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", setquery);
-			}
+			StammLog(true, "Execute %s", setquery);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, setquery);
 
 
+
+
 			// Notice to API
-			nativelib_PublicPlayerBecomeVip(client);
+			nativelib_PublicPlayerBecomeVip(client, oldlevel, g_iPlayerLevel[client]);
 		}
-		else if (levelstufe == 0 && levelstufe != g_playerlevel[client])
+
+		else if (levelstufe == 0 && levelstufe != g_iPlayerLevel[client])
 		{
 			// New level is no level, poor player ):
 			decl String:queryback[256];
-							
+
 			// set to zero
-			g_playerlevel[client] = 0;
+			g_iPlayerLevel[client] = 0;
 
 
 			// Update to database
-			Format(queryback, sizeof(queryback), "UPDATE `%s` SET `level`=0 WHERE `steamid`='%s'", g_tablename, steamid);
+			Format(queryback, sizeof(queryback), g_sUpdatePlayerQuery, g_sTableName, 0, steamid);
 			
-			if (g_debug) 
-			{
-				LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", queryback);
-			}
+			StammLog(true, "Execute %s", queryback);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, queryback);
 		}
@@ -382,42 +442,46 @@ public clientlib_CheckVip(client)
 
 
 
+
+
+
+
 // Saves player points and feature states
-public clientlib_SavePlayer(client, number)
+clientlib_SavePlayer(client, number)
 {
 	if (sqllib_db != INVALID_HANDLE && clientlib_isValidClient(client))
 	{
 		decl String:query[4024];
 		decl String:steamid[64];
-		
+
 		clientlib_getSteamid(client, steamid, sizeof(steamid));
-		
+
+
 		// Zero points only?
-		if (g_playerpoints[client] == 0)
+		if (g_iPlayerPoints[client] == 0)
 		{
-			Format(query, sizeof(query), "UPDATE `%s` SET `points`=0 ", g_tablename);
+			Format(query, sizeof(query), g_sUpdateSetPointsZeroQuery, g_sTableName);
 		}
 		else
 		{
 			// Add new points
-			Format(query, sizeof(query), "UPDATE `%s` SET `points`=`points`+(%i) ", g_tablename, number);
+			Format(query, sizeof(query), g_sUpdateAddPointsQuery, g_sTableName, number);
 		}
 
+
 		// Add all features to the call
-		for (new i=0; i < g_features; i++)
+		for (new i=0; i < g_iFeatures; i++)
 		{
 			Format(query, sizeof(query), "%s, `%s`=%i", query, g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][WANT_FEATURE][client]);
 		}
 
 		Format(query, sizeof(query), "%s WHERE `steamid`='%s'", query, steamid);
-		
+
+
 		// Execute
 		SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 		
-		if (g_debug)
-		{ 
-			LogToFile(g_DebugFile, "[ STAMM DEBUG ] Execute %s", query);
-		}
+		StammLog(true, "Execute %s", query);
 
 		// Notice to API
 		nativelib_ClientSave(client);
@@ -426,14 +490,20 @@ public clientlib_SavePlayer(client, number)
 
 
 
+
+
+
 // Get the steamid
-public clientlib_getSteamid(client, String:steamid[], size)
+clientlib_getSteamid(client, String:steamid[], size)
 {
 	GetClientAuthString(client, steamid, size);
 	
 	// Replace STEAM_1: with STEAM_0:
 	ReplaceString(steamid, size, "STEAM_1:", "STEAM_0:");
 }
+
+
+
 
 
 
@@ -446,82 +516,136 @@ public Action:clientlib_CmdSay(client, args)
 	GetClientName(client, name, sizeof(name));
 	GetCmdArgString(text, sizeof(text));
 	
+
+
 	// Parse out "
 	ReplaceString(text, sizeof(text), "\"", "");
 	
+
+
 	if (clientlib_isValidClient(client))
 	{
 		// Want the player start happy hour?
-		if (g_happynumber[client] == 1)
+		if (g_iHappyNumber[client] == 1)
 		{
 			// get the time
 			new timetoset = StringToInt(text);
 			
+
 			// valid time?
 			if (timetoset > 1)
 			{  
-				g_happynumber[client] = timetoset;
+				g_iHappyNumber[client] = timetoset;
 			}
 			else
 			{
 				// Else abort
-				g_happynumber[client] = 0;
-				CPrintToChat(client, "%s %t", g_StammTag, "aborted");
+				g_iHappyNumber[client] = 0;
+
+
+
+				if (!g_bMoreColors)
+				{
+					CPrintToChat(client, "%s %t", g_sStammTag, "aborted");
+				}
+				else
+				{
+					MCPrintToChat(client, "%s %t", g_sStammTag, "aborted");
+				}
+
+				panellib_CreateUserPanels(client, 4);
 				
 				return Plugin_Handled;
 			}
 			
+
+
 			// Notice next step
-			CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyFactor");
-			CPrintToChat(client, "%s %t", g_StammTag, "WriteHappyFactorInfo");
+			if (!g_bMoreColors)
+			{
+				CPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyFactor");
+				CPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyFactorInfo");
+			}
+			else
+			{
+				MCPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyFactor");
+				MCPrintToChat(client, "%s %t", g_sStammTag, "WriteHappyFactorInfo");
+			}
 			
+
 			// type to factor
-			g_happyfactor[client] = 1;
-				
+			g_iHappyFactor[client] = 1;
+
+
 			return Plugin_Handled;	
 		}
-		else if (g_happyfactor[client] == 1)
+
+		else if (g_iHappyFactor[client] == 1)
 		{
 			// Get factor
 			new factortoset = StringToInt(text);
 			
+
 			// Valid factor and happy hour not started?
-			if (factortoset > 1 && !g_happyhouron) 
+			if (factortoset > 1 && !g_bHappyHourON) 
 			{
 				// Reset marke to start happy
-				g_happyfactor[client] = 0;
+				g_iHappyFactor[client] = 0;
 
 				// Start happy
-				otherlib_StartHappyHour(g_happynumber[client]*60, factortoset);
+				otherlib_StartHappyHour(g_iHappyNumber[client]*60, factortoset);
 				
-				g_happynumber[client] = 0;
+				g_iHappyNumber[client] = 0;
 			}
 			else
 			{
 				// Abort
-				CPrintToChat(client, "%s %t", g_StammTag, "aborted");
+				if (!g_bMoreColors)
+				{
+					CPrintToChat(client, "%s %t", g_sStammTag, "aborted");
+				}
+				else
+				{
+					MCPrintToChat(client, "%s %t", g_sStammTag, "aborted");
+				}
 				
-				g_happynumber[client] = 0;
-				g_happyfactor[client] = 0;
+
+
+				g_iHappyNumber[client] = 0;
+				g_iHappyFactor[client] = 0;
 			}
+
+			panellib_CreateUserPanels(client, 4);
 				
 			return Plugin_Handled;	
 		}
 
-		else if (g_pointsnumber[client] > 0)
+		else if (g_iPointsNumber[client] > 0)
 		{
-			// want to add points
-			if (StrEqual(text, " "))
+			new choose = g_iPointsNumber[client];
+			new pointstoset = StringToInt(text);
+			
+
+			// Valid input?
+			if (StrEqual(text, " ") || (pointstoset == 0 && !StrEqual(text, "0")))
 			{
-				g_pointsnumber[client] = 0;
-				CPrintToChat(client, "%s %t", g_StammTag, "aborted");
+				g_iPointsNumber[client] = 0;
+
+				if (!g_bMoreColors)
+				{
+					CPrintToChat(client, "%s %t", g_sStammTag, "aborted");
+				}
+				else
+				{
+					MCPrintToChat(client, "%s %t", g_sStammTag, "aborted");
+				}
+
+				panellib_CreateUserPanels(client, 4);
 				
 				return Plugin_Handled;
 			}
-			
-			new choose = g_pointsnumber[client];
-			new pointstoset = StringToInt(text);
-			
+
+
 			if (clientlib_isValidClient(choose))
 			{
 				new String:names[MAX_NAME_LENGTH+1];
@@ -534,43 +658,57 @@ public Action:clientlib_CmdSay(client, args)
 				
 
 				// Notice changes
-				CPrintToChat(client, "%s %t", g_StammTag, "SetPoints", names, g_playerpoints[choose]);
-				CPrintToChat(choose, "%s %t", g_StammTag, "SetPoints2", g_playerpoints[choose]);
+				if (!g_bMoreColors)
+				{
+					CPrintToChat(client, "%s %t", g_sStammTag, "SetPoints", names, g_iPlayerPoints[choose]);
+					CPrintToChat(choose, "%s %t", g_sStammTag, "SetPoints2", g_iPlayerPoints[choose]);
+				}
+				else
+				{
+					MCPrintToChat(client, "%s %t", g_sStammTag, "SetPoints", names, g_iPlayerPoints[choose]);
+					MCPrintToChat(choose, "%s %t", g_sStammTag, "SetPoints2", g_iPlayerPoints[choose]);
+				}
+
+				panellib_CreateUserPanels(client, 4);
 			}
 			
-			g_pointsnumber[client] = 0;
+
+
+			g_iPointsNumber[client] = 0;
 			
 			return Plugin_Handled;
 		}
 
 		//  Show viplist
-		else if (StrEqual(text, g_viplist) && StrContains(g_viplist, "sm_") != 0)
+		else if (StrEqual(text, g_sVipList) && StrContains(g_sVipList, "sm_") != 0)
 		{
 			// Get top ten
 			sqllib_GetVipTop(client, 0);
 		}
 
 		// Vip Rank
-		else if (StrEqual(text, g_viprank) && StrContains(g_viprank, "sm_") != 0)
+		else if (StrEqual(text, g_sVipRank) && StrContains(g_sVipRank, "sm_") != 0)
 		{
 			// show rank
 			sqllib_GetVipRank(client, 0);
 		}
 
-		else if (StrEqual(text, g_sinfo) && StrContains(g_sinfo, "sm_") != 0)
+		else if (StrEqual(text, g_sInfo) && StrContains(g_sInfo, "sm_") != 0)
 		{
 			// show info panel
 			panellib_CreateUserPanels(client, 3);
 		}
-		else if (StrEqual(text, g_schange) && StrContains(g_schange, "sm_") != 0)
+
+		else if (StrEqual(text, g_sChange) && StrContains(g_sChange, "sm_") != 0)
 		{
 			// Show change list
 			panellib_CreateUserPanels(client, 1);
 		}
-		else if (StrEqual(text, g_texttowrite) && StrContains(g_texttowrite, "sm_") != 0)
+
+		else if (StrEqual(text, g_sTextToWrite) && StrContains(g_sTextToWrite, "sm_") != 0)
 		{
 			// Show player points
-			if (!g_useMenu)
+			if (!GetConVarBool(configlib_UseMenu))
 			{
 				pointlib_ShowPlayerPoints(client, false);
 			}
@@ -579,40 +717,46 @@ public Action:clientlib_CmdSay(client, args)
 				SendPanelToClient(panellib_createInfoPanel(client), client, panellib_InfoHandler, 40);
 			}
 		}
-		else if (StrEqual(text, g_admin_menu) && StrContains(g_admin_menu, "sm_") != 0 && clientlib_IsAdmin(client))
+
+		else if (StrEqual(text, g_sAdminMenu) && StrContains(g_sAdminMenu, "sm_") != 0 && clientlib_IsAdmin(client))
 		{
 			// Open admin menu
 			panellib_CreateUserPanels(client, 4);
 		}
 	}
 	
+
+
 	return Plugin_Continue;
 }
 
 
 
 
-// Check players
-public clientlib_CheckPlayers()
-{
-	new players = clientlib_GetPlayerCount();
-	new factor = (MaxClients - players) + 1;
 
+// Check players
+clientlib_CheckPlayers()
+{
 	// update global points	
-	if (g_extra_points > 0)
+	if (GetConVarBool(configlib_ExtraPoints))
 	{
 		// Only if happy hour not started
-		if (!g_happyhouron)
+		if (!g_bHappyHourON)
 		{ 
-			g_points = factor;
+			new players = clientlib_GetPlayerCount();
+			new factor = ((MaxClients - players) / 4) + 1;
+			
+			g_iPoints = factor;
 		}
 	}
 }
 
 
 
+
+
 // get current clients on server
-public clientlib_GetPlayerCount()
+clientlib_GetPlayerCount()
 {
 	new players = 0;
 

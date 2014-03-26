@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,27 +35,31 @@
 
 
 
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature FireWeapon",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.1",
 	description = "VIP's can ignite players with there weapon",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -65,19 +69,29 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-	STAMM_LoadTranslation();
 
-	Format(haveDescription, sizeof(haveDescription), "%T", "GetFireWeapon", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP FireWeapon", haveDescription);
+	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP FireWeapon");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetFireWeapon", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -86,6 +100,7 @@ public OnPluginStart()
 {
 	HookEvent("player_hurt", PlayerHurt);
 }
+
 
 
 

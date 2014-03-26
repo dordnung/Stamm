@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
  */
 
 
+
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
@@ -34,25 +35,30 @@
 
 #pragma semicolon 1
 
-new Handle:c_throwingknife;
 
-new throwingknife;
+
+new Handle:g_hThrowingKnife;
+new Handle:g_hAddThrowingKnifes;
+
+
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Throwing Knife",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.4.1",
 	description = "Give VIP's every Round x Throwing Knifes",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
+
 // Add feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -69,30 +75,43 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 
+
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP Throwing Knife", "");
+	STAMM_RegisterFeature("VIP Throwing Knife");
 }
 
 
 
+
+
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
-
-	Format(description, sizeof(description), "%T", "GetThrowingKnife", LANG_SERVER, throwingknife);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetThrowingKnife", client, GetConVarInt(g_hThrowingKnife));
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -100,34 +119,30 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("throwing_knifes", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	c_throwingknife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
-	
-	AutoExecConfig(true, "throwing_knifes", "stamm/features");
+	g_hThrowingKnife = AutoExecConfig_CreateConVar("throwingknife_amount", "3", "x = Amount of throwing knifes VIP's get");
+	g_hAddThrowingKnifes = AutoExecConfig_CreateConVar("throwingknife_onlyadd", "0", "1 = Only append throwing knifes to old ones, 0 = Set them new");
 
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
+
 	HookEvent("player_spawn", eventPlayerSpawn);
 }
 
 
 
-// Load config
-public OnConfigsExecuted()
-{
-	throwingknife = GetConVarInt(c_throwingknife);
-}
-
-
 
 // Client changed feature
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
-	if (!mode) 
+	if (!mode && !GetConVarBool(g_hAddThrowingKnifes)) 
 	{
 		SetClientThrowingKnives(client, 0);
 	}
 }
+
 
 
 
@@ -141,13 +156,17 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+
 // Add knifes
 public Action:SetKnifes(Handle:timer, any:client)
 {
 	if (STAMM_IsClientValid(client))
 	{
 		// First set to zero
-		SetClientThrowingKnives(client, 0);
+		if (!GetConVarBool(g_hAddThrowingKnifes))
+		{
+			SetClientThrowingKnives(client, 0);
+		}
 		
 		// Check if VIP and want it
 		if (STAMM_HaveClientFeature(client))
@@ -155,7 +174,14 @@ public Action:SetKnifes(Handle:timer, any:client)
 			// If valid -> Give knifes
 			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
 			{
-				SetClientThrowingKnives(client, throwingknife);
+				if (GetConVarBool(g_hAddThrowingKnifes))
+				{
+					SetClientThrowingKnives(client, GetClientThrowingKnives(client) + GetConVarInt(g_hThrowingKnife));
+				}
+				else
+				{
+					SetClientThrowingKnives(client, GetConVarInt(g_hThrowingKnife));
+				}
 			}
 		}
 	}

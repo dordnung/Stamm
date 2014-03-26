@@ -6,7 +6,7 @@
  * Web         http://bara.in
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 Bara
+ * Copyright (C) 2012-2014 Bara
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,14 +39,14 @@ public Plugin:myinfo =
 	name = "FastLadder",
 	author = "Bara",
 	description = "Prohibit non VIP's the fast go up on ladders",
-	version = "1.0.1",
+	version = "1.1.1",
 	url = "www.bara.in"
 };
 
 
 
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 
@@ -55,6 +55,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -63,9 +64,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature for CSS and CSGO
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -75,13 +74,21 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 
-
-
 	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP FastLadder");
+}
 
-	Format(description, sizeof(description), "%T", "GetFastLadder", LANG_SERVER);
 
-	STAMM_AddFeature("VIP FastLadder", description, false);
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetFastLadder", client);
+	
+	PushArrayString(array, fmt);
 }
 
 

@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 #pragma semicolon 1
 
 
-new stammview[MAXPLAYERS + 1];
+new g_iStammView[MAXPLAYERS + 1];
 
 
 
@@ -44,15 +44,16 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Icon",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.1",
 	description = "Adds an Stamm Icon on top of a player",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 
@@ -61,27 +62,39 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetIcon", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Icon", description);
+	STAMM_RegisterFeature("VIP Icon");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetIcon", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -91,49 +104,51 @@ public OnPluginStart()
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_death", eventPlayerDeath);
 	
+
 	for (new i=0; i <= MaxClients; i++) 
 	{
-		stammview[i] = 0;
+		g_iStammView[i] = 0;
 	}
 }
 
 
 
+
 // Client changed feature state
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client))
 	{
 		// Disabled it
 		if (!mode)
 		{
-			if (stammview[client] != 0) 
+			if (g_iStammView[client] != 0) 
 			{
 				// Delete old ICON
-				if (IsValidEntity(stammview[client]))
+				if (IsValidEntity(g_iStammView[client]))
 				{
 					decl String:class[128];
 					
-					GetEdictClassname(stammview[client], class, sizeof(class));
+					GetEdictClassname(g_iStammView[client], class, sizeof(class));
 					
-
 
 					if (StrEqual(class, "prop_dynamic")) 
 					{
-						RemoveEdict(stammview[client]);
+						RemoveEdict(g_iStammView[client]);
 					}
 				}
 				
-				stammview[client] = 0;
+				g_iStammView[client] = 0;
 			}
 		}
 		else if (STAMM_HaveClientFeature(client))
 		{
 			// Create an icon
-			CreateTimer(2.5, CreateStamm, client);
+			CreateTimer(2.5, CreateStamm, GetClientUserId(client));
 		}
 	}
 }
+
 
 
 
@@ -141,7 +156,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 // Download Icon and preache it
 public OnMapStart()
 {
-	PrecacheModel("models/stamm/stammview.mdl", true);
+	PrecacheModel("models/stamm/stammview.mdl");
 	
 	AddFileToDownloadsTable("materials/models/stamm/stammview.vtf");
 	AddFileToDownloadsTable("models/stamm/stammview.mdl");
@@ -155,11 +170,13 @@ public OnMapStart()
 
 
 
+
 // Create icons for vips on spawn
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
+
 	if (STAMM_IsClientValid(client))
 	{
 		if (STAMM_HaveClientFeature(client))
@@ -167,11 +184,27 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 			if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
 			{
 				// Create timer
-				CreateTimer(2.5, CreateStamm, client);
+				CreateTimer(2.5, CreateStamm, GetClientUserId(client));
 			}
 		}
 	}
 }
+
+
+
+
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	if (STAMM_HaveClientFeature(client))
+	{
+		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client)) 
+		{
+			// Create timer
+			CreateTimer(2.5, CreateStamm, GetClientUserId(client));
+		}
+	}
+}
+
 
 
 
@@ -181,47 +214,52 @@ public Action:eventPlayerDeath(Handle:event, const String:name[], bool:dontBroad
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
 	// Client have an icon
-	if (stammview[client] != 0) 
+	if (g_iStammView[client] != 0) 
 	{
-		if (IsValidEntity(stammview[client]))
+		if (IsValidEntity(g_iStammView[client]))
 		{
 			decl String:class[128];
 			
-			GetEdictClassname(stammview[client], class, sizeof(class));
+			GetEdictClassname(g_iStammView[client], class, sizeof(class));
 			
 			// Delete
 			if (StrEqual(class, "prop_dynamic")) 
 			{
-				RemoveEdict(stammview[client]);
+				RemoveEdict(g_iStammView[client]);
 			}
 		}
 		
-		stammview[client] = 0;
+		g_iStammView[client] = 0;
 	}
 }
 
 
 
+
 // Create the icon
-public Action:CreateStamm(Handle:timer, any:client)
+public Action:CreateStamm(Handle:timer, any:userid)
 {
+	new client = GetClientOfUserId(userid);
+
+
 	if (STAMM_IsClientValid(client))
 	{
 		// Valid team
 		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && IsPlayerAlive(client))
 		{
 			// First delete old one
-			if (stammview[client] != 0) 
+			if (g_iStammView[client] != 0) 
 			{
-				if (IsValidEntity(stammview[client]))
+				if (IsValidEntity(g_iStammView[client]))
 				{
 					decl String:class[128];
 					
-					GetEdictClassname(stammview[client], class, sizeof(class));
+					
+					GetEdictClassname(g_iStammView[client], class, sizeof(class));
 					
 					if (StrEqual(class, "prop_dynamic")) 
 					{
-						RemoveEdict(stammview[client]);
+						RemoveEdict(g_iStammView[client]);
 					}
 				}
 			}
@@ -248,7 +286,7 @@ public Action:CreateStamm(Handle:timer, any:client)
 					if (IsValidEntity(view))
 					{
 						// Mark players entity and spawn it to him
-						stammview[client] = view;
+						g_iStammView[client] = view;
 						
 						GetClientAbsOrigin(client, origin);
 						

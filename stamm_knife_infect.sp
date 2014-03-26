@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 // Includes
 #include <sourcemod>
-#include <colors>
 #include <sdktools>
 #include <autoexecconfig>
 
@@ -38,16 +37,12 @@
 
 
 
-new dur;
-new mode_infect;
-new lhp;
-new timers[MAXPLAYERS+1];
+new Handle:g_hDur;
+new Handle:g_hMode;
+new Handle:g_hlHP;
 
-new Handle:dur_c;
-new Handle:mode_c;
-new Handle:lhp_c;
-
-new bool:Infected[MAXPLAYERS+1];
+new g_iTimers[MAXPLAYERS+1];
+new bool:g_bInfected[MAXPLAYERS+1];
 
 
 
@@ -56,23 +51,26 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature KnifeInfect",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.1",
 	description = "VIP's can infect players with knife",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -81,23 +79,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	// Colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -109,10 +91,20 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetKnifeInfect", LANG_SERVER);
+	STAMM_RegisterFeature("VIP KnifeInfect");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
 	
-	STAMM_AddFeature("VIP KnifeInfect", description);
+	Format(fmt, sizeof(fmt), "%T", "GetKnifeInfect", client);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -125,53 +117,57 @@ public OnPluginStart()
 	HookEvent("player_hurt", PlayerHurt);
 	HookEvent("player_spawn", PlayerDeath);
 
+
 	AutoExecConfig_SetFile("knife_infect", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hDur = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
+	g_hMode = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
+	g_hlHP = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
 	
-	dur_c = AutoExecConfig_CreateConVar("infect_duration", "0", "Infect Duration, 0 = Next Spawn, x = Time in Seconds");
-	mode_c = AutoExecConfig_CreateConVar("infect_mode", "2", "Infect Mode, 0 = Enemy lose HP every second, 1 = Enemy have an infected overlay, 2 = Both");
-	lhp_c = AutoExecConfig_CreateConVar("infect_hp", "2", "If mode is 0 or 2: HP lose every Second");
-	
-	AutoExecConfig(true, "knife_infect", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
 
 
-// Load Config
-public OnConfigsExecuted()
+
+public OnMapStart()
 {
-	dur = GetConVarInt(dur_c);
-	mode_infect = GetConVarInt(mode_c);
-	lhp = GetConVarInt(lhp_c);
-	
-	if (mode_infect != 1 || dur) 
+	if (GetConVarInt(g_hMode) != 1 || GetConVarInt(g_hDur)) 
 	{
-		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, SecondTimer, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
+
 
 
 
 // Timer to check for infected Players
 public Action:SecondTimer(Handle:timer, any:data)
 {
+	new mode_infect = GetConVarInt(g_hMode);
+	new dur = GetConVarInt(g_hDur);
+	new lhp = GetConVarInt(g_hlHP);
+
+
 	for (new i=1; i <= MaxClients; i++)
 	{
 		if (STAMM_IsClientValid(i))
 		{
 			// Client is infected
-			if (Infected[i])
+			if (g_bInfected[i])
 			{
 				// Only for a specific duration
 				if (dur)
 				{
-					timers[i]--;
+					g_iTimers[i]--;
 					
 					// Time is over
-					if (timers[i] <= 0)
+					if (g_iTimers[i] <= 0)
 					{
-						Infected[i] = false;
+						g_bInfected[i] = false;
 						
 						if (mode_infect) 
 						{
@@ -182,6 +178,7 @@ public Action:SecondTimer(Handle:timer, any:data)
 					}
 				}
 				
+
 				// Player lose health on infect
 				if (mode_infect != 1)
 				{
@@ -194,6 +191,7 @@ public Action:SecondTimer(Handle:timer, any:data)
 						ForcePlayerSuicide(i);
 					}
 					
+
 					SetEntityHealth(i, newhp);
 				}
 			}
@@ -205,16 +203,18 @@ public Action:SecondTimer(Handle:timer, any:data)
 
 
 
+
 // Player died, reset infect
 public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if (STAMM_IsClientValid(client) && Infected[client])
-	{
-		Infected[client] = false;
 
-		if (mode_infect) 
+	if (STAMM_IsClientValid(client) && g_bInfected[client])
+	{
+		g_bInfected[client] = false;
+
+		if (GetConVarInt(g_hMode)) 
 		{
 			ClientCommand(client, "r_screenoverlay \"\"");
 		}
@@ -223,32 +223,39 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 
 
 
+
 // A Player gets hurted
 public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 {
-	new String:weapon[64];
-	new String:p_name[128];
-	
+	decl String:weapon[64];
+	decl String:p_name[128];
+	decl String:tag[64];
+
+
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
+	new dur = GetConVarInt(g_hDur);
+
+
 	GetEventString(event, "weapon", weapon, sizeof(weapon));
+	STAMM_GetTag(tag, sizeof(tag));
+
 
 	// Clients are valid
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
 		// Weapon was knife
-		if (StrEqual(weapon, "knife") && !Infected[client])
+		if (StrEqual(weapon, "knife") && !g_bInfected[client])
 		{
 			// Attack was from a VIP
 			if (STAMM_HaveClientFeature(attacker))
 			{
-				Infected[client] = true;
+				g_bInfected[client] = true;
 				
 				GetClientName(attacker, p_name, sizeof(p_name));
 				
 				// Infecte the player
-				if (mode_infect)
+				if (GetConVarInt(g_hMode))
 				{
 					// With a Overlay
 					if (STAMM_GetGame() == GameCSS) 
@@ -265,13 +272,13 @@ public PlayerHurt(Handle:event, String:name[], bool:dontBroadcast)
 				// For specific time
 				if (dur)
 				{
-					timers[client] = dur;
-					
-					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotTimeInfected", LANG_SERVER, p_name, dur);
+					g_iTimers[client] = dur;
+
+					STAMM_PrintToChat(client, "%s %t", tag, "YouGotTimeInfected", p_name, dur);
 				}
 				else 
 				{
-					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "YouGotRoundInfected", LANG_SERVER, p_name);
+					STAMM_PrintToChat(client, "%s %t", tag, "YouGotRoundInfected", p_name);
 				}
 			}
 		}

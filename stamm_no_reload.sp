@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature No Reload",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.1",
 	description = "VIP's don't have to reload",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -51,16 +51,19 @@ public Plugin:myinfo =
 
 
 
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -70,9 +73,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -85,16 +86,27 @@ public OnAllPluginsLoaded()
 
 	// Load Trans.
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoReload", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Reload", description);
+	STAMM_RegisterFeature("VIP No Reload");
+
 
 	// Weapon fire for non TF2 games
 	if (STAMM_GetGame() != GameTF2)
 	{
 		HookEvent("weapon_fire", eventWeaponFire);
 	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetNoReload", client);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -127,6 +139,7 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 
 
 
+
 // Give no reload to a weapon
 public giveNoReload(client, String:weapons[])
 {
@@ -141,7 +154,8 @@ public giveNoReload(client, String:weapons[])
 			new pri_i = GetPlayerWeaponSlot(client, 0);
 			new sec_i = GetPlayerWeaponSlot(client, 1);
 			new weapon;
-			
+
+
 			// Found prim. weapon?
 			if (pri_i != -1)
 			{
@@ -166,6 +180,7 @@ public giveNoReload(client, String:weapons[])
 				}
 			}
 
+
 			// Is weapon the prim. weapon?
 			if (StrEqual(weapons, Pri))
 			{
@@ -183,6 +198,8 @@ public giveNoReload(client, String:weapons[])
 				// Something went wrong here
 				return;
 			}
+
+
 
 			// Get clip annd ammo
 			new clip = GetEntProp(weapon, Prop_Send, "m_iClip1");

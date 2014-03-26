@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,10 +41,10 @@
 
 
 
-new FroggyJumped[MAXPLAYERS + 1];
+new g_iFroggyJumped[MAXPLAYERS + 1];
 
-new Handle:c_strong;
-new strong;
+new Handle:g_hStrong;
+
 
 
 
@@ -52,25 +52,29 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature FroggyJump",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.1",
 	description = "VIP's have Froggy Jump",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
@@ -78,20 +82,14 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("froggyjump", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	c_strong = AutoExecConfig_CreateConVar("froggyjump_strong", "200", "The push up strong");
+	g_hStrong = AutoExecConfig_CreateConVar("froggyjump_strong", "200", "The push up strong");
 
-	AutoExecConfig(true, "froggyjump", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	strong = GetConVarInt(c_strong);
-}
 
 
 
@@ -99,18 +97,27 @@ public OnConfigsExecuted()
 // Add the feature
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-	STAMM_LoadTranslation();
 
-	Format(haveDescription, sizeof(haveDescription), "%T", "GetFroggyJump", LANG_SERVER);
+	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP FroggyJump");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
 	
-	STAMM_AddFeature("VIP FroggyJump", haveDescription);
+	Format(fmt, sizeof(fmt), "%T", "GetFroggyJump", client);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -131,7 +138,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 	}
 
 
-	// For TF2, not for Scout
+	// In TF2, not for Scout
 	if (STAMM_GetGame() == GameTF2)
 	{
 		if (TF2_GetPlayerClass(client) == TFClass_Scout)
@@ -148,7 +155,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 	// Reset when on Ground
 	if (GetEntityFlags(client) & FL_ONGROUND)
 	{
-		FroggyJumped[client] = 0;
+		g_iFroggyJumped[client] = 0;
 		bPressed[client] = false;
 	}
 	else
@@ -158,7 +165,7 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 		{
 
 			// For second time?
-			if (!bPressed[client] && FroggyJumped[client]++ == 1)
+			if (!bPressed[client] && g_iFroggyJumped[client]++ == 1)
 			{
 				new Float:velocity[3];
 				new Float:velocity0;
@@ -171,27 +178,43 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 				velocity1 = GetEntPropFloat(client, Prop_Send, "m_vecVelocity[1]");
 				velocity2 = GetEntPropFloat(client, Prop_Send, "m_vecVelocity[2]");
 
-				velocity2_new = float(strong);
+				velocity2_new = float(GetConVarInt(g_hStrong));
 
 
 
 				// calculate new velocity^^
-				if (velocity2 < 150.0) 
+				if (velocity2 < 150.0)
+				{
 					velocity2_new = velocity2_new + 20.0;
+				}
 				if (velocity2 < 100.0) 
+				{
 					velocity2_new = velocity2_new + 30.0;
+				}
 				if (velocity2 < 50.0) 
+				{
 					velocity2_new = velocity2_new + 40.0;
+				}
 				if (velocity2 < 0.0) 
+				{
 					velocity2_new = velocity2_new + 50.0;
+				}
 				if (velocity2 < -50.0) 
+				{
 					velocity2_new = velocity2_new + 60.0;
+				}
 				if (velocity2 < -100.0) 
+				{
 					velocity2_new = velocity2_new + 70.0;
+				}
 				if (velocity2 < -150.0) 
+				{
 					velocity2_new = velocity2_new + 80.0;
+				}
 				if (velocity2 < -200.0) 
+				{
 					velocity2_new = velocity2_new + 90.0;
+				}
 
 
 

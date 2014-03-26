@@ -1,0 +1,13 @@
+// Here you can add the blocks for the chatcolor configuration
+// You need them in the cfg/stamm/features/chatcolors.txt file.
+
+"LevelSettings"
+{
+	// Block for e.g colors blue, beige and tag Player
+	"l1"             "Bronze"
+	
+	"l2"             "Silver"
+	"l3"             "Gold"
+	"l4"             "Platinum"
+	"l5"             "God"
+}

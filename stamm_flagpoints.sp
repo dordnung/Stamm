@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
-#include <colors>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -37,8 +36,7 @@
 
 
 
-new Handle:flagneed_c;
-new String:flagneed[12];
+new Handle:g_hFlagNeed;
 
 
 
@@ -46,7 +44,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature FlagPoints",
 	author = "Popoklopsi",
-	version = "1.0.3",
+	version = "1.1.1",
 	description = "Give only points to players with a specific flag",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -54,15 +52,17 @@ public Plugin:myinfo =
 
 
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -72,11 +72,12 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("flagpoints", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	flagneed_c = AutoExecConfig_CreateConVar("flag_need", "s", "Flag a player needs to collect points");
+	g_hFlagNeed = AutoExecConfig_CreateConVar("flag_need", "s", "Flag string a player needs to collect points");
 	
-	AutoExecConfig(true, "flagpoints", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
@@ -84,70 +85,41 @@ public OnPluginStart()
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-	// Good colors
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
 
 	// Load Translation
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP FlagPoints", "");
+	STAMM_RegisterFeature("VIP FlagPoints");
 }
 
 
-
-// Load Config
-public OnConfigsExecuted()
-{
-	GetConVarString(flagneed_c, flagneed, sizeof(flagneed));
-}
 
 
 
 // Stop non VIP's getting points
 public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 {
-	if (clientAllowed(client))
+	decl String:tag[64];
+	decl String:flagNeed[32];
+
+
+	GetConVarString(g_hFlagNeed, flagNeed, sizeof(flagNeed));
+
+
+	if ((GetUserFlagBits(client) & ReadFlagString(flagNeed) || GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
 		return Plugin_Continue;
 	}
 	else
 	{
-		CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "NoPoints", flagneed);
+		STAMM_GetTag(tag, sizeof(tag));
+
+		STAMM_PrintToChat(client, "%s %t", tag, "NoPoints", flagNeed);
 	}
 
 	return Plugin_Handled;
-}
-
-
-
-// Check client flags
-// Hugh stuff oO
-public bool:clientAllowed(client)
-{
-	if (STAMM_IsClientValid(client))
-	{
-		new AdminId:adminid = GetUserAdmin(client);
-		new AdminFlag:flag;
-
-		FindFlagByChar(flagneed[0], flag);
-
-		return GetAdminFlag(adminid, flag);
-	}
-	
-	return false;
 }

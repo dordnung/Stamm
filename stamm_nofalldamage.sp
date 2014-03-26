@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,38 +39,42 @@
 
 
 
+
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Fall Damage",
 	author = "Popoklopsi",
-	version = "1.1.1",
+	version = "1.2.1",
 	description = "Give VIP's No Fall Damage",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-	
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -80,12 +84,25 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, SDKHooks is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoFallDamage", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Fall Damage", description);
+	STAMM_RegisterFeature("VIP No Fall Damage");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetNoFallDamage", client);
+	
+	PushArrayString(array, fmt);
+}
+
+
 
 
 
@@ -94,6 +111,7 @@ public STAMM_OnClientReady(client)
 {
 	SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
 }
+
 
 
 

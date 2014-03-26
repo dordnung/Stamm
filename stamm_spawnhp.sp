@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@
 
 
 
-new hp;
-new Handle:c_hp;
+new Handle:g_hHP;
+
 
 
 
@@ -48,51 +48,55 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature SpawnHP",
 	author = "Popoklopsi",
-	version = "1.3.2",
+	version = "1.4.1",
 	description = "Give VIP's more HP on spawn",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP SpawnHP", "");
+	STAMM_RegisterFeature("VIP SpawnHP");
 }
 
 
 
+
 // Add to udater and add descriptions
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
-	}
-
-
-	// Add for each block a description
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetSpawnHP", LANG_SERVER, hp * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		Updater_ForceUpdate();
 	}
 }
 
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetSpawnHP", client, GetConVarInt(g_hHP) * block);
+	
+	PushArrayString(array, fmt);
+}
 
 
 
@@ -101,22 +105,17 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	AutoExecConfig_SetFile("spawnhp", "stamm/features");
-	
-	c_hp = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more per block");
-	
-	AutoExecConfig(true, "spawnhp", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
+	g_hHP = AutoExecConfig_CreateConVar("spawnhp_hp", "50", "HP a VIP gets every spawn more per block");
+	
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
-
-// Load Config
-public OnConfigsExecuted()
-{
-	hp = GetConVarInt(c_hp);
-}
 
 
 
@@ -130,7 +129,7 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 		// Timer to add points
 		if (IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)) 
 		{
-			CreateTimer(0.5, changeHealth, client);
+			CreateTimer(0.5, changeHealth, GetClientUserId(client));
 		}
 	}
 }
@@ -139,9 +138,16 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 
 
 // Change here the health
-public Action:changeHealth(Handle:timer, any:client)
+public Action:changeHealth(Handle:timer, any:userid)
 {
 	// Get highest client block
+	new client = GetClientOfUserId(userid);
+
+	if (!STAMM_IsClientValid(client))
+	{
+		return Plugin_Stop;
+	}
+
 	new clientBlock = STAMM_GetClientBlock(client);
 
 
@@ -149,10 +155,12 @@ public Action:changeHealth(Handle:timer, any:client)
 	if (clientBlock > 0)
 	{
 		// Set new HP
-		new newHP = GetClientHealth(client) + hp * clientBlock;
+		new newHP = GetClientHealth(client) + GetConVarInt(g_hHP) * clientBlock;
 		
 		// also increate max HP
 		SetEntProp(client, Prop_Data, "m_iMaxHealth", newHP);
 		SetEntityHealth(client, newHP);
 	}
+
+	return Plugin_Stop;
 }

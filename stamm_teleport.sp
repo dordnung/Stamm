@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -36,14 +35,16 @@
 
 
 
+
 // The teleport list of clients
-new Float:TeleportList[MAXPLAYERS + 1][3][3];
+new Float:g_fTeportList[MAXPLAYERS + 1][3][3];
 
 // The teleports
-new Teleports[MAXPLAYERS + 1][3];
+new g_iTeleports[MAXPLAYERS + 1][3];
 
 // timer to teleport
-new timer[MAXPLAYERS + 1];
+new g_iTimer[MAXPLAYERS + 1];
+
 
 
 
@@ -52,7 +53,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Teleport",
 	author = "Popoklopsi",
-	version = "1.1.1",
+	version = "1.2.1",
 	description = "VIP's can create Teleport Points",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -61,56 +62,55 @@ public Plugin:myinfo =
 
 
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
 // Add the feature to stamm
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetTeleport", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Teleport", description);
+	STAMM_RegisterFeature("VIP Teleport");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetTeleport", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
 // Plugin started
 public OnPluginStart()
 {
-	// Replace lightgreen if not exists
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
-
 	// Register console cmds
 	RegConsoleCmd("sm_sadd", AddTele, "Adds a new Teleporter");
 	RegConsoleCmd("sm_stele", Tele, "Teleports an Player");
@@ -121,44 +121,63 @@ public OnPluginStart()
 
 
 
+
 // Precache model
 public OnMapStart()
 {
-	PrecacheModel("materials/sprites/strider_blackball.vmt", true); 
+	PrecacheModel("materials/sprites/strider_blackball.vmt"); 
 	
+
 	// Reset stuff
 	for (new i=0; i <= MaxClients; i++)
 	{
-		Teleports[i][0] = 0;
-		timer[i] = 0;
+		g_iTeleports[i][0] = 0;
+		g_iTimer[i] = 0;
 	}
 }
 
 
+// Add Command for teleporting
+public STAMM_OnClientRequestCommands(client)
+{
+	if (STAMM_HaveClientFeature(client))
+	{
+		STAMM_AddCommand("!sadd", "%T", "GetTeleport", client);
+	}
+}
 
 
 // Add a new Teleport to the list
 public Action:AddTele(client, args)
 {
+	decl String:tag[64];
+
+
 	if (STAMM_IsClientValid(client))
 	{
 		// Only if client is valid
 		if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
 		{
 			// Get clients location
-			GetClientAbsAngles(client, TeleportList[client][1]);
-			GetClientAbsOrigin(client, TeleportList[client][0]);
+			GetClientAbsAngles(client, g_fTeportList[client][1]);
+			GetClientAbsOrigin(client, g_fTeportList[client][0]);
+
+
+			// Get Stamm tag
+			STAMM_GetTag(tag, sizeof(tag));
+
 			
 			// Add
-			Teleports[client][0] = 1;
+			g_iTeleports[client][0] = 1;
 			
 			// Notice that added
-			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "TeleportAdded", LANG_SERVER);
+			STAMM_PrintToChat(client, "%s %t", tag, "TeleportAdded");
 		}
 	}
 	
 	return Plugin_Handled;
 }
+
 
 
 
@@ -168,16 +187,17 @@ public Action:Tele(client, args)
 	if (STAMM_IsClientValid(client))
 	{
 		// Only if client is valid and have a valid teleport points
-		if (STAMM_HaveClientFeature(client) && Teleports[client][0] && !timer[client] && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
+		if (STAMM_HaveClientFeature(client) && g_iTeleports[client][0] && !g_iTimer[client] && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
 		{
 			// Create the teleporter
-			Teleports[client][2] = 1;
-			Teleports[client][1] = createEnt(client);
+			g_iTeleports[client][2] = 1;
+			g_iTeleports[client][1] = createEnt(client);
 		}
 	}
 	
 	return Plugin_Handled;
 }
+
 
 
 
@@ -187,41 +207,43 @@ public OnGameFrame()
 	for (new i=1; i <= MaxClients; i++)
 	{
 		// Check for running teleports
-		if (timer[i] > 0)
+		if (g_iTimer[i] > 0)
 		{
 			if (STAMM_IsClientValid(i))
 			{
-				timer[i]--;
+				g_iTimer[i]--;
 				
+
 				// Now we can teleport
-				if (timer[i] <= 0)
+				if (g_iTimer[i] <= 0)
 				{
-					if (IsValidEntity(Teleports[i][1])) 
+					if (IsValidEntity(g_iTeleports[i][1])) 
 					{
 						// Remove teleporter
-						RemoveEdict(Teleports[i][1]);
+						RemoveEdict(g_iTeleports[i][1]);
 					}
 
 					// Teleport the client if teleport valid
-					if (Teleports[i][2] == 1) 
+					if (g_iTeleports[i][2] == 1) 
 					{
-						TeleportEntity(i, TeleportList[i][0], TeleportList[i][1], NULL_VECTOR);
+						TeleportEntity(i, g_fTeportList[i][0], g_fTeportList[i][1], NULL_VECTOR);
 						
-						Teleports[i][2] = 2;
+						g_iTeleports[i][2] = 2;
 
 						// Create end teleport
-						Teleports[i][1] = createEnt(i);
+						g_iTeleports[i][1] = createEnt(i);
 					}
 				}
 				else 
 				{
 					// Back to teleporter
-					TeleportEntity(i, TeleportList[i][2], NULL_VECTOR, NULL_VECTOR);
+					TeleportEntity(i, g_fTeportList[i][2], NULL_VECTOR, NULL_VECTOR);
 				}
 			}
 		}
 	}
 }
+
 
 
 
@@ -231,7 +253,9 @@ public createEnt(client)
 	// It's a env_smokestack
 	new ent = CreateEntityByName("env_smokestack");
 	
-	GetClientAbsOrigin(client, TeleportList[client][2]);
+	GetClientAbsOrigin(client, g_fTeportList[client][2]);
+	
+
 	
 	// Could we create it?
 	if (ent != -1)
@@ -269,9 +293,9 @@ public createEnt(client)
 		DispatchSpawn(ent);
 
 		// And teleport it
-		TeleportEntity(ent, TeleportList[client][2], NULL_VECTOR, NULL_VECTOR);
+		TeleportEntity(ent, g_fTeportList[client][2], NULL_VECTOR, NULL_VECTOR);
 		
-		timer[client] = 180;
+		g_iTimer[client] = 180;
 	}
 	
 	return ent;
@@ -285,5 +309,5 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	timer[client] = 0;
+	g_iTimer[client] = 0;
 }

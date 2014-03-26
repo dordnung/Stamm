@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to defuse the bomb instantly
+	"level"         "Gold"
+}

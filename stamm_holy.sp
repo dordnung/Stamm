@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,25 +36,26 @@
 
 
 
-new Handle:hear_all;
-new hear;
+new Handle:g_hHearAll;
+new bool:g_hUseNew = false;
 
-new bool:useNew = false;
+
 
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature Holy Granade",
 	author = "Popoklopsi",
-	version = "1.3.2",
+	version = "1.4.1",
 	description = "Give VIP's a holy granade",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 
@@ -63,17 +64,17 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -85,11 +86,22 @@ public OnAllPluginsLoaded()
 	
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetHoly", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Holy Grenade", description);
+	STAMM_RegisterFeature("VIP Holy Grenade");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetHoly", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -97,11 +109,12 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("holy_grenade", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	hear_all = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
+	g_hHearAll = AutoExecConfig_CreateConVar("holy_hear", "1", "0=Every one hear Granade, 1=Only Player who throw it");
 	
-	AutoExecConfig(true, "holy_grenade", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 	
 	HookEvent("weapon_fire", eventWeaponFire);
 	HookEvent("hegrenade_detonate", eventHeDetonate);
@@ -109,20 +122,19 @@ public OnPluginStart()
 
 
 
+
 // Load configs and download and precache files
 public OnConfigsExecuted()
 {
-	hear = GetConVarInt(hear_all);
-
 	// Check new Sound path
 	if (FileExists("sound/stamm/throw.mp3"))
 	{
-		useNew = true;
+		g_hUseNew = true;
 	}
 	
 
 	// Download all files
-	if (!useNew)
+	if (!g_hUseNew)
 	{
 		AddFileToDownloadsTable("sound/music/stamm/throw.mp3");
 		AddFileToDownloadsTable("sound/music/stamm/explode.mp3");
@@ -132,6 +144,7 @@ public OnConfigsExecuted()
 		AddFileToDownloadsTable("sound/stamm/throw.mp3");
 		AddFileToDownloadsTable("sound/stamm/explode.mp3");
 	}
+	
 
 	AddFileToDownloadsTable("materials/models/stamm/holy_grenade.vtf");
 	AddFileToDownloadsTable("models/stamm/holy_grenade.mdl");
@@ -144,11 +157,11 @@ public OnConfigsExecuted()
 	
 
 	// Precache
-	PrecacheModel("models/stamm/holy_grenade.mdl", true);
-	PrecacheModel("materials/sprites/splodesprite.vmt", true);
+	PrecacheModel("models/stamm/holy_grenade.mdl");
+	PrecacheModel("materials/sprites/splodesprite.vmt");
 
 	// Sound Stuff
-	if (!useNew)
+	if (!g_hUseNew)
 	{
 		if (STAMM_GetGame() == GameCSGO)
 		{
@@ -157,8 +170,8 @@ public OnConfigsExecuted()
 		}
 		else
 		{
-			PrecacheSound("music/stamm/throw.mp3", true);
-			PrecacheSound("music/stamm/explode.mp3", true);
+			PrecacheSound("music/stamm/throw.mp3");
+			PrecacheSound("music/stamm/explode.mp3");
 		}
 	}
 	else
@@ -170,11 +183,20 @@ public OnConfigsExecuted()
 		}
 		else
 		{
-			PrecacheSound("stamm/throw.mp3", true);
-			PrecacheSound("stamm/explode.mp3", true);
+			PrecacheSound("stamm/throw.mp3");
+			PrecacheSound("stamm/explode.mp3");
 		}
 	}
 }
+
+
+
+
+public OnMapStart()
+{
+	OnConfigsExecuted();
+}
+
 
 
 
@@ -197,9 +219,9 @@ public Action:eventWeaponFire(Handle:event, const String:name[], bool:dontBroadc
 			if (STAMM_HaveClientFeature(client))
 			{
 				// Play a sound to client or to all?
-				if (hear) 
+				if (GetConVarInt(g_hHearAll)) 
 				{
-					if (!useNew)
+					if (!g_hUseNew)
 					{
 						EmitSoundToClient(client, "music/stamm/throw.mp3");
 					}
@@ -293,9 +315,9 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			
 
 			// Play sound
-			if (hear) 
+			if (GetConVarInt(g_hHearAll)) 
 			{
-				if (!useNew)
+				if (!g_hUseNew)
 				{
 					EmitSoundToClient(client, "music/stamm/explode.mp3");
 				}
@@ -307,7 +329,7 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 			}
 			else
 			{
-				if (!useNew)
+				if (!g_hUseNew)
 				{
 					EmitSoundToAll("music/stamm/explode.mp3");
 				}

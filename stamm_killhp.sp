@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,16 +32,12 @@
 #include <updater>
 
 
-
 #pragma semicolon 1
 
 
 
-new hp;
-new mhp;
-
-new Handle:c_hp;
-new Handle:m_hp;
+new Handle:g_hHP;
+new Handle:g_hMHP;
 
 
 
@@ -49,48 +45,57 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature KillHP",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.1",
 	description = "Give VIP's HP every kill",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP KillHP", "");
+	STAMM_RegisterFeature("VIP KillHP");
 }
 
 
 
+
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
-
-
-
-	// Add Description
-	Format(description, sizeof(description), "%T", "GetKillHP", LANG_SERVER, hp);
-	
-	STAMM_AddFeatureText(STAMM_GetLevel(), description);
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetKillHP", client, GetConVarInt(g_hHP));
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -98,24 +103,19 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("killhp", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+	
+	g_hHP = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
+	g_hMHP = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
+	
+	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
+	
 
 	HookEvent("player_death", PlayerDeath);
-	
-	c_hp = AutoExecConfig_CreateConVar("killhp_hp", "5", "HP a VIP gets every kill");
-	m_hp = AutoExecConfig_CreateConVar("killhp_max", "100", "Max HP of a player");
-	
-	AutoExecConfig(true, "killhp", "stamm/features");
-	AutoExecConfig_CleanFile();
 }
 
 
-
-// Load config
-public OnConfigsExecuted()
-{
-	hp = GetConVarInt(c_hp);
-	mhp = GetConVarInt(m_hp);
-}
 
 
 
@@ -124,13 +124,15 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
+	new mhp = GetConVarInt(g_hMHP);
 	
+
 	if (STAMM_IsClientValid(client) && STAMM_IsClientValid(attacker))
 	{
 		// Give HP to Killer
 		if (STAMM_HaveClientFeature(attacker))
 		{
-			new newHP = GetClientHealth(attacker) + hp;
+			new newHP = GetClientHealth(attacker) + GetConVarInt(g_hHP);
 			
 			// Not more than Max HP
 			if (newHP >= mhp) 

@@ -1,0 +1,8 @@
+"LevelSettings"
+{
+	// Level to get a own VIP Chat, -1 to Disable
+	"chat"          "Silver"
+	
+	// Level to be able to write VIP Messages, -1 to Disable
+	"messages"      "Platinum"
+}

@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@
 
 
 
-new Handle:c_let_free;
-new Handle:c_vip_kick_message;
-new Handle:c_vip_kick_message2;
-new Handle:c_vip_slots;
+new Handle:g_hLetFree;
+new Handle:g_hVIPKickMessage;
+new Handle:g_hVIPKickMessage2;
+new Handle:g_hVIPSlots;
 
 new let_free;
 new vip_slots;
@@ -49,49 +49,64 @@ new String:vip_kick_message2[128];
 
 
 
+
 // Information
 public Plugin:myinfo =
 {
 	name = "Stamm Feature VIP Slot",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.1",
 	description = "Give VIP's a VIP Slot",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
+
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetSlot", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Slot", description);
+	STAMM_RegisterFeature("VIP Slot");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetSlot", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -99,14 +114,15 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("slot", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	c_let_free = AutoExecConfig_CreateConVar("slot_let_free", "0", "1 = Let a Slot always free and kick a random Player  0 = Off");
-	c_vip_kick_message = AutoExecConfig_CreateConVar("slot_vip_kick_message", "You joined on a Reserve Slot", "Message, when someone join on a Reserve Slot");
-	c_vip_kick_message2 = AutoExecConfig_CreateConVar("slot_vip_kick_message2", "You get kicked, to let a VIP slot free", "Message for the random kicked person");
-	c_vip_slots = AutoExecConfig_CreateConVar("slot_vip_slots", "0", "How many Reserve Slots should there be ?");
+	g_hLetFree = AutoExecConfig_CreateConVar("slot_let_free", "1", "1 = Let a Slot always free and kick a random Player  0 = Off");
+	g_hVIPKickMessage = AutoExecConfig_CreateConVar("slot_vip_kick_message", "You joined on a Reserve Slot", "Message, when someone join on a Reserve Slot");
+	g_hVIPKickMessage2 = AutoExecConfig_CreateConVar("slot_vip_kick_message2", "You get kicked, to let a VIP slot free", "Message for the random kicked person");
+	g_hVIPSlots = AutoExecConfig_CreateConVar("slot_vip_slots", "2", "How many Reserve Slots should there be ?");
 	
-	AutoExecConfig(true, "slot", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
@@ -114,12 +130,12 @@ public OnPluginStart()
 // Load Config
 public OnConfigsExecuted()
 {
-	let_free = GetConVarInt(c_let_free);
+	let_free = GetConVarInt(g_hLetFree);
 	
-	GetConVarString(c_vip_kick_message, vip_kick_message, sizeof(vip_kick_message));
-	GetConVarString(c_vip_kick_message2, vip_kick_message2, sizeof(vip_kick_message2));
+	GetConVarString(g_hVIPKickMessage, vip_kick_message, sizeof(vip_kick_message));
+	GetConVarString(g_hVIPKickMessage2, vip_kick_message2, sizeof(vip_kick_message2));
 	
-	vip_slots = GetConVarInt(c_vip_slots);
+	vip_slots = GetConVarInt(g_hVIPSlots);
 }
 
 
@@ -150,6 +166,7 @@ public VipSlotCheck(client)
 			KickClient(client, vip_kick_message);
 		}
 	}
+	
 	
 	// Check for let a slot free
 	current_players = GetClientCount(false);

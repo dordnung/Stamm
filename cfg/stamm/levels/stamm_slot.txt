@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get VIP slot
+	"level"         "God"
+}

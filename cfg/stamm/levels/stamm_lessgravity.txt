@@ -1,0 +1,21 @@
+// Here you can add as much levels as you want
+// x is the amount of gravity you set up in the config.
+// For each block the amount will be increased by x
+
+"LevelSettings"
+{
+	// Get x Percent less gravity
+	"1"             "Bronze"
+	
+	// Get x*2 Percent less gravity
+	"2"             "Gold"
+	
+	// Get x*3 Percent less gravity
+	"3"             "Platinum"
+	
+	// Get x*4 Percent less gravity
+	"4"             "Special"
+	
+	// Get x*5 Percent less gravity
+	//"5"           "OtherLevel"
+}

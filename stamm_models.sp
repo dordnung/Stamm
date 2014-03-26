@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
 #include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
@@ -53,21 +52,17 @@ new modelCount;
 new model_change;
 new same_models;
 new admin_model;
-new lowest;
 
 new String:PlayerModel[MAXPLAYERS + 1][PLATFORM_MAX_PATH + 1];
-
 new String:models[64][4][PLATFORM_MAX_PATH + 1];
-
 new String:model_change_cmd[32];
 
-new Handle:c_model_change_cmd;
-new Handle:c_model_change;
-new Handle:c_same_models;
-new Handle:c_admin_model;
+new Handle:g_hModelChangeCmd;
+new Handle:g_hModelChange;
+new Handle:g_hSameModels;
+new Handle:g_hAdminModel;
 
 new bool:Loaded;
-
 
 
 
@@ -75,63 +70,44 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Vip Models",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.1",
 	description = "Give VIP's VIP Models",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add the feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
-	// Colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-		
 	STAMM_LoadTranslation();
-
-	STAMM_AddFeature("VIP Models", "");
+	STAMM_RegisterFeature("VIP Models");
 }
 
 
 
+
 // Feature loaded, parse models
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
 	decl String:urlString[256];
 
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+	new Handle:model_settings;
+
 
 	// Auto updater
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
-		Updater_AddPlugin(urlString);
-	}
+		Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
-	// Load Translation files
-	if (model_change && same_models)
-	{
-		Format(description, sizeof(description), "%T", "GetModelChange", LANG_SERVER, model_change_cmd);
-	}
-	else 
-	{
-		Format(description, sizeof(description), "%T", "GetModel", LANG_SERVER);
+		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 
 
@@ -143,9 +119,8 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 	// To Keyvalues
-	new Handle:model_settings = CreateKeyValues("ModelSettings");
+	model_settings = CreateKeyValues("ModelSettings");
 
-	lowest = STAMM_GetLevelCount();
 
 	FileToKeyValues(model_settings, "cfg/stamm/features/ModelSettings.txt");
 
@@ -162,7 +137,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 
 			if (!StrEqual(models[modelCount][MODELPATH], "") && !StrEqual(models[modelCount][MODELPATH], "0"))
 			{
-				PrecacheModel(models[modelCount][MODELPATH], true);
+				PrecacheModel(models[modelCount][MODELPATH]);
 			}
 
 			KvGetString(model_settings, "name", models[modelCount][MODELNAME], sizeof(models[][]));
@@ -176,20 +151,13 @@ public STAMM_OnFeatureLoaded(String:basename[])
 				STAMM_WriteToLog(false, "ATTENTION: Level Config is now in ModelSettings.txt under the key \"level\"!");
 
 				// Found nothing
-				if (STAMM_GetLevel() == 0)
+				if (STAMM_GetBlockLevel() == 0)
 				{
 					STAMM_WriteToLog(false, "ATTENTION: Found no level for model %s. Zero assumed!!", models[modelCount][MODELNAME]);
 				}
 
 
-				Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", STAMM_GetLevel());
-
-
-				// First Level with models
-				if (STAMM_GetLevel() < lowest)
-				{
-					lowest = STAMM_GetLevel();
-				}
+				Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "%i", STAMM_GetBlockLevel());
 			}
 
 			else
@@ -209,11 +177,6 @@ public STAMM_OnFeatureLoaded(String:basename[])
 					STAMM_WriteToLog(false, "ATTENTION: Found incorrect level for model %s. One assumed!!", models[modelCount][MODELNAME]);
 					Format(models[modelCount][MODELLEVEL], sizeof(models[][]), "1");
 				}
-
-				if (StringToInt(models[modelCount][MODELLEVEL]) < lowest)
-				{
-					lowest = StringToInt(models[modelCount][MODELLEVEL]);
-				}
 			}
 
 			// One model more
@@ -223,11 +186,64 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	}
 	
 
-
 	CloseHandle(model_settings);
-	
-	STAMM_AddFeatureText(lowest, description);
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	new bool:found = false;
+	
+	for (new item = 0; item < modelCount; item++)
+	{
+		// Right team and right level?
+		if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_GetClientLevel(client) >= StringToInt(models[item][MODELLEVEL]))
+		{
+			if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
+			{
+				found = true;
+				
+				break;
+			}
+		}
+	}
+	
+	
+	if (found)
+	{
+		if (model_change && same_models)
+		{
+			Format(fmt, sizeof(fmt), "%T", "GetModelChange", client, model_change_cmd);
+		}
+		else 
+		{
+			Format(fmt, sizeof(fmt), "%T", "GetModel", client);
+		}
+
+		PushArrayString(array, fmt);
+	}
+}
+
+
+
+
+
+public OnMapStart()
+{
+	// Precache the models again
+	for (new i = 0; i < modelCount; i++)
+	{
+		if (!StrEqual(models[i][MODELPATH], "") && !StrEqual(models[i][MODELPATH], "0"))
+		{
+			PrecacheModel(models[i][MODELPATH]);
+		}
+	}
+}
+
 
 
 
@@ -236,14 +252,16 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("vip_models", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	c_model_change = AutoExecConfig_CreateConVar("model_change", "1", "0 = Players can only change models, when changing team, 1 = Players can always change it");
-	c_admin_model = AutoExecConfig_CreateConVar("model_admin_model", "1", "Should Admins also get a VIP Skin 1 = Yes, 0 = No");
-	c_model_change_cmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
-	c_same_models = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
+	g_hModelChange = AutoExecConfig_CreateConVar("model_change", "1", "0 = Players can only change models, when changing team, 1 = Players can always change it");
+	g_hAdminModel = AutoExecConfig_CreateConVar("model_admin_model", "1", "Should Admins also get a VIP Skin 1 = Yes, 0 = No");
+	g_hModelChangeCmd = AutoExecConfig_CreateConVar("model_change_cmd", "sm_smodel", "Command to change model");
+	g_hSameModels = AutoExecConfig_CreateConVar("model_models", "0", "1 = VIP's can choose the model, 0 = Random Skin every Round");
 
-	AutoExecConfig(true, "vip_models", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
+	
 	
 	HookEvent("player_team", eventPlayerTeam);
 	HookEvent("player_spawn", eventPlayerSpawn);
@@ -255,14 +273,17 @@ public OnPluginStart()
 
 
 
+
+
 // And load the configs
 public OnConfigsExecuted()
 {
-	model_change = GetConVarInt(c_model_change);
-	same_models = GetConVarInt(c_same_models);
-	admin_model = GetConVarInt(c_admin_model);
+	model_change = GetConVarInt(g_hModelChange);
+	same_models = GetConVarInt(g_hSameModels);
+	admin_model = GetConVarInt(g_hAdminModel);
 	
-	GetConVarString(c_model_change_cmd, model_change_cmd, sizeof(model_change_cmd));
+	GetConVarString(g_hModelChangeCmd, model_change_cmd, sizeof(model_change_cmd));
+
 
 	if (!Loaded)
 	{
@@ -278,6 +299,7 @@ public OnConfigsExecuted()
 		Format(model_change_cmd, sizeof(model_change_cmd), "!%s", model_change_cmd);
 	}
 }
+
 
 
 
@@ -323,12 +345,14 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+
+
 // Player changed team
 public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	// Reset moedl
+	// Reset model
 	if (STAMM_IsClientValid(client))
 	{
 		PlayerHasModel[client] = 0;
@@ -336,6 +360,8 @@ public Action:eventPlayerTeam(Handle:event, const String:name[], bool:dontBroadc
 		Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 	}
 }
+
+
 
 
 
@@ -349,6 +375,7 @@ public ModelDownloads()
 
 		return;
 	}
+
 
 	// If yes, open it
 	new Handle:downloadfile = OpenFile("cfg/stamm/features/ModelDownloads.txt", "rb");
@@ -367,9 +394,49 @@ public ModelDownloads()
 			ReplaceString(filecontent, sizeof(filecontent), "\t", "");
 			ReplaceString(filecontent, sizeof(filecontent), "\r", "");
 			
-			if (!StrEqual(filecontent, "")) 
+
+			if (strlen(filecontent) > 2 && !(filecontent[0] == '/' && filecontent[1] == '/'))
 			{
-				AddFileToDownloadsTable(filecontent);
+				if (filecontent[strlen(filecontent) - 1] == '*')
+				{
+					filecontent[strlen(filecontent) - 2] = '\0';
+
+					if (DirExists(filecontent))
+					{
+						new Handle:dir = OpenDirectory(filecontent);
+
+						if (dir != INVALID_HANDLE)
+						{
+							decl String:content[PLATFORM_MAX_PATH + 1];
+							new FileType:type;
+
+							while (ReadDirEntry(dir, content, sizeof(content), type))
+							{
+								if (type == FileType_File)
+								{
+									Format(content, sizeof(content), "%s/%s", filecontent, content);
+
+									AddFileToDownloadsTable(filecontent);
+								}
+							}
+						}
+					}
+					else
+					{
+						STAMM_WriteToLog(false, "Found folder '%s' in ModelDownloads, but folder does not exist!", filecontent);
+					}
+				}
+				else
+				{
+					if (FileExists(filecontent))
+					{
+						AddFileToDownloadsTable(filecontent);
+					}
+					else
+					{
+						STAMM_WriteToLog(false, "Found file '%s' in ModelDownloads, but file does not exist!", filecontent);
+					}
+				}
 			}
 		}
 
@@ -378,24 +445,34 @@ public ModelDownloads()
 }
 
 
+
+
+
 // Player want a new model
 public Action:CmdModel(client, args)
 {
+	decl String:tag[64];
+
+
 	if (STAMM_IsClientValid(client))
 	{
-		if (model_change && PlayerHasModel[client])
+		if (model_change && same_models && PlayerHasModel[client])
 		{
-			// Resetz his mark for a model
+			STAMM_GetTag(tag, sizeof(tag));
+
+			// Reset his mark for a model
 			PlayerHasModel[client] = 0;
-			
 			Format(PlayerModel[client], sizeof(PlayerModel[]), "");
 			
-			CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "NewModel", client);
+
+			STAMM_PrintToChat(client, "%s %t", tag, "NewModel", client);
 		}
 	}
 	
 	return Plugin_Handled;
 }
+
+
 
 
 
@@ -410,7 +487,8 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 			
 			GetMenuItem(menu, param2, ModelChoose, sizeof(ModelChoose));
 			
-			// don'T want standard model
+
+			// don't want standard model
 			if (!StrEqual(ModelChoose, "standard"))
 			{
 				// set the new model
@@ -421,8 +499,7 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 				
 				Format(PlayerModel[param1], sizeof(PlayerModel[]), ModelChoose);
 			}
-
-			if (StrEqual(ModelChoose, "standard")) 
+			else
 			{
 				// Reset model
 				// But mark he don't want a model
@@ -437,6 +514,7 @@ public ModelMenuCall(Handle:menu, MenuAction:action, param1, param2)
 		CloseHandle(menu);
 	}
 }
+
 
 
 
@@ -468,7 +546,7 @@ public PrepareSameModels(client)
 		for (new item = 0; item < modelCount; item++)
 		{
 			// Right team and right level?
-			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_IsClientVip(client, StringToInt(models[item][MODELLEVEL])))
+			if (GetClientTeam(client) == StringToInt(models[item][MODELTEAM]) && STAMM_GetClientLevel(client) >= StringToInt(models[item][MODELLEVEL]))
 			{
 				if (!StrEqual(models[item][MODELPATH], "") && !StrEqual(models[item][MODELPATH], "0"))
 				{
@@ -480,6 +558,7 @@ public PrepareSameModels(client)
 			}
 		}
 		
+
 		// Also add standard choose
 		AddMenuItem(ModelMenu, "standard", StandardModel);
 		
@@ -498,6 +577,8 @@ public PrepareSameModels(client)
 
 
 
+
+
 // Prepare random models
 public PrepareRandomModels(client)
 {
@@ -509,13 +590,14 @@ public PrepareRandomModels(client)
 	// Collect available models of the client
 	for (new item = 0; item < modelCount; item++)
 	{
-		if (StringToInt(models[item][MODELTEAM]) == GetClientTeam(client) && STAMM_IsClientVip(client, StringToInt(models[item][MODELLEVEL])))
+		if (StringToInt(models[item][MODELTEAM]) == GetClientTeam(client) && STAMM_GetClientLevel(client) >= StringToInt(models[item][MODELLEVEL]))
 		{
 			modelsFound[found] = item;
 
 			found++;
 		}
 	}
+
 
 	// Found available ones?
 	if (found > 0)

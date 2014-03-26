@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +23,24 @@
  */
 
 
+
+
 // Use Semicolons
 #pragma semicolon 1
 
 
 
-// Start Eventlib
-public eventlib_Start()
-{
 
+
+// Start Eventlib
+eventlib_Start()
+{
 	// Event Round start for TF2
-	if (otherlib_getGame() == 3)
+	if (g_iGameID == GAME_TF2)
 	{
 		HookEvent("teamplay_round_start", eventlib_RoundStart);
-		HookEvent("arena_round_start", eventlib_RoundStart);
 	}
-	else if (otherlib_getGame() == 4)
+	else if (g_iGameID == GAME_DOD)
 	{
 		// Event Round start for DOD
 		HookEvent("dod_round_start", eventlib_RoundStart);
@@ -49,18 +51,20 @@ public eventlib_Start()
 		HookEvent("round_start", eventlib_RoundStart);
 	}
 
+
 	// Player Death
 	HookEvent("player_death", eventlib_PlayerDeath);
 }
 
 
 
+
+
 // Round started
 public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
-
 	// Get points with rounds and enough players on server?
-	if ((g_vip_type == 2 || g_vip_type == 4 || g_vip_type == 6 || g_vip_type == 7) && clientlib_GetPlayerCount() >= g_min_player)
+	if ((g_iVipType == 2 || g_iVipType == 4 || g_iVipType == 6 || g_iVipType == 7) && clientlib_GetPlayerCount() >= GetConVarInt(configlib_MinPlayer))
 	{
 		// Client loop
 		for (new client = 1; client <= MaxClients; client++)
@@ -72,42 +76,70 @@ public Action:eventlib_RoundStart(Handle:event, const String:name[], bool:dontBr
 				if (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)
 				{
 					// Give global points
-					pointlib_GivePlayerPoints(client, g_points, true);
+					if (pointlib_GivePlayerPoints(client, g_iPoints, true) && GetConVarBool(configlib_ShowTextOnPoints))
+					{
+						// Notify player
+						if (!g_bMoreColors)
+						{
+							CPrintToChat(client, "%s %t", g_sStammTag, "NewPointsRound", g_iPoints);
+						}
+						else
+						{
+							MCPrintToChat(client, "%s %t", g_sStammTag, "NewPointsRound", g_iPoints);
+						}
+					}
 				}
 			}
 		}
 	}
-	
 
 	// Announce Happy hour
-	if (g_happyhouron) 
+	if (g_bHappyHourON) 
 	{
-		CPrintToChatAll("%s %t", g_StammTag, "HappyActive", g_points);
+		if (!g_bMoreColors)
+		{
+			CPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+		}
+		else
+		{
+			MCPrintToChatAll("%s %t", g_sStammTag, "HappyActive", g_iPoints);
+		}
 	}
 }
+
+
+
 
 
 // A Player died
 public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {
-
 	// Get client and attacker of event
 	new userid = GetClientOfUserId(GetEventInt(event, "userid"));
 	new client = GetClientOfUserId(GetEventInt(event, "attacker"));
 
+
 	// Are both valid?
-	if (clientlib_isValidClient(userid))
+	if (clientlib_isValidClient(userid) && clientlib_isValidClient(client))
 	{
-		if (clientlib_isValidClient(client))
+		// Get points with kills?
+		if (g_iVipType == 1 || g_iVipType == 4 || g_iVipType == 5 || g_iVipType == 7)
 		{
-			// Get points with kills?
-			if (g_vip_type == 1 || g_vip_type == 4 || g_vip_type == 5 || g_vip_type == 7)
+			// Valid Team? Enough Players? No suicide?
+			if (clientlib_GetPlayerCount() >= GetConVarInt(configlib_MinPlayer) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && userid != client && GetClientTeam(userid) != GetClientTeam(client))
 			{
-				// Valid Team? Enough Players? No suicide?
-				if (clientlib_GetPlayerCount() >= g_min_player && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3) &&  userid != client && GetClientTeam(userid) != GetClientTeam(client))
+				// Give global Points
+				if (pointlib_GivePlayerPoints(client, g_iPoints, true) && GetConVarBool(configlib_ShowTextOnPoints))
 				{
-					// Give global Points
-					pointlib_GivePlayerPoints(client, g_points, true);
+					// Notify player
+					if (!g_bMoreColors)
+					{
+						CPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
+					}
+					else
+					{
+						MCPrintToChat(client, "%s %t", g_sStammTag, "NewPointsKill", g_iPoints);
+					}
 				}
 			}
 		}

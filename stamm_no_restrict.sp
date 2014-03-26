@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,14 +36,15 @@
 
 
 
-new bool:weaponRestrict[WeaponID];
+new bool:g_bWeaponRestrict[WeaponID];
+
 
 
 public Plugin:myinfo =
 {
 	name = "Stamm Feature No Restrict",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.1",
 	description = "VIP's can use restricted weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -52,7 +53,7 @@ public Plugin:myinfo =
 
 
 // Auto Updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 
@@ -61,6 +62,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -70,15 +72,15 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
 	decl String:path[PLATFORM_MAX_PATH + 1];
 	new Handle:kv;
 
 
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
+
 	
 	// We need plugin weaponrestrict	
 	if (!LibraryExists("weaponrestrict")) 
@@ -86,20 +88,15 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, Weapon Restrict is not installed!");
 	}
 	
+	
 	if (STAMM_GetGame() == GameTF2 || STAMM_GetGame() == GameDOD) 
 	{
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
-		
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetNoRestrict", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP No Restrict", description);
-
-
+	STAMM_RegisterFeature("VIP No Restrict");
 
 
 	if (STAMM_GetGame() == GameCSGO)
@@ -143,7 +140,7 @@ public OnAllPluginsLoaded()
 			KvGoBack(kv);
 			
 			//  Get status of weapon
-			weaponRestrict[GetWeaponID(buffer)] = (KvGetNum(kv, buffer) == 1);
+			g_bWeaponRestrict[GetWeaponID(buffer)] = (KvGetNum(kv, buffer) == 1);
 			
 
 			KvJumpToKey(kv, buffer);
@@ -160,6 +157,19 @@ public OnAllPluginsLoaded()
 
 
 
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetNoRestrict", client);
+	
+	PushArrayString(array, fmt);
+}
+
+
+
+
 // Player want to buy somehing
 public Action:Restrict_OnCanBuyWeapon(client, team, WeaponID:id, &CanBuyResult:result)
 {
@@ -168,7 +178,7 @@ public Action:Restrict_OnCanBuyWeapon(client, team, WeaponID:id, &CanBuyResult:r
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Normally he can't buy it
-			if (result != CanBuy_Allow && weaponRestrict[id])
+			if (result != CanBuy_Allow && g_bWeaponRestrict[id])
 			{
 				// But now he can :)
 				result = CanBuy_Allow;
@@ -192,7 +202,7 @@ public Action:Restrict_OnCanPickupWeapon(client, team, WeaponID:id, &bool:result
 		if (STAMM_HaveClientFeature(client))
 		{
 			// Normally he can't pick it up
-			if (result != true && weaponRestrict[id])
+			if (result != true && g_bWeaponRestrict[id])
 			{
 				// Now he can :)
 				result = true;

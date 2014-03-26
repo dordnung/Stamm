@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,13 +36,8 @@
 
 
 
-new hp;
-new timeInterval;
-
-new Handle:c_hp;
-new Handle:c_time;
-new Handle:ClientTimers[MAXPLAYERS + 1];
-
+new Handle:g_hHP;
+new Handle:g_hTime;
 
 
 // Plugin Info
@@ -50,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature RegenerateHP",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.1",
 	description = "Regenerate HP of VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -61,39 +56,45 @@ public Plugin:myinfo =
 // Add feature to stamm
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-		
-	STAMM_AddFeature("VIP HP Regenerate", "");
+	STAMM_RegisterFeature("VIP HP Regenerate");
 }
 
 
 
 
+
 // Add to updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
+}
 
-	// Set Description for each block
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetRegenerate", LANG_SERVER, hp * i, timeInterval);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
-	}
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetRegenerate", client, GetConVarInt(g_hHP) * block, GetConVarInt(g_hTime));
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -102,89 +103,64 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Create Config
 public OnPluginStart()
 {
-	HookEvent("player_spawn", PlayerSpawn);
-
 	AutoExecConfig_SetFile("regenerate", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hHP = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every x seconds per block");
+	g_hTime = AutoExecConfig_CreateConVar("regenerate_time", "1", "Time interval to regenerate (in Seconds)");
 	
-	c_hp = AutoExecConfig_CreateConVar("regenerate_hp", "2", "HP regeneration of a VIP, every x seconds per block");
-	c_time = AutoExecConfig_CreateConVar("regenerate_time", "1", "Time interval to regenerate (in Seconds)");
-	
-	AutoExecConfig(true, "regenerate", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
 
-// Read config
+
 public OnConfigsExecuted()
 {
-	hp = GetConVarInt(c_hp);
-	timeInterval = GetConVarInt(c_time);
-}
-
-
-
-// a Player spawned
-public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
-{
-	new client = GetClientOfUserId(GetEventInt(event, "userid"));
-	
-	// Does the client have this feature?
-	if (STAMM_IsClientValid(client))
-	{
-		if (STAMM_HaveClientFeature(client))
-		{
-			// Reset timer if available
-			if (ClientTimers[client] != INVALID_HANDLE) 
-			{
-				KillTimer(ClientTimers[client]);
-			}
-
-			// Start timer to add health
-			ClientTimers[client] = CreateTimer(float(timeInterval), GiveHealth, client, TIMER_REPEAT);
-		}
-	}
+	 CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, _, TIMER_REPEAT);
 }
 
 
 
 // Regenerate Timer
-public Action:GiveHealth(Handle:timer, any:client)
+public Action:GiveHealth(Handle:timer, any:data)
 {
-	// Is client valid?
-	if (STAMM_IsClientValid(client))
+	for (new client=1; client <= MaxClients; client++)
 	{
-		// Get highest client block
-		new clientBlock = STAMM_GetClientBlock(client);
-
-
-		// Have client block and is player alive and in right team?
-		if (clientBlock > 0 && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
+		// Is client valid?
+		if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 		{
-			// Get max Health and add regenerate HP
-			new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+			// Get highest client block
+			new clientBlock = STAMM_GetClientBlock(client);
 
-			new oldHP = GetClientHealth(client);
-			new newHP = oldHP + hp * clientBlock;
-			
-			// Only if not higher than max Health
-			if (newHP > maxHealth)
+
+			// Have client block and is player alive and in right team?
+			if (clientBlock > 0 && IsPlayerAlive(client) && (GetClientTeam(client) == 2 || GetClientTeam(client) == 3))
 			{
-				if (oldHP < maxHealth) 
+				// Get max Health and add regenerate HP
+				new maxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+
+				new oldHP = GetClientHealth(client);
+				new newHP = oldHP + GetConVarInt(g_hHP) * clientBlock;
+				
+				// Only if not higher than max Health
+				if (newHP > maxHealth)
 				{
-					newHP = maxHealth;
+					if (oldHP < maxHealth) 
+					{
+						newHP = maxHealth;
+					}
+					else 
+					{
+						continue;
+					}
 				}
-				else 
-				{
-					return Plugin_Continue;
-				}
+				
+				SetEntityHealth(client, newHP);
 			}
-			
-			SetEntityHealth(client, newHP);
-			
-			return Plugin_Continue;
 		}
 	}
 	
-	return Plugin_Handled;
+	return Plugin_Continue;
 }

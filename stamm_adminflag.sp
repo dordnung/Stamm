@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,36 +40,36 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Admin Flags",
 	author = "Popoklopsi",
-	version = "1.3.2",
-	description = "Give VIP's admin flags",
+	version = "1.4.1",
+	description = "Give VIP's Admin Flags",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
+
 
 
 
 // Add feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm"))
+	if (!STAMM_IsAvailable())
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-
-	STAMM_AddFeature("VIP Admin Flags", "");
+	STAMM_RegisterFeature("VIP Admin Flags", false);
 }
 
 
 
 
 // Feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:description[64];
-	new String:theflags[64];
-
+	decl String:theflags[64];
 	decl String:urlString[256];
+
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
@@ -77,6 +77,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	{
 		// Add to auto updater
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 
 
@@ -87,14 +88,21 @@ public STAMM_OnFeatureLoaded(String:basename[])
 		Format(theflags, sizeof(theflags), "");
 		
 		getLevelFlag(theflags, sizeof(theflags), i);
-		
-		// Valid flags?
-		if (!StrEqual(theflags, ""))
-		{
-			Format(description, sizeof(description), "%T", "GetAdminFlags", LANG_SERVER, theflags);
-			STAMM_AddFeatureText(i, description);
-		}
 	}
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	STAMM_GetBlockName(block, fmt, sizeof(fmt));
+	Format(fmt, sizeof(fmt), "%T", "GetAdminFlags", client, fmt);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -107,12 +115,13 @@ public STAMM_OnClientReady(client)
 		decl String:theflags[64];
 		new bytes;
 
+
 		// Get Flags for client level
 		Format(theflags, sizeof(theflags), "");
-		
-		getLevelFlag(theflags, sizeof(theflags), STAMM_GetClientLevel(client));
+		getClientFlags(client, theflags, sizeof(theflags));
 
-		if (!StrEqual(theflags, "")) 
+
+		if (!StrEqual(theflags, "") && theflags[0] != '\0') 
 		{
 			// Get bits of the string
 			bytes = ReadFlagString(theflags);
@@ -120,8 +129,7 @@ public STAMM_OnClientReady(client)
 			// Set flags
 			if (bytes)
 			{
-				new oldbytes = GetUserFlagBits(client);
-				SetUserFlagBits(client, bytes | oldbytes);
+				SetUserFlagBits(client, bytes | GetUserFlagBits(client));
 			}
 		}
 	}
@@ -129,43 +137,117 @@ public STAMM_OnClientReady(client)
 
 
 
+
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientReady(client);
+}
+
+
+
+
 // Read out the flags
 public getLevelFlag(String:theflags[], size, level)
 {
-	new Handle:flagvalue = CreateKeyValues("AdminFlags");
+	new blocks = STAMM_GetBlockCount();
+
 
 	// Do we have a file?
-	if (!FileExists("cfg/stamm/features/adminflags.txt"))
+	if (!FileExists("cfg/stamm/features/adminflags.txt") && blocks <= 0)
 	{
-		STAMM_WriteToLog(false, "Didn't find cfg/stamm/features/adminflags.txt!");
+		SetFailState("Couldn't find any block and also 'cfg/stamm/features/adminflags.txt' doesn't exist!");
 
 		return;
 	}
-	
-	FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
-	
 
 
-	// Key Value loop
-	if (KvGotoFirstSubKey(flagvalue, false))
+	if (blocks > 0)
 	{
-		do
+		for (new i=1; i <= blocks; i++)
 		{
-			decl String:section[64];
-			
-			KvGetSectionName(flagvalue, section, sizeof(section));
-
-			// Only Flags for specific level
-			if (STAMM_GetLevelNumber(section) == level)
+			if (STAMM_GetBlockLevel(i) == level)
 			{
-				KvGoBack(flagvalue);
-				KvGetString(flagvalue, section, theflags, size);
+				STAMM_GetBlockName(i, theflags, size);
 
 				break;
 			}
 		}
-		while (KvGotoNextKey(flagvalue, false));
 	}
-	
-	CloseHandle(flagvalue);
+	else
+	{
+		new Handle:flagvalue = CreateKeyValues("AdminFlags");
+		
+		FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
+		
+
+		STAMM_WriteToLog(false, "Attention: Found only old AdminFlags level config. New one is in: cfg/stamm/levels/adminflags.txt!");
+
+
+		// Key Value loop
+		if (KvGotoFirstSubKey(flagvalue, false))
+		{
+			do
+			{
+				decl String:section[64];
+				
+				KvGetSectionName(flagvalue, section, sizeof(section));
+
+
+				// Only Flags for specific level
+				if (STAMM_GetLevelNumber(section) == level)
+				{
+					KvGoBack(flagvalue);
+					KvGetString(flagvalue, section, theflags, size);
+				}
+			}
+			while (KvGotoNextKey(flagvalue, false));
+		}
+		
+		CloseHandle(flagvalue);
+	}
+}
+
+
+
+// Read out the flags
+public getClientFlags(client, String:theflags[], size)
+{
+	if (STAMM_GetBlockCount() > 0)
+	{
+		new block = STAMM_GetClientBlock(client);
+
+		if (block > 0)
+		{
+			STAMM_GetBlockName(block, theflags, size);
+		}
+	}
+	else
+	{
+		new Handle:flagvalue = CreateKeyValues("AdminFlags");
+		
+		FileToKeyValues(flagvalue, "cfg/stamm/features/adminflags.txt");
+		
+
+		// Key Value loop
+		if (KvGotoFirstSubKey(flagvalue, false))
+		{
+			do
+			{
+				decl String:section[64];
+				
+				KvGetSectionName(flagvalue, section, sizeof(section));
+
+
+				// Only Flags for specific level
+				if (STAMM_GetLevelNumber(section) == STAMM_GetClientLevel(client))
+				{
+					KvGoBack(flagvalue);
+					KvGetString(flagvalue, section, theflags, size);
+				}
+			}
+			while (KvGotoNextKey(flagvalue, false));
+		}
+		
+		CloseHandle(flagvalue);
+	}
 }

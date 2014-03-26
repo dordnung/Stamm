@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,11 @@
 
 // Includes
 #include <sourcemod>
+
+#undef REQUIRE_EXTENSIONS
 #include <tf2_stocks>
+#define REQUIRE_EXTENSIONS
+
 #include <sdktools>
 
 #undef REQUIRE_PLUGIN
@@ -38,9 +42,8 @@
 
 
 
-new bool:RoundEnd;
-
-new particels[MAXPLAYERS + 1][2];
+new bool:g_bRoundEnd;
+new g_iParticels[MAXPLAYERS + 1][2];
 
 
 
@@ -48,7 +51,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature End of Round Immunity",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.1",
 	description = "Give VIP's immunity at the end of the round",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -56,18 +59,21 @@ public Plugin:myinfo =
 
 
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
 
-	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
+
+	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 // Hooke needed events
@@ -82,12 +88,11 @@ public OnPluginStart()
 }
 
 
+
 // Add feature for TF2
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -97,11 +102,22 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 	
+	
 	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP End of Round Immunity");
+}
 
-	Format(haveDescription, sizeof(haveDescription), "%T", "GetImmunity", LANG_SERVER);
 
-	STAMM_AddFeature("VIP End of Round Immunity", haveDescription);
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetImmunity", client);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -109,7 +125,7 @@ public OnAllPluginsLoaded()
 // A round is finish
 public RoundWin(Handle:event, const String:name[], bool:dontBroadcast)
 {	
-	RoundEnd = true;
+	g_bRoundEnd = true;
 
 	// Set god mod for each VIP
 	for (new i=1; i <= MaxClients; i++)
@@ -129,7 +145,7 @@ public RoundWin(Handle:event, const String:name[], bool:dontBroadcast)
 // A round started
 public RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {	
-	RoundEnd = false;
+	g_bRoundEnd = false;
 	
 	// Delete Effects
 	for (new i=0; i < MAXPLAYERS+1; i++)
@@ -143,7 +159,7 @@ public RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 // A player died
 public Action:PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if (!RoundEnd) 
+	if (!g_bRoundEnd) 
 	{
 		return Plugin_Continue;
 	}
@@ -166,8 +182,8 @@ public Action:PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 // Create the effects
 public ImmuneEffects(client)
 {
-	particels[client][0] = EntIndexToEntRef(AttachParticle(client, "player_recent_teleport_red", 2.0));
-	particels[client][1] = EntIndexToEntRef(AttachParticle(client, "player_recent_teleport_blue", 2.0));
+	g_iParticels[client][0] = EntIndexToEntRef(AttachParticle(client, "player_recent_teleport_red", 2.0));
+	g_iParticels[client][1] = EntIndexToEntRef(AttachParticle(client, "player_recent_teleport_blue", 2.0));
 }
 
 
@@ -219,9 +235,9 @@ public AttachParticle(entity, String:particleType[], Float:offsetZ)
 public ClearParticles(client)
 {
 	// Client have effect?
-	if (particels[client][0] > 0)
+	if (g_iParticels[client][0] > 0)
 	{
-		new particle = EntRefToEntIndex(particels[client][0]);
+		new particle = EntRefToEntIndex(g_iParticels[client][0]);
 		
 		// Kill
 		if (particle > MaxClients && IsValidEntity(particle))
@@ -229,12 +245,12 @@ public ClearParticles(client)
 			AcceptEntityInput(particle, "Kill");
 		}
 
-		particels[client][0] = 0;
+		g_iParticels[client][0] = 0;
 	}
 
-	if (particels[client][1] > 0)
+	if (g_iParticels[client][1] > 0)
 	{
-		new particle = EntRefToEntIndex(particels[client][1]);
+		new particle = EntRefToEntIndex(g_iParticels[client][1]);
 		
 		// Kill
 		if (particle > MaxClients && IsValidEntity(particle))
@@ -242,7 +258,7 @@ public ClearParticles(client)
 			AcceptEntityInput(particle, "Kill");
 		}
 			
-		particels[client][1] = 0;
+		g_iParticels[client][1] = 0;
 	}
 }
 
@@ -251,7 +267,7 @@ public ClearParticles(client)
 // Set speed to highest on Round end
 public OnGameFrame()
 {
-	if (RoundEnd)
+	if (g_bRoundEnd)
 	{
 		// For each VIP
 		for (new i=1; i <= MaxClients; i++)

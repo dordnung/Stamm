@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
-#include <colors>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -36,11 +35,12 @@
 
 
 
-new maximum;
-new Usages[MAXPLAYERS + 1];
+new g_iMaximum;
+new g_iUsages[MAXPLAYERS + 1];
 
-new Handle:kv;
-new Handle:weaponlist;
+new Handle:g_hKV;
+new Handle:g_hWeaponList;
+
 
 
 
@@ -48,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Weapons",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.1",
 	description = "Give VIP's weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -56,28 +56,32 @@ public Plugin:myinfo =
 
 
 
+
 // Add to auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
+
 
 
 
 // Add the feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
 	decl String:path[PLATFORM_MAX_PATH + 1];
 
-	if (!LibraryExists("stamm")) 
+
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -87,11 +91,9 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature, not Supported for your game!");
 	}
 
+
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetWeapons", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP Weapons", description);
+	STAMM_RegisterFeature("VIP Weapons");
 
 
 	if (STAMM_GetGame() == GameCSGO)
@@ -117,19 +119,19 @@ public OnAllPluginsLoaded()
 
 
 	// Read the config
-	kv = CreateKeyValues("WeaponSettings");
-	FileToKeyValues(kv, path);
+	g_hKV = CreateKeyValues("WeaponSettings");
+	FileToKeyValues(g_hKV, path);
 	
 	// Maxium gives
-	maximum = KvGetNum(kv, "maximum");
+	g_iMaximum = KvGetNum(g_hKV, "maximum");
 	
 	// Create Menu
-	weaponlist = CreateMenu(weaponlist_handler);
-	SetMenuTitle(weaponlist, "!sgive <weapon_name>");
+	g_hWeaponList = CreateMenu(weaponlist_handler);
+	SetMenuTitle(g_hWeaponList, "!sgive <weapon_name>");
 	
 
 	// Parse config
-	if (KvGotoFirstSubKey(kv, false))
+	if (KvGotoFirstSubKey(g_hKV, false))
 	{
 		decl String:buffer[120];
 		decl String:buffer2[120];
@@ -137,7 +139,7 @@ public OnAllPluginsLoaded()
 		do
 		{
 			// Get Weaponname
-			KvGetSectionName(kv, buffer, sizeof(buffer));
+			KvGetSectionName(g_hKV, buffer, sizeof(buffer));
 
 			strcopy(buffer2, sizeof(buffer2), buffer);
 
@@ -145,45 +147,43 @@ public OnAllPluginsLoaded()
 			ReplaceString(buffer, sizeof(buffer), "weapon_", "");
 
 			// And go back
-			KvGoBack(kv);
+			KvGoBack(g_hKV);
 			
 			//  Get status of weapon
-			if (!StrEqual(buffer2, "maximum") && KvGetNum(kv, buffer2) == 1) 
+			if (!StrEqual(buffer2, "maximum") && KvGetNum(g_hKV, buffer2) == 1) 
 			{
-				AddMenuItem(weaponlist, buffer, buffer);
+				AddMenuItem(g_hWeaponList, buffer, buffer);
 			}
 
 
-			KvJumpToKey(kv, buffer2);
+			KvJumpToKey(g_hKV, buffer2);
 		} 
-		while (KvGotoNextKey(kv, false));
+		while (KvGotoNextKey(g_hKV, false));
 
 		// Go Back
-		KvRewind(kv);
+		KvRewind(g_hKV);
 	}
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetWeapons", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
 // Load the configs
 public OnPluginStart()
 {
-	// Good colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-
-
-
 	// Register commands
 	RegConsoleCmd("sm_sgive", GiveCallback, "Give VIP's Weapons");
 	RegConsoleCmd("sm_sweapons", InfoCallback, "show Weaponlist");
@@ -191,6 +191,15 @@ public OnPluginStart()
 	HookEvent("round_start", RoundStart);
 }
 
+
+// Add Command for weapons
+public STAMM_OnClientRequestCommands(client)
+{
+	if (STAMM_HaveClientFeature(client))
+	{
+		STAMM_AddCommand("!sweapons", "%T", "GetWeapons", client);
+	}
+}
 
 
 // Menu handler 
@@ -212,21 +221,24 @@ public weaponlist_handler(Handle:menu, MenuAction:action, param1, param2)
 
 
 
+
 // Resetz uses
 public RoundStart(Handle:event, String:name[], bool:dontBroadcast)
 {
 	for (new x=0; x <= MaxClients; x++)
 	{ 
-		Usages[x] = 0;
+		g_iUsages[x] = 0;
 	}
 }
+
+
 
 
 
 // Also reset usages
 public STAMM_OnClientReady(client)
 {
-	Usages[client] = 0;
+	g_iUsages[client] = 0;
 }
 
 
@@ -237,7 +249,7 @@ public Action:InfoCallback(client, args)
 {
 	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 	{
-		DisplayMenu(weaponlist, client, 30);
+		DisplayMenu(g_hWeaponList, client, 40);
 	}
 
 	return Plugin_Handled;
@@ -249,41 +261,49 @@ public Action:InfoCallback(client, args)
 // Give a weapon
 public Action:GiveCallback(client, args)
 {
-	if (GetCmdArgs() == 1)
+	decl String:tag[64];
+
+
+	if (STAMM_IsClientValid(client))
 	{
-		if (STAMM_IsClientValid(client))
+		if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client))
 		{
-			if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client))
+			if (GetCmdArgs() == 1)
 			{
 				// max. usages not reached
-				if (Usages[client] < maximum)
+				if (g_iUsages[client] < g_iMaximum)
 				{
 					decl String:WeaponName[64];
 					
 					GetCmdArg(1, WeaponName, sizeof(WeaponName));
-					
+					STAMM_GetTag(tag, sizeof(tag));
+
+
 					// Add weapon tag
 					Format(WeaponName, sizeof(WeaponName), "weapon_%s", WeaponName);
 
+
 					// Enabled?
-					if (KvGetNum(kv, WeaponName))
+					if (KvGetNum(g_hKV, WeaponName))
 					{
 						// Give Item
 						GivePlayerItem(client, WeaponName);
 						
-						Usages[client]++;
+						g_iUsages[client]++;
 					}
-
 					else 
 					{
-						CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "WeaponFailed", LANG_SERVER);
+						STAMM_PrintToChat(client, "%s %t", tag, "WeaponFailed");
 					}
 				}
-				
 				else
 				{
-					CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %T", "MaximumReached", LANG_SERVER);
+					STAMM_PrintToChat(client, "%s %t", tag, "MaximumReached");
 				}
+			}
+			else 
+			{
+				STAMM_PrintToChat(client, "%s %t", tag, "WeaponFailed");
 			}
 		}
 	}

@@ -1,0 +1,42 @@
+"ModelSettings"
+{
+	"VIP Guerilla"
+	{
+		// 2 = Terrorists, Red, US-Armee
+		// 3 = Anti-Terrorists, Blue, Wehrmacht
+		"team"              "2"
+		
+		// Absolut path to the .mdl file
+		"model"             "models/stamm/t_guerilla.mdl"
+		
+		// Name to show ingame
+		"name"              "Guerilla VIP"
+		
+		// Level a player get this model
+		"level"             "Silver"
+	}
+	
+	"VIP Leet"
+	{
+		"team"              "2"
+		"model"             "models/stamm/t_leet.mdl"
+		"name"              "Leet VIP"
+		"level"             "Gold"
+	}
+	
+	"VIP GSG 9"
+	{
+		"team"              "3"
+		"model"             "models/stamm/ct_gsg9.mdl"
+		"name"              "GSG 9 VIP"
+		"level"             "Silver"
+	}
+	
+	"VIP Urban"
+	{
+		"team"              "3"
+		"model"             "models/stamm/ct_urban.mdl"
+		"name"              "Urban VIP"
+		"level"             "Gold"
+	}
+}

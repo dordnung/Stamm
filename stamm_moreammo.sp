@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,12 +37,11 @@
 
 
 
-new ammo;
 
-new Handle:c_ammo;
-new Handle:thetimer;
+new Handle:g_hAmmo;
+new Handle:g_hTheTimer;
 
-new bool:WeaponEdit[MAXPLAYERS + 1][2024];
+new bool:g_bWeaponEdit[MAXPLAYERS + 1][2024];
 
 
 
@@ -51,17 +50,18 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreAmmo",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.1",
 	description = "Give VIP's more ammo",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -84,8 +84,10 @@ public OnAllPluginsLoaded()
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP MoreAmmo", "");
+	STAMM_RegisterFeature("VIP MoreAmmo");
 }
+
+
 
 
 
@@ -94,21 +96,24 @@ public OnPluginStart()
 {
 	HookEvent("player_death", PlayerDeath);
 
+
 	// Config
 	AutoExecConfig_SetFile("moreammo", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hAmmo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
 	
-	c_ammo = AutoExecConfig_CreateConVar("ammo_amount", "20", "Ammo increase in percent each block!");
-	
-	AutoExecConfig(true, "moreammo", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
 
+
+
 // Feature loaded, add desc. and auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -116,38 +121,38 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
-	}
-
-	// Add dscriptions for block
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetMoreAmmo", LANG_SERVER, ammo * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		Updater_ForceUpdate();
 	}
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetMoreAmmo", client, GetConVarInt(g_hAmmo) * block);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
 // Reset on mapstart
 public OnMapStart()
 {
-	if (thetimer != INVALID_HANDLE) 
+	if (g_hTheTimer != INVALID_HANDLE) 
 	{
-		KillTimer(thetimer);
+		KillTimer(g_hTheTimer);
 	}
 
 	// Create check timer
-	thetimer = CreateTimer(1.0, CheckWeapons, _, TIMER_REPEAT);
+	g_hTheTimer = CreateTimer(1.0, CheckWeapons, _, TIMER_REPEAT);
 }
 
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	ammo = GetConVarInt(c_ammo);
-}
 
 
 
@@ -158,9 +163,10 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 	
 	for (new x=0; x < 2024; x++) 
 	{
-		WeaponEdit[client][x] = false;
+		g_bWeaponEdit[client][x] = false;
 	}
 }
+
 
 
 
@@ -171,16 +177,19 @@ public RoundStart(Handle:event, String:name[], bool:dontBroadcast)
 	{
 		for (new i=0; i <= MaxClients; i++) 
 		{
-			WeaponEdit[i][x] = false;
+			g_bWeaponEdit[i][x] = false;
 		}
 	}
 }
 
 
 
+
 // Check weapons
 public Action:CheckWeapons(Handle:timer, any:data)
 {
+	new ammo = GetConVarInt(g_hAmmo);
+
 	// Client loop
 	for (new i = 1; i <= MaxClients; i++)
 	{
@@ -202,7 +211,7 @@ public Action:CheckWeapons(Handle:timer, any:data)
 					// Player carry weapon?
 					new weapon = GetPlayerWeaponSlot(client, x);
 
-					if (weapon != -1 && !WeaponEdit[client][weapon])
+					if (weapon != -1 && !g_bWeaponEdit[client][weapon])
 					{
 						// Get ammo index
 						new ammotype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
@@ -224,7 +233,7 @@ public Action:CheckWeapons(Handle:timer, any:data)
 								// Set ammo
 								SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, ammotype);
 								
-								WeaponEdit[client][weapon] = true;
+								g_bWeaponEdit[client][weapon] = true;
 							}
 						}
 					}

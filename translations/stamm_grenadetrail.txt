@@ -1,8 +1,0 @@
-"Phrases"
-{
-	"GetGrenadeTrail"
-	{
-		"en"		"Get a grenade trail"
-		"de"		"Bekomme eine Granaten Spur"
-	}
-}

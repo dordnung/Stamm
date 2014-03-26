@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level until players lose points on death
+	"level"         "Gold"
+}

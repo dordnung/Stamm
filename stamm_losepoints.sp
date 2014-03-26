@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 // Includes 
 #include <sourcemod>
 #include <autoexecconfig>
-#include <colors>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -37,13 +36,11 @@
 
 
 
-new deathCounter[MAXPLAYERS + 1];
+new g_iDeathCounter[MAXPLAYERS + 1];
 
-new Handle:deathcount_c;
-new Handle:pointscount_c;
+new Handle:g_hDeathCount;
+new Handle:g_hPointScount;
 
-new deathcount;
-new pointscount;
 
 
 
@@ -51,44 +48,55 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LosePoints",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.1",
 	description = "Non VIP's lose until a specific level points on death",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:haveDescription[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 
 	STAMM_LoadTranslation();
+	STAMM_RegisterFeature("VIP LosePoints");
+}
 
-	Format(haveDescription, sizeof(haveDescription), "%T", "NoLosePoints", LANG_SERVER);
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
 	
-	STAMM_AddFeature("VIP LosePoints", haveDescription, false);
+	Format(fmt, sizeof(fmt), "%T", "NoLosePoints", client);
+	
+	PushArrayString(array, fmt);
 }
 
 
 
 
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -97,47 +105,26 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Create Config
 public OnPluginStart()
 {
-	// Colors :)
-	if (!CColorAllowed(Color_Lightgreen))
-	{
-		if (CColorAllowed(Color_Lime))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Lime);
-		}
-		else if (CColorAllowed(Color_Olive))
-		{
-			CReplaceColor(Color_Lightgreen, Color_Olive);
-		}
-	}
-	
-
-
 	HookEvent("player_death", PlayerDeath);
 
+
 	AutoExecConfig_SetFile("losepoints", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 
-	deathcount_c = AutoExecConfig_CreateConVar("death_count", "2", "How much deaths a player needs to lose points");
-	pointscount_c = AutoExecConfig_CreateConVar("points_count", "2", "How much points a player loses after <death_count> deaths");
+	g_hDeathCount = AutoExecConfig_CreateConVar("death_count", "2", "How much deaths a player needs to lose points");
+	g_hPointScount = AutoExecConfig_CreateConVar("points_count", "2", "How much points a player loses after <death_count> deaths");
 
-	AutoExecConfig(true, "losepoints", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
-
-
-// Load config
-public OnConfigsExecuted()
-{
-	deathcount = GetConVarInt(deathcount_c);
-	pointscount = GetConVarInt(pointscount_c);
-}
 
 
 
 // Death counter -> zero
 public OnClientAuthorized(client, const String:auth[])
 {
-	deathCounter[client] = 0;
+	g_iDeathCounter[client] = 0;
 }
 
 
@@ -146,23 +133,29 @@ public OnClientAuthorized(client, const String:auth[])
 // A Player died
 public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 {
+	decl String:tag[64];
+
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
+	new deathcount = GetConVarInt(g_hDeathCount);
+	new pointscount = GetConVarInt(g_hPointScount);
+
+
 	if (STAMM_IsClientValid(client) && attacker > 0 && client != attacker)
 	{
 		// Client doesn't have the feature
 		if (!STAMM_HaveClientFeature(client) && IsClientInGame(attacker) && (GetClientTeam(client) != GetClientTeam(attacker)))
 		{
 			// check death count
-			if (++deathCounter[client] == deathcount)
+			if (++g_iDeathCounter[client] == deathcount)
 			{				
 				// Delete points ):
 				STAMM_DelClientPoints(client, pointscount);
 
-				CPrintToChat(client, "{lightgreen}[ {green}Stamm {lightgreen}] %t", "LosePoints", pointscount, deathcount);
+				STAMM_PrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
 
-				deathCounter[client] = 0;
+
+				g_iDeathCounter[client] = 0;
 			}
 		}
 	}

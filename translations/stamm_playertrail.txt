@@ -1,8 +1,0 @@
-"Phrases"
-{
-	"GetPlayerTrail"
-	{	
-		"en"		"Get a player trail"
-		"de"		"Bekomme eine Spieler Spur"
-	}
-}

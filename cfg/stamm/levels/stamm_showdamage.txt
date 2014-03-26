@@ -1,0 +1,5 @@
+"LevelSettings"
+{
+	// Level to get show damage
+	"level"         "Silver"
+}

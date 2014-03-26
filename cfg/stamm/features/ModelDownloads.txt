@@ -1,0 +1,13 @@
+// Here you can add the needed files for your models.
+//
+// You can add a direct path to the file:
+// materials/models/stamm/t_guerilla/t_guerilla.vmt
+//
+// But you can also add a star to add all files in that folder to the downloads table:
+// materials/models/stamm/t_guerilla/*
+
+materials/models/stamm/t_guerilla/*
+materials/models/stamm/t_leet/*
+materials/models/stamm/ct_gsg9/*
+materials/models/stamm/ct_urban/*
+models/stamm/*

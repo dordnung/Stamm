@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@
 
 
 
-new pspeed;
-new Handle:c_speed;
+new Handle:g_hSpeed;
+
 
 
 
@@ -45,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature MoreSpeed",
 	author = "Popoklopsi",
-	version = "1.2.2",
+	version = "1.3.1",
 	description = "Give VIP's more speed",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -56,14 +56,15 @@ public Plugin:myinfo =
 // Add Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP MoreSpeed", "");
+	STAMM_RegisterFeature("VIP MoreSpeed");
 }
+
 
 
 
@@ -72,49 +73,48 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	AutoExecConfig_SetFile("morespeed", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hSpeed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
 	
-	c_speed = AutoExecConfig_CreateConVar("speed_increase", "20", "Speed increase in percent each block!");
-	
-	AutoExecConfig(true, "morespeed", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
 
 
 // Auto updater and description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
 
+
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
+
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
-	}
-
-
-
-	// Set description for each block
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetMoreSpeed", LANG_SERVER, pspeed * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
+		Updater_ForceUpdate();
 	}
 }
 
 
 
 
-// Load config
-public OnConfigsExecuted()
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 {
-	pspeed = GetConVarInt(c_speed);
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetMoreSpeed", client, GetConVarInt(g_hSpeed) * block);
+	
+	PushArrayString(array, fmt);
 }
+
 
 
 
@@ -124,13 +124,20 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	STAMM_OnClientChangedFeature(client, true);
+	STAMM_OnClientChangedFeature(client, true, false);
+}
+
+
+
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientChangedFeature(client, true, false);
 }
 
 
 
 // Client changed feature state
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
@@ -147,7 +154,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 				// Set new speed of player
 				new Float:newSpeed;
 				
-				newSpeed = 1.0 + float(pspeed)/100.0 * clientBlock;
+				newSpeed = 1.0 + float(GetConVarInt(g_hSpeed)) / 100.0 * clientBlock;
 				
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", newSpeed);
 			}

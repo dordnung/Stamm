@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,17 +31,19 @@
 #include <stamm>
 #include <updater>
 
+
 // Colors for the diffent grenades
-#define HEColor 	{225,0,0,225}
-#define FlashColor 	{255,255,0,225}
-#define SmokeColor	{0,225,0,225}
-#define DecoyColor	{139,090,043,225}
-#define MoloColor	{255,069,0,225}
+#define HEColor {225,0,0,225}
+#define FlashColor {255,255,0,225}
+#define SmokeColor {0,225,0,225}
+#define DecoyColor {139,090,043,225}
+#define MoloColor {255,069,0,225}
 
 #pragma semicolon 1
 
 
-new BeamSprite;
+new g_iBeamSprite;
+
 
 
 
@@ -49,7 +51,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature GrenadeTrail",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.4.1",
 	description = "Give VIP's a grenade trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -57,15 +59,17 @@ public Plugin:myinfo =
 
 
 // Auto updater
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -75,9 +79,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -89,10 +91,20 @@ public OnAllPluginsLoaded()
 		
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetGrenadeTrail", LANG_SERVER);
+	STAMM_RegisterFeature("VIP Grenade Trail");
+}
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
 	
-	STAMM_AddFeature("VIP Grenade Trail", description);
+	Format(fmt, sizeof(fmt), "%T", "GetGrenadeTrail", client);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -108,7 +120,7 @@ public OnPluginStart()
 // Precache trail
 public OnMapStart()
 {
-	BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
+	g_iBeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
 }
 
 
@@ -209,7 +221,7 @@ public AddTrail(client, ent, tcolor[4])
 		if (IsValidEntity(ent) && owner == client)
 		{
 			// Create trail
-			TE_SetupBeamFollow(ent, BeamSprite,	0, 5.0, 3.0, 3.0, 1, tcolor);
+			TE_SetupBeamFollow(ent, g_iBeamSprite, 0, 5.0, 3.0, 3.0, 1, tcolor);
 			TE_SendToAll();
 		}
 	}

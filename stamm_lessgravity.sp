@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,11 @@
 
 #pragma semicolon 1
 
-new grav;
-new Handle:c_grav;
+
+
+new Handle:g_hGrav;
+
+
 
 
 // Details
@@ -42,7 +45,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LessGravity",
 	author = "Popoklopsi",
-	version = "1.2.3",
+	version = "1.3.1",
 	description = "Give VIP's less gravity",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -53,13 +56,13 @@ public Plugin:myinfo =
 // Add the Feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Less Gravity", "");
+	STAMM_RegisterFeature("VIP Less Gravity");
 }
 
 
@@ -70,45 +73,45 @@ public OnPluginStart()
 {
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	AutoExecConfig_SetFile("lessgravity", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hGrav = AutoExecConfig_CreateConVar("gravity_decrease", "5", "Gravity decrease in percent each block!");
 	
-	c_grav = AutoExecConfig_CreateConVar("gravity_decrease", "10", "Gravity decrease in percent each block!");
-	
-	AutoExecConfig(true, "lessgravity", "stamm/features");
 	AutoExecConfig_CleanFile();
-}
-
-
-
-// And load it
-public OnConfigsExecuted()
-{
-	grav = GetConVarInt(c_grav);
+	AutoExecConfig_ExecuteFile();
 }
 
 
 
 
 // Add to auto update and set description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
+}
 
-	// Add dsecription for each feature
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetLessGravity", LANG_SERVER, grav * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
-	}
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetLessGravity", client, GetConVarInt(g_hGrav) * block);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -119,14 +122,20 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	STAMM_OnClientChangedFeature(client, true);
+	STAMM_OnClientChangedFeature(client, true, false);
 }
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientChangedFeature(client, true, false);
+}
 
-// Also change it, if he cahnged the state
-public STAMM_OnClientChangedFeature(client, bool:mode)
+
+
+// Also change it, if he changed the state
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
@@ -143,7 +152,7 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 			if (clientBlock > 0)
 			{
 				// Calculate new gravity
-				newGrav = 1.0 - float(grav)/100.0 * clientBlock;
+				newGrav = 1.0 - float(GetConVarInt(g_hGrav)) / 100.0 * clientBlock;
 
 				if (newGrav < 0.1) 
 				{
@@ -158,5 +167,24 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 			// Else reset gravity
 			SetEntityGravity(client, 1.0);
 		}
+	}
+}
+
+
+
+// When client is on a ladder gravity will go back to normal
+public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
+{
+	if (STAMM_IsClientValid(client))
+	{
+		static MoveType:lastMove[MAXPLAYERS + 1] = MOVETYPE_NONE;
+		new MoveType:current = GetEntityMoveType(client);
+
+		if (current != MOVETYPE_LADDER && lastMove[client] == MOVETYPE_LADDER)
+		{
+			STAMM_OnClientChangedFeature(client, true, false);
+		}
+
+		lastMove[client] = current;
 	}
 }

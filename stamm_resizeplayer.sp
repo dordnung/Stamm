@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,10 +35,11 @@
 
 
 
-new resize;
-new Handle:c_resize;
 
-new Float:clientSize[MAXPLAYERS + 1];
+new Handle:g_hResize;
+new Float:g_hClientSize[MAXPLAYERS + 1];
+
+
 
 
 // Plugin ifno
@@ -46,7 +47,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature ResizePlayer",
 	author = "Popoklopsi",
-	version = "1.0.1",
+	version = "1.1.1",
 	description = "Resizes VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -58,7 +59,7 @@ public Plugin:myinfo =
 public OnAllPluginsLoaded()
 {
 	// Stamm not found
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -69,10 +70,12 @@ public OnAllPluginsLoaded()
 		SetFailState("Can't Load Feature. not Supported for your game!");
 	}
 
+
 	// Load translation and add feaure
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Resize Player", "");
+	STAMM_RegisterFeature("VIP Resize Player");
 }
+
 
 
 
@@ -82,31 +85,26 @@ public OnPluginStart()
 	// Hook event player spawn
 	HookEvent("player_spawn", PlayerSpawn);
 
+
 	// Create Config
 	AutoExecConfig_SetFile("resizeplayer", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hResize = AutoExecConfig_CreateConVar("resize_amount", "10", "Resize amount in(+)/de(-)crease in percent each block!");
 	
-	c_resize = AutoExecConfig_CreateConVar("resize_amount", "10", "Resize amount in(+)/de(-)crease in percent each block!");
-	
-	AutoExecConfig(true, "resizeplayer", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
-
-
-// Get Config cvar
-public OnConfigsExecuted()
-{
-	resize = GetConVarInt(c_resize);
-}
 
 
 
 // Feature loaded
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
+
 
 	// Add to updater
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -114,16 +112,21 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
+}
 
 
-	// Write level descriptions
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetResize", LANG_SERVER, resize * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
-	}
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetResize", client, GetConVarInt(g_hResize) * block);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -133,7 +136,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public STAMM_OnClientReady(client)
 {
 	// Default size is 1.0
-	clientSize[client] = 1.0;
+	g_hClientSize[client] = 1.0;
 
 	// For each block
 	for (new i=STAMM_GetBlockCount(); i > 0; i--)
@@ -142,11 +145,11 @@ public STAMM_OnClientReady(client)
 		if (STAMM_HaveClientFeature(client, i))
 		{
 			// set new size
-			clientSize[client] = 1.0 + float(resize)/100.0 * i;
+			g_hClientSize[client] = 1.0 + float(GetConVarInt(g_hResize))/100.0 * i;
 
-			if (clientSize[client] < 0.1) 
+			if (g_hClientSize[client] < 0.1) 
 			{
-				clientSize[client] = 0.1;
+				g_hClientSize[client] = 0.1;
 			}
 
 			// Break here
@@ -162,13 +165,20 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	STAMM_OnClientChangedFeature(client, true);
+	STAMM_OnClientChangedFeature(client, true, false);
+}
+
+
+
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	STAMM_OnClientReady(client);
 }
 
 
 
 // Client changed a feature
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (STAMM_IsClientValid(client))
 	{
@@ -177,12 +187,13 @@ public STAMM_OnClientChangedFeature(client, bool:mode)
 
 
 		// Setz size
-		SetEntPropFloat(client, Prop_Send, "m_flModelScale", clientSize[client]);
+		SetEntPropFloat(client, Prop_Send, "m_flModelScale", g_hClientSize[client]);
+
 
 		if (STAMM_GetGame() == GameTF2)
 		{
 			// On TF2 setz head size
-			SetEntPropFloat(client, Prop_Send, "m_flHeadScale", clientSize[client]);
+			SetEntPropFloat(client, Prop_Send, "m_flHeadScale", g_hClientSize[client]);
 		}
 	}
 }
@@ -196,10 +207,10 @@ public OnGameFrame()
 	{
 		for (new i = 1; i <= MaxClients; i++)
 		{
-			if (STAMM_IsClientValid(i) && clientSize[i] != 1.0)
+			if (STAMM_IsClientValid(i) && g_hClientSize[i] != 1.0)
 			{
 				// Set head size
-				SetEntPropFloat(i, Prop_Send, "m_flHeadScale", clientSize[i]);
+				SetEntPropFloat(i, Prop_Send, "m_flHeadScale", g_hClientSize[i]);
 			}
 		}
 	}

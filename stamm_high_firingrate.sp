@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,10 @@
 // Includes
 #include <sourcemod>
 #include <autoexecconfig>
+
+#undef REQUIRE_EXTENSIONS
 #include <tf2items>
+#define REQUIRE_EXTENSIONS
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
@@ -36,9 +39,7 @@
 
 
 
-
-new firerate;
-new Handle:c_firerate;
+new Handle:g_hFireRate;
 
 
 
@@ -47,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Higher Firing Rate",
 	author = "Popoklopsi",
-	version = "1.0.2",
+	version = "1.1.1",
 	description = "Give VIP's higher firing Rate",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -57,7 +58,7 @@ public Plugin:myinfo =
 // Add feature
 public OnAllPluginsLoaded()
 {
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
@@ -77,7 +78,7 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_AddFeature("VIP Higher Firing Rate", "");
+	STAMM_RegisterFeature("VIP Higher Firing Rate");
 }
 
 
@@ -87,27 +88,21 @@ public OnAllPluginsLoaded()
 public OnPluginStart()
 {
 	AutoExecConfig_SetFile("higher_firingrate", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hFireRate = AutoExecConfig_CreateConVar("firing_rate", "10", "Firing rate increase in percent each block!");
 	
-	c_firerate = AutoExecConfig_CreateConVar("firing_rate", "10", "Firing rate increase in percent each block!");
-	
-	AutoExecConfig(true, "higher_firingrate", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
-
-// Load config
-public OnConfigsExecuted()
-{
-	firerate = GetConVarInt(c_firerate);
-}
 
 
 
 // Add to auto updater and set description
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
-	decl String:haveDescription[64];
 	decl String:urlString[256];
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
@@ -115,16 +110,21 @@ public STAMM_OnFeatureLoaded(String:basename[])
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
+}
 
 
-	// Description for each block	
-	for (new i=1; i <= STAMM_GetBlockCount(); i++)
-	{
-		Format(haveDescription, sizeof(haveDescription), "%T", "GetHigherFiringRate", LANG_SERVER, firerate * i);
-		
-		STAMM_AddFeatureText(STAMM_GetLevel(i), haveDescription);
-	}
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetHigherFiringRate", client, GetConVarInt(g_hFireRate) * block);
+	
+	PushArrayString(array, fmt);
 }
 
 
@@ -134,6 +134,7 @@ public STAMM_OnFeatureLoaded(String:basename[])
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
 	new bool:change = false;
+	
 	
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
@@ -149,7 +150,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 			
 			TF2Items_SetItemIndex(hItem, -1);
 
-			new Float:newFire = 1.0 - float(firerate)/100.0 * clientBlock;
+			new Float:newFire = 1.0 - float(GetConVarInt(g_hFireRate))/100.0 * clientBlock;
 
 
 			if (newFire < 0.1)

@@ -6,7 +6,7 @@
  * Web         http://popoklopsi.de
  * -----------------------------------------------------
  * 
- * Copyright (C) 2012-2013 David <popoklopsi> Ordnung
+ * Copyright (C) 2012-2014 David <popoklopsi> Ordnung
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ new Handle:beamTimer[MAXPLAYERS+1];
 new haveBeam[MAXPLAYERS+1];
 new modelInd;
 
-new Handle:c_lifeTime;
-new Handle:c_material;
+new Handle:g_hLifeTime;
+new Handle:g_hMaterial;
 
 
 
@@ -55,23 +55,26 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature PlayerTrail",
 	author = "Popoklopsi",
-	version = "1.2.1",
+	version = "1.3.1",
 	description = "Give VIP's a player trail",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
 
 
 
+
 // Add auto update
-public STAMM_OnFeatureLoaded(String:basename[])
+public STAMM_OnFeatureLoaded(const String:basename[])
 {
 	decl String:urlString[256];
+
 
 	Format(urlString, sizeof(urlString), "http://popoklopsi.de/stamm/updater/update.php?plugin=%s", basename);
 
 	if (LibraryExists("updater") && STAMM_AutoUpdate())
 	{
 		Updater_AddPlugin(urlString);
+		Updater_ForceUpdate();
 	}
 }
 
@@ -81,20 +84,29 @@ public STAMM_OnFeatureLoaded(String:basename[])
 // Add feature
 public OnAllPluginsLoaded()
 {
-	decl String:description[64];
-
-	if (!LibraryExists("stamm")) 
+	if (!STAMM_IsAvailable()) 
 	{
 		SetFailState("Can't Load Feature, Stamm is not installed!");
 	}
 
 
 	STAMM_LoadTranslation();
-		
-	Format(description, sizeof(description), "%T", "GetPlayerTrail", LANG_SERVER);
-	
-	STAMM_AddFeature("VIP PlayerTrail", description);
+	STAMM_RegisterFeature("VIP PlayerTrail");
 }
+
+
+
+
+// Add descriptions
+public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
+{
+	decl String:fmt[256];
+	
+	Format(fmt, sizeof(fmt), "%T", "GetPlayerTrail", client);
+	
+	PushArrayString(array, fmt);
+}
+
 
 
 
@@ -104,14 +116,17 @@ public OnPluginStart()
 	HookEvent("player_spawn", eventPlayerSpawn);
 	HookEvent("player_death", eventPlayerDeath);
 
+
 	AutoExecConfig_SetFile("playertrail", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
 	
-	c_lifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element");
-	c_material = AutoExecConfig_CreateConVar("ptrail_material", "sprites/laserbeam.vmt", "Material to use, start after materials/");
+	g_hLifeTime = AutoExecConfig_CreateConVar("ptrail_lifetime", "4.0", "Lifetime of each trail element in seconds");
+	g_hMaterial = AutoExecConfig_CreateConVar("ptrail_material", "sprites/laserbeam.vmt", "Material to use, start after materials/");
 	
-	AutoExecConfig(true, "playertrail", "stamm/features");
 	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
+
 
 
 
@@ -120,13 +135,14 @@ public OnConfigsExecuted()
 {
 	decl String:materialPrecache[PLATFORM_MAX_PATH + 1];
 
-	lifetime = GetConVarFloat(c_lifeTime);
 
-	GetConVarString(c_material, materialPrecache, sizeof(materialPrecache));
+	lifetime = GetConVarFloat(g_hLifeTime);
+
+	GetConVarString(g_hMaterial, materialPrecache, sizeof(materialPrecache));
 
 	Format(material, sizeof(material), "materials/%s", materialPrecache);
 
-	modelInd = PrecacheModel(material, true);
+	modelInd = PrecacheModel(material);
 
 
 
@@ -155,6 +171,7 @@ public OnMapStart()
 
 
 
+
 // Add Trails for VIP's
 public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {	
@@ -178,11 +195,29 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 
 
 
+public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)
+{
+	// First delete old ones
+	DeleteTrail(client);
+
+	if (STAMM_HaveClientFeature(client))
+	{
+		// Create new one
+		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3)) 
+		{
+			CreateTimer(2.5, SetupTrail, client);
+		}
+	}
+}
+
+
+
 // On disconnect delete trails
 public OnClientDisconnect(client)
 {	
 	DeleteTrail(client);
 }
+
 
 
 
@@ -222,8 +257,9 @@ public Action:SetupTrail(Handle:timer, any:client)
 
 
 
+
 // Client doesnt want it anymore
-public STAMM_OnClientChangedFeature(client, bool:mode)
+public STAMM_OnClientChangedFeature(client, bool:mode, bool:isShop)
 {
 	if (!mode) 
 	{
@@ -241,13 +277,16 @@ public Action:CreateTrail(Handle:timer, any:client)
 		decl Float:velocity[3];
 		new color[4];
 
+
 		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);		
+
 
 		// Move?
 		if (!(velocity[0] == 0.0 && velocity[1] == 0.0 && velocity[2] == 0.0))
 		{
 			return Plugin_Continue;
 		}
+
 
 		// Create on weapon high
 		new ent = GetPlayerWeaponSlot(client, 2);
@@ -267,6 +306,7 @@ public Action:CreateTrail(Handle:timer, any:client)
 			color[2] = 255;
 		}
 
+
 		color[3] = 255;
 
 		// Setup
@@ -283,6 +323,7 @@ public Action:CreateTrail(Handle:timer, any:client)
 	
 	return Plugin_Continue;
 }
+
 
 
 
@@ -360,7 +401,10 @@ public DeleteTrail(client)
 		CloseHandle(beamTimer[client]);
 	}
 
+
 	beamTimer[client] = INVALID_HANDLE;
+
+
 
 	// Get trail of player
 	new ent = haveBeam[client];
