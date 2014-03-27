@@ -110,7 +110,7 @@ public Action:STAMM_OnClientGetPoints_PRE(client, &number)
 	GetConVarString(g_hFlagNeed, flagNeed, sizeof(flagNeed));
 
 
-	if ((GetUserFlagBits(client) & ReadFlagString(flagNeed) || GetUserFlagBits(client) & ADMFLAG_ROOT))
+	if (((GetUserFlagBits(client) & ReadFlagString(flagNeed) == ReadFlagString(flagNeed)) || GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
 		return Plugin_Continue;
 	}

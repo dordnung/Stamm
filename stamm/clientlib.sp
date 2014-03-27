@@ -171,7 +171,7 @@ clientlib_ClientReady(client)
 		if (!StrEqual(giveFlagAdmin, "0") && !StrEqual(giveFlagAdmin, ""))
 		{ 
 			// Flag checking
-			if (GetUserFlagBits(client) & ReadFlagString(giveFlagAdmin))
+			if (GetUserFlagBits(client) & ReadFlagString(giveFlagAdmin) == ReadFlagString(giveFlagAdmin))
 			{
 				clientlib_GiveFastVIP(client);
 			}
@@ -258,7 +258,7 @@ bool:clientlib_IsAdmin(client)
 
 	if (clientlib_isValidClient_PRE(client))
 	{
-		return (GetUserFlagBits(client) & ReadFlagString(adminflag) || GetUserFlagBits(client) & ADMFLAG_ROOT);
+		return ((GetUserFlagBits(client) & ReadFlagString(adminflag) == ReadFlagString(adminflag)) || GetUserFlagBits(client) & ADMFLAG_ROOT);
 	}
 	
 
@@ -279,7 +279,7 @@ clientlib_IsSpecialVIP(client)
 		// Private level loop
 		for (new i=0; i < g_iPLevels; i++)
 		{		
-			if ((GetUserFlagBits(client) & ReadFlagString(g_sLevelFlag[i])))
+			if ((GetUserFlagBits(client) & ReadFlagString(g_sLevelFlag[i]) == ReadFlagString(g_sLevelFlag[i])))
 			{
 				return i;
 			}
