@@ -31,7 +31,10 @@
 #include <stamm>
 #include <updater>
 
-#undef COLOR_GREEN
+#if defined COLOR_GREEN
+	#undef COLOR_GREEN
+#endif
+
 #include <ccc>
 
 #include <scp>
