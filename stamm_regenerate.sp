@@ -118,7 +118,7 @@ public OnPluginStart()
 
 public OnConfigsExecuted()
 {
-	 CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, _, TIMER_REPEAT);
+	 CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 
