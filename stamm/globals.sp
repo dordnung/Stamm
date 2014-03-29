@@ -192,7 +192,6 @@ new Handle:g_hHudSync;
 
 
 #define g_sSelectVersionQuery "SELECT REPLACE(`version`, '.', '') FROM `%s` ORDER BY `version` DESC LIMIT 1"
-#define g_sSelectHappyQuery "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1"
 #define g_sSelectPointsQuery "SELECT `points` FROM `%s` WHERE `steamid`='%s'"
 #define g_sSelectAllPointsQuery "SELECT `VIP` FROM `%s` LIMIT 1"
 #define g_sSelectTop10Query "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10"
