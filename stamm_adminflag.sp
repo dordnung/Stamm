@@ -40,7 +40,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Admin Flags",
 	author = "Popoklopsi",
-	version = "1.4.1",
+	version = "1.4.2",
 	description = "Give VIP's Admin Flags",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -129,7 +129,47 @@ public STAMM_OnClientReady(client)
 			// Set flags
 			if (bytes)
 			{
+				// We have to reset admin flags before and change flags on rebuild
+				DumpAdminCache(AdminCache_Admins, true);
+
 				SetUserFlagBits(client, bytes | GetUserFlagBits(client));
+			}
+		}
+	}
+}
+
+
+
+
+// Give VIP's flags again on rebuild
+public OnRebuildAdminCache(AdminCachePart:part)
+{
+	if (part == AdminCache_Admins)
+	{
+		for (new client=0; client <= MaxClients; client++)
+		{
+			if (STAMM_IsClientValid(client))
+			{
+				decl String:theflags[64];
+				new bytes;
+
+
+				// Get Flags for client level
+				Format(theflags, sizeof(theflags), "");
+				getClientFlags(client, theflags, sizeof(theflags));
+
+
+				if (!StrEqual(theflags, "") && theflags[0] != '\0')
+				{
+					// Get bits of the string
+					bytes = ReadFlagString(theflags);
+
+					// Set flags
+					if (bytes)
+					{
+						SetUserFlagBits(client, bytes | GetUserFlagBits(client));
+					}
+				}
 			}
 		}
 	}
