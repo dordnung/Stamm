@@ -430,7 +430,9 @@ stammStarted()
 
 
 	// Print hint
-	PrintToServer("######### [ STAMM ] Stamm started succesfully with %i Features and %i Levels ###########", g_iFeatures, g_iLevels+g_iPLevels);
+	PrintToServer(" ");
+	PrintToServer("## [ STAMM ] Stamm started succesfully with %i Features and %i Levels ##", g_iFeatures, g_iLevels+g_iPLevels);
+	PrintToServer(" ");
 
 
 	// If debug, notice stamm started
