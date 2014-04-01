@@ -526,7 +526,7 @@ Handle:otherlib_openTempFile()
 {
 	decl String:path[PLATFORM_MAX_PATH + 1];
 
-	Format(path, sizeof(path), "cfg/stamm");
+	BuildPath(Path_SM, path, sizeof(path), "data");
 
 	if (!DirExists(path))
 	{
@@ -537,7 +537,7 @@ Handle:otherlib_openTempFile()
 	}
 
 	new Handle:kvalue = CreateKeyValues("stamm_storage");
-	Format(path, sizeof(path), "cfg/stamm/external_storage.txt");
+	Format(path, sizeof(path), "%s/stamm_storage.txt", path);
 
 	if (!FileExists(path))
 	{
@@ -565,10 +565,14 @@ Handle:otherlib_openTempFile()
 
 otherlib_saveTempFile(&Handle:tmpFile)
 {
+	decl String:path[PLATFORM_MAX_PATH + 1];
+
+	BuildPath(Path_SM, path, sizeof(path), "data/stamm_storage.txt");
+
 	if (tmpFile != INVALID_HANDLE)
 	{
 		KvRewind(tmpFile);
-		KeyValuesToFile(tmpFile, "cfg/stamm/external_storage.txt");
+		KeyValuesToFile(tmpFile, path);
 
 		CloseHandle(tmpFile);
 	}
