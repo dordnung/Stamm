@@ -39,7 +39,7 @@ public Plugin:myinfo =
 	name = "Stamm Feature FastLadder",
 	author = "Bara",
 	description = "Prohibit non VIP's the fast go up on ladders",
-	version = "1.1.1",
+	version = "1.1.2",
 	url = "www.bara.in"
 };
 

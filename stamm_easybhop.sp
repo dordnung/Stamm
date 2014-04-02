@@ -37,7 +37,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature EasyBhop",
 	author = "Bara",
-	version = "1.1.1",
+	version = "1.1.2",
 	description = "Give VIP's eady bunnyhop",
 	url = "www.bara.in"
 };
