@@ -704,6 +704,10 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 			Format(query, sizeof(query), g_sUpdateSetPointsLevelZeroQuery, g_sTableName, steamid);
 			
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
+
+
+			// Check with new stats
+			clientlib_CheckVip(client);
 		}
 	}
 
