@@ -168,7 +168,6 @@ new Handle:g_hHudSync;
 
 
 #define g_sUpdatePlayerQuery "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'"
-#define g_sUpdateSetPointsLevelZeroQuery "UPDATE `%s` SET `level`=0,`points`=0 WHERE `steamid`='%s'"
 #define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 "
 #define g_sUpdateSetPointsQuery "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'"
 #define g_sUpdateAddPointsQuery "UPDATE `%s` SET `points`=`points`+(%i) "

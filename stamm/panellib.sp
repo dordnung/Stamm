@@ -697,11 +697,10 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 
 			// Set level and points to zero
 			g_iPlayerPoints[client] = 0;
-			g_iPlayerLevel[client] = 0;
 					
 			
 			// Update in database
-			Format(query, sizeof(query), g_sUpdateSetPointsLevelZeroQuery, g_sTableName, steamid);
+			Format(query, sizeof(query), g_sUpdateSetPointsZeroQuery, g_sTableName, steamid);
 			
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, query);
 

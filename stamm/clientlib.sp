@@ -425,7 +425,7 @@ clientlib_CheckVip(client)
 			decl String:queryback[256];
 
 			new oldlevel = g_iPlayerLevel[client];
-			
+
 			// set to zero
 			g_iPlayerLevel[client] = 0;
 
@@ -439,7 +439,7 @@ clientlib_CheckVip(client)
 
 
 			// Notice to API
-			nativelib_PublicPlayerBecomeVip(client, oldlevel, g_iPlayerLevel[client]);
+			nativelib_PublicPlayerBecomeVip(client, oldlevel, 0);
 		}
 	}
 }
