@@ -10,10 +10,12 @@
 new g_iCount[MAXPLAYERS+1];
 
 new Handle:g_hTimer[MAXPLAYERS+1] = INVALID_HANDLE;
+new Handle:g_hResetTimer[MAXPLAYERS+1] = INVALID_HANDLE;
 
 new Handle:g_hMode = INVALID_HANDLE;
 new Handle:g_hNonVIP = INVALID_HANDLE;
 new Handle:g_hMinT = INVALID_HANDLE;
+new Handle:g_hReset = INVALID_HANDLE;
 
 new g_BeamSprite;
 new g_HaloSprite;
@@ -22,7 +24,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Refuse",
 	author = "Bara",
-	version = "1.0",
+	version = "1.0.0",
 	description = "On every level terrorists are be able to refuse one more game",
 	url = "www.bara.in"
 };
@@ -62,6 +64,7 @@ public OnPluginStart()
 	g_hMode = AutoExecConfig_CreateConVar("refuse_mode", "1", "0 - None, 1 - Beam Ring");
 	g_hNonVIP = AutoExecConfig_CreateConVar("refuse_nonvip", "1", "Should non-VIPs be able to refuse?", _, true, 0.0, true, 1.0);
 	g_hMinT = AutoExecConfig_CreateConVar("refuse_t", "3", "How many terrorists have to live for refusal at least.");
+	g_hReset = AutoExecConfig_CreateConVar("refuse_reset_time", "10.0", "After how many seconds should refuse effect disappear ( refuse_mode must be higher than 0 ) (0 - unlimited) ?");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -202,6 +205,23 @@ public Action:Timer_V(Handle:hTimer, any:client)
 	return Plugin_Stop;
 }
 
+public Action:Timer_Reset(Handle:hTimer, any:client)
+{
+	if(STAMM_IsClientValid(client))
+	{
+		if(g_hTimer[client] != INVALID_HANDLE)
+		{
+			CloseHandle(g_hTimer[client]);
+			g_hTimer[client] = INVALID_HANDLE;
+		}
+
+		if(g_hResetTimer[client] != INVALID_HANDLE)
+		{
+			g_hResetTimer[client] = INVALID_HANDLE;
+		}
+	}
+}
+
 stock SetClientAura(client)
 {
 	if(g_hTimer[client] != INVALID_HANDLE)
@@ -210,9 +230,26 @@ stock SetClientAura(client)
 		g_hTimer[client] = INVALID_HANDLE;
 	}
 
+	if(g_hResetTimer[client] != INVALID_HANDLE)
+	{
+		CloseHandle(g_hResetTimer[client]);
+		g_hResetTimer[client] = INVALID_HANDLE;
+	}
+
+	if(g_hResetTimer[client] == INVALID_HANDLE)
+	{
+		if(GetConVarInt(g_hMode) > 0)
+		{
+			if(GetConVarFloat(g_hReset) > 0.0)
+			{
+				g_hResetTimer[client] = CreateTimer(GetConVarFloat(g_hReset), Timer_Reset, client);
+			}
+		}
+	}
+
 	if(g_hTimer[client] == INVALID_HANDLE)
 	{
-		g_hTimer[client] = CreateTimer(0.01, Timer_V, client, TIMER_REPEAT);
+		g_hTimer[client] = CreateTimer(0.1, Timer_V, client, TIMER_REPEAT);
 	}
 }
 
@@ -224,6 +261,12 @@ stock Reset(client)
 	{
 		CloseHandle(g_hTimer[client]);
 		g_hTimer[client] = INVALID_HANDLE;
+	}
+
+	if(g_hResetTimer[client] != INVALID_HANDLE)
+	{
+		CloseHandle(g_hResetTimer[client]);
+		g_hResetTimer[client] = INVALID_HANDLE;
 	}
 }
 
