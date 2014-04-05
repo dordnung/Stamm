@@ -26,10 +26,12 @@
 // Includes
 #include <sourcemod>
 #include <sdktools>
+#include <autoexecconfig>
 
 #undef REQUIRE_PLUGIN
 #include <stamm>
 #include <updater>
+#include <cstrike>
 
 #pragma semicolon 1
 
@@ -37,6 +39,8 @@
 
 new g_iMaximum;
 new g_iUsages[MAXPLAYERS + 1];
+
+new Handle:g_hMode = INVALID_HANDLE;
 
 new Handle:g_hKV;
 new Handle:g_hWeaponList;
@@ -48,7 +52,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Weapons",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Give VIP's weapons",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -172,9 +176,20 @@ public OnAllPluginsLoaded()
 public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 {
 	decl String:fmt[256];
-	
-	Format(fmt, sizeof(fmt), "%T", "GetWeapons", client);
-	
+
+	if (GetConVarInt(g_hMode) == 1)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetWeaponsAsT", client);
+	}
+	else if (GetConVarInt(g_hMode) == 2)
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetWeaponsAsCT", client);
+	}
+	else
+	{
+		Format(fmt, sizeof(fmt), "%T", "GetWeapons", client);
+	}
+
 	PushArrayString(array, fmt);
 }
 
@@ -189,6 +204,14 @@ public OnPluginStart()
 	RegConsoleCmd("sm_sweapons", InfoCallback, "show Weaponlist");
 	
 	HookEvent("round_start", RoundStart);
+
+	AutoExecConfig_SetFile("weapons", "stamm/features");
+	AutoExecConfig_SetCreateFile(true);
+
+	g_hMode = AutoExecConfig_CreateConVar("sm_sweapons_restrict", "0", "0 - Players on both teams can give weapons themselve, 1 - Only terrorists can give weapons themselves, 2 - Only counter-terrorists can give weapons themselves");
+	
+	AutoExecConfig_CleanFile();
+	AutoExecConfig_ExecuteFile();
 }
 
 
@@ -247,9 +270,40 @@ public STAMM_OnClientReady(client)
 // Open weapon menu
 public Action:InfoCallback(client, args)
 {
+	decl String:tag[64];
+	
 	if (STAMM_IsClientValid(client) && STAMM_HaveClientFeature(client))
 	{
-		DisplayMenu(g_hWeaponList, client, 40);
+		STAMM_GetTag(tag, sizeof(tag));
+
+		if (GetConVarInt(g_hMode) == 1)
+		{
+			if (GetClientTeam(client) == CS_TEAM_T)
+			{
+				DisplayMenu(g_hWeaponList, client, 40);
+			}
+			else
+			{
+				STAMM_PrintToChat(client, "%s %t", tag, "CTCanNotGive");
+			}
+		}
+
+		else if (GetConVarInt(g_hMode) == 2)
+		{
+			if (GetClientTeam(client) == CS_TEAM_CT)
+			{
+				DisplayMenu(g_hWeaponList, client, 40);
+			}
+			else
+			{
+				STAMM_PrintToChat(client, "%s %t", tag, "TCanNotGive");
+			}
+		}
+		
+		else
+		{
+			DisplayMenu(g_hWeaponList, client, 40);
+		}
 	}
 
 	return Plugin_Handled;
@@ -263,21 +317,39 @@ public Action:GiveCallback(client, args)
 {
 	decl String:tag[64];
 
-
 	if (STAMM_IsClientValid(client))
 	{
 		if (STAMM_HaveClientFeature(client) && IsPlayerAlive(client))
 		{
+			STAMM_GetTag(tag, sizeof(tag));
+
 			if (GetCmdArgs() == 1)
 			{
+				if (GetConVarInt(g_hMode) == 1)
+				{
+					if (GetClientTeam(client) == CS_TEAM_CT)
+					{
+						STAMM_PrintToChat(client, "%s %t", tag, "CTCanNotGive");
+
+						return Plugin_Handled;
+					}
+				}
+				else if (GetConVarInt(g_hMode) == 2)
+				{
+					if (GetClientTeam(client) == CS_TEAM_T)
+					{
+						STAMM_PrintToChat(client, "%s %t", tag, "TCanNotGive");
+
+						return Plugin_Handled;
+					}
+				}
+
 				// max. usages not reached
 				if (g_iUsages[client] < g_iMaximum)
 				{
 					decl String:WeaponName[64];
 					
 					GetCmdArg(1, WeaponName, sizeof(WeaponName));
-					STAMM_GetTag(tag, sizeof(tag));
-
 
 					// Add weapon tag
 					Format(WeaponName, sizeof(WeaponName), "weapon_%s", WeaponName);
