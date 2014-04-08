@@ -50,6 +50,7 @@ public OnAllPluginsLoaded()
 
 
 
+
 public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 {
 	decl String:fmt[256];
@@ -57,6 +58,13 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 	Format(fmt, sizeof(fmt), "%T", "GetRefuse", client, block+1);
 	
 	PushArrayString(array, fmt);
+}
+
+
+
+public STAMM_OnClientRequestCommands(client)
+{
+	STAMM_AddCommand("!refuse", "%T", "RefuseCommand", client);
 }
 
 
@@ -229,7 +237,7 @@ public Action:Timer_V(Handle:hTimer, any:client)
 	if (STAMM_IsClientValid(client) && IsPlayerAlive(client))
 	{
 		static Float:fVec[3];
-		
+
 		GetClientAbsOrigin(client, fVec);
 		fVec[2] += (5 * g_iCount[client]);
 
