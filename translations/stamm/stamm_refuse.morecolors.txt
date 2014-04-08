@@ -7,6 +7,12 @@
 		"de"        "Du kannst {1} Mal verweigern"
 	}
 	
+	"RefuseCommand"
+	{
+		"en"        "Refuse the Game"
+		"de"        "Verweigere das Spiel"
+	}
+	
 	"NotEnoughT"
 	{
 		"#format"	"{1:d}"
