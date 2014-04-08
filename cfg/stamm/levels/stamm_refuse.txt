@@ -1,0 +1,4 @@
+"LevelSettings"
+{
+	"1"           "Gold"
+}
