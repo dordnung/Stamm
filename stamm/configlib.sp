@@ -51,6 +51,7 @@ new Handle:configlib_SeeText;
 new Handle:configlib_ServerID;
 new Handle:configlib_TextToWrite;
 new Handle:configlib_VipType;
+new Handle:configlib_BotKills;
 new Handle:configlib_TableName;
 new Handle:configlib_HudText;
 new Handle:configlib_TimePoint;
@@ -98,6 +99,7 @@ configlib_CreateConfig()
 	configlib_SeeText = AutoExecConfig_CreateConVar("stamm_see_text", "1", "1 = All see the players points, 0 = only the player, who write it in the chat");
 	configlib_TextToWrite = AutoExecConfig_CreateConVar("stamm_texttowrite", "sm_stamm", "Command to see current points");
 	configlib_VipType = AutoExecConfig_CreateConVar("stamm_vip_type", "1", "How to get Points, 1=kills, 2=rounds, 3=time, 4=kills&rounds, 5=kills&time, 6=rounds&time, 7=kills&rounds&time");
+	configlib_BotKills = AutoExecConfig_CreateConVar("stamm_bot_kills", "0", "1 = Count Bot Kills, too. 0 = Off");
 	configlib_TimePoint = AutoExecConfig_CreateConVar("stamm_time_point", "1", "If you set points for time: How much minutes are one point?");
 	configlib_VipList = AutoExecConfig_CreateConVar("stamm_viplist", "sm_slist", "Command for VIP Top 10");
 	configlib_TableName = AutoExecConfig_CreateConVar("stamm_table_name", "STAMM_DB", "Your Stamm Table Name. It appends '_<serverid>' at the end!");
