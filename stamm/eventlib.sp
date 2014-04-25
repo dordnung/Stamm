@@ -120,7 +120,7 @@ public Action:eventlib_PlayerDeath(Handle:event, const String:name[], bool:dontB
 
 
 	// Are both valid?
-	if (clientlib_isValidClient(client) && (clientlib_isValidClient(userid) || !GetConVarBool(configlib_BotKills)))
+	if (clientlib_isValidClient(client) && (clientlib_isValidClient(userid) || GetConVarBool(configlib_BotKills)))
 	{
 		// Get points with kills?
 		if (g_iVipType == 1 || g_iVipType == 4 || g_iVipType == 5 || g_iVipType == 7)
