@@ -385,52 +385,15 @@ stammStarted()
 	}
 	else 
 	{
-		// Late loaded
-		decl String:pathdir[PLATFORM_MAX_PATH + 1];
-		decl String:buffer[PLATFORM_MAX_PATH + 1];
-
-		new FileType:typs;
-
-		// Path to the stamm plugins
-		BuildPath(Path_SM, pathdir, sizeof(pathdir), "plugins/stamm");
-
-
-		// Open the dir
-		new Handle:dir = OpenDirectory(pathdir);
-
-		// Valid dir?
-		if (dir != INVALID_HANDLE)
-		{
-			// Read all files
-			while (ReadDirEntry(dir, buffer, sizeof(buffer), typs))
-			{
-				// is it a file?
-				if (typs == FileType_File)
-				{
-					// is it a .smx file?
-					if (StrContains(buffer, ".smx", false) > 0)
-					{
-						// Load the feature
-						ReplaceString(buffer, sizeof(buffer), ".smx", "", false);
-
-						ServerCommand("sm plugins load stamm/%s", buffer);
-					}
-				}
-			}
-
-			// Close dir
-			CloseHandle(dir);
-		}
-
-
-
 		// Load all features
 		CreateTimer(2.0, featurelib_loadFeatures, -1);
 	}
 
 
 	// Print hint
-	PrintToServer("######### [ STAMM ] Stamm started succesfully with %i Features and %i Levels ###########", g_iFeatures, g_iLevels+g_iPLevels);
+	PrintToServer(" ");
+	PrintToServer("## [ STAMM ] Stamm started succesfully with %i Features and %i Levels ##", g_iFeatures, g_iLevels+g_iPLevels);
+	PrintToServer(" ");
 
 
 	// If debug, notice stamm started

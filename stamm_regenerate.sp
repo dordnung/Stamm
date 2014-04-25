@@ -38,6 +38,7 @@
 
 new Handle:g_hHP;
 new Handle:g_hTime;
+new bool:g_bStarted;
 
 
 // Plugin Info
@@ -45,7 +46,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature RegenerateHP",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Regenerate HP of VIP's",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -103,6 +104,8 @@ public STAMM_OnClientRequestFeatureInfo(client, block, &Handle:array)
 // Create Config
 public OnPluginStart()
 {
+	g_bStarted = false;
+
 	AutoExecConfig_SetFile("regenerate", "stamm/features");
 	AutoExecConfig_SetCreateFile(true);
 
@@ -118,7 +121,11 @@ public OnPluginStart()
 
 public OnConfigsExecuted()
 {
-	 CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, _, TIMER_REPEAT);
+	if (!g_bStarted)
+	{
+		g_bStarted = true;
+		CreateTimer(float(GetConVarInt(g_hTime)), GiveHealth, _, TIMER_REPEAT);
+	}
 }
 
 

@@ -5,6 +5,16 @@
 		"en"        "Get Weapons per chat"
 		"de"        "Bekomme Waffen per Chat"
 	}
+	"GetWeaponsAsT"
+	{
+		"en"        "Get Weapons per chat as T"
+		"de"        "Bekomme als T Waffen per Chat"
+	}
+	"GetWeaponsAsCT"
+	{
+		"en"        "Get Weapons per chat as CT"
+		"de"        "Bekomme als CT Waffen per Chat"
+	}
 	"MaximumReached"
 	{
 		"en"        "Maximum reached!"
@@ -14,5 +24,15 @@
 	{
 		"en"        "{green}Weapon invalid {lightgreen}or {green}not allowed!"
 		"de"        "{green}Waffe ungültig {lightgreen}oder {green}nicht erlaubt!"
+	}
+	"TCanNotGive"
+	{
+		"en"        "{green}Terrorists {lightgreen}can not give weapons themselves!"
+		"de"        "{green}Terroristen {lightgreen}können sich keine Waffen geben!"
+	}
+	"CTCanNotGive"
+	{
+		"en"        "{green}Counter-Terrorists {lightgreen}can not give weapons themselves!"
+		"de"        "{green}Counter-Terroristen {lightgreen}können sich keine Waffen geben!"
 	}
 }

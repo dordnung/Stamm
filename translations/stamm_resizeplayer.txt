@@ -1,9 +1,0 @@
-"Phrases"
-{
-	"GetResize"
-	{
-		"#format"	"{1:i}"
-		"en"		"Become {1} percent size of your normal size"
-		"de"		"Werde {1} Prozent deiner normalen GrÃƒÂ¶ÃƒÅ¸e groÃƒÅ¸"
-	}
-}

@@ -415,8 +415,6 @@ clientlib_CheckVip(client)
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, setquery);
 
 
-
-
 			// Notice to API
 			nativelib_PublicPlayerBecomeVip(client, oldlevel, g_iPlayerLevel[client]);
 		}
@@ -425,6 +423,8 @@ clientlib_CheckVip(client)
 		{
 			// New level is no level, poor player ):
 			decl String:queryback[256];
+
+			new oldlevel = g_iPlayerLevel[client];
 
 			// set to zero
 			g_iPlayerLevel[client] = 0;
@@ -436,6 +436,10 @@ clientlib_CheckVip(client)
 			StammLog(true, "Execute %s", queryback);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, queryback);
+
+
+			// Notice to API
+			nativelib_PublicPlayerBecomeVip(client, oldlevel, 0);
 		}
 	}
 }

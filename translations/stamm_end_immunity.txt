@@ -1,8 +1,0 @@
-"Phrases"
-{
-	"GetImmunity"
-	{
-		"en"		"Get end of round immunity"
-		"de"		"Bekomme am Ende der Runde ImmunitÃƒÂ¤t"
-	}
-}

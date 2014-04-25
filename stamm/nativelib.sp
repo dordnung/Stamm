@@ -403,21 +403,21 @@ public nativelib_GetLevel(Handle:plugin, numParams)
 		// Check valid block
 		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
 		{
-			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
 		/* TODO: IMPLEMENT
 		// Check if shop
 		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
 		{
-			ThrowNativeError(2, "Block %i has no level, it's a shop Feature!", block);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i has no level, it's a shop Feature!", block);
 		} */
 
 		return g_FeatureList[feature][FEATURE_LEVEL][block-1];
 	}
 	else
 	{
-		ThrowNativeError(3, "Your Feature is invalid");
+		ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 	}
 
 
@@ -443,20 +443,20 @@ public nativelib_GetPoints(Handle:plugin, numParams)
 		// Check valid block
 		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
 		{
-			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
 		// Check if no shop
 		if (g_FeatureList[feature][FEATURE_LEVEL][block-1] > 0)
 		{
-			ThrowNativeError(2, "Block %i has no points, it's a level Feature!", block);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i has no points, it's a level Feature!", block);
 		}
 
 		return g_FeatureList[feature][FEATURE_POINTS][block-1];
 	}
 	else
 	{
-		ThrowNativeError(3, "Your Feature is invalid");
+		ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 	}
 
 
@@ -483,14 +483,14 @@ public nativelib_IsShop(Handle:plugin, numParams)
 		// Check valid block
 		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
 		{
-			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
 		return (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0);
 	}
 	else
 	{
-		ThrowNativeError(2, "Your Feature is invalid");
+		ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 	}
 
 
@@ -514,7 +514,7 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Your Feature is invalid");
+		ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 	}
 
 
@@ -542,14 +542,14 @@ public nativelib_GetBlockName(Handle:plugin, numParams)
 		// Check valid block
 		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
 		{
-			ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 		}
 
 		/* TODO: IMPLEMENT
 		// Check if shop
 		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
 		{
-			ThrowNativeError(2, "Block %i has no level, it's a shop Feature!", block);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i has no level, it's a shop Feature!", block);
 		} */
 
 		// Get block Name
@@ -558,7 +558,7 @@ public nativelib_GetBlockName(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Your Feature is invalid");
+		ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 	}
 }
 
@@ -596,7 +596,7 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Your Feature is invalid");
+		ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 	}
 
 
@@ -638,7 +638,7 @@ public nativelib_GetClientStammPoints(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -685,12 +685,12 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 		}
 		else
 		{
-			ThrowNativeError(1, "Your Feature is invalid");
+			ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 		}
 	}
 	else
 	{
-		ThrowNativeError(2, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -716,7 +716,7 @@ public nativelib_GetClientStammLevel(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -740,7 +740,7 @@ public nativelib_GetStammLevelPoints(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Level %i is invalid! Found only %i non private Levels", type, g_iLevels);
+		ThrowNativeError(SP_ERROR_NATIVE, "Level %i is invalid! Found only %i non private Levels", type, g_iLevels);
 	}
 
 
@@ -780,7 +780,7 @@ public nativelib_GetStammLevelName(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Level %i is invalid! Found only %i Levels", type, g_iLevels+g_iPLevels);
+		ThrowNativeError(SP_ERROR_NATIVE, "Level %i is invalid! Found only %i Levels", type, g_iLevels+g_iPLevels);
 	}
 
 
@@ -830,7 +830,7 @@ public nativelib_IsLevelPrivate(Handle:plugin, numParams)
 	// greater than normal levels?
 	if (type > g_iLevels+g_iPLevels)
 	{
-		ThrowNativeError(1, "Level %i is invalid! Found only %i Levels", type, g_iLevels+g_iPLevels);
+		ThrowNativeError(SP_ERROR_NATIVE, "Level %i is invalid! Found only %i Levels", type, g_iLevels+g_iPLevels);
 	}
 
 
@@ -923,12 +923,12 @@ public nativelib_StartHappyHour(Handle:plugin, numParams)
 		}
 		else
 		{
-			ThrowNativeError(1, "Factor must be greater than 1");
+			ThrowNativeError(SP_ERROR_NATIVE, "Factor must be greater than 1");
 		}
 	}
 	else 
 	{
-		ThrowNativeError(2, "Time must be greater than 1");
+		ThrowNativeError(SP_ERROR_NATIVE, "Time must be greater than 1");
 	}
 	
 
@@ -983,12 +983,12 @@ public nativelib_ClientWantStammFeature(Handle:plugin, numParams)
 		}
 		else
 		{
-			ThrowNativeError(1, "Your Feature is invalid");
+			ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 		}
 	}
 	else
 	{
-		ThrowNativeError(2, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 	return false;
@@ -1017,7 +1017,7 @@ public nativelib_AddClientStammPoints(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -1046,7 +1046,7 @@ public nativelib_DelClientStammPoints(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -1083,7 +1083,7 @@ public nativelib_SetClientStammPoints(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -1100,7 +1100,7 @@ public nativelib_AddFeature(Handle:plugin, numParams)
 	// Max features reached?
 	if (g_iFeatures >= MAXFEATURES)
 	{
-		ThrowNativeError(1, "Max features of %i reached!", MAXFEATURES);
+		ThrowNativeError(SP_ERROR_NATIVE, "Max features of %i reached!", MAXFEATURES);
 	}
 
 	decl String:name[64];
@@ -1124,7 +1124,7 @@ public nativelib_RegFeature(Handle:plugin, numParams)
 	// Max features reached?
 	if (g_iFeatures >= MAXFEATURES)
 	{
-		ThrowNativeError(1, "Max features of %i reached!", MAXFEATURES);
+		ThrowNativeError(SP_ERROR_NATIVE, "Max features of %i reached!", MAXFEATURES);
 	}
 
 	decl String:name[64];
@@ -1184,7 +1184,7 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 			// Check valid block
 			if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
 			{
-				ThrowNativeError(1, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+				ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
 			}
 
 			if (!g_FeatureList[feature][WANT_FEATURE][client])
@@ -1206,12 +1206,12 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 		}
 		else
 		{
-			ThrowNativeError(2, "Your Feature is invalid");
+			ThrowNativeError(SP_ERROR_NATIVE, "Your Feature is invalid");
 		}
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 
 
@@ -1292,7 +1292,7 @@ public nativelib_IsClientVip(Handle:plugin, numParams)
 	}
 	else
 	{
-		ThrowNativeError(1, "Client %i is invalid", client);
+		ThrowNativeError(SP_ERROR_NATIVE, "Client %i is invalid", client);
 	}
 	
 
@@ -1412,12 +1412,12 @@ public nativelib_AddCommand(Handle:plugin, numParams)
 {
 	if (g_iCommands == MAXFEATURES)
 	{
-		ThrowNativeError(1, "Max commands of %i reached!", MAXFEATURES);
+		ThrowNativeError(SP_ERROR_NATIVE, "Max commands of %i reached!", MAXFEATURES);
 	}
 
 	if (!nativelib_requesting_commands)
 	{
-		ThrowNativeError(2, "You can only use this native in forward STAMM_OnClientRequestCommands");
+		ThrowNativeError(SP_ERROR_NATIVE, "You can only use this native in forward STAMM_OnClientRequestCommands");
 	}
 
 

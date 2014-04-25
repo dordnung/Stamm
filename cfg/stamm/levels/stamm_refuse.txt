@@ -1,0 +1,14 @@
+// Here you can add as much levels as you want
+// For each block the amount will be increased by 1
+
+"LevelSettings"
+{
+	// Can refuse 1 time
+	"1"             "Silver"
+	
+	// Can refuse 2 times
+	"2"             "Gold"
+	
+	// Can refuse 3 times
+	//"3"           "Platinum"
+}

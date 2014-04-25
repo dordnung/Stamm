@@ -1,8 +1,0 @@
-"Phrases"
-{
-	"GetNoReload"
-	{
-		"en"		"Don't have to reload"
-		"de"		"Nicht nachladen mÃ¼ssen"
-	}
-}

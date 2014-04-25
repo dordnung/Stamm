@@ -1,8 +1,0 @@
-"Phrases"
-{
-	"GetIcon"
-	{	
-		"en"		"Get an VIP icon on top of you"
-		"de"		"Bekomme ein VIP Icon ÃƒÂ¼ber deinen Kopf"
-	}
-}

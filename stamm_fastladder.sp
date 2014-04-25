@@ -3,7 +3,7 @@
  * File        stamm_fastladder.sp
  * Authors     Bara
  * License     GPLv3
- * Web         http://bara.in
+ * Web         https://bara.in
  * -----------------------------------------------------
  * 
  * Copyright (C) 2012-2014 Bara
@@ -36,10 +36,10 @@
 
 public Plugin:myinfo = 
 {
-	name = "FastLadder",
+	name = "Stamm Feature FastLadder",
 	author = "Bara",
 	description = "Prohibit non VIP's the fast go up on ladders",
-	version = "1.1.1",
+	version = "1.1.2",
 	url = "www.bara.in"
 };
 

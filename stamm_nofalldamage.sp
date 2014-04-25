@@ -34,8 +34,6 @@
 
 #pragma semicolon 1
 
-#define DMG_FALL   (1 << 5)
-
 
 
 
@@ -116,7 +114,7 @@ public STAMM_OnClientReady(client)
 
 
 // Client toke damage
-public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype)
+public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype, &weapon, Float:damageForce[3], Float:damagePosition[3], damagecustom)
 {
 	if (STAMM_IsClientValid(client))
 	{

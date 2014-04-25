@@ -3,7 +3,7 @@
  * File        stamm_easybhop.sp
  * Authors     Bara
  * License     GPLv3
- * Web         http://bara.in
+ * Web         https://bara.in
  * -----------------------------------------------------
  * 
  * Copyright (C) 2012-2014 Bara
@@ -35,9 +35,9 @@
 
 public Plugin:myinfo =
 {
-	name = "EasyBhop",
+	name = "Stamm Feature EasyBhop",
 	author = "Bara",
-	version = "1.1.1",
+	version = "1.1.2",
 	description = "Give VIP's eady bunnyhop",
 	url = "www.bara.in"
 };

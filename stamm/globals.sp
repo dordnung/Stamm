@@ -104,8 +104,8 @@ new StammGames:g_iGameID;
 
 // String globals
 new String:g_sAdminMenu[32];
-new String:g_sPluginVersion[16] = "2.21";
-new String:g_sPluginVersionUpdate[16] = "2.2.1";
+new String:g_sPluginVersion[16] = "2.22";
+new String:g_sPluginVersionUpdate[16] = "2.2.2";
 new String:g_sTableName[64];
 new String:g_sTextToWrite[32];
 new String:g_sTextToWriteF[32];
@@ -168,7 +168,6 @@ new Handle:g_hHudSync;
 
 
 #define g_sUpdatePlayerQuery "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'"
-#define g_sUpdateSetPointsLevelZeroQuery "UPDATE `%s` SET `level`=0,`points`=0 WHERE `steamid`='%s'"
 #define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 "
 #define g_sUpdateSetPointsQuery "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'"
 #define g_sUpdateAddPointsQuery "UPDATE `%s` SET `points`=`points`+(%i) "
@@ -192,7 +191,6 @@ new Handle:g_hHudSync;
 
 
 #define g_sSelectVersionQuery "SELECT REPLACE(`version`, '.', '') FROM `%s` ORDER BY `version` DESC LIMIT 1"
-#define g_sSelectHappyQuery "SELECT `end`, `factor` FROM `%s_happy` WHERE `end` > %i LIMIT 1"
 #define g_sSelectPointsQuery "SELECT `points` FROM `%s` WHERE `steamid`='%s'"
 #define g_sSelectAllPointsQuery "SELECT `VIP` FROM `%s` LIMIT 1"
 #define g_sSelectTop10Query "SELECT `name`, `points` FROM `%s` WHERE `level` > 0 ORDER BY `points` DESC LIMIT 10"

@@ -35,6 +35,7 @@ levellib_LoadLevels()
 {
 	// Create the keyvalue
 	decl String:flagTest[64];
+	decl String:flagTest2[64];
 	new bool:duplicate;
 
 
@@ -63,10 +64,11 @@ levellib_LoadLevels()
 
 			// Check if it's a non private level
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
+			KvGetString(all_levels, "flags", flagTest2, sizeof(flagTest2), "");
 
 
 			// Check now, and check if we under the maxlevels line
-			if (strlen(flagTest) < 1 && g_iLevels < MAXLEVELS)
+			if (strlen(flagTest) < 1 && strlen(flagTest2) < 1 && g_iLevels < MAXLEVELS)
 			{
 				// Get point count
 				new points = KvGetNum(all_levels, "points");
@@ -139,7 +141,10 @@ levellib_LoadLevels()
 			// Check if flag tag exists
 			KvGetString(all_levels, "flag", flagTest, sizeof(flagTest), "");
 
-
+			if (strlen(flagTest) <= 0)
+			{
+				KvGetString(all_levels, "flags", flagTest, sizeof(flagTest), "");
+			}
 
 			// Yes it exists
 			if (strlen(flagTest) > 0 && g_iLevels + g_iPLevels < MAXLEVELS)
