@@ -48,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature LosePoints",
 	author = "Popoklopsi",
-	version = "1.1.1",
+	version = "1.1.2",
 	description = "Non VIP's lose until a specific level points on death",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -151,7 +151,8 @@ public PlayerDeath(Handle:event, String:name[], bool:dontBroadcast)
 			{				
 				// Delete points ):
 				STAMM_DelClientPoints(client, pointscount);
-
+				STAMM_GetTag(tag, sizeof(tag));
+				
 				STAMM_PrintToChat(client, "%s %t", tag, "LosePoints", pointscount, deathcount);
 
 
