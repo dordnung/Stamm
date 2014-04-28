@@ -38,8 +38,9 @@
 
 new Handle:g_hTag;
 new Handle:g_hAdmin;
+new Handle:g_hDefault;
 
-
+new bool:isLoaded = false;
 
 
 // Details of plugin
@@ -47,7 +48,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature VIP Tag",
 	author = "Popoklopsi",
-	version = "1.4.1",
+	version = "1.4.2",
 	description = "Give VIP's a VIP Tag",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -70,7 +71,6 @@ public OnAllPluginsLoaded()
 
 
 	STAMM_LoadTranslation();
-	STAMM_RegisterFeature("VIP Tag", true, false);
 }
 
 
@@ -95,6 +95,7 @@ public OnPluginStart()
 	AutoExecConfig_SetCreateFile(true);
 
 	g_hTag = AutoExecConfig_CreateConVar("tag_text", "*VIP*", "Stamm Tag");
+	g_hDefault = AutoExecConfig_CreateConVar("tag_default", "0", "1=Tag is enabled by default, 0=Players have to activate it at first");
 	g_hAdmin = AutoExecConfig_CreateConVar("tag_admin", "1", "1=Admins get also tag, 0=Off");
 	
 	AutoExecConfig_CleanFile();
@@ -102,6 +103,20 @@ public OnPluginStart()
 	
 	
 	HookEvent("player_spawn", eventPlayerSpawn);
+}
+
+
+
+
+// Configs loaded
+public OnConfigsExecuted()
+{
+	if (!isLoaded)
+	{
+		isLoaded = true;
+
+		STAMM_RegisterFeature("VIP Tag", true, GetConVarBool(g_hDefault));
+	}
 }
 
 
