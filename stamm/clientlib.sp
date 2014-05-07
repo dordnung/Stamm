@@ -88,7 +88,8 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 		{
 			new Float:startPos;
 			new Float:endPos;
-			
+			decl String:tag[128];
+
 
 			// Set position of text.
 			if (TF2_GetPlayerClass(client) != TFClass_Engineer)
@@ -102,10 +103,21 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 				endPos = 0.02;
 			}
 
+			strcopy(tag, sizeof(tag), g_sStammTag);
+
+			if (!g_bMoreColors)
+			{
+				CRemoveTags(tag, sizeof(tag));
+			}
+			else
+			{
+				MCRemoveTags(tag, sizeof(tag));
+			}
+
 
 			// Show the hud text
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
-			ShowSyncHudText(client, g_hHudSync, "[STAMM] %t: %i", "Points", g_iPlayerPoints[client]);
+			ShowSyncHudText(client, g_hHudSync, "%s %t: %i", "Points", tag, g_iPlayerPoints[client]);
 		}
 	}
 
