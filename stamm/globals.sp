@@ -104,8 +104,8 @@ new StammGames:g_iGameID;
 
 // String globals
 new String:g_sAdminMenu[32];
-new String:g_sPluginVersion[16] = "2.23";
-new String:g_sPluginVersionUpdate[16] = "2.2.3";
+new String:g_sPluginVersion[16] = "2.24";
+new String:g_sPluginVersionUpdate[16] = "2.2.4";
 new String:g_sTableName[64];
 new String:g_sTextToWrite[32];
 new String:g_sTextToWriteF[32];
@@ -168,7 +168,7 @@ new Handle:g_hHudSync;
 
 
 #define g_sUpdatePlayerQuery "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'"
-#define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 "
+#define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 WHERE `steamid`='%s'"
 #define g_sUpdateSetPointsQuery "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'"
 #define g_sUpdateAddPointsQuery "UPDATE `%s` SET `points`=`points`+(%i) "
 #define g_sUpdateAddPointsSteamidQuery "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'"
