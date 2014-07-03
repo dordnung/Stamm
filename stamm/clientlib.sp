@@ -476,7 +476,7 @@ clientlib_SavePlayer(client, number)
 		// Zero points only?
 		if (g_iPlayerPoints[client] == 0)
 		{
-			Format(query, sizeof(query), g_sUpdateSetPointsZeroQuery, g_sTableName);
+			Format(query, sizeof(query), g_sUpdateSetPointsZeroSaveQuery, g_sTableName);
 		}
 		else
 		{
