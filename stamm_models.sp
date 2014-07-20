@@ -70,7 +70,7 @@ public Plugin:myinfo =
 {
 	name = "Stamm Feature Vip Models",
 	author = "Popoklopsi",
-	version = "1.3.1",
+	version = "1.3.2",
 	description = "Give VIP's VIP Models",
 	url = "https://forums.alliedmods.net/showthread.php?t=142073"
 };
@@ -566,6 +566,10 @@ public PrepareSameModels(client)
 		if (found)
 		{
 			DisplayMenu(ModelMenu, client, MENU_TIME_FOREVER);
+		}
+		else
+		{
+			CloseHandle(ModelMenu);
 		}
 	}
 	else if (PlayerHasModel[client] && !StrEqual(PlayerModel[client], ""))
