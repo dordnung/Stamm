@@ -122,9 +122,15 @@ public PlayerSpawn(Handle:event, String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	STAMM_OnClientChangedFeature(client, true, false);
+	// Players spawn without Gravity (not always)
+	CreateTimer(0.1, Timer_ChangeGravity, client);
 }
 
+
+public Action:Timer_ChangeGravity(Handle:timer, any:client)
+{
+	STAMM_OnClientChangedFeature(client, true, false);
+}
 
 
 public STAMM_OnClientBecomeVip(client, oldlevel, newlevel)

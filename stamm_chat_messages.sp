@@ -35,8 +35,8 @@
 
 
 
-new g_iWelcome;
-new g_iLeave;
+new g_iWelcome = -1;
+new g_iLeave = -1;
 
 
 

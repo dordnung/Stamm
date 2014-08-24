@@ -104,8 +104,8 @@ new StammGames:g_iGameID;
 
 // String globals
 new String:g_sAdminMenu[32];
-new String:g_sPluginVersion[16] = "2.22";
-new String:g_sPluginVersionUpdate[16] = "2.2.2";
+new String:g_sPluginVersion[16] = "2.28";
+new String:g_sPluginVersionUpdate[16] = "2.2.8";
 new String:g_sTableName[64];
 new String:g_sTextToWrite[32];
 new String:g_sTextToWriteF[32];
@@ -146,7 +146,7 @@ new bool:g_bMoreColors;
 new Handle:g_hFeatureBlocks[MAXFEATURES];
 new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;
-
+new Handle:g_hSteamIDRegex2;
 
 
 
@@ -168,8 +168,8 @@ new Handle:g_hHudSync;
 
 
 #define g_sUpdatePlayerQuery "UPDATE `%s` SET `level`=%i WHERE `steamid`='%s'"
-#define g_sUpdateSetPointsLevelZeroQuery "UPDATE `%s` SET `level`=0,`points`=0 WHERE `steamid`='%s'"
-#define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 "
+#define g_sUpdateSetPointsZeroQuery "UPDATE `%s` SET `points`=0 WHERE `steamid`='%s'"
+#define g_sUpdateSetPointsZeroSaveQuery "UPDATE `%s` SET `points`=0 "
 #define g_sUpdateSetPointsQuery "UPDATE `%s` SET `points`=%i WHERE `steamid`='%s'"
 #define g_sUpdateAddPointsQuery "UPDATE `%s` SET `points`=`points`+(%i) "
 #define g_sUpdateAddPointsSteamidQuery "UPDATE `%s` SET `points`=`points`+(%i) WHERE `steamid`='%s'"

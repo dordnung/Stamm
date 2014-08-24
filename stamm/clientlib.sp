@@ -88,7 +88,8 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 		{
 			new Float:startPos;
 			new Float:endPos;
-			
+			decl String:tag[128];
+
 
 			// Set position of text.
 			if (TF2_GetPlayerClass(client) != TFClass_Engineer)
@@ -102,10 +103,21 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 				endPos = 0.02;
 			}
 
+			strcopy(tag, sizeof(tag), g_sStammTag);
+
+			if (!g_bMoreColors)
+			{
+				CRemoveTags(tag, sizeof(tag));
+			}
+			else
+			{
+				MCRemoveTags(tag, sizeof(tag));
+			}
+
 
 			// Show the hud text
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
-			ShowSyncHudText(client, g_hHudSync, "[STAMM] %t: %i", "Points", g_iPlayerPoints[client]);
+			ShowSyncHudText(client, g_hHudSync, "%s %t: %i", tag, "Points", g_iPlayerPoints[client]);
 		}
 	}
 
@@ -220,8 +232,8 @@ clientlib_IsSteamIDConnected(String:steamid[])
 	// Copy to buffer
 	strcopy(search, sizeof(search), steamid);
 
-	// Replace STEAM_1: with STEAM_0:
-	ReplaceString(search, sizeof(search), "STEAM_1:", "STEAM_0:");
+	// Convert Steamid to unique format
+	clientlib_convertSteamid(search, sizeof(search));
 
 
 	// Client Loop
@@ -415,8 +427,6 @@ clientlib_CheckVip(client)
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, setquery);
 
 
-
-
 			// Notice to API
 			nativelib_PublicPlayerBecomeVip(client, oldlevel, g_iPlayerLevel[client]);
 		}
@@ -425,6 +435,8 @@ clientlib_CheckVip(client)
 		{
 			// New level is no level, poor player ):
 			decl String:queryback[256];
+
+			new oldlevel = g_iPlayerLevel[client];
 
 			// set to zero
 			g_iPlayerLevel[client] = 0;
@@ -436,6 +448,10 @@ clientlib_CheckVip(client)
 			StammLog(true, "Execute %s", queryback);
 
 			SQL_TQuery(sqllib_db, sqllib_SQLErrorCheckCallback, queryback);
+
+
+			// Notice to API
+			nativelib_PublicPlayerBecomeVip(client, oldlevel, 0);
 		}
 	}
 }
@@ -460,7 +476,7 @@ clientlib_SavePlayer(client, number)
 		// Zero points only?
 		if (g_iPlayerPoints[client] == 0)
 		{
-			Format(query, sizeof(query), g_sUpdateSetPointsZeroQuery, g_sTableName);
+			Format(query, sizeof(query), g_sUpdateSetPointsZeroSaveQuery, g_sTableName);
 		}
 		else
 		{
@@ -497,11 +513,33 @@ clientlib_SavePlayer(client, number)
 clientlib_getSteamid(client, String:steamid[], size)
 {
 	GetClientAuthString(client, steamid, size);
+
+	clientlib_convertSteamid(steamid, size);
+}
+
+
+
+
+
+
+
+// Converts all Steamids to an unique format
+clientlib_convertSteamid(String:steamid[], size)
+{
+	// Convert the new Steamid Format to the old one
+	if (MatchRegex(g_hSteamIDRegex2, steamid) == 1)
+	{
+		steamid[strlen(steamid)] = '\0';
+		
+		new id = StringToInt(steamid[5]);
+
+		Format(steamid, size, "STEAM_0:%d:%d", id & 1, id >> 1);
+	}
+
 	
 	// Replace STEAM_1: with STEAM_0:
 	ReplaceString(steamid, size, "STEAM_1:", "STEAM_0:");
 }
-
 
 
 
