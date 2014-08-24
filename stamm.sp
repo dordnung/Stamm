@@ -172,6 +172,10 @@ public OnPluginStart()
 	g_iPoints = 1;
 	g_bHappyHourON = false;
 	
+	
+	// Test for new Steamid Format
+	g_hSteamIDRegex2 = CompileRegex("^\\[U:1:[0-9]{3,11}+\\]$");
+
 
 	// Register Say Filter
 	RegConsoleCmd("say", clientlib_CmdSay);

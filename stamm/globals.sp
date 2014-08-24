@@ -146,7 +146,7 @@ new bool:g_bMoreColors;
 new Handle:g_hFeatureBlocks[MAXFEATURES];
 new Handle:g_hHappyTimer;
 new Handle:g_hHudSync;
-
+new Handle:g_hSteamIDRegex2;
 
 
 

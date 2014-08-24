@@ -232,8 +232,8 @@ clientlib_IsSteamIDConnected(String:steamid[])
 	// Copy to buffer
 	strcopy(search, sizeof(search), steamid);
 
-	// Replace STEAM_1: with STEAM_0:
-	ReplaceString(search, sizeof(search), "STEAM_1:", "STEAM_0:");
+	// Convert Steamid to unique format
+	clientlib_convertSteamid(search, sizeof(search));
 
 
 	// Client Loop
@@ -514,9 +514,20 @@ clientlib_getSteamid(client, String:steamid[], size)
 {
 	GetClientAuthString(client, steamid, size);
 
+	clientlib_convertSteamid(steamid, size);
+}
 
-	// For TF2 we have to use the new SteamID Format
-	if (g_iGameID == GAME_TF2)
+
+
+
+
+
+
+// Converts all Steamids to an unique format
+clientlib_convertSteamid(String:steamid[], size)
+{
+	// Convert the new Steamid Format to the old one
+	if (MatchRegex(g_hSteamIDRegex2, steamid) == 1)
 	{
 		steamid[strlen(steamid)] = '\0';
 		
@@ -529,7 +540,6 @@ clientlib_getSteamid(client, String:steamid[], size)
 	// Replace STEAM_1: with STEAM_0:
 	ReplaceString(steamid, size, "STEAM_1:", "STEAM_0:");
 }
-
 
 
 
