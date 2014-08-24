@@ -117,7 +117,7 @@ public Action:clientlib_ShowHudText(Handle:timer, any:data)
 
 			// Show the hud text
 			SetHudTextParams(startPos, endPos, 0.6, 255, 255, 0, 255, 0, 0.0, 0.0, 0.0);
-			ShowSyncHudText(client, g_hHudSync, "%s %t: %i", "Points", tag, g_iPlayerPoints[client]);
+			ShowSyncHudText(client, g_hHudSync, "%s %t: %i", tag, "Points", g_iPlayerPoints[client]);
 		}
 	}
 
