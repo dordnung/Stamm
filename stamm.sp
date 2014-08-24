@@ -304,6 +304,8 @@ public OnConfigsExecuted()
 	// No mapchange? Real load
 	if (!g_bPluginStarted)
 	{	
+		g_bPluginStarted = true;
+		
 		// Start rest of stamm componants
 		// They need the config
 		sqllib_Start();
