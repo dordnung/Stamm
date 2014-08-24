@@ -513,6 +513,18 @@ clientlib_SavePlayer(client, number)
 clientlib_getSteamid(client, String:steamid[], size)
 {
 	GetClientAuthString(client, steamid, size);
+
+
+	// For TF2 we have to use the new SteamID Format
+	if (g_iGameID == GAME_TF2)
+	{
+		steamid[strlen(steamid)] = '\0';
+		
+		new id = StringToInt(steamid[5]);
+
+		Format(steamid, size, "STEAM_0:%d:%d", id & 1, id >> 1);
+	}
+
 	
 	// Replace STEAM_1: with STEAM_0:
 	ReplaceString(steamid, size, "STEAM_1:", "STEAM_0:");
