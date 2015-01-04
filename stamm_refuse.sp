@@ -173,7 +173,7 @@ public Action:Command_Refuse(client, args)
 				{
 					if (g_iCount[client] < g_iClientBlock)
 					{
-						if (CheckTeam() <= GetConVarInt(g_hMinT))
+						if (GetConVarInt(g_hMinT) >= CheckTeam())
 						{
 							STAMM_PrintToChat(client, "%T", "NotEnoughT", client, GetConVarInt(g_hMinT));
 
@@ -202,7 +202,7 @@ public Action:Command_Refuse(client, args)
 					{
 						if (g_iCount[client] == 0)
 						{
-							if (CheckTeam() <= GetConVarInt(g_hMinT))
+							if (GetConVarInt(g_hMinT) >= CheckTeam())
 							{
 								STAMM_PrintToChat(client, "%T", "NotEnoughT", client, GetConVarInt(g_hMinT));
 
