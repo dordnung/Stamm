@@ -64,7 +64,23 @@ panellib_Start()
 	// Register sadmin
 	if (!StrContains(g_sAdminMenu, "sm_")) 
 	{
-		RegAdminCmd(g_sAdminMenu, panellib_OpenAdmin, ADMFLAG_CUSTOM6);
+		decl String:p_sBuffer[20];
+		
+		GetConVarString(configlib_AdminFlag, p_sBuffer, 20);
+		
+		new p_iAdmFlags;
+		new p_iResults;
+		
+		p_iAdmFlags = ReadFlagString(p_sBuffer, p_iResults);
+		
+		if(p_iResults > 0)
+		{
+			RegAdminCmd(g_sAdminMenu, panellib_OpenAdmin, p_iAdmFlags);
+		}
+		else
+		{
+			RegAdminCmd(g_sAdminMenu, panellib_OpenAdmin, ADMFLAG_CUSTOM6);
+		}
 	}
 
 
