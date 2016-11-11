@@ -210,7 +210,7 @@ public Action:eventHeDetonate(Handle:event, const String:name[], bool:dontBroadc
 				// Create and teleport to smoke
 				TeleportEntity(ent_light, origin, NULL_VECTOR, NULL_VECTOR);
 				
-				CreateTimer(20.0, delete, ent_light, TIMER_FLAG_NO_MAPCHANGE);
+				CreateTimer(20.0, Timer_Delete, ent_light, TIMER_FLAG_NO_MAPCHANGE);
 			}
 		}
 	}
@@ -247,7 +247,7 @@ public Action:PartyLight(Handle:timer, any:light)
 
 
 // Delete the light on finish
-public Action:delete(Handle:timer, any:light)
+public Action:Timer_Delete(Handle:timer, any:light)
 {
 	if (IsValidEntity(light))
 	{
