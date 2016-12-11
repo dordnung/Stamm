@@ -666,6 +666,10 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 		// Must be valid
 		if (clientlib_isValidClient(client) && clientlib_isValidClient(param1))
 		{
+			// Get level with client points
+			new levelstufe = levellib_ClientPointsToID(client);
+			new oldlevel = g_iPlayerLevel[client];
+
 			// Get the name and steamid
 			GetClientName(client, name, sizeof(name));
 			clientlib_getSteamid(client, steamid, sizeof(steamid));
@@ -692,6 +696,12 @@ public panellib_PlayerListHandlerDelete(Handle:menu, MenuAction:action, param1, 
 				{
 					MCPrintToChat(client, "%s %t", g_sStammTag, "YourDeletedPoints");
 				}
+			}
+			
+			if (levelstufe > 0 && levelstufe != g_iPlayerLevel[client])
+			{
+				// Notice to API
+				nativelib_PublicPlayerBecomeVip(client, oldlevel, g_iPlayerLevel[client]);
 			}
 
 
