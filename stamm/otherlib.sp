@@ -89,6 +89,11 @@ otherlib_saveGame()
 	{ 
 		g_iGameID = GAME_CSGO;
 	}
+	
+	else if (StrEqual(GameName, "csco")) 
+	{ 
+		g_iGameID = GAME_CSGO;
+	}
 
 	else if (StrEqual(GameName, "tf")) 
 	{ 
