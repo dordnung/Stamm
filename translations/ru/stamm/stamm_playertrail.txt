@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"GetPlayerTrail"
+	{	
+		"ru"        "Получите след игрока"
+	}
+}

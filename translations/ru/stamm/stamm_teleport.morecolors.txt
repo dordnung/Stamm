@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GetTeleport"
+	{
+		"ru"        "Создавайте точки телепортации"
+	}
+	"TeleportAdded"
+	{
+		"ru"        "{mediumseagreen}Вы добавили {strange}новый телепорт{mediumseagreen}, введите {strange}!stele {mediumseagreen}для {strange}телепортации"
+	}
+}

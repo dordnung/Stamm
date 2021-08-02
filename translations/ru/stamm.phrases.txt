@@ -1,0 +1,271 @@
+"Phrases"
+{
+	"aborted"
+	{
+		"ru"        "отменено"
+	}
+	"Round"
+	{
+		"ru"        "раунд"
+	}
+	"Kill"
+	{
+		"ru"        "убийство"
+	}
+	"Minute"
+	{
+		"ru"        "мин."
+	}
+	"Points"
+	{
+		"ru"        "Очков Штамм"
+	}
+	"Flag"
+	{
+		"ru"        "Флаг"
+	}
+	"VIP"
+	{
+		"ru"        "VIP"
+	}
+	"PointInfo"
+	{
+		"ru"        "Вы получаете 1 очко Штамма с:"
+	}
+	"NewPointsKill"
+	{
+		"ru"        "Вы получили {green}{1} очко(а/в) Штамм за {lightgreen}убийство игрока"
+	}
+	"NewPointsRound"
+	{
+		"ru"        "Вы получили {green}{1} очко(а/в) Штамм за {lightgreen}новый раунд"
+	}
+	"NewPointsTime"
+	{
+		"ru"        "Вы получили {green}{1} очко(а/в) Штамм за {lightgreen}игру на сервере в {2} мин."
+	}
+	"InfoTyp"
+	{
+		"ru"        "включён, {green}введите {1}{lightgreen}, чтобы увидеть ваши {green}текущие очки Штамм"
+	}
+	"InfoTypInfo"
+	{
+		"ru"        "Введите {green}{1}{lightgreen}, чтобы увидеть все преимущества {green}Штамм"
+	}
+	"DeletedPoints"
+	{
+		"ru"        "Очки Штамм {green}игрока {1} {lightgreen}удалены!"
+	}
+	"YourDeletedPoints"
+	{
+		"ru"        "Ваши очки Штамм {green}были сброшены!!"
+	}
+	"AllLevels"
+	{
+		"ru"        "Обзор уровня"
+	}
+	"ChoosePlayer"
+	{
+		"ru"        "Выбрать игрока"
+	}
+	"ChooseFeature"
+	{
+		"ru"        "Выбрать возможность"
+	}
+	"NoRanks"
+	{
+		"ru"        "Игроки Штамм {lightgreen}не найдены"
+	}
+	"Rank"
+	{
+		"ru"        "Вы на {green}{1}. Месте{lightgreen} с {green}{2} очками Штамм"
+	}
+	"NoVIPClient"
+	{
+		"ru"        "У вас есть {green}{1} очков Штамм{lightgreen}, вам ещё нужно{green} {2} очков{lightgreen}, чтобы стать {3}{4}"
+	}
+	"VIPClient"
+	{
+		"ru"        "У вас есть {green}{1} очков Штамм{lightgreen}, вы {2}{3}"
+	}
+	"NoVIPClientPlain"
+	{
+		"ru"        "У вас есть {1} очков Штамм, вам ещё нужно {2} очков, чтобы стать {3}{4}"
+	}
+	"VIPClientPlain"
+	{
+		"ru"        "У вас есть {1} очков Штамм, вы {2}{3}"
+	}
+	"NoVIPAll"
+	{
+		"ru"        "{green}{1} {lightgreen}имеет {green}{2} очков Штамм{lightgreen}, ему до сих пор нужно{green} {3} очков{lightgreen}, чтобы стать {4}{5}"
+	}
+	"VIPAll"
+	{
+		"ru"        "{green}{1} {lightgreen}имеет {green}{2} очков Штамм{lightgreen}, он {3}{4}"
+	}
+	"VIPClientZero"
+	{
+		"ru"        "У вас есть {green}{1} очков Штамм{lightgreen}"
+	}
+	"VIPClientPlainZero"
+	{
+		"ru"        "У вас есть {1} очков Штамм"
+	}
+	"VIPAllZero"
+	{
+		"ru"        "{green}{1} {lightgreen}имеет {green}{2} очков Штамм{lightgreen}"
+	}
+	"LevelNowVIP"
+	{
+		"ru"        "{1} теперь {green}имеет {2} VIP"
+	}
+	"LevelNowLevel"
+	{
+		"ru"        "{1} теперь {green}имеет {2}"
+	}
+	"JoinVIP"
+	{
+		"ru"        "{green}Перезайдите{lightgreen}, чтобы получить {green}все возможности"
+	}
+	"StammPoints"
+	{
+		"ru"        "Ваши очки Штамм:"
+	}
+	"StammTop"
+	{
+		"ru"        "10 лучших игроков Штамм:"
+	}
+	"StammRank"
+	{
+		"ru"        "Рейтинг вашего Штамм:"
+	}
+	"StammChange"
+	{
+		"ru"        "Включение/выключение возможностей:"
+	}
+	"Close"
+	{
+		"ru"        "Закрыть"
+	}
+	"Reset"
+	{
+		"ru"        "Сброс"
+	}
+	"Back"
+	{
+		"ru"        "Назад"
+	}
+	"HaveFeatures"
+	{
+		"ru"        "Доступны следующие возможности:"
+	}
+	"ChangeFeatures"
+	{
+		"ru"        "Включение/выключение работающих возможностей:"
+	}
+	"FeatureOn"
+	{
+		"ru"        "Отключить {1}"
+	}
+	"FeatureOff"
+	{
+		"ru"        "Включить {1}"
+	}
+	"AdminMenu"
+	{
+		"ru"        "Меню администратора"
+	}
+	"PointsOfPlayer"
+	{
+		"ru"        "Дать очки Штамм игроку"
+	}
+	"StammCMD"
+	{
+		"ru"        "Команды Штамм"
+	}
+	"StammFeatures"
+	{
+		"ru"        "Возможности Штамм"
+	}
+	"ResetPlayer"
+	{
+		"ru"        "Сброс очков Штамм игрока"
+	}
+	"HappyHour"
+	{
+		"ru"        "Начать счастливый час"
+	}
+	"HappyHourEnd"
+	{
+		"ru"        "Остановить счастливый час"
+	}
+	"WritePoints"
+	{
+		"ru"        "Напишите сейчас{green} количество очков Штамм {lightgreen}для добавления {green}в вашем чате"
+	}
+	"WritePointsInfo"
+	{
+		"ru"        "Сообщение {green}с одним пробелом {lightgreen}= {green}отменено"
+	}
+	"SetPoints"
+	{
+		"ru"        "Очки Штамм {green}{1} {lightgreen}были установлены на {green}{2}"
+	}
+	"SetPoints2"
+	{
+		"ru"        "{green}Ваши очки Штамм {lightgreen}были установлены на {green}{1}"
+	}
+	"WriteHappyFactor"
+	{
+		"ru"        "{green}Теперь введите {lightgreen}коэффициент умножения {green}в чате"
+	}
+	"WriteHappyFactorInfo"
+	{
+		"ru"        "Если меньше, {green}чем 2 {lightgreen}= {green}отменено"
+	}
+	"WriteHappyTime"
+	{
+		"ru"        "{green}Теперь введите {lightgreen}продолжительность (в минутах) {green}в чате"
+	}
+	"WriteHappyTimeInfo"
+	{
+		"ru"        "Если меньше, {green}чем 2 {lightgreen}= {green}отменено"
+	}
+	"HappyRunning"
+	{
+		"ru"        "Счастливый час {green}уже работает"
+	}
+	"HappyNotRunning"
+	{
+		"ru"        "Счастливый час {green}не запущен"
+	}
+	"HappyActive"
+	{
+		"ru"        "В настоящее время {green}счастливый час {lightgreen}запущен. Теперь все получают на {green}{1}x больше очков Штамм"
+	}
+	"HappyEnded"
+	{
+		"ru"        "Счастливый час закончился!"
+	}
+	"LoadFeature"
+	{
+		"ru"        "Включить возможность"
+	}
+	"UnloadFeature"
+	{
+		"ru"        "Отключить возможность"
+	}
+	"LoadedFeature"
+	{
+		"ru"        "Загружена {green}возможность {1}"
+	}
+	"UnloadedFeature"
+	{
+		"ru"        "Отключена {green}возможность {1}"
+	}
+	"NoFeatureFound"
+	{
+		"ru"        "{green}Возможность {lightgreen}не найдена"
+	}
+}

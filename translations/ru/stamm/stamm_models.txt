@@ -1,0 +1,27 @@
+"Phrases"
+{
+	"GetModel"
+	{
+		"ru"        "Получите собственную модель"
+	}
+	"GetModelChange"
+	{
+		"ru"        "Получите собственную модель ({1})"
+	}
+	"ChooseModel"
+	{
+		"ru"        "Выберите VIP-модель"
+	}
+	"StandardModel"
+	{
+		"ru"        "Стандартная модель"
+	}
+	"NewModel"
+	{
+		"ru" 		"{green}В следующем раунде {lightgreen}вы можете выбрать {green}новую модель!"
+	}
+	"ModelChangeCmd"
+	{
+		"ru" 		"Выберите новую модель: {1}"
+	}
+}
