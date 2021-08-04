@@ -1,0 +1,42 @@
+"Phrases"
+{
+	"GetRefuse"
+	{
+		"ru"        "Вы можете отказаться от игры {1} раз"
+	}
+	
+	"RefuseCommand"
+	{
+		"ru"        "Отказаться от игры"
+	}
+	
+	"NotEnoughT"
+	{
+		"ru"		"{strange}[ {mediumseagreen}Отказ {strange}] {strange}Вы не можете отказаться, потому что в живых осталось меньше {mediumseagreen}{1} {strange}террористов."
+	}
+	
+	"Refuse"
+	{
+		"ru"		"{strange}[ {mediumseagreen}Отказ {strange}] {mediumseagreen}{1} {strange}отказался от игры."
+	}
+	
+	"MultiRefuse"
+	{
+		"ru"		"{strange}[ {mediumseagreen}Отказ {strange}] {mediumseagreen}{1} {strange}отказался от игры. {strange}[{mediumseagreen}{2}{strange}/{mediumseagreen}{3}{strange}]"
+	}
+	
+	"CantRefuse"
+	{
+		"ru"        "{strange}[ {mediumseagreen}Отказ {strange}] {strange}Вы не можете больше отказываться!"
+	}
+	
+	"NotAlive"
+	{
+		"ru"        "{strange}[ {mediumseagreen}Отказ {strange}] {strange}Мёртвые игроки не могут отказаться!"
+	}
+
+	"NoT"
+	{
+		"ru"        "{strange}[ {mediumseagreen}Отказ {strange}] {strange}Спецназ не могут отказаться!"
+	}
+}

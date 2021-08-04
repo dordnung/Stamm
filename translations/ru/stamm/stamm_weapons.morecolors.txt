@@ -1,0 +1,31 @@
+"Phrases"
+{
+	"GetWeapons"
+	{
+		"ru"        "Получайте оружие за общение в чате"
+	}
+	"GetWeaponsAsT"
+	{
+		"ru"        "Получайте оружие за общение в чате(за Т)"
+	}
+	"GetWeaponsAsCT"
+	{
+		"ru"        "Получайте оружие за общение в чате(за СП)"
+	}
+	"MaximumReached"
+	{
+		"ru"        "Достигнут максимум!"
+	}
+	"WeaponFailed"
+	{
+		"ru"        "{mediumseagreen}Оружие недействительно {strange}или {mediumseagreen}запрещено!"
+	}
+	"TCanNotGive"
+	{
+		"ru"        "{mediumseagreen}Террористы {strange}не могут довать оружие самим себе!"
+	}
+	"CTCanNotGive"
+	{
+		"ru"        "{mediumseagreen}Спецназ {strange}не могут довать оружие самим себе!"
+	}
+}

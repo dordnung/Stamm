@@ -1,0 +1,35 @@
+"Phrases"
+{
+	"GetVIPMessage"
+	{	
+		"ru"        "Писать VIP-сообщения{1}"
+	}
+	"GetVIPChat"
+	{	
+		"ru"        "Получите собственный VIP-чат (начните сообщение с #})"
+	}
+	"FeatureDisabled"
+	{
+		"ru"        "Вы отключили {mediumseagreen}эту возможность!"
+	}
+	"Activate"
+	{
+		"ru"        " (начните сообщение с {1})"
+	}
+	"VIPMessageName"
+	{
+		"ru"        "{strange}[VIP-сообщение] {mediumseagreen}{1}"
+	}
+	"VIPMessage"
+	{
+		"ru"        "{teamcolor}{1}"
+	}
+	"VIPChatName"
+	{
+		"ru"        "{strange}[VIP-чат] {mediumseagreen}{1}"
+	}
+	"VIPChat"
+	{
+		"ru"        "{teamcolor}{1}"
+	}
+}

@@ -1,0 +1,19 @@
+"Phrases"
+{
+	"LeaveMessage"
+	{
+		"ru"        "{mediumseagreen}VIP {1} {strange}покидает сервер."
+	}
+	"WelcomeMessage"
+	{
+		"ru"        "{mediumseagreen}VIP {1} {strange}присоединяется в серверу."
+	}
+	"GetLeaveMessages"
+	{
+		"ru"        "Получить сообщение о выходе с сервера"
+	}
+	"GetWelcomeMessages"
+	{
+		"ru"        "Получить приветственное сообщение"
+	}
+}

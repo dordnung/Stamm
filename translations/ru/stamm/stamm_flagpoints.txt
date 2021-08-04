@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"NoPoints"
+	{
+		"ru"        "{green}Вам нужен {lightgreen}флаг {1} {green}для получения очков"
+	}
+}

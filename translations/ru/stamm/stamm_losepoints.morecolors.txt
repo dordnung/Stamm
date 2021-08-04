@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"NoLosePoints"
+	{
+		"ru"        "Не теряйте очки при смерти"
+	}
+	"LosePoints"
+	{
+		"ru"        "Вы потеряли {mediumseagreen}{1} очков, {strange}потому-что вы {mediumseagreen}умерли {2} раз(а)"
+	}
+}

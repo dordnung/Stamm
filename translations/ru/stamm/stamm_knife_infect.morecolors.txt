@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"GetKnifeInfect"
+	{
+		"ru"        "Заразите игроков ножом"
+	}
+	"YouGotTimeInfected"
+	{
+		"ru"        "{mediumseagreen}Вы {strange}были заражены {mediumseagreen}игроком {strange}{1} {mediumseagreen}на {strange}{2} сек."
+	}
+	"YouGotRoundInfected"
+	{
+		"ru"        "{mediumseagreen}Вы {strange}были заражены {mediumseagreen}игроком {strange}{1} {mediumseagreen}до {strange}следующей жизни"
+	}
+}
