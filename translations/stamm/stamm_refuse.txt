@@ -43,4 +43,9 @@
 	{
 		"en"        "{lightgreen}[ {green}Refuse {lightgreen}] {green}CTs can not refuse!"
 	}
+
+	"NoLuck"
+	{
+		"en"        "{lightgreen}[ {green}Refuse {lightgreen}] {green}No luck, maybe next time!"
+	}
 }

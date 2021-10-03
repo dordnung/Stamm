@@ -19,6 +19,9 @@ new Handle:g_hMode = INVALID_HANDLE;
 new Handle:g_hNonVIP = INVALID_HANDLE;
 new Handle:g_hMinT = INVALID_HANDLE;
 new Handle:g_hReset = INVALID_HANDLE;
+new Handle:g_hMultiR = INVALID_HANDLE;
+new Handle:g_hMultiB = INVALID_HANDLE;
+new Handle:g_hMultiP = INVALID_HANDLE;
 
 
 new g_BeamSprite;
@@ -104,6 +107,9 @@ public OnPluginStart()
 	g_hNonVIP = AutoExecConfig_CreateConVar("refuse_nonvip", "1", "Should non-VIPs be able to refuse?", _, true, 0.0, true, 1.0);
 	g_hMinT = AutoExecConfig_CreateConVar("refuse_t", "3", "How many terrorists have to live for refusal at least.");
 	g_hReset = AutoExecConfig_CreateConVar("refuse_reset_time", "10.0", "After how many seconds should refuse effect disappear ( refuse_mode must be 1 ) (0 - unlimited) ?");
+	g_hMultiR = AutoExecConfig_CreateConVar("refuse_multi_refuse", "1", "Enable multi refusing?", _, true, 0.0, true, 1.0);
+	g_hMultiB = AutoExecConfig_CreateConVar("refuse_base_chance", "5", "How much is the base chance for 2nd (or more) refuse? (0 - to disable refuse by chance)");
+	g_hMultiP = AutoExecConfig_CreateConVar("refuse_multiplicator", "3", "How much percent per level add to refuse base chance?");
 	
 	AutoExecConfig_CleanFile();
 	AutoExecConfig_ExecuteFile();
@@ -169,7 +175,7 @@ public Action:Command_Refuse(client, args)
 			{
 				new g_iClientBlock = STAMM_GetClientBlock(client) + 1;
 
-				if (g_iClientBlock > 1)
+				if (g_iClientBlock > 1 && GetConVarBool(g_hMultiR))
 				{
 					if (g_iCount[client] < g_iClientBlock)
 					{
@@ -181,6 +187,17 @@ public Action:Command_Refuse(client, args)
 						}
 
 						g_iCount[client]++;
+
+						if (GetConVarInt(g_hMultiB) > 0)
+						{
+							new iRandom = GetRandomInt(1, 100);
+
+							if (iRandom > GetConVarInt(g_hMultiB) + (GetConVarInt(g_hMultiP) * (g_iClientBlock - 1))) // Reduce g_iClientBlock by one, to start from level 1 with 1
+							{
+								STAMM_PrintToChat(client, "%T", "NoLuck", client);
+								return Plugin_Handled;
+							}
+						}
 
 						STAMM_PrintToChatAll("%T", "MultiRefuse", client, client, g_iCount[client], g_iClientBlock);
 
