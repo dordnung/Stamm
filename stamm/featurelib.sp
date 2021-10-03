@@ -50,32 +50,32 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 
 	// Get the short basename and the real basename
 	featurelib_getPluginBaseName(plugin, basename, sizeof(basename));
-	GetPluginFilename(plugin, g_FeatureList[g_iFeatures][FEATURE_BASEREAL], sizeof(basename));
+	GetPluginFilename(plugin, g_FeatureList[g_iFeatures].FEATURE_BASEREAL, sizeof(basename));
 
 
 	// Cut out .smx
-	ReplaceString(g_FeatureList[g_iFeatures][FEATURE_BASEREAL], sizeof(basename), ".smx", "", false);
+	ReplaceString(g_FeatureList[g_iFeatures].FEATURE_BASEREAL, sizeof(basename), ".smx", "", false);
 
 
 
 	// Search for duplicates
 	for (new i=0; i < g_iFeatures; i++)
 	{
-		if (StrEqual(g_FeatureList[i][FEATURE_BASE], basename, false))
+		if (StrEqual(g_FeatureList[i].FEATURE_BASE, basename, false))
 		{
-			if (!StrEqual(g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL], false))
+			if (!StrEqual(g_FeatureList[i].FEATURE_BASEREAL, g_FeatureList[g_iFeatures].FEATURE_BASEREAL, false))
 			{
-				StammLog(false, "Found duplicate Feature. First Plugin at: %s. Second Plugin at: %s", g_FeatureList[i][FEATURE_BASEREAL], g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+				StammLog(false, "Found duplicate Feature. First Plugin at: %s. Second Plugin at: %s", g_FeatureList[i].FEATURE_BASEREAL, g_FeatureList[g_iFeatures].FEATURE_BASEREAL);
 
 				return;
 			}
 
 
 			// Duplicate found, assign new values
-			g_FeatureList[i][FEATURE_ENABLE] = true;
-			g_FeatureList[i][FEATURE_HANDLE] = plugin;
-			g_FeatureList[i][FEATURE_CHANGE] = allowChange;
-			g_FeatureList[i][FEATURE_STANDARD] = standard;
+			g_FeatureList[i].FEATURE_ENABLE = true;
+			g_FeatureList[i].FEATURE_HANDLE = plugin;
+			g_FeatureList[i].FEATURE_CHANGE = allowChange;
+			g_FeatureList[i].FEATURE_STANDARD = standard;
 
 
 			// if plugin already started load the feature
@@ -100,15 +100,15 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 			
 
 	// Assign values of the new feature
-	Format(g_FeatureList[g_iFeatures][FEATURE_BASE], sizeof(basename), basename);
-	Format(g_FeatureList[g_iFeatures][FEATURE_NAME], sizeof(basename), name);
+	Format(g_FeatureList[g_iFeatures].FEATURE_BASE, sizeof(basename), basename);
+	Format(g_FeatureList[g_iFeatures].FEATURE_NAME, sizeof(basename), name);
 	
 
-	g_FeatureList[g_iFeatures][FEATURE_HANDLE] = plugin;
-	g_FeatureList[g_iFeatures][FEATURE_ENABLE] = true;
-	g_FeatureList[g_iFeatures][FEATURE_CHANGE] = allowChange;
-	g_FeatureList[g_iFeatures][FEATURE_STANDARD] = standard;
-	g_FeatureList[g_iFeatures][FEATURE_BLOCKS] = 0;
+	g_FeatureList[g_iFeatures].FEATURE_HANDLE = plugin;
+	g_FeatureList[g_iFeatures].FEATURE_ENABLE = true;
+	g_FeatureList[g_iFeatures].FEATURE_CHANGE = allowChange;
+	g_FeatureList[g_iFeatures].FEATURE_STANDARD = standard;
+	g_FeatureList[g_iFeatures].FEATURE_BLOCKS = 0;
 
 
 	// Check if level File exists
@@ -123,10 +123,10 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 		{
 			// Mark feature as zero level
 			goON = false;
-			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
+			g_FeatureList[g_iFeatures].FEATURE_LEVEL[0] = 0;
 
 			/* TODO: IMPLEMENT
-			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
+			g_FeatureList[g_iFeatures].FEATURE_POINTS[0] = 0; */
 
 			// Debug
 			StammLog(true, "Found no Block-File for %s. Switch to Zero level", basename);
@@ -163,18 +163,18 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 		// File is invalid, mark level as zero
 		if (!KvGotoFirstSubKey(level_settings, false))
 		{
-			g_FeatureList[g_iFeatures][FEATURE_LEVEL][0] = 0;
+			g_FeatureList[g_iFeatures].FEATURE_LEVEL[0] = 0;
 
 			/* TODO: IMPLEMENT
-			g_FeatureList[g_iFeatures][FEATURE_POINTS][0] = 0; */
+			g_FeatureList[g_iFeatures].FEATURE_POINTS[0] = 0; */
 
 			// Debug
-			StammLog(true, "Found invalid Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures][FEATURE_BASE]);
+			StammLog(true, "Found invalid Configfile for %s. Switch to Zero level", g_FeatureList[g_iFeatures].FEATURE_BASE);
 		}
 		else
 		{
 			// Start to parse it
-			new start = g_FeatureList[g_iFeatures][FEATURE_BLOCKS];
+			new start = g_FeatureList[g_iFeatures].FEATURE_BLOCKS;
 
 			// Loop for keyvalues
 			do
@@ -200,8 +200,8 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 				// When it's a int, we have a shop feature
 				if (StringToInt(Svalue2) > 0)
 				{
-					g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = StringToInt(Svalue2);
-					g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = 0;
+					g_FeatureList[g_iFeatures].FEATURE_POINTS[start] = StringToInt(Svalue2);
+					g_FeatureList[g_iFeatures].FEATURE_LEVEL[start] = 0;
 
 					found = true;
 				}
@@ -215,10 +215,10 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 						found = true; 
 
 
-						g_FeatureList[g_iFeatures][FEATURE_LEVEL][start] = i + 1;
+						g_FeatureList[g_iFeatures].FEATURE_LEVEL[start] = i + 1;
 
 						/* TODO: IMPLEMENT
-						g_FeatureList[g_iFeatures][FEATURE_POINTS][start] = 0; */
+						g_FeatureList[g_iFeatures].FEATURE_POINTS[start] = 0; */
 
 						// Break
 						break;
@@ -230,14 +230,14 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 				if (!found)
 				{
 					// Mark as disabled
-					g_FeatureList[g_iFeatures][FEATURE_ENABLE] = false;
+					g_FeatureList[g_iFeatures].FEATURE_ENABLE = false;
 
 					// Unload it
-					ServerCommand("sm plugins unload %s stamm", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+					ServerCommand("sm plugins unload %s stamm", g_FeatureList[g_iFeatures].FEATURE_BASEREAL);
 					
 
 					// Log the error
-					StammLog(false, "Invalid Level for Feature: %s", g_FeatureList[g_iFeatures][FEATURE_BASEREAL]);
+					StammLog(false, "Invalid Level for Feature: %s", g_FeatureList[g_iFeatures].FEATURE_BASEREAL);
 
 
 					// Stop here
@@ -254,7 +254,7 @@ featurelib_addFeature(Handle:plugin, String:name[], bool:allowChange, bool:stand
 
 
 			// Update count
-			g_FeatureList[g_iFeatures][FEATURE_BLOCKS] = start;
+			g_FeatureList[g_iFeatures].FEATURE_BLOCKS = start;
 		}
 		
 
@@ -286,14 +286,14 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 	if (featureIndex != -1)
 	{
 		// Announce if debug
-		StammLog(true, "Loaded Feature %s successfully", g_FeatureList[featureIndex][FEATURE_BASE]);
+		StammLog(true, "Loaded Feature %s successfully", g_FeatureList[featureIndex].FEATURE_BASE);
 
 		// Add new Column for this feature
-		sqllib_AddColumn(g_FeatureList[featureIndex][FEATURE_BASE], g_FeatureList[featureIndex][FEATURE_STANDARD]);
+		sqllib_AddColumn(g_FeatureList[featureIndex].FEATURE_BASE, g_FeatureList[featureIndex].FEATURE_STANDARD);
 
 
 		// Notice to feature, that it's loaded now
-		nativelib_startLoaded(g_FeatureList[featureIndex][FEATURE_HANDLE], g_FeatureList[featureIndex][FEATURE_BASE]);
+		nativelib_startLoaded(g_FeatureList[featureIndex].FEATURE_HANDLE, g_FeatureList[featureIndex].FEATURE_BASE);
 	}
 	else
 	{
@@ -305,16 +305,16 @@ public Action:featurelib_loadFeatures(Handle:timer, any:featureIndex)
 		for (new i = 0; i < g_iFeatures; i++)
 		{
 			// Add column
-			sqllib_AddColumn(g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][FEATURE_STANDARD]);
+			sqllib_AddColumn(g_FeatureList[i].FEATURE_BASE, g_FeatureList[i].FEATURE_STANDARD);
 			
 
 			// Notice to feature, that it's loaded now
-			nativelib_startLoaded(g_FeatureList[i][FEATURE_HANDLE], g_FeatureList[i][FEATURE_BASE]);
+			nativelib_startLoaded(g_FeatureList[i].FEATURE_HANDLE, g_FeatureList[i].FEATURE_BASE);
 			
 
 
 			// Notice to all if debug
-			StammLog(true, "Loaded Feature %s successfully", g_FeatureList[i][FEATURE_BASE]);
+			StammLog(true, "Loaded Feature %s successfully", g_FeatureList[i].FEATURE_BASE);
 		}
 		
 
@@ -396,21 +396,21 @@ featurelib_UnloadFeature(Handle:plugin)
 
 
 	// Unlload it
-	ServerCommand("sm plugins unload %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
+	ServerCommand("sm plugins unload %s stamm", g_FeatureList[index].FEATURE_BASEREAL);
 
 	// Mark as disabled
-	g_FeatureList[index][FEATURE_ENABLE] = false;
+	g_FeatureList[index].FEATURE_ENABLE = false;
 
 
 
 	// Announce unload
 	if (!g_bMoreColors)
 	{
-		CPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
+		CPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index].FEATURE_NAME);
 	}
 	else
 	{
-		MCPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index][FEATURE_NAME]);
+		MCPrintToChatAll("%s %t", g_sStammTag, "UnloadedFeature", g_FeatureList[index].FEATURE_NAME);
 	}
 }
 
@@ -427,20 +427,20 @@ featurelib_loadFeature(Handle:plugin)
 	new index = featurelib_getFeatureByHandle(plugin);
 
 	// Load it 
-	ServerCommand("sm plugins load %s stamm", g_FeatureList[index][FEATURE_BASEREAL]);
+	ServerCommand("sm plugins load %s stamm", g_FeatureList[index].FEATURE_BASEREAL);
 
 
 	// Mark as enabled, and announce it
-	g_FeatureList[index][FEATURE_ENABLE] = true;
+	g_FeatureList[index].FEATURE_ENABLE = true;
 
 
 	if (!g_bMoreColors)
 	{
-		CPrintToChatAll("%s %t", g_sStammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
+		CPrintToChatAll("%s %t", g_sStammTag, "LoadedFeature", g_FeatureList[index].FEATURE_NAME);
 	}
 	else
 	{
-		MCPrintToChatAll("%s %t", g_sStammTag, "LoadedFeature", g_FeatureList[index][FEATURE_NAME]);
+		MCPrintToChatAll("%s %t", g_sStammTag, "LoadedFeature", g_FeatureList[index].FEATURE_NAME);
 	}
 }
 
@@ -476,10 +476,10 @@ public Action:featurelib_Load(args)
 		// Find the feature
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (!g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			if (!g_FeatureList[i].FEATURE_ENABLE && StrEqual(basename, g_FeatureList[i].FEATURE_BASE, false))
 			{
 				// Load it
-				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_loadFeature(g_FeatureList[i].FEATURE_HANDLE);
 
 				// Finish
 				return Plugin_Handled;
@@ -490,10 +490,10 @@ public Action:featurelib_Load(args)
 		// Not found, search with real Basename
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (!g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			if (!g_FeatureList[i].FEATURE_ENABLE && StrEqual(basename, g_FeatureList[i].FEATURE_BASEREAL, false))
 			{
 				// Load it
-				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_loadFeature(g_FeatureList[i].FEATURE_HANDLE);
 
 				return Plugin_Handled;
 			}
@@ -535,10 +535,10 @@ public Action:featurelib_UnLoad(args)
 		// Search it
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			if (g_FeatureList[i].FEATURE_ENABLE && StrEqual(basename, g_FeatureList[i].FEATURE_BASE, false))
 			{
 				// Unload it
-				featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_UnloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 
 				return Plugin_Handled;
 			}
@@ -548,10 +548,10 @@ public Action:featurelib_UnLoad(args)
 		// search with real basename
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE] && StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			if (g_FeatureList[i].FEATURE_ENABLE && StrEqual(basename, g_FeatureList[i].FEATURE_BASEREAL, false))
 			{
 				// Unload on found
-				featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_UnloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 
 				return Plugin_Handled;
 			}
@@ -593,9 +593,9 @@ public Action:featurelib_ReLoad(args)
 		// Loops again, see above!
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASE], false))
+			if (StrEqual(basename, g_FeatureList[i].FEATURE_BASE, false))
 			{
-				featurelib_ReloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_ReloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 
 				return Plugin_Handled;
 			}
@@ -604,9 +604,9 @@ public Action:featurelib_ReLoad(args)
 
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (StrEqual(basename, g_FeatureList[i][FEATURE_BASEREAL], false))
+			if (StrEqual(basename, g_FeatureList[i].FEATURE_BASEREAL, false))
 			{
-				featurelib_ReloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_ReloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 
 				return Plugin_Handled;
 			}	
@@ -640,13 +640,13 @@ public Action:featurelib_List(args)
 	for (new i=0; i < g_iFeatures; i++)
 	{
 		// Print with enabled and disabled mark
-		if (g_FeatureList[i][FEATURE_ENABLE])
+		if (g_FeatureList[i].FEATURE_ENABLE)
 		{
-			PrintToServer("  %02d \"%s\" <%s>", i+1, g_FeatureList[i][FEATURE_NAME], g_FeatureList[i][FEATURE_BASEREAL]);
+			PrintToServer("  %02d \"%s\" <%s>", i+1, g_FeatureList[i].FEATURE_NAME, g_FeatureList[i].FEATURE_BASEREAL);
 		}
 		else
 		{
-			PrintToServer("  %02d Disabled - \"%s\" <%s>", i+1, g_FeatureList[i][FEATURE_NAME], g_FeatureList[i][FEATURE_BASEREAL]);
+			PrintToServer("  %02d Disabled - \"%s\" <%s>", i+1, g_FeatureList[i].FEATURE_NAME, g_FeatureList[i].FEATURE_BASEREAL);
 		}
 	}
 	
@@ -665,7 +665,7 @@ featurelib_getFeatureByHandle(Handle:plugin)
 	for (new i=0; i < g_iFeatures; i++)
 	{
 		// Handle the same?
-		if (g_FeatureList[i][FEATURE_HANDLE] == plugin)
+		if (g_FeatureList[i].FEATURE_HANDLE == plugin)
 		{
 			// Return the intern index
 			return i;

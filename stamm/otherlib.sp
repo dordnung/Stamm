@@ -58,7 +58,7 @@ otherlib_PrepareFiles()
 		}
 		else
 		{
-			PrecacheSound(lvlUpSound);
+			g_blvlUpSoundPrecached = PrecacheSound(lvlUpSound);
 		}
 	}
 }
@@ -153,25 +153,25 @@ public Action:otherlib_commandListener(client, const String:command[], argc)
 				for (new i=0; i < g_iFeatures; i++)
 				{
 					// Check short and real basename
-					if (StrEqual(arg, g_FeatureList[i][FEATURE_BASE], false) || StrEqual(arg, g_FeatureList[i][FEATURE_BASEREAL], false))
+					if (StrEqual(arg, g_FeatureList[i].FEATURE_BASE, false) || StrEqual(arg, g_FeatureList[i].FEATURE_BASEREAL, false))
 					{
 
 						if (mode == 1)
 						{
 							// Load mode
-							featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+							featurelib_loadFeature(g_FeatureList[i].FEATURE_HANDLE);
 						}
 
 						else if (mode == 2)
 						{
 							// Unload Mode
-							featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+							featurelib_UnloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 						}
 
 						else
 						{
 							// Reload mode
-							featurelib_ReloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+							featurelib_ReloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 						}
 
 

@@ -401,19 +401,19 @@ public nativelib_GetLevel(Handle:plugin, numParams)
 	if (feature != -1)
 	{
 		// Check valid block
-		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
+		if (block > g_FeatureList[feature].FEATURE_BLOCKS || block <= 0)
 		{
-			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature].FEATURE_BLOCKS);
 		}
 
 		/* TODO: IMPLEMENT
 		// Check if shop
-		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
+		if (g_FeatureList[feature].FEATURE_POINTS[block-1] > 0)
 		{
 			ThrowNativeError(SP_ERROR_NATIVE, "Block %i has no level, it's a shop Feature!", block);
 		} */
 
-		return g_FeatureList[feature][FEATURE_LEVEL][block-1];
+		return g_FeatureList[feature].FEATURE_LEVEL[block-1];
 	}
 	else
 	{
@@ -441,18 +441,18 @@ public nativelib_GetPoints(Handle:plugin, numParams)
 	if (feature != -1)
 	{
 		// Check valid block
-		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
+		if (block > g_FeatureList[feature].FEATURE_BLOCKS || block <= 0)
 		{
-			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature].FEATURE_BLOCKS);
 		}
 
 		// Check if no shop
-		if (g_FeatureList[feature][FEATURE_LEVEL][block-1] > 0)
+		if (g_FeatureList[feature].FEATURE_LEVEL[block-1] > 0)
 		{
 			ThrowNativeError(SP_ERROR_NATIVE, "Block %i has no points, it's a level Feature!", block);
 		}
 
-		return g_FeatureList[feature][FEATURE_POINTS][block-1];
+		return g_FeatureList[feature].FEATURE_POINTS[block-1];
 	}
 	else
 	{
@@ -481,12 +481,12 @@ public nativelib_IsShop(Handle:plugin, numParams)
 	if (feature != -1)
 	{
 		// Check valid block
-		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
+		if (block > g_FeatureList[feature].FEATURE_BLOCKS || block <= 0)
 		{
-			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature].FEATURE_BLOCKS);
 		}
 
-		return (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0);
+		return (g_FeatureList[feature].FEATURE_POINTS[block-1] > 0);
 	}
 	else
 	{
@@ -510,7 +510,7 @@ public nativelib_GetBlockCount(Handle:plugin, numParams)
 	// Found feature?
 	if (feature != -1)
 	{
-		return g_FeatureList[feature][FEATURE_BLOCKS];
+		return g_FeatureList[feature].FEATURE_BLOCKS;
 	}
 	else
 	{
@@ -540,14 +540,14 @@ public nativelib_GetBlockName(Handle:plugin, numParams)
 	if (feature != -1)
 	{
 		// Check valid block
-		if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
+		if (block > g_FeatureList[feature].FEATURE_BLOCKS || block <= 0)
 		{
-			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+			ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature].FEATURE_BLOCKS);
 		}
 
 		/* TODO: IMPLEMENT
 		// Check if shop
-		if (g_FeatureList[feature][FEATURE_POINTS][block-1] > 0)
+		if (g_FeatureList[feature].FEATURE_POINTS[block-1] > 0)
 		{
 			ThrowNativeError(SP_ERROR_NATIVE, "Block %i has no level, it's a shop Feature!", block);
 		} */
@@ -583,7 +583,7 @@ public nativelib_GetBlockOfName(Handle:plugin, numParams)
 	if (feature != -1)
 	{
 		// Go through all blocks
-		for (new j=0; j < g_FeatureList[feature][FEATURE_BLOCKS]; j++)
+		for (new j=0; j < g_FeatureList[feature].FEATURE_BLOCKS; j++)
 		{
 			// Check if name equals
 			GetArrayString(g_hFeatureBlocks[feature], j, block, sizeof(block));
@@ -665,17 +665,17 @@ public nativelib_GetClientStammBlock(Handle:plugin, numParams)
 			for (new j=MAXLEVELS-1; j >= 0; j--)
 			{
 				// Block exists?
-				if (g_FeatureList[feature][FEATURE_LEVEL][j] != 0 /* TODO: IMPLEMENT|| g_FeatureList[feature][FEATURE_POINTS][j] > 0*/)
+				if (g_FeatureList[feature].FEATURE_LEVEL[j] != 0 /* TODO: IMPLEMENT|| g_FeatureList[feature].FEATURE_POINTS[j] > 0*/)
 				{
 					// Client have Block?
-					if (g_FeatureList[feature][FEATURE_LEVEL][j] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][j] && g_FeatureList[feature][WANT_FEATURE][client])
+					if (g_FeatureList[feature].FEATURE_LEVEL[j] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature].FEATURE_LEVEL[j] && g_FeatureList[feature].WANT_FEATURE[client])
 					{
 						// found highest
 						return j+1;
 					}
 					/* TODO: IMPLEMENT
 					// Client have Block?
-					if (g_FeatureList[feature][FEATURE_POINTS][j] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], j) == 1 && g_FeatureList[feature][WANT_FEATURE][client])
+					if (g_FeatureList[feature].FEATURE_POINTS[j] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], j) == 1 && g_FeatureList[feature].WANT_FEATURE[client])
 					{
 						// found highest
 						return j+1;
@@ -979,7 +979,7 @@ public nativelib_ClientWantStammFeature(Handle:plugin, numParams)
 		if (feature != -1)
 		{
 			// return status
-			return g_FeatureList[feature][WANT_FEATURE][client];
+			return g_FeatureList[feature].WANT_FEATURE[client];
 		}
 		else
 		{
@@ -1182,24 +1182,24 @@ public nativelib_HaveClientFeature(Handle:plugin, numParams)
 		if (feature != -1)
 		{
 			// Check valid block
-			if (block > g_FeatureList[feature][FEATURE_BLOCKS] || block <= 0)
+			if (block > g_FeatureList[feature].FEATURE_BLOCKS || block <= 0)
 			{
-				ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature][FEATURE_BLOCKS]);
+				ThrowNativeError(SP_ERROR_NATIVE, "Block %i is invalid! Feature only have %i Blocks", block, g_FeatureList[feature].FEATURE_BLOCKS);
 			}
 
-			if (!g_FeatureList[feature][WANT_FEATURE][client])
+			if (!g_FeatureList[feature].WANT_FEATURE[client])
 			{
 				return false;
 			}
 
 			/* TODO: IMPLEMENT
 			// Player level high enough and want feature?
-			if (g_FeatureList[g_iFeatures][FEATURE_POINTS][block-1] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], block-1) == 1)
+			if (g_FeatureList[g_iFeatures].FEATURE_POINTS[block-1] > 0 && GetArrayCell(g_hBoughtBlock[client][feature], block-1) == 1)
 			{
 				return true;
 			}*/
 
-			if (g_FeatureList[feature][FEATURE_LEVEL][block-1] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature][FEATURE_LEVEL][block-1])
+			if (g_FeatureList[feature].FEATURE_LEVEL[block-1] > 0 && g_iPlayerLevel[client] >= g_FeatureList[feature].FEATURE_LEVEL[block-1])
 			{
 				return true;
 			}
@@ -1325,7 +1325,7 @@ public nativelib_LoadFeature(Handle:plugin, numParams)
 
 
 	// Feature already enabled?
-	if (feature == -1 || g_FeatureList[feature][FEATURE_ENABLE]) 
+	if (feature == -1 || g_FeatureList[feature].FEATURE_ENABLE) 
 	{
 		return -1;
 	}
@@ -1353,7 +1353,7 @@ public nativelib_UnloadFeature(Handle:plugin, numParams)
 
 
 	// Is not loaded?
-	if (feature == -1 || !g_FeatureList[feature][FEATURE_ENABLE]) 
+	if (feature == -1 || !g_FeatureList[feature].FEATURE_ENABLE) 
 	{
 		return -1;
 	}

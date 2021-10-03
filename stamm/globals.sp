@@ -40,20 +40,20 @@
 
 
 // This we need to save all information about a feature
-enum FeatureEnum
+enum struct FeatureEnum
 {
-	FEATURE_LEVEL[MAXLEVELS],
+	int FEATURE_LEVEL[MAXLEVELS];
 	/* TODO: IMPLEMENT
-	FEATURE_POINTS[MAXLEVELS],*/
-	FEATURE_BLOCKS,
-	bool:FEATURE_CHANGE,
-	bool:FEATURE_STANDARD,
-	bool:FEATURE_ENABLE,
-	bool:WANT_FEATURE[MAXPLAYERS + 1],
-	String:FEATURE_BASE[64],
-	String:FEATURE_BASEREAL[64],
-	String:FEATURE_NAME[64],
-	Handle:FEATURE_HANDLE,
+	int FEATURE_POINTS[MAXLEVELS];*/
+	int FEATURE_BLOCKS;
+	bool FEATURE_CHANGE;
+	bool FEATURE_STANDARD;
+	bool FEATURE_ENABLE;
+	bool WANT_FEATURE[MAXPLAYERS + 1];
+	char FEATURE_BASE[64];
+	char FEATURE_BASEREAL[64];
+	char FEATURE_NAME[64];
+	Handle FEATURE_HANDLE;
 }
 
 
@@ -77,7 +77,7 @@ enum StammGames
 
 
 // Save information about MAXFEATURES features
-new g_FeatureList[MAXFEATURES][FeatureEnum];
+FeatureEnum g_FeatureList[MAXFEATURES];
 
 
 
@@ -138,6 +138,7 @@ new bool:g_bPluginStarted;
 new bool:g_bIsLate;
 new bool:g_bHappyHourON;
 new bool:g_bMoreColors;
+new bool:g_blvlUpSoundPrecached;
 
 
 

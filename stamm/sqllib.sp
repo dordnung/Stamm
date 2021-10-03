@@ -201,7 +201,7 @@ sqllib_InsertPlayer(client)
 		// And state of all features
 		for (new i=0; i < g_iFeatures; i++)
 		{ 
-			Format(query, sizeof(query), "%s, `%s`", query, g_FeatureList[i][FEATURE_BASE]);
+			Format(query, sizeof(query), "%s, `%s`", query, g_FeatureList[i].FEATURE_BASE);
 		}
 
 
@@ -399,7 +399,7 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				// set feature state to standard
 				for (new i=0; i < g_iFeatures; i++)
 				{ 
-					g_FeatureList[i][WANT_FEATURE][client] = g_FeatureList[i][FEATURE_STANDARD];
+					g_FeatureList[i].WANT_FEATURE[client] = g_FeatureList[i].FEATURE_STANDARD;
 				}
 
 
@@ -419,11 +419,11 @@ public sqllib_InsertHandler(Handle:owner, Handle:hndl, const String:error[], any
 				{
 					if (SQL_FetchInt(hndl, 3+i) == 1)
 					{
-						g_FeatureList[i][WANT_FEATURE][client] = true;
+						g_FeatureList[i].WANT_FEATURE[client] = true;
 					}
 					else
 					{
-						g_FeatureList[i][WANT_FEATURE][client] = false;
+						g_FeatureList[i].WANT_FEATURE[client] = false;
 					}
 				}
 				
@@ -540,7 +540,7 @@ public sqllib_InsertHandler2(Handle:owner, Handle:hndl, const String:error[], an
 					for (new i=0; i < g_iFeatures; i++)
 					{
 						// Basename equals?
-						if (StrEqual(g_FeatureList[i][FEATURE_BASE], feature, false))
+						if (StrEqual(g_FeatureList[i].FEATURE_BASE, feature, false))
 						{
 							index = i;
 

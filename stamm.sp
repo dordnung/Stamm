@@ -222,10 +222,10 @@ public OnPluginEnd()
 {
 	for (new i=0; i < g_iFeatures; i++)
 	{
-		if (g_FeatureList[i][FEATURE_ENABLE])
+		if (g_FeatureList[i].FEATURE_ENABLE)
 		{
 			// Unload Feature
-			featurelib_UnloadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+			featurelib_UnloadFeature(g_FeatureList[i].FEATURE_HANDLE);
 		}
 	}
 }
@@ -246,9 +246,9 @@ public OnPluginPauseChange(bool:pause)
 		// On unpause load all features again
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			if (g_FeatureList[i][FEATURE_ENABLE])
+			if (g_FeatureList[i].FEATURE_ENABLE)
 			{
-				featurelib_loadFeature(g_FeatureList[i][FEATURE_HANDLE]);
+				featurelib_loadFeature(g_FeatureList[i].FEATURE_HANDLE);
 			}
 		}
 	}
@@ -445,7 +445,7 @@ public Action:checkFeatures(Handle:timer, any:data)
 
 		for (new j=0; j < sizeof(runningPlugins); j++)
 		{
-			if (runningPlugins[j] != INVALID_HANDLE && g_FeatureList[i][FEATURE_HANDLE] == runningPlugins[j])
+			if (runningPlugins[j] != INVALID_HANDLE && g_FeatureList[i].FEATURE_HANDLE == runningPlugins[j])
 			{
 				found = true;
 
@@ -456,7 +456,7 @@ public Action:checkFeatures(Handle:timer, any:data)
 		// Plugin seems to be disabled
 		if (!found)
 		{
-			g_FeatureList[i][FEATURE_ENABLE] = false;
+			g_FeatureList[i].FEATURE_ENABLE = false;
 		}
 	}
 

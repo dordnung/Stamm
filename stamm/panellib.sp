@@ -310,7 +310,7 @@ panellib_CreateUserPanels(client, mode)
 
 				/* TODO: IMPLEMENT
 				// Maybe he bought a block
-				for (new j=0; j < g_FeatureList[i][FEATURE_BLOCKS]; j++)
+				for (new j=0; j < g_FeatureList[i].FEATURE_BLOCKS; j++)
 				{
 					if (GetArrayCell(g_hBoughtBlock[client][i], j) == 1)
 					{
@@ -322,7 +322,7 @@ panellib_CreateUserPanels(client, mode)
 
 
 				// Only enabled features and changeable features
-				if (g_FeatureList[i][FEATURE_ENABLE] && g_FeatureList[i][FEATURE_CHANGE] && (g_iPlayerLevel[client] >= g_FeatureList[i][FEATURE_LEVEL][0] || enabled))
+				if (g_FeatureList[i].FEATURE_ENABLE && g_FeatureList[i].FEATURE_CHANGE && (g_iPlayerLevel[client] >= g_FeatureList[i].FEATURE_LEVEL[0] || enabled))
 				{
 					// found something
 					found = true;
@@ -330,13 +330,13 @@ panellib_CreateUserPanels(client, mode)
 
 
 					// Text to enable or disable feature
-					if (g_FeatureList[i][WANT_FEATURE][client])
+					if (g_FeatureList[i].WANT_FEATURE[client])
 					{ 
-						Format(MenuItem, sizeof(MenuItem), "%T", "FeatureOn", client, g_FeatureList[i][FEATURE_NAME]);
+						Format(MenuItem, sizeof(MenuItem), "%T", "FeatureOn", client, g_FeatureList[i].FEATURE_NAME);
 					}
 					else
 					{ 
-						Format(MenuItem, sizeof(MenuItem), "%T", "FeatureOff", client, g_FeatureList[i][FEATURE_NAME]);
+						Format(MenuItem, sizeof(MenuItem), "%T", "FeatureOff", client, g_FeatureList[i].FEATURE_NAME);
 					}
 
 
@@ -455,15 +455,15 @@ public panellib_ChangePanelHandler(Handle:menu, MenuAction:action, param1, param
 			index = StringToInt(ChangeChoose);
 			
 			// Just set to opposite
-			g_FeatureList[index][WANT_FEATURE][param1] = !g_FeatureList[index][WANT_FEATURE][param1];
+			g_FeatureList[index].WANT_FEATURE[param1] = !g_FeatureList[index].WANT_FEATURE[param1];
 			
 
 
 			// Only if enabled
-			if (g_FeatureList[index][FEATURE_ENABLE])
+			if (g_FeatureList[index].FEATURE_ENABLE)
 			{
 				// Notice to API
-				nativelib_ClientChanged(param1, g_FeatureList[index][FEATURE_HANDLE], g_FeatureList[index][WANT_FEATURE][param1] /* TODO: IMPLEMENT ,false */);
+				nativelib_ClientChanged(param1, g_FeatureList[index].FEATURE_HANDLE, g_FeatureList[index].WANT_FEATURE[param1] /* TODO: IMPLEMENT ,false */);
 			}
 
 
@@ -495,7 +495,7 @@ public panellib_FeaturelistLoadHandler(Handle:menu, MenuAction:action, param1, p
 		// Get selected and load it
 		GetMenuItem(menu, param2, choose, sizeof(choose));
 		
-		featurelib_loadFeature(g_FeatureList[StringToInt(choose)][FEATURE_HANDLE]);
+		featurelib_loadFeature(g_FeatureList[StringToInt(choose)].FEATURE_HANDLE);
 
 		panellib_AdminHandler(INVALID_HANDLE, MenuAction_Select, param1, 5);
 	}
@@ -527,7 +527,7 @@ public panellib_FeaturelistUnloadHandler(Handle:menu, MenuAction:action, param1,
 		// Get item and unload
 		GetMenuItem(menu, param2, choose, sizeof(choose));
 		
-		featurelib_UnloadFeature(g_FeatureList[StringToInt(choose)][FEATURE_HANDLE]);
+		featurelib_UnloadFeature(g_FeatureList[StringToInt(choose)].FEATURE_HANDLE);
 
 		panellib_AdminHandler(INVALID_HANDLE, MenuAction_Select, param1, 6);
 	}
@@ -891,19 +891,19 @@ public panellib_InfoHandler(Handle:menu, MenuAction:action, param1, param2)
 					for (new j=0; j < g_iFeatures && !foundFeature; j++)
 					{
 						// Only enabled features
-						if (!g_FeatureList[j][FEATURE_ENABLE])
+						if (!g_FeatureList[j].FEATURE_ENABLE)
 						{
 							continue;
 						}
 
-						for (new l=0; l < g_FeatureList[j][FEATURE_BLOCKS] && !foundFeature; l++)
+						for (new l=0; l < g_FeatureList[j].FEATURE_BLOCKS && !foundFeature; l++)
 						{
-							if (i+1 != g_FeatureList[j][FEATURE_LEVEL][l])
+							if (i+1 != g_FeatureList[j].FEATURE_LEVEL[l])
 							{
 								continue;
 							}
 
-							new Handle:hArray = nativelib_RequestFeature(g_FeatureList[j][FEATURE_HANDLE], param1, l+1);
+							new Handle:hArray = nativelib_RequestFeature(g_FeatureList[j].FEATURE_HANDLE, param1, l+1);
 
 
 							if (hArray == INVALID_HANDLE)
@@ -975,17 +975,17 @@ public panellib_FeatureListHandler(Handle:menu, MenuAction:action, param1, param
 		for (new i=0; i < g_iFeatures; i++)
 		{
 			// Only enabled ones
-			if (g_FeatureList[i][FEATURE_ENABLE])
+			if (g_FeatureList[i].FEATURE_ENABLE)
 			{
-				for (new k=0; k < g_FeatureList[i][FEATURE_BLOCKS]; k++)
+				for (new k=0; k < g_FeatureList[i].FEATURE_BLOCKS; k++)
 				{
-					if (g_FeatureList[i][FEATURE_LEVEL][k] != id)
+					if (g_FeatureList[i].FEATURE_LEVEL[k] != id)
 					{
 						continue;
 					}
 
 
-					new Handle:hArray = nativelib_RequestFeature(g_FeatureList[i][FEATURE_HANDLE], param1, k+1);
+					new Handle:hArray = nativelib_RequestFeature(g_FeatureList[i].FEATURE_HANDLE, param1, k+1);
 
 
 					if (hArray == INVALID_HANDLE)
@@ -1187,11 +1187,11 @@ public panellib_AdminHandler(Handle:menu, MenuAction:action, param1, param2)
 				for (new i=0; i < g_iFeatures; i++)
 				{
 					// Check enable or disabled
-					if ((!g_FeatureList[i][FEATURE_ENABLE] && param2 == 5) || (g_FeatureList[i][FEATURE_ENABLE] && param2 == 6))
+					if ((!g_FeatureList[i].FEATURE_ENABLE && param2 == 5) || (g_FeatureList[i].FEATURE_ENABLE && param2 == 6))
 					{
 						// ADD 
 						Format(itemString, sizeof(itemString), "%i", i);
-						AddMenuItem(featurelist, itemString, g_FeatureList[i][FEATURE_NAME]);
+						AddMenuItem(featurelist, itemString, g_FeatureList[i].FEATURE_NAME);
 						
 						
 						// Check found

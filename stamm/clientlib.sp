@@ -412,7 +412,7 @@ clientlib_CheckVip(client)
 
 			GetConVarString(configlib_LvlUpSound, lvlUpSound, sizeof(lvlUpSound));
 
-			if (!StrEqual(lvlUpSound, "0") && isUP && IsSoundPrecached(lvlUpSound))
+			if (!StrEqual(lvlUpSound, "0") && isUP && g_blvlUpSoundPrecached)
 			{
 				EmitSoundToAll(lvlUpSound);
 			}
@@ -488,7 +488,7 @@ clientlib_SavePlayer(client, number)
 		// Add all features to the call
 		for (new i=0; i < g_iFeatures; i++)
 		{
-			Format(query, sizeof(query), "%s, `%s`=%i", query, g_FeatureList[i][FEATURE_BASE], g_FeatureList[i][WANT_FEATURE][client]);
+			Format(query, sizeof(query), "%s, `%s`=%i", query, g_FeatureList[i].FEATURE_BASE, g_FeatureList[i].WANT_FEATURE[client]);
 		}
 
 		Format(query, sizeof(query), "%s WHERE `steamid`='%s'", query, steamid);
@@ -512,7 +512,7 @@ clientlib_SavePlayer(client, number)
 // Get the steamid
 clientlib_getSteamid(client, String:steamid[], size)
 {
-	GetClientAuthString(client, steamid, size);
+	GetClientAuthId(client, AuthId_Steam2, steamid, size);
 
 	clientlib_convertSteamid(steamid, size);
 }
