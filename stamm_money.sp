@@ -139,7 +139,7 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 		if ((GetClientTeam(client) == 2 || GetClientTeam(client) == 3) && STAMM_HaveClientFeature(client))
 		{
 			// Get old money and calc. new one
-			new OldMoney = GetEntData(client, FindSendPropOffs("CCSPlayer", "m_iAccount"));
+			new OldMoney = GetEntData(client, FindSendPropInfo("CCSPlayer", "m_iAccount"));
 			new NewMoney = GetConVarInt(g_hCash) + OldMoney;
 			
 			// Max money reached?
@@ -159,7 +159,7 @@ public Action:eventPlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 			}
 			
 			// Set new money
-			SetEntData(client, FindSendPropOffs("CCSPlayer", "m_iAccount"), NewMoney);
+			SetEntData(client, FindSendPropInfo("CCSPlayer", "m_iAccount"), NewMoney);
 		}
 	}
 }

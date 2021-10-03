@@ -294,7 +294,7 @@ public Action:CreateStamm(Handle:timer, any:userid)
 						
 						TeleportEntity(view, origin, NULL_VECTOR, NULL_VECTOR);
 						
-						GetClientAuthString(client, steamid, sizeof(steamid));
+						GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
 						DispatchKeyValue(client, "targetname", steamid);
 						
 						SetVariantString(steamid);
